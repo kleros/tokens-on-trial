@@ -1,12 +1,35 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+import configureStore from './bootstrap/configure-store'
+import App from './bootstrap/app'
+import registerServiceWorker from './bootstrap/register-service-worker'
+import { arbitrableTokenList } from './bootstrap/dapp-api'
 
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: http://bit.ly/CRA-PWA
-serviceWorker.unregister();
+const { store, history } = configureStore()
+export default store
+
+const render = Component => {
+  ReactDOM.render(
+    <Component
+      key={process.env.NODE_ENV === 'development' ? Math.random() : undefined}
+      store={store}
+      history={history}
+    />,
+    document.getElementById('root')
+  )
+}
+render(App)
+registerServiceWorker()
+
+window.addEventListener('unload', () =>
+  localStorage.setItem(
+    arbitrableTokenList.options.address + 'notifications',
+    JSON.stringify(store.getState().notification.notifications.data)
+  )
+)
+
+if (module.hot)
+  module.hot.accept('./bootstrap/app', () => {
+    render(App)
+  })

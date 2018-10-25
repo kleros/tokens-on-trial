@@ -1,0 +1,84 @@
+@import '../../styles/_colors.scss';
+
+@mixin buttonType($type, $background, $text) {
+  &--#{$type} {
+    background: $background;
+
+    &:hover {
+      background: darken($background, 5%);
+    }
+
+    &:active {
+      background: darken($background, 10%);
+    }
+
+    .Button-label {
+      color: $text;
+    }
+  }
+}
+
+/* @define Button */
+.Button {
+  align-items: center;
+  border-radius: 5px;
+  box-shadow: 0 2px 0 0 $mint;
+  display: inline-flex;
+  max-width: 100%;
+  padding: 0 2vw;
+  user-select: none;
+
+  @media only screen and (min-width: 800px) {
+    padding: 0 1.5vw;
+  }
+
+  @include buttonType('primary', $info, $invertedText);
+  @include buttonType('secondary', lighten($info, 20%), $invertedText);
+  @include buttonType('ternary', $mint, $darkText);
+
+  &--link {
+    text-decoration: none;
+  }
+
+  &-label {
+    line-height: initial;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &--small {
+    height: 45px;
+
+    // stylelint-disable-next-line plugin/selector-bem-pattern
+    .Button-label {
+      font-size: 14px;
+    }
+  }
+
+  &--normal {
+    // stylelint-disable-next-line plugin/selector-bem-pattern
+    .Button-label {
+      font-size: 2.5vw;
+      margin: 1.5vw 0;
+
+      @media only screen and (min-width: 800px) {
+        font-size: 1.5vw;
+        margin: 1vw 0;
+      }
+    }
+  }
+
+  &--large {
+    height: 75px;
+
+    // stylelint-disable-next-line plugin/selector-bem-pattern
+    .Button-label {
+      font-size: 28px;
+    }
+  }
+
+  &.is-disabled {
+    background: $disabled;
+  }
+}
