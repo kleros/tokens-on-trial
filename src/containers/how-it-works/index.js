@@ -23,13 +23,13 @@ export default () => (
       technology.
       <br />
       <br />
-      The rules of the game are simple. Anyone can submit images to the gallery
+      The rules of the game are simple. Anyone can submit tokens to the gallery
       by clicking on the "Submit Token" button on the top right.
       <br />
       <br />
-      Anyone can challenge an image (say it's not a doge) for a period of time.
-      Challenging it will create a Kleros dispute with the image as evidence for
-      jurors to decide who is right.
+      Anyone can challenge a token (say the information is incorrect) for a
+      period of time. Challenging it will create a Kleros dispute with the image
+      as evidence for jurors to decide who is right.
       <br />
       <br />
       Both submitting and challenging images require an ETH deposit. This
@@ -64,9 +64,9 @@ export default () => (
       The payout policy of the experiment is defined as follows:
       <ul>
         <li>
-          A total of 1,000,000 Token Coins (DOGE) will be split among submitters
-          in proportion to the amount of unique doge pictures they get accepted
-          into the list.
+          A total of 1,000,000 Token Coins (TOKEN) will be split among
+          submitters in proportion to the amount of unique token pictures they
+          get accepted into the list.
         </li>
         <br />
         <li>
@@ -88,10 +88,10 @@ export default () => (
         </li>
         <br />
         <li>
-          To be considered valid, a picture must clearly display a doge or a
-          cat. Pictures with hidden doges or cats will not be considered as
+          To be considered valid, a picture must clearly display a token or a
+          cat. Pictures with hidden tokens or cats will not be considered as
           valid if a normal observer would not be able to see it without help
-          (e.g., an image with a doge only a few px large would not be
+          (e.g., an image with a token only a few px large would not be
           considered valid, because an observer would be unable to see it with
           plain sight).
         </li>
@@ -107,7 +107,7 @@ export default () => (
         </li>
         <br />
         <li>
-          Pictures which contain both a doge and a cat will not be considered
+          Pictures which contain both a token and a cat will not be considered
           valid.
         </li>
         <br />
@@ -128,7 +128,7 @@ export default () => (
         <br />
       </ul>
     </p>
-    <Button to="https://medium.com/kleros/doges-on-trial-pilot-explainer-911492c3a7d8">
+    <Button to="https://medium.com/kleros/tokens-on-trial-pilot-explainer-911492c3a7d8">
       Guide
     </Button>
   </div>

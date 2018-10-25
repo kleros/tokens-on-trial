@@ -3,10 +3,10 @@ import { createActions } from 'lessdux'
 /* Actions */
 
 // Tokens
-export const doges = createActions('TOKENS')
+export const tokens = createActions('TOKENS')
 
 // Token
-export const doge = {
+export const token = {
   ...createActions('TOKEN', {
     withCreate: true,
     withUpdate: true
@@ -21,32 +21,32 @@ export const doge = {
 
 // Tokens
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
-  type: doges.FETCH,
+  type: tokens.FETCH,
   payload: { cursor, count, filterValue, sortValue }
 })
 
 // Token
 export const createToken = imageFileDataURL => ({
-  type: doge.CREATE,
+  type: token.CREATE,
   payload: { imageFileDataURL }
 })
 export const fetchToken = (ID, withDisputeData) => ({
-  type: doge.FETCH,
+  type: token.FETCH,
   payload: { ID, withDisputeData }
 })
 export const executeTokenRequest = ID => ({
-  type: doge.EXECUTE_REQUEST,
+  type: token.EXECUTE_REQUEST,
   payload: { ID }
 })
 export const submitTokenChallenge = ID => ({
-  type: doge.SUBMIT_CHALLENGE,
+  type: token.SUBMIT_CHALLENGE,
   payload: { ID }
 })
 export const appealTokenRuling = ID => ({
-  type: doge.APPEAL_RULING,
+  type: token.APPEAL_RULING,
   payload: { ID }
 })
 export const executeTokenRuling = ID => ({
-  type: doge.EXECUTE_RULING,
+  type: token.EXECUTE_RULING,
   payload: { ID }
 })
