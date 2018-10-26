@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
-import { Switch, Route, Link } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 
 import Tokens from '../containers/tokens'
 import PageNotFound from '../components/page-not-found'
@@ -16,10 +16,7 @@ import './fontawesome'
 import './app.css'
 
 const _ConnectedNavBar = () => (
-  <NavBar
-    routes={[{ title: 'Tokens', to: '/' }]}
-    extras={[<Link to="/">Notifications</Link>]}
-  />
+  <NavBar routes={[{ title: 'KLEROS', to: '/' }]} extras={[<div />]} />
 )
 
 const ConnectedNavBar = connect(state => ({

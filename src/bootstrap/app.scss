@@ -8,7 +8,7 @@
 // Global Overrides
 * {
   box-sizing: border-box !important;
-  font-family: 'Metropolis', sans-serif !important;
+  font-family: 'Roboto', sans-serif !important;
   scroll-behavior: smooth !important;
 }
 
@@ -54,7 +54,6 @@ body,
   background: $background;
   display: flex;
   flex-direction: column;
-  overflow: scroll;
   position: relative;
 }
 

@@ -3,11 +3,12 @@
 /* @define NavBar */
 .NavBar {
   align-items: center;
+  background: $absoluteBlack;
   display: flex;
   height: 70px;
   justify-content: center;
   left: 0;
-  padding: 0 13%;
+  padding: 0 3%;
   position: absolute;
   top: 0;
   width: 100%;
@@ -27,16 +28,21 @@
   }
 
   &-route {
+    background-color: $absoluteBlack;
     flex: 0 1;
     font-size: 15px;
     font-weight: 500;
-    margin-left: 40px;
 
     &-link {
-      color: $heading;
+      color: $white;
       display: block;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: 500;
       height: 70px;
-      line-height: 70px;
+      letter-spacing: 2.92px;
+      line-height: 75px;
+      margin-left: 10px;
       text-decoration: none;
       white-space: nowrap;
 
