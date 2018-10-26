@@ -27,6 +27,21 @@
     width: 40px;
   }
 
+  &-kleros {
+    background-color: $absoluteBlack;
+    color: $white;
+    display: block;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    height: 70px;
+    letter-spacing: 2.92px;
+    line-height: 75px;
+    padding-left: 10px;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
   &-route {
     background-color: $absoluteBlack;
     flex: 0 1;

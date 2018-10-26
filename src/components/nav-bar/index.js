@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { Link, NavLink } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { pushRotate as ReactBurgerMenu } from 'react-burger-menu'
 import debounce from 'debounce'
 
@@ -45,26 +45,8 @@ export default class NavBar extends PureComponent {
     const logoImg = <img src={logo} alt="Logo" className="NavBar-logo" />
     const routesAndExtras = [
       ...routes.map(r => (
-        <div key={r.title} className="NavBar-route">
-          {r.isExternal ? (
-            <a
-              href={r.to}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="NavBar-route-link"
-            >
-              {r.title}
-            </a>
-          ) : (
-            <NavLink
-              exact
-              to={r.to}
-              className="NavBar-route-link"
-              activeClassName="is-active"
-            >
-              {r.title}
-            </NavLink>
-          )}
+        <div key={r.title} className="NavBar-kleros">
+          {r.title}
         </div>
       )),
       ...extras.map((e, i) => (
