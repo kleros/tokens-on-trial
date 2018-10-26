@@ -1993,7 +1993,7 @@
                 }
               ]
             },
-            "documentation": " @dev Constructs the arbitrable token list.\n @param _arbitrator The chosen arbitrator.\n @param _arbitratorExtraData Extra data for the arbitrator contract.\n @param _feeGovernor The fee governor of this contract.\n @param _stake The stake parameter for sharing fees.\n @param _t2clGovernor The t2clGovernor address. This address can update t2clGovernor, arbitrationFeesWaitingTime and challengeReward.\n @param _arbitrationFeesWaitingTime The maximum time to wait for arbitration fees if the dispute is raised.\n @param _challengeReward The amount in Weis of deposit required for a submission or a challenge in addition to the arbitration fees.\n @param _timeToChallenge The time in seconds, parties have to challenge.",
+            "documentation": " @dev Constructs the arbitrable token list.\n @param _arbitrator The chosen arbitrator.\n @param _arbitratorExtraData Extra data for the arbitrator contract.\n @param _feeGovernor The fee governor of this contract.\n @param _stake The stake parameter for sharing fees.\n @param _t2clGovernor The t2clGovernor address. This address can updat**e t2clGovernor, arbitrationFeesWaitingTime and challengeReward.\n @param _arbitrationFeesWaitingTime The maximum time to wait for arbitration fees if the dispute is raised.\n @param _challengeReward The amount in Weis of deposit required for a submission or a challenge in addition to the arbitration fees.\n @param _timeToChallenge The time in seconds, parties have to challenge.",
             "id": 15352,
             "implemented": true,
             "isConstructor": true,

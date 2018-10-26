@@ -9,7 +9,6 @@ export const _tokenShape = PropTypes.shape({
   status: PropTypes.oneOf(tokenConstants.STATUS_ENUM.indexes).isRequired,
   lastAction: PropTypes.instanceOf(Date),
   submitter: PropTypes.string.isRequired,
-  challenger: PropTypes.string.isRequired,
   balance: PropTypes.string.isRequired,
   disputed: PropTypes.bool.isRequired,
   disputeID: PropTypes.string.isRequired,

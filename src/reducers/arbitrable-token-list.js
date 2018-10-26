@@ -11,6 +11,7 @@ const {
 } = createResource(
   PropTypes.shape({
     arbitrator: PropTypes.string.isRequired,
+    challengeReward: PropTypes.number.isRequired,
     stake: PropTypes.string.isRequired,
     timeToChallenge: PropTypes.number.isRequired,
     itemsCounts: PropTypes.shape(
@@ -19,7 +20,7 @@ const {
         return acc
       }, {})
     ).isRequired,
-    arbitrationCost: PropTypes.string.isRequired
+    arbitrationFeesWaitingTime: PropTypes.number.isRequired
   })
 )
 export { arbitrableTokenListDataShape }
@@ -39,6 +40,7 @@ export const getSubmitCost = state =>
         state.arbitrableTokenList.arbitrableTokenListData.data.arbitrationCost
       )
     )
+
 export const getTimeToChallenge = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&
   state.arbitrableTokenList.arbitrableTokenListData.data.timeToChallenge

@@ -5,7 +5,6 @@ import { reducer as form } from 'redux-form'
 import wallet from './wallet'
 import arbitrableTokenList from './arbitrable-token-list'
 import token from './token'
-import modal from './modal'
 
 // Export root reducer
 export default combineReducers({
@@ -13,6 +12,5 @@ export default combineReducers({
   form,
   wallet,
   arbitrableTokenList,
-  token,
-  modal
+  token
 })
