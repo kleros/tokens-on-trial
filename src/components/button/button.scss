@@ -1,15 +1,15 @@
 @import '../../styles/_colors.scss';
 
-@mixin buttonType($type, $background, $text) {
+@mixin buttonType($type, $background, $hover, $active, $text) {
   &--#{$type} {
     background: $background;
 
     &:hover {
-      background: linear-gradient(90deg, $lightBlueHover 0%, $lightGreenHover 100%);
+      background: $hover;
     }
 
     &:active {
-      background: linear-gradient(90deg, $lightBlueHover 0%, $lightGreenHover 100%);
+      background: $active;
     }
 
     .Button-label {
@@ -21,8 +21,9 @@
 /* @define Button */
 .Button {
   align-items: center;
-  border-radius: 5px;
+  border-radius: 3px;
   box-shadow: 0 2px 0 0 $mint;
+  cursor: pointer;
   display: inline-flex;
   max-width: 100%;
   padding: 0 2vw;
@@ -32,9 +33,13 @@
     padding: 0 1.5vw;
   }
 
-  @include buttonType('primary', linear-gradient(90deg, $lightBlue 0%, $lightGreen 100%), $invertedText);
-  @include buttonType('secondary', lighten($info, 20%), $invertedText);
-  @include buttonType('ternary', $mint, $darkText);
+  @include buttonType(
+    'primary',
+    linear-gradient(90deg, $lightBlue 0%, $lightGreen 100%),
+    linear-gradient(90deg, $lightBlueHover 0%, $lightGreenHover 100%),
+    linear-gradient(90deg, $lightBlueActive 0%, $lightGreenActive 100%),
+    $invertedText
+  );
 
   &--link {
     text-decoration: none;
@@ -57,13 +62,15 @@
   }
 
   &--normal {
+    height: 38px;
+    justify-content: center;
     // stylelint-disable-next-line plugin/selector-bem-pattern
     .Button-label {
-      font-size: 2.5vw;
+      font-size: 2vw;
       margin: 1.5vw 0;
 
       @media only screen and (min-width: 800px) {
-        font-size: 1.5vw;
+        font-size: 1vw;
         margin: 1vw 0;
       }
     }

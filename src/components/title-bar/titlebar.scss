@@ -1,7 +1,7 @@
 @import '../../styles/_colors.scss';
 
-/* @define Topbar */
-.Topbar {
+/* @define TitleBar */
+.TitleBar {
   align-items: center;
   display: flex;
   left: 0;
@@ -18,9 +18,12 @@
   }
 
   &-submitToken {
-    border-radius: 2px;
-    height: 40px;
     margin-left: auto;
     margin-right: 1em;
+    width: 160px;
+
+    &-icon {
+      margin-right: 10px;
+    }
   }
 }

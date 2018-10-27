@@ -7,6 +7,7 @@ import faQuestion from '@fortawesome/fontawesome-free-solid/faQuestion'
 import faSlidersH from '@fortawesome/fontawesome-free-solid/faSlidersH'
 import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
 import faUpload from '@fortawesome/fontawesome-free-solid/faUpload'
+import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 
 library.add(
   faCaretDown,
@@ -16,5 +17,6 @@ library.add(
   faQuestion,
   faSlidersH,
   faTimes,
-  faUpload
+  faUpload,
+  faPlus
 )
