@@ -4,10 +4,12 @@ import PropTypes from 'prop-types'
 
 import './token-card.css'
 
-const TokenCard = ({ name, imageUrl }) => (
+const TokenCard = ({ name, imageUrl, ticker }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
-      <h5>{name}</h5>
+      <h5>
+        {name} - {ticker}
+      </h5>
     </div>
     <div className="TokenCard-content">
       <Img
@@ -22,7 +24,8 @@ const TokenCard = ({ name, imageUrl }) => (
 
 TokenCard.propTypes = {
   name: PropTypes.string.isRequired,
-  imageUrl: PropTypes.string.isRequired
+  imageUrl: PropTypes.string.isRequired,
+  ticker: PropTypes.string.isRequired
 }
 
 export default TokenCard

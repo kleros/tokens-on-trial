@@ -92,7 +92,12 @@ const Tokens = () => (
     <TitleBar />
     <div className="TokenGrid">
       {fakeData.map(token => (
-        <TokenCard key={token.ID} name={token.name} imageUrl={token.imageUrl} />
+        <TokenCard
+          key={token.ID}
+          name={token.name}
+          imageUrl={token.imageUrl}
+          ticker={token.ticker}
+        />
       ))}
     </div>
   </div>
