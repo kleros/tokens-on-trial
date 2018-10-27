@@ -5,11 +5,11 @@
     background: $background;
 
     &:hover {
-      background: darken($background, 5%);
+      background: linear-gradient(90deg, $lightBlueHover 0%, $lightGreenHover 100%);
     }
 
     &:active {
-      background: darken($background, 10%);
+      background: linear-gradient(90deg, $lightBlueHover 0%, $lightGreenHover 100%);
     }
 
     .Button-label {
@@ -32,7 +32,7 @@
     padding: 0 1.5vw;
   }
 
-  @include buttonType('primary', $info, $invertedText);
+  @include buttonType('primary', linear-gradient(90deg, $lightBlue 0%, $lightGreen 100%), $invertedText);
   @include buttonType('secondary', lighten($info, 20%), $invertedText);
   @include buttonType('ternary', $mint, $darkText);
 

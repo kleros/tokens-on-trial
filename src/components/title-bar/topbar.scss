@@ -1,0 +1,26 @@
+@import '../../styles/_colors.scss';
+
+/* @define Topbar */
+.Topbar {
+  align-items: center;
+  display: flex;
+  left: 0;
+  padding-top: 1em;
+  width: 100%;
+
+  &-title {
+    color: $darkGrey;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 400;
+    margin: 0.7em 0;
+  }
+
+  &-submitToken {
+    border-radius: 2px;
+    height: 40px;
+    margin-left: auto;
+    margin-right: 1em;
+  }
+}
