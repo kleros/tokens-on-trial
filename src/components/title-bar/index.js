@@ -3,7 +3,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Button from '../button'
 
-import './titlebar.css'
+import './title-bar.css'
 
 export default () => (
   <div className="TitleBar">

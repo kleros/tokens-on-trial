@@ -1,0 +1,45 @@
+@import '../../styles/_colors.scss';
+
+/* @define TokenCard */
+.TokenCard {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 3px;
+  box-shadow: 0 3 6 $shadow;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 230px;
+  justify-content: space-between;
+  margin: 10px;
+  width: 248px;
+
+  &-header {
+    align-items: center;
+    border-bottom: 1px solid #ebebeb;
+    display: flex;
+    flex-direction: row;
+    height: 35px;
+    justify-content: center;
+  }
+
+  &-content {
+    align-content: center;
+    display: flex;
+    justify-content: center;
+  }
+
+  &-footer {
+    background-color: #f8f8f8;
+    display: flex;
+    height: 39px;
+
+    &-badge {
+      width: 30px;
+    }
+  }
+
+  &-image {
+    height: 90px;
+  }
+}
