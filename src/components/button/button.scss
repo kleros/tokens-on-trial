@@ -1,8 +1,9 @@
 @import '../../styles/_colors.scss';
 
-@mixin buttonType($type, $background, $hover, $active, $text) {
+@mixin buttonType($type, $background, $hover, $active, $text, $border) {
   &--#{$type} {
     background: $background;
+    border: 1px solid $border;
 
     &:hover {
       background: $hover;
@@ -38,7 +39,16 @@
     linear-gradient(90deg, $lightBlue 0%, $lightGreen 100%),
     linear-gradient(90deg, $lightBlueHover 0%, $lightGreenHover 100%),
     linear-gradient(90deg, $lightBlueActive 0%, $lightGreenActive 100%),
-    $invertedText
+    $invertedText,
+    none
+  );
+  @include buttonType(
+    'secondary',
+    $white,
+    darken($white, 5%),
+    darken($white, 10%),
+    $text,
+    $buttonBorder
   );
 
   &--link {

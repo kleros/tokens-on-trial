@@ -1,0 +1,29 @@
+@import '../../../../styles/_colors.scss';
+
+/* @define Submit */
+.Submit {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  &-bottom {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &-form-fieldset {
+    margin: 0 0 !important;
+    padding: 0 0 !important;
+  }
+
+  &-return {
+    flex: 3 0 0;
+  }
+
+  &-request {
+    flex: 1 0 0;
+    margin-left: 16px;
+  }
+}

@@ -1,0 +1,42 @@
+@import '../../styles/_colors.scss';
+
+/* @define Modal */
+.Modal {
+  background: $white;
+  border: 1px solid $border;
+  border-radius: 3px;
+  box-shadow: 0 3 6 $shadow;
+  box-sizing: border-box;
+  left: 50%;
+  max-height: calc(100% - 50px);
+  outline: none;
+  overflow: auto;
+  padding: 30px 34px;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 370px;
+  z-index: 1000;
+
+  &--overlay {
+    background: $overlay;
+    height: 100%;
+    left: 0;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+  }
+
+  &-title {
+    color: $darkGrey;
+    font-size: 1.4vw;
+    font-weight: 500;
+    margin: 0 0;
+  }
+
+  &-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+}

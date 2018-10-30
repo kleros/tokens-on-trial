@@ -11,6 +11,7 @@ $orange: #ffbe61;
 $blue: #0059ab;
 $white: #fff;
 $darkerWhite: #f2f2f2;
+$inputBorder: #d9d9d9;
 
 $lightBlue: #0ab3bd;
 $lightGreen: #37e3ba;
@@ -36,9 +37,11 @@ $invertedText: $white;
 
 // Backgrounds
 $background: $darkerWhite;
+$overlay: hsla(0, 0%, 0%, 0.302);
 
 //Borders
 $border: #ccc;
+$buttonBorder: #979797;
 
 // Cards
-$shadow: #c9c9c980;
+$shadow: hsla(0, 0%, 79%, 0.502);

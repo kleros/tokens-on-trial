@@ -8,6 +8,7 @@ import { Switch, Route } from 'react-router-dom'
 import Tokens from '../containers/tokens'
 import PageNotFound from '../components/page-not-found'
 import NavBar from '../components/nav-bar'
+import TokenModal from '../containers/token-modal'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -38,6 +39,9 @@ const App = ({ store, history }) => (
               <Route component={PageNotFound} />
             </Switch>
           </div>
+          <Switch>
+            <Route exact path="*" component={TokenModal} />
+          </Switch>
           <Route exact path="*" component={GlobalComponents} />
         </div>
       </ConnectedRouter>
