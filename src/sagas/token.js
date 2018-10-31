@@ -1,8 +1,47 @@
-import { takeLatest, call } from 'redux-saga/effects'
+import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import { PATCH_TOKEN_URL, arbitrableTokenList } from '../bootstrap/dapp-api'
 import * as tokenActions from '../actions/token'
+import * as tokenSelectors from '../reducers/token'
+import * as walletSelectors from '../reducers/wallet'
+import * as tokenConstants from '../constants/token'
+
+/**
+ * Fetches a paginatable list of tokens.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object[]} - The fetched tokens.
+ */
+function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
+  const data = yield call(
+    arbitrableTokenList.methods.queryItems(
+      cursor,
+      count,
+      tokenConstants.FILTER_OPTIONS_ENUM.values.map((_, i) =>
+        filterValue.includes(i)
+      ),
+      sortValue
+    ).call,
+    { from: yield select(walletSelectors.getAccount) }
+  )
+
+  const tokens = [
+    ...(cursor === '0x00'
+      ? []
+      : (yield select(tokenSelectors.getTokens)) || []),
+    ...(yield all(
+      data.values
+        .filter(
+          ID =>
+            ID !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
+        )
+        .map(ID => call(fetchToken, { payload: { ID } }))
+    ))
+  ]
+  tokens.hasMore = data.hasMore
+  return tokens
+}
 
 /**
  * Fetches a token from the list.
@@ -11,7 +50,6 @@ import * as tokenActions from '../actions/token'
  */
 export function* fetchToken({ payload: { ID } }) {
   const token = yield call(arbitrableTokenList.methods.items(ID).call)
-
   return {
     ID,
     status: token.status,
@@ -48,6 +86,15 @@ function* createToken({ payload: { token } }) {
  * The root of the token saga.
  */
 export default function* tokenSaga() {
+  // Tokens
+  yield takeLatest(
+    tokenActions.tokens.FETCH,
+    lessduxSaga,
+    'fetch',
+    tokenActions.tokens,
+    fetchTokens
+  )
+
   // Token
   yield takeLatest(
     tokenActions.token.CREATE,
