@@ -6,14 +6,12 @@ import * as tokenConstants from '../constants/token'
 // Common Shapes
 export const _tokenShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
-  status: PropTypes.oneOf(tokenConstants.STATUS_ENUM.indexes).isRequired,
+  status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
+    .isRequired,
   lastAction: PropTypes.instanceOf(Date),
-  submitter: PropTypes.string.isRequired,
+  latestAgreementID: PropTypes.string.isRequired,
   balance: PropTypes.string.isRequired,
-  disputed: PropTypes.bool.isRequired,
-  disputeID: PropTypes.string.isRequired,
-  disputeStatus: PropTypes.oneOf(tokenConstants.DISPUTE_STATUS_ENUM.indexes),
-  appealCost: PropTypes.string
+  challengeReward: PropTypes.string.isRequired
 })
 export const _tokensShape = PropTypes.arrayOf(_tokenShape.isRequired)
 

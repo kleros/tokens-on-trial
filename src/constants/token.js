@@ -16,17 +16,6 @@ export const STATUS_ENUM = createEnum([
   'Accepted',
   'Rejected'
 ])
-export const STATUS_COLOR_ENUM = createEnum([
-  '#0059ab',
-  '#ffbe61',
-  '#47cf73',
-  '#ff364f'
-])
-export const DISPUTE_STATUS_ENUM = createEnum([
-  'Waiting',
-  'Appealable',
-  'Solved'
-])
 export const RULING_ENUM = createEnum(['Pending', 'Accepted', 'Rejected'])
 
 // Gallery Settings
