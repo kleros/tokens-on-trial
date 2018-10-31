@@ -7,6 +7,7 @@ const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
 const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
+const PATCH_TOKEN_URL = process.env[`REACT_APP_${env}_PATCH_TOKEN_URL`]
 
 let web3
 let isInfura = false
@@ -57,5 +58,6 @@ export {
   ETHAddressRegExp,
   strictETHAddressRegExp,
   arbitrableTokenList,
-  arbitrator
+  arbitrator,
+  PATCH_TOKEN_URL
 }
