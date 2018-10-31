@@ -20,8 +20,8 @@ const TokenModal = ({ openTokenModal, closeTokenModal }) => (
 )
 
 TokenModal.propTypes = {
-  openTokenModal: PropTypes.func.isRequired,
-  closeTokenModal: PropTypes.func.isRequired
+  closeTokenModal: PropTypes.func.isRequired,
+  openTokenModal: PropTypes.bool.isRequired
 }
 
 export default connect(
