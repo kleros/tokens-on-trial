@@ -97,6 +97,13 @@ export default function* tokenSaga() {
 
   // Token
   yield takeLatest(
+    tokenActions.token.FETCH,
+    lessduxSaga,
+    'fetch',
+    tokenActions.token,
+    fetchToken
+  )
+  yield takeLatest(
     tokenActions.token.CREATE,
     lessduxSaga,
     {
