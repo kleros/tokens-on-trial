@@ -10,7 +10,6 @@
   display: flex;
   flex-direction: column;
   height: 230px;
-  justify-content: space-between;
   margin: 10px;
   width: 248px;
 
@@ -24,8 +23,9 @@
   }
 
   &-content {
-    align-content: center;
+    align-items: center;
     display: flex;
+    flex-grow: 1;
     justify-content: center;
   }
 
@@ -41,5 +41,6 @@
 
   &-image {
     height: 90px;
+    margin-bottom: 7px;
   }
 }
