@@ -10,7 +10,22 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
   'ClearingRequested', // The item is registered, but someone has requested to remove it.
   'PreventiveClearingRequested' // The item has never been registered, but someone asked to clear it preemptively to avoid it being shown as not registered during the dispute resolution process.
 ])
-export const RULING_ENUM = createEnum(['Pending', 'Executed', 'Refused'])
+export const RULING_ENUM = createEnum(['Pending', 'Executed', 'Rejected'])
+
+export const STATUS_ENUM = createEnum([
+  ...IN_CONTRACT_STATUS_ENUM.values.filter(
+    v => v !== IN_CONTRACT_STATUS_ENUM.Absent
+  )
+])
+
+export const STATUS_COLOR_ENUM = createEnum([
+  '#ea0743',
+  '#0712ea',
+  '#07ea16',
+  '#0712ea',
+  '#ea9a07',
+  '#ea5a07'
+])
 
 // Gallery Settings
 export const FILTER_OPTIONS_ENUM = createEnum([
