@@ -1,9 +1,11 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
+import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import TitleBar from '../../components/title-bar'
 import TokenCard from '../../components/token-card'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
+import * as tokenActions from '../../actions/token'
 
 import './tokens.css'
 
@@ -87,29 +89,41 @@ const fakeData = [
   }
 ]
 
-const Tokens = () => (
-  <div ref={this.ref} className="Tokens">
-    <TitleBar />
-    <div className="TokenGrid">
-      {fakeData.map(token => (
-        <TokenCard
-          key={token.ID}
-          name={token.name}
-          imageUrl={token.imageUrl}
-          ticker={token.ticker}
-        />
-      ))}
-    </div>
-  </div>
-)
+class Tokens extends PureComponent {
+  static propTypes = {
+    // Action Dispatchers
+    fetchArbitrableTokenListData: PropTypes.func.isRequired
+  }
+
+  componentDidMount() {
+    const { fetchArbitrableTokenListData } = this.props
+    fetchArbitrableTokenListData()
+  }
+
+  render() {
+    return (
+      <div ref={this.ref} className="Tokens">
+        <TitleBar />
+        <div className="TokenGrid">
+          {fakeData.map(token => (
+            <TokenCard
+              key={token.ID}
+              name={token.name}
+              imageUrl={token.imageUrl}
+              ticker={token.ticker}
+            />
+          ))}
+        </div>
+      </div>
+    )
+  }
+}
 
 export default connect(
-  state => ({
-    accounts: state.wallet.accounts,
-    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData
-  }),
+  null,
   {
     fetchArbitrableTokenListData:
-      arbitrableTokenListActions.fetchArbitrableTokenListData
+      arbitrableTokenListActions.fetchArbitrableTokenListData,
+    fetchTokens: tokenActions.fetchTokens
   }
 )(Tokens)

@@ -18,3 +18,11 @@ export const createToken = tokenData => ({
   type: token.CREATE,
   payload: { token: tokenData }
 })
+export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
+  type: tokens.FETCH,
+  payload: { cursor, count, filterValue, sortValue }
+})
+export const fetchToken = (ID, withDisputeData) => ({
+  type: token.FETCH,
+  payload: { ID, withDisputeData }
+})

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
 import * as modalActions from '../../actions/modal'
+import * as modalSelectors from '../../reducers/modal'
 import Modal from '../../components/modal'
 
 import Submit from './components/submit'
@@ -21,7 +22,11 @@ const TokenModal = ({ openTokenModal, closeTokenModal }) => (
 
 TokenModal.propTypes = {
   closeTokenModal: PropTypes.func.isRequired,
-  openTokenModal: PropTypes.bool.isRequired
+  openTokenModal: modalSelectors.openTokenModalShape
+}
+
+TokenModal.defaultProps = {
+  openTokenModal: null
 }
 
 export default connect(
