@@ -32,10 +32,13 @@ export function* fetchArbitrableTokenListData() {
     challengeReward: Number(d.challengeReward),
     stake: String(d.stake),
     timeToChallenge: Number(d.timeToChallenge) * 1000,
-    itemsCounts: tokenConstants.STATUS_ENUM.values.reduce((acc, value) => {
-      acc[value] = Number(d.itemsCounts[value.toLowerCase()])
-      return acc
-    }, {}),
+    itemsCounts: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
+      (acc, value) => {
+        acc[value] = Number(d.itemsCounts[value.toLowerCase()])
+        return acc
+      },
+      {}
+    ),
     arbitrationCost: String(arbitrationCost),
     arbitrationFeesWaitingTime: Number(d.arbitrationFeesWaitingTime)
   }

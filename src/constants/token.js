@@ -10,17 +10,13 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
   'ClearingRequested', // The item is registered, but someone has requested to remove it.
   'PreventiveClearingRequested' // The item has never been registered, but someone asked to clear it preemptively to avoid it being shown as not registered during the dispute resolution process.
 ])
-export const STATUS_ENUM = createEnum([
-  'Pending',
-  'Challenged',
-  'Accepted',
-  'Rejected'
-])
-export const RULING_ENUM = createEnum(['Pending', 'Accepted', 'Rejected'])
+export const RULING_ENUM = createEnum(['Pending', 'Executed', 'Refused'])
 
 // Gallery Settings
 export const FILTER_OPTIONS_ENUM = createEnum([
-  ...STATUS_ENUM.values,
+  ...IN_CONTRACT_STATUS_ENUM.values.filter(
+    v => v !== IN_CONTRACT_STATUS_ENUM.Absent
+  ),
   'My Submissions',
   'My Challenges'
 ])

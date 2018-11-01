@@ -4,8 +4,10 @@ import { connect } from 'react-redux'
 
 import TitleBar from '../../components/title-bar'
 import TokenCard from '../../components/token-card'
+import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as tokenActions from '../../actions/token'
+import * as tokenConstants from '../../constants/token'
 
 import './tokens.css'
 
@@ -91,13 +93,53 @@ const fakeData = [
 
 class Tokens extends PureComponent {
   static propTypes = {
+    // Redux State
+    tokens: tokenSelectors.tokensShape.isRequired,
+
     // Action Dispatchers
-    fetchArbitrableTokenListData: PropTypes.func.isRequired
+    fetchArbitrableTokenListData: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired
+  }
+
+  state = {
+    filterValue: tokenConstants.FILTER_OPTIONS_ENUM.indexes.filter(
+      i =>
+        i !== tokenConstants.FILTER_OPTIONS_ENUM.Challenged &&
+        i !== tokenConstants.FILTER_OPTIONS_ENUM.Refused
+    ),
+    filter: tokenConstants.FILTER_OPTIONS_ENUM.values.filter(
+      v =>
+        v !==
+          tokenConstants.FILTER_OPTIONS_ENUM[
+            tokenConstants.FILTER_OPTIONS_ENUM.Challenged
+          ] &&
+        v !==
+          tokenConstants.FILTER_OPTIONS_ENUM[
+            tokenConstants.FILTER_OPTIONS_ENUM.Refused
+          ]
+    ),
+    sortValue: 0,
+    sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' }
   }
 
   componentDidMount() {
     const { fetchArbitrableTokenListData } = this.props
     fetchArbitrableTokenListData()
+    this.fetchTokens(true)
+  }
+
+  fetchTokens = clear => {
+    const { tokens, fetchTokens } = this.props
+    const { filterValue, sortValue } = this.state
+    if (!tokens.loading)
+      fetchTokens(
+        tokens.data && clear !== true
+          ? tokens.data[tokens.data.length - 1].ID
+          : '0x00',
+        10,
+        filterValue,
+        sortValue
+      )
   }
 
   render() {
@@ -120,7 +162,9 @@ class Tokens extends PureComponent {
 }
 
 export default connect(
-  null,
+  state => ({
+    tokens: state.token.tokens
+  }),
   {
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData,
