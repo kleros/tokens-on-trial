@@ -52,7 +52,7 @@ export function* fetchToken({ payload: { ID } }) {
   const token = yield call(arbitrableTokenList.methods.items(ID).call)
   return {
     ID,
-    status: token.status,
+    status: Number(token.status),
     balance: String(token.balance),
     challengeReward: String(token.balance),
     latestAgreementID: String(token.latestAgreementID),
