@@ -6,33 +6,40 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import './token-card.css'
 import EtherScanLogo from '../../../src/assets/images/etherscan.png'
 
-const TokenCard = ({ name, imageUrl, ticker, badges }) => (
+const TokenCard = ({ token }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
       <FontAwesomeIcon icon="check" color="#11BABD" />
       <h5>
-        {name} - {ticker}
+        {token.name} - {token.ticker}
       </h5>
-      <a href="/">
+      <a href={`https://etherscan.io/token/${token.address}`}>
         <Img src={EtherScanLogo} />
       </a>
     </div>
     <div className="TokenCard-content">
       <Img
-        src={imageUrl}
+        src={token.imageUrl}
         alt={`Doge List Submission`}
         className="TokenCard-image"
       />
     </div>
-    {badges && <div className="TokenCard-footer" />}
+    <div
+      className={`TokenCard-footer${
+        !token.badges || token.badges.length === 0 ? ' TokenCard-hidden' : ''
+      }`}
+    />
   </div>
 )
 
 TokenCard.propTypes = {
-  name: PropTypes.string.isRequired,
-  imageUrl: PropTypes.string.isRequired,
-  ticker: PropTypes.string.isRequired,
-  badges: PropTypes.shape([]).isRequired
+  token: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    imageUrl: PropTypes.string.isRequired,
+    ticker: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
+    badges: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+  }).isRequired
 }
 
 export default TokenCard

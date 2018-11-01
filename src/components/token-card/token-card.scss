@@ -43,6 +43,9 @@
 
   &-image {
     height: 90px;
-    margin-bottom: 7px;
+  }
+
+  &-hidden {
+    visibility: hidden;
   }
 }
