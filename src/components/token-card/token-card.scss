@@ -19,7 +19,9 @@
     display: flex;
     flex-direction: row;
     height: 35px;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    padding-top: 3px;
   }
 
   &-content {
