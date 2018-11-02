@@ -6,9 +6,63 @@
   justify-content: space-between;
   margin-top: 10px;
 
+  &-top {
+    display: flex;
+    justify-content: space-between;
+  }
+
   &-separator {
     border-color: $darkerGrey;
+    border-width: 1px;
     margin: 6px 0;
+
+    &-neon {
+      border-color: $neon;
+    }
+  }
+
+  &-filterSelect {
+    align-content: stretch;
+    display: flex;
+  }
+
+  &-my {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 7px 0;
+    min-height: 30px;
+    width: 40%;
+
+    &-button {
+      justify-content: center;
+      margin-right: 16px;
+    }
+  }
+
+  &-status {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-height: 10px;
+    width: 60%;
+
+    &-button {
+      justify-content: center;
+      margin: 7px 0;
+      margin-left: 16px;
+
+      &-small {
+        min-width: 136px;
+      }
+
+      &-medium {
+        min-width: 161px;
+      }
+
+      &-large {
+        min-width: 226px;
+      }
+    }
   }
 
   &-search {
