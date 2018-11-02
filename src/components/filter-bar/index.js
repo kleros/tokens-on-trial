@@ -11,7 +11,7 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
     <div className="FilterBar">
       <div className="FilterBar-search">
         <FontAwesomeIcon icon="search" />
-        <div className="FilterBar-search-label">Search</div>
+        <input className="FilterBar-search-input" placeholder="Search" />
       </div>
       <div className="FilterBar-filter" onClick={toggleFilterOptions}>
         <div className="FilterBar-filter-label">Filter:</div>

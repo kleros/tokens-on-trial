@@ -70,9 +70,11 @@
     display: flex;
     margin: 19px 0;
 
-    &-label {
+    &-input {
+      border: none;
       font-size: 0.9em;
       margin-left: 10px;
+      outline: none;
     }
   }
 
