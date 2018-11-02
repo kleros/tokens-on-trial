@@ -41,7 +41,8 @@ class Tokens extends PureComponent {
           ]
     ),
     sortValue: 0,
-    sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' }
+    sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
+    filterOptionsVisible: false
   }
 
   ref = React.createRef()
@@ -131,12 +132,21 @@ class Tokens extends PureComponent {
       )
   }
 
+  toggleFilterOptions = () => {
+    const { filterOptionsVisible } = this.state
+    this.setState({ filterOptionsVisible: !filterOptionsVisible })
+  }
+
   render() {
     const { tokens } = this.props
+    const { filterOptionsVisible } = this.state
     return (
       <div ref={this.ref} className="Tokens">
         <TitleBar />
-        <FilterBar />
+        <FilterBar
+          filterOptionsVisible={filterOptionsVisible}
+          toggleFilterOptions={this.toggleFilterOptions}
+        />
         <div className="TokenGrid">
           {tokens.data && this.mapTokens(tokens.data)}
         </div>
