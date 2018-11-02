@@ -24,11 +24,6 @@ class Tokens extends PureComponent {
   }
 
   state = {
-    filterValue: tokenConstants.FILTER_OPTIONS_ENUM.indexes.filter(
-      i =>
-        i !== tokenConstants.FILTER_OPTIONS_ENUM.Challenged &&
-        i !== tokenConstants.FILTER_OPTIONS_ENUM.Rejected
-    ),
     filter: tokenConstants.FILTER_OPTIONS_ENUM.values.filter(
       v =>
         v !==
@@ -69,42 +64,6 @@ class Tokens extends PureComponent {
         this.fetchTokens()
     }, 500)
   }
-
-  getFilterOptionsWithCountsAndColors = memoizeOne((accounts, tokens = []) =>
-    tokenConstants.FILTER_OPTIONS_ENUM.values.map(value => {
-      const label = value
-      let count
-      switch (tokenConstants.FILTER_OPTIONS_ENUM[value]) {
-        case tokenConstants.FILTER_OPTIONS_ENUM.Submitted:
-        case tokenConstants.FILTER_OPTIONS_ENUM.Resubmitted:
-        case tokenConstants.FILTER_OPTIONS_ENUM.ClearingRequested:
-        case tokenConstants.FILTER_OPTIONS_ENUM.PreventiveClearingRequested:
-        case tokenConstants.FILTER_OPTIONS_ENUM.Registered:
-        case tokenConstants.FILTER_OPTIONS_ENUM.Cleared:
-          count = tokens.filter(
-            token => token.status === tokenConstants.FILTER_OPTIONS_ENUM[value]
-          ).length
-          break
-        case tokenConstants.FILTER_OPTIONS_ENUM['My Submissions']:
-          count = tokens.filter(token => token.submitter === accounts[0]).length
-          break
-        case tokenConstants.FILTER_OPTIONS_ENUM['My Challenges']:
-          count = tokens.filter(token => token.challenger === accounts[0])
-            .length
-          break
-        default:
-          count = 0
-          break
-      }
-
-      return {
-        label,
-        count,
-        color:
-          tokenConstants.STATUS_COLOR_ENUM[tokenConstants.STATUS_ENUM[value]]
-      }
-    })
-  )
 
   mapTokens = memoizeOne(tokens =>
     tokens.map(token => {

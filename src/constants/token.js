@@ -29,9 +29,12 @@ export const STATUS_COLOR_ENUM = createEnum([
 
 // Gallery Settings
 export const FILTER_OPTIONS_ENUM = createEnum([
-  ...IN_CONTRACT_STATUS_ENUM.values.filter(
-    v => v !== IN_CONTRACT_STATUS_ENUM.Absent
-  ),
+  'Registered',
+  'Registration Requests',
+  'Challenged Registration Requests',
+  'Cleared',
+  'Clearing Requests',
+  'Challenged Clearing Requests',
   'My Submissions',
   'My Challenges'
 ])

@@ -3,6 +3,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
 import Button from '../button'
+import * as tokenConstants from '../../constants/token'
 
 import './filter-bar.css'
 
@@ -24,64 +25,37 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
       <div>
         <div className="FilterBar-filterSelect">
           <div className="FilterBar-my">
-            <Button
-              className="FilterBar-my-button"
-              size="small"
-              type="secondary"
-            >
-              My Submissions
-            </Button>
-            <Button
-              className="FilterBar-my-button"
-              size="small"
-              type="secondary"
-            >
-              My Challenges
-            </Button>
+            {tokenConstants.FILTER_OPTIONS_ENUM.indexes
+              .filter(i => i >= 6)
+              .map(i => (
+                <Button
+                  className="FilterBar-my-button"
+                  size="small"
+                  type="secondary"
+                >
+                  {tokenConstants.FILTER_OPTIONS_ENUM[i]}
+                </Button>
+              ))}
           </div>
           <div className="FilterBar-status">
-            <Button
-              className="FilterBar-status-button FilterBar-status-button-small"
-              size="small"
-              type="primary"
-            >
-              Registered
-            </Button>
-            <Button
-              className="FilterBar-status-button FilterBar-status-button-medium"
-              size="small"
-              type="secondary"
-            >
-              Registration Requests
-            </Button>
-            <Button
-              className="FilterBar-status-button FilterBar-status-button-large"
-              size="small"
-              type="secondary"
-            >
-              Challenged Registration Requests
-            </Button>
-            <Button
-              className="FilterBar-status-button FilterBar-status-button-small"
-              size="small"
-              type="secondary"
-            >
-              Cleared
-            </Button>
-            <Button
-              className="FilterBar-status-button FilterBar-status-button-medium"
-              size="small"
-              type="secondary"
-            >
-              Clearing Requests
-            </Button>
-            <Button
-              className="FilterBar-status-button FilterBar-status-button-large"
-              size="small"
-              type="secondary"
-            >
-              Challenged Clearing Requests
-            </Button>
+            {tokenConstants.FILTER_OPTIONS_ENUM.indexes
+              .filter(i => i < 6)
+              .map(i => (
+                <Button
+                  className={`FilterBar-status-button
+                FilterBar-status-button-${
+                  tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 10
+                    ? `small`
+                    : tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 24
+                      ? `medium`
+                      : `large`
+                }`}
+                  size="small"
+                  type="secondary"
+                >
+                  {tokenConstants.FILTER_OPTIONS_ENUM[i]}
+                </Button>
+              ))}
           </div>
         </div>
         <hr className="FilterBar-separator-neon" />
@@ -105,7 +79,10 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
 )
 
 FilterBar.propTypes = {
+  // State
   filterOptionsVisible: PropTypes.bool.isRequired,
+
+  // Handlers
   toggleFilterOptions: PropTypes.func.isRequired
 }
 
