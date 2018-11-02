@@ -24,17 +24,7 @@ class Tokens extends PureComponent {
   }
 
   state = {
-    filter: tokenConstants.FILTER_OPTIONS_ENUM.values.filter(
-      v =>
-        v !==
-          tokenConstants.FILTER_OPTIONS_ENUM[
-            tokenConstants.FILTER_OPTIONS_ENUM.Challenged
-          ] &&
-        v !==
-          tokenConstants.FILTER_OPTIONS_ENUM[
-            tokenConstants.FILTER_OPTIONS_ENUM.Rejected
-          ]
-    ),
+    filter: tokenConstants.FILTER_OPTIONS_ENUM.values,
     sortValue: 0,
     sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
     filterOptionsVisible: false
