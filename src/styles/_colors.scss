@@ -3,6 +3,7 @@ $absoluteBlack: #000;
 $grey: #3d464d;
 $lightGrey: #a3a2a5;
 $darkGrey: #4a4a4a;
+$darkerGrey: #ebebeb;
 $darkestGrey: #1a1b23;
 $mint: #f5f8fa;
 $green: #47cf73;
@@ -36,7 +37,7 @@ $darkText: $darkestGrey;
 $invertedText: $white;
 
 // Backgrounds
-$background: $darkerWhite;
+$background: $white;
 $overlay: hsla(0, 0%, 0%, 0.302);
 
 //Borders
@@ -44,4 +45,4 @@ $border: #ccc;
 $buttonBorder: #979797;
 
 // Cards
-$shadow: hsla(0, 0%, 79%, 0.502);
+$shadow: rgba(201, 201, 201, 0.5);
