@@ -12,7 +12,7 @@ $orange: #ffbe61;
 $blue: #0059ab;
 $white: #fff;
 $darkerWhite: #f2f2f2;
-$inputBorder: #d9d9d9;
+$neon: #0bb4bd;
 
 $lightBlue: #0ab3bd;
 $lightGreen: #37e3ba;
@@ -20,6 +20,8 @@ $lightBlueHover: #079da5;
 $lightGreenHover: #33cfab;
 $lightBlueActive: #068d94;
 $lightGreenActive: #2eb495;
+
+$primary: $neon;
 
 // States
 $disabled: $darkGrey;
@@ -43,6 +45,7 @@ $overlay: hsla(0, 0%, 0%, 0.302);
 //Borders
 $border: #ccc;
 $buttonBorder: #979797;
+$inputBorder: #d9d9d9;
 
 // Cards
 $shadow: rgba(201, 201, 201, 0.5);

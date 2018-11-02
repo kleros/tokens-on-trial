@@ -1,0 +1,64 @@
+@import '../../styles/_colors.scss';
+
+/* @define FilterBar */
+.FilterBar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+
+  &-separator {
+    border-color: $darkerGrey;
+    margin: 6px 0;
+  }
+
+  &-search {
+    align-items: center;
+    display: flex;
+    margin: 19px 0;
+
+    &-label {
+      font-size: 0.9em;
+      margin-left: 10px;
+    }
+  }
+
+  &-count {
+    font-size: 0.9em;
+  }
+
+  &-filter {
+    align-items: center;
+    color: $primary;
+    display: flex;
+    font-weight: 400;
+    margin: 19px 0;
+
+    &-label {
+      font-size: 0.9em;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+
+    &-choice {
+      margin: 0 4px;
+    }
+  }
+
+  &-sort {
+    display: flex;
+    font-size: 0.9em;
+
+    &-label {
+      margin-right: 6px;
+    }
+
+    &-margin {
+      margin-right: 24px;
+    }
+
+    &-choice {
+      font-weight: 500;
+      margin: 0 3px;
+    }
+  }
+}

@@ -9,6 +9,7 @@ import faTimes from '@fortawesome/fontawesome-free-solid/faTimes'
 import faUpload from '@fortawesome/fontawesome-free-solid/faUpload'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faFilter from '@fortawesome/fontawesome-free-solid/faFilter'
+import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
 
 library.add(
   faCaretDown,
@@ -20,5 +21,6 @@ library.add(
   faTimes,
   faUpload,
   faPlus,
-  faFilter
+  faFilter,
+  faSearch
 )
