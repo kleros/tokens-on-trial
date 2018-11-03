@@ -29,6 +29,7 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
               .filter(i => i >= 6)
               .map(i => (
                 <Button
+                  key={i}
                   className="FilterBar-my-button"
                   size="small"
                   type="secondary"
@@ -42,14 +43,15 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
               .filter(i => i < 6)
               .map(i => (
                 <Button
+                  key={i}
                   className={`FilterBar-status-button
-                FilterBar-status-button-${
-                  tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 10
-                    ? `small`
-                    : tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 24
-                      ? `medium`
-                      : `large`
-                }`}
+                    FilterBar-status-button-${
+                      tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 10
+                        ? `small`
+                        : tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 24
+                          ? `medium`
+                          : `large`
+                    }`}
                   size="small"
                   type="secondary"
                 >
