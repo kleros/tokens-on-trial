@@ -10,6 +10,7 @@ import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as tokenActions from '../../actions/token'
 import * as tokenConstants from '../../constants/token'
+import { filterToContractParam, defaultFilter } from '../../utils/filter'
 
 import './tokens.css'
 
@@ -24,10 +25,10 @@ class Tokens extends PureComponent {
   }
 
   state = {
-    filter: tokenConstants.FILTER_OPTIONS_ENUM.values,
     sortValue: 0,
     sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
-    filterOptionsVisible: false
+    filterOptionsVisible: false,
+    filter: defaultFilter()
   }
 
   ref = React.createRef()
@@ -69,7 +70,8 @@ class Tokens extends PureComponent {
 
   fetchTokens = clear => {
     const { tokens, fetchTokens } = this.props
-    const { filterValue, sortValue } = this.state
+    const { filter, sortValue } = this.state
+    const filterValue = filterToContractParam(filter)
     if (!tokens.loading)
       fetchTokens(
         tokens.data && clear !== true

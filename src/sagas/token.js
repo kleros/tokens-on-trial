@@ -5,7 +5,6 @@ import { PATCH_TOKEN_URL, arbitrableTokenList } from '../bootstrap/dapp-api'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
-import * as tokenConstants from '../constants/token'
 
 /**
  * Fetches a paginatable list of tokens.
@@ -17,9 +16,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
     arbitrableTokenList.methods.queryItems(
       cursor,
       count,
-      tokenConstants.FILTER_OPTIONS_ENUM.values.map((_, i) =>
-        filterValue.includes(i)
-      ),
+      filterValue,
       sortValue
     ).call,
     { from: yield select(walletSelectors.getAccount) }
