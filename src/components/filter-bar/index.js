@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
@@ -7,7 +7,40 @@ import * as tokenConstants from '../../constants/token'
 
 import './filter-bar.css'
 
-const FilterBar = ({ filterOptionsVisible, toggleFilterOptions, filter }) => (
+class FilterButton extends PureComponent {
+  static propTypes = {
+    option: PropTypes.number.isRequired,
+    handleFilterChange: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired,
+    className: PropTypes.string.isRequired
+  }
+
+  onFilterChange = () => {
+    const { option, handleFilterChange } = this.props
+    handleFilterChange(tokenConstants.FILTER_OPTIONS_ENUM[option])
+  }
+
+  render() {
+    const { type, option, className } = this.props
+    return (
+      <Button
+        className={className}
+        size="small"
+        type={type}
+        onClick={this.onFilterChange}
+      >
+        {tokenConstants.FILTER_OPTIONS_ENUM[option]}
+      </Button>
+    )
+  }
+}
+
+const FilterBar = ({
+  filterOptionsVisible,
+  toggleFilterOptions,
+  filter,
+  handleFilterChange
+}) => (
   <div>
     <div className="FilterBar">
       <div className="FilterBar-search">
@@ -28,26 +61,28 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions, filter }) => (
             {tokenConstants.FILTER_OPTIONS_ENUM.indexes
               .filter(i => i >= 6)
               .map(i => (
-                <Button
+                <FilterButton
                   key={i}
+                  option={i}
                   className="FilterBar-my-button"
-                  size="small"
                   type={
                     filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]
                       ? 'primary'
                       : 'secondary'
                   }
+                  handleFilterChange={handleFilterChange}
                 >
                   {tokenConstants.FILTER_OPTIONS_ENUM[i]}
-                </Button>
+                </FilterButton>
               ))}
           </div>
           <div className="FilterBar-status">
             {tokenConstants.FILTER_OPTIONS_ENUM.indexes
               .filter(i => i < 6)
               .map(i => (
-                <Button
+                <FilterButton
                   key={i}
+                  option={i}
                   className={`FilterBar-status-button
                     FilterBar-status-button-${
                       tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 10
@@ -56,15 +91,15 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions, filter }) => (
                           ? `medium`
                           : `large`
                     }`}
-                  size="small"
                   type={
                     filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]
                       ? 'primary'
                       : 'secondary'
                   }
+                  handleFilterChange={handleFilterChange}
                 >
                   {tokenConstants.FILTER_OPTIONS_ENUM[i]}
-                </Button>
+                </FilterButton>
               ))}
           </div>
         </div>
@@ -94,7 +129,8 @@ FilterBar.propTypes = {
   filter: PropTypes.shape({}).isRequired,
 
   // Handlers
-  toggleFilterOptions: PropTypes.func.isRequired
+  toggleFilterOptions: PropTypes.func.isRequired,
+  handleFilterChange: PropTypes.func.isRequired
 }
 
 export default FilterBar

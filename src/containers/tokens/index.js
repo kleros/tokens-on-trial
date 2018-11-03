@@ -68,6 +68,12 @@ class Tokens extends PureComponent {
     })
   )
 
+  handleFilterChange = key => {
+    const { filter } = this.state
+    filter[key] = !filter[key]
+    this.setState({ filter }, () => this.fetchTokens(true))
+  }
+
   fetchTokens = clear => {
     const { tokens, fetchTokens } = this.props
     const { filter, sortValue } = this.state
@@ -98,6 +104,7 @@ class Tokens extends PureComponent {
           filterOptionsVisible={filterOptionsVisible}
           toggleFilterOptions={this.toggleFilterOptions}
           filter={filter}
+          handleFilterChange={this.handleFilterChange}
         />
         <div className="TokenGrid">
           {tokens.data && this.mapTokens(tokens.data)}
