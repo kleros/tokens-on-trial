@@ -18,7 +18,7 @@ export const {
     type: 'text',
     validate: [required]
   },
-  uri: {
+  URI: {
     type: 'text',
     validate: [required]
   }
