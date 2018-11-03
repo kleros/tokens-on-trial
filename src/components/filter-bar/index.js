@@ -7,7 +7,7 @@ import * as tokenConstants from '../../constants/token'
 
 import './filter-bar.css'
 
-const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
+const FilterBar = ({ filterOptionsVisible, toggleFilterOptions, filter }) => (
   <div>
     <div className="FilterBar">
       <div className="FilterBar-search">
@@ -32,7 +32,11 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
                   key={i}
                   className="FilterBar-my-button"
                   size="small"
-                  type="secondary"
+                  type={
+                    filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]
+                      ? 'primary'
+                      : 'secondary'
+                  }
                 >
                   {tokenConstants.FILTER_OPTIONS_ENUM[i]}
                 </Button>
@@ -53,7 +57,11 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
                           : `large`
                     }`}
                   size="small"
-                  type="secondary"
+                  type={
+                    filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]
+                      ? 'primary'
+                      : 'secondary'
+                  }
                 >
                   {tokenConstants.FILTER_OPTIONS_ENUM[i]}
                 </Button>
@@ -83,6 +91,7 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions }) => (
 FilterBar.propTypes = {
   // State
   filterOptionsVisible: PropTypes.bool.isRequired,
+  filter: PropTypes.shapeOf({}).isRequired,
 
   // Handlers
   toggleFilterOptions: PropTypes.func.isRequired

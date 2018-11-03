@@ -90,13 +90,14 @@ class Tokens extends PureComponent {
 
   render() {
     const { tokens } = this.props
-    const { filterOptionsVisible } = this.state
+    const { filterOptionsVisible, filter } = this.state
     return (
       <div ref={this.ref} className="Tokens">
         <TitleBar />
         <FilterBar
           filterOptionsVisible={filterOptionsVisible}
           toggleFilterOptions={this.toggleFilterOptions}
+          filter={filter}
         />
         <div className="TokenGrid">
           {tokens.data && this.mapTokens(tokens.data)}
