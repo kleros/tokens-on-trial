@@ -91,7 +91,7 @@ const FilterBar = ({ filterOptionsVisible, toggleFilterOptions, filter }) => (
 FilterBar.propTypes = {
   // State
   filterOptionsVisible: PropTypes.bool.isRequired,
-  filter: PropTypes.shapeOf({}).isRequired,
+  filter: PropTypes.shape({}).isRequired,
 
   // Handlers
   toggleFilterOptions: PropTypes.func.isRequired
