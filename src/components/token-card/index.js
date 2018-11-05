@@ -5,11 +5,20 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import './token-card.css'
 import EtherScanLogo from '../../../src/assets/images/etherscan.png'
+import * as tokenConstants from '../../constants/token'
 
 const TokenCard = ({ token }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
-      <FontAwesomeIcon icon="check" color="#11BABD" />
+      <FontAwesomeIcon
+        className={
+          token.clientStatus === tokenConstants.STATUS_ENUM.PENDING
+            ? 'TokenCard-hidden'
+            : ''
+        }
+        icon={tokenConstants.STATUS_ICON_ENUM[token.clientStatus]}
+        color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+      />
       <h5>
         {token.name} - {token.ticker}
       </h5>
@@ -38,7 +47,9 @@ TokenCard.propTypes = {
     imageUrl: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
-    badges: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+    badges: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+    status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
+      .isRequired
   }).isRequired
 }
 

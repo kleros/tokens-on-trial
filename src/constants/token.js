@@ -13,18 +13,24 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
 export const RULING_ENUM = createEnum(['Pending', 'Executed', 'Rejected'])
 
 export const STATUS_ENUM = createEnum([
-  ...IN_CONTRACT_STATUS_ENUM.values.filter(
-    v => v !== IN_CONTRACT_STATUS_ENUM.Absent
-  )
+  'PENDING',
+  'CHALLENGED',
+  'REGISTERED',
+  'CLEARED'
+])
+
+export const STATUS_ICON_ENUM = createEnum([
+  'hourglass-half',
+  'gavel',
+  'check',
+  'times-circle'
 ])
 
 export const STATUS_COLOR_ENUM = createEnum([
-  '#ea0743',
-  '#0712ea',
-  '#07ea16',
-  '#0712ea',
-  '#ea9a07',
-  '#ea5a07'
+  '#0A72BD',
+  '#FB7413',
+  '#11BABD',
+  '#EF0101'
 ])
 
 // Gallery Settings

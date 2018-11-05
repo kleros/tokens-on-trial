@@ -10,6 +10,9 @@ import faUpload from '@fortawesome/fontawesome-free-solid/faUpload'
 import faPlus from '@fortawesome/fontawesome-free-solid/faPlus'
 import faFilter from '@fortawesome/fontawesome-free-solid/faFilter'
 import faSearch from '@fortawesome/fontawesome-free-solid/faSearch'
+import faGavel from '@fortawesome/fontawesome-free-solid/faGavel'
+import faTimesCircle from '@fortawesome/fontawesome-free-solid/faTimesCircle'
+import faHourglassHalf from '@fortawesome/fontawesome-free-solid/faHourglassHalf'
 
 library.add(
   faCaretDown,
@@ -22,5 +25,8 @@ library.add(
   faUpload,
   faPlus,
   faFilter,
-  faSearch
+  faSearch,
+  faGavel,
+  faTimesCircle,
+  faHourglassHalf
 )
