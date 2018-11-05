@@ -1,16 +1,5 @@
 @import '../../styles/_colors.scss';
 
-/* @define Tokens */
-.Tokens {
-  align-items: stretch;
-  background-color: $background;
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  margin: 0 9%;
-  padding: 1em;
-}
-
 /* @define TokenGrid */
 .TokenGrid {
   display: flex;

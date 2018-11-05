@@ -98,7 +98,7 @@ class Tokens extends PureComponent {
     const { tokens } = this.props
     const { filterOptionsVisible, filter } = this.state
     return (
-      <div ref={this.ref} className="Tokens">
+      <div ref={this.ref} className="Page">
         <TitleBar />
         <FilterBar
           filterOptionsVisible={filterOptionsVisible}

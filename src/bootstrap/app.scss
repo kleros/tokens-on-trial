@@ -67,3 +67,14 @@ hr {
 img {
   font-size: 6px;
 }
+
+/* @define Page */
+.Page {
+  align-items: stretch;
+  background-color: $background;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0 9%;
+  padding: 1em;
+}
