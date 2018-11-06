@@ -1,11 +1,17 @@
 import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import { PATCH_TOKEN_URL, arbitrableTokenList } from '../bootstrap/dapp-api'
+import {
+  STORE_AWS_PROVIDER,
+  arbitrableTokenList,
+  web3
+} from '../bootstrap/dapp-api'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
-import * as tokenConstatns from '../constants/token'
+import * as tokenConstants from '../constants/token'
+import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
+import * as errorConstants from '../constants/error'
 
 /**
  * Fetches a paginatable list of tokens.
@@ -42,17 +48,17 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
 }
 
 const contractStatusToClientStatus = ({ status, disputed }) => {
-  if (disputed) return tokenConstatns.STATUS_ENUM.CHALLENGED
-  switch (tokenConstatns.IN_CONTRACT_STATUS_ENUM[status]) {
+  if (disputed) return tokenConstants.STATUS_ENUM.CHALLENGED
+  switch (tokenConstants.IN_CONTRACT_STATUS_ENUM[status]) {
     case 'Submitted':
     case 'Resubmitted':
     case 'ClearingRequested':
     case 'PreventiveClearingRequested':
-      return tokenConstatns.STATUS_ENUM.PENDING
+      return tokenConstants.STATUS_ENUM.PENDING
     case 'Registered':
-      return tokenConstatns.STATUS_ENUM.REGISTERED
+      return tokenConstants.STATUS_ENUM.REGISTERED
     case 'Cleared':
-      return tokenConstatns.STATUS_ENUM.CLEARED
+      return tokenConstants.STATUS_ENUM.CLEARED
     default:
       throw new Error('Unknown status')
   }
@@ -91,19 +97,33 @@ export function* fetchToken({ payload: { ID } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* createToken({ payload: { token } }) {
+function* createToken({ payload: { token, metaEvidence } }) {
+  const ID = web3.utils.keccak256(token)
+
   // Upload token
-  const response = yield call(fetch, PATCH_TOKEN_URL, {
-    method: 'PATCH',
+  yield call(fetch, STORE_AWS_PROVIDER, {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ payload: { token } })
+    body: JSON.stringify({
+      payload: {
+        fileName: `${web3.utils.keccak256(token)}.json`,
+        base64EncodedData: btoa(token)
+      }
+    })
   })
 
-  // TODO: submit to contract
-  console.info('upload response:', response)
+  // Add to contract if absent
+  if (Number((yield call(fetchToken, { payload: { ID } }))._status) === 0)
+    yield call(
+      arbitrableTokenList.methods.requestRegistration(ID, metaEvidence).send,
+      {
+        from: yield select(walletSelectors.getAccount),
+        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
+      }
+    )
+  else throw new Error(errorConstants.TOKEN_ALREADY_SUBMITTED)
 
-  // Return the response
-  return response
+  return yield call(fetchToken, { payload: { ID } })
 }
 
 /**
