@@ -121,7 +121,7 @@ class TokenDetails extends PureComponent {
               </div>
               <div className="TokenDetails-action">
                 <Button type="primary">
-                  <FontAwesomeIcon icon="plus" className="TokenDetails-icon" />
+                  <FontAwesomeIcon icon="gavel" className="TokenDetails-icon" />
                   Challenge Registry
                 </Button>
               </div>
