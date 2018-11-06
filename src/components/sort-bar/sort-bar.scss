@@ -1,0 +1,30 @@
+@import '../../styles/_colors.scss';
+
+/* @define SortBar */
+.SortBar {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+
+  &-count {
+    font-size: 0.9em;
+  }
+
+  &-sort {
+    display: flex;
+    font-size: 0.9em;
+
+    &-label {
+      margin-right: 6px;
+    }
+
+    &-margin {
+      margin-right: 24px;
+    }
+
+    &-choice {
+      font-weight: 500;
+      margin: 0 3px;
+    }
+  }
+}

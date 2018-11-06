@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one'
 import TitleBar from '../../components/title-bar'
 import TokenCard from '../../components/token-card'
 import FilterBar from '../../components/filter-bar'
+import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as tokenActions from '../../actions/token'
@@ -106,6 +107,7 @@ class Tokens extends PureComponent {
           filter={filter}
           handleFilterChange={this.handleFilterChange}
         />
+        <SortBar />
         <div className="TokenGrid">
           {tokens.data && this.mapTokens(tokens.data)}
         </div>

@@ -106,20 +106,6 @@ const FilterBar = ({
         <hr className="FilterBar-separator-neon" />
       </div>
     )}
-    <div className="FilterBar">
-      <div className="FilterBar-count">123.456 Tokens</div>
-      <div className="FilterBar-sort">
-        <div className="FilterBar-sort-label">Sort by period:</div>
-        <div className="FilterBar-sort-choice">All</div>
-        <FontAwesomeIcon
-          className="FilterBar-sort-margin"
-          icon="caret-down"
-          size="xs"
-        />
-        <div className="FilterBar-sort-choice">Newest</div>
-        <FontAwesomeIcon icon="caret-down" size="xs" />
-      </div>
-    </div>
   </div>
 )
 
