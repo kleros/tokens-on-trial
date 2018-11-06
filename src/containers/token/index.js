@@ -1,16 +1,24 @@
 import React, { PureComponent } from 'react'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
+import Img from 'react-image'
 
+import EtherScanLogo from '../../assets/images/etherscan.png'
+import Button from '../../components/button'
 import * as tokenActions from '../../actions/token'
-import * as tokenSelectors from '../../reducers/token'
 
 import './token.css'
 
 class TokenDetails extends PureComponent {
   static propTypes = {
     fetchToken: PropTypes.func.isRequired,
-    token: tokenSelectors.tokenShape.isRequired,
+    token: PropTypes.shape({
+      name: PropTypes.string,
+      ticker: PropTypes.string,
+      address: PropTypes.string,
+      URI: PropTypes.string
+    }),
     match: PropTypes.shape({
       params: PropTypes.shape({
         tokenID: PropTypes.string
@@ -19,7 +27,8 @@ class TokenDetails extends PureComponent {
   }
 
   static defaultProps = {
-    match: {}
+    match: {},
+    token: null
   }
 
   state = {
@@ -51,14 +60,65 @@ class TokenDetails extends PureComponent {
 
       return (
         <div className="Page">
-          <div>
-            <h5>{token.ID}</h5>
+          <div className="TokenDetails">
+            <Img className="TokenDetails-img" src={token.URL} />
+            <div className="TokenDetails-card">
+              <div className="TokenDetails-label">
+                <span className="TokenDetails-label-name">{token.name}</span>
+                <span className="TokenDetails-label-ticker">
+                  {token.ticker}
+                </span>
+              </div>
+              <div className="TokenDetails-divider" />
+              <div className="TokenDetails-meta">
+                <div className="TokenDetails-meta--aligned">
+                  <span>
+                    <a
+                      className="TokenDetails--link"
+                      href={`https://etherscan.io/token/${token.address}`}
+                    >
+                      <Img
+                        className="TokenDetails-icon TokenDetails-meta--aligned"
+                        src={EtherScanLogo}
+                      />
+                      00a041...31ae
+                    </a>
+                  </span>
+                </div>
+                <div>
+                  <span>
+                    <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
+                      1
+                    </span>
+                    Badges
+                  </span>
+                </div>
+              </div>
+              <div className="TokenDetails-meta">
+                <span className="TokenDetails-meta--aligned">
+                  <FontAwesomeIcon
+                    className="TokenDetails-icon"
+                    icon="hourglass-half"
+                  />
+                  Registration Requested
+                </span>
+                <div className="TokenDetails-timer">
+                  Challenge Deadline 12:34:56
+                </div>
+              </div>
+              <div className="TokenDetails-action">
+                <Button type="primary">
+                  <FontAwesomeIcon icon="plus" className="TokenDetails-icon" />
+                  Challenge Registry
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       )
     } else
       return (
-        <div>
+        <div className="Page">
           <h5>Loading...</h5>
         </div>
       )
