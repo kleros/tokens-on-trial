@@ -26,4 +26,11 @@
     flex: 3 0 0;
     margin-left: 16px;
   }
+
+  &-stake {
+    align-content: flex-start;
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+  }
 }
