@@ -22,7 +22,7 @@ export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,
   payload: { cursor, count, filterValue, sortValue }
 })
-export const fetchToken = (ID, withDisputeData) => ({
+export const fetchToken = ID => ({
   type: token.FETCH,
-  payload: { ID, withDisputeData }
+  payload: { ID }
 })

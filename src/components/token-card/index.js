@@ -28,7 +28,7 @@ const TokenCard = ({ token }) => (
     </div>
     <div className="TokenCard-content">
       <Img
-        src={token.imageUrl}
+        src={token.URL}
         alt={`Doge List Submission`}
         className="TokenCard-image"
       />
@@ -44,7 +44,7 @@ const TokenCard = ({ token }) => (
 TokenCard.propTypes = {
   token: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    imageUrl: PropTypes.string.isRequired,
+    URL: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     badges: PropTypes.arrayOf(PropTypes.shape({})).isRequired,

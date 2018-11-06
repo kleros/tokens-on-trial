@@ -6,6 +6,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import { Switch, Route } from 'react-router-dom'
 
 import Tokens from '../containers/tokens'
+import TokenDetail from '../containers/token'
 import PageNotFound from '../components/page-not-found'
 import NavBar from '../components/nav-bar'
 import TokenModal from '../containers/token-modal'
@@ -36,6 +37,7 @@ const App = ({ store, history }) => (
           <div id="scroll-root">
             <Switch>
               <Route exact path="/" component={Tokens} />
+              <Route exact path="/:tokenID" component={TokenDetail} />
               <Route component={PageNotFound} />
             </Switch>
           </div>
