@@ -8,7 +8,7 @@ $darkestGrey: #1a1b23;
 $mint: #f5f8fa;
 $green: #47cf73;
 $red: #ff364f;
-$orange: #ffbe61;
+$orange: #f66e0c;
 $blue: #0059ab;
 $white: #fff;
 $darkerWhite: #f2f2f2;
@@ -42,10 +42,11 @@ $invertedText: $white;
 $background: $white;
 $overlay: hsla(0, 0%, 0%, 0.302);
 
-//Borders
-$border: #ccc;
 $buttonBorder: #4a4a4a;
 $inputBorder: #d9d9d9;
 
 // Cards
 $shadow: rgba(201, 201, 201, 0.5);
+$card: $white;
+$border: #ccc;
+$action: #f8f8f8;
