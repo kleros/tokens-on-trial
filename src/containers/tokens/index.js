@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import memoizeOne from 'memoize-one'
@@ -15,7 +15,7 @@ import { filterToContractParam, defaultFilter } from '../../utils/filter'
 
 import './tokens.css'
 
-class Tokens extends PureComponent {
+class Tokens extends Component {
   static propTypes = {
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
@@ -28,7 +28,6 @@ class Tokens extends PureComponent {
   state = {
     sortValue: 0,
     sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
-    filterOptionsVisible: false,
     filter: defaultFilter()
   }
 
@@ -90,20 +89,13 @@ class Tokens extends PureComponent {
       )
   }
 
-  toggleFilterOptions = () => {
-    const { filterOptionsVisible } = this.state
-    this.setState({ filterOptionsVisible: !filterOptionsVisible })
-  }
-
   render() {
     const { tokens } = this.props
-    const { filterOptionsVisible, filter } = this.state
+    const { filter } = this.state
     return (
       <div ref={this.ref} className="Page">
         <TitleBar />
         <FilterBar
-          filterOptionsVisible={filterOptionsVisible}
-          toggleFilterOptions={this.toggleFilterOptions}
           filter={filter}
           handleFilterChange={this.handleFilterChange}
         />

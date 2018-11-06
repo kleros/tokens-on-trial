@@ -6,6 +6,8 @@ import Img from 'react-image'
 
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
+import FilterBar from '../../components/filter-bar'
+import { defaultFilter } from '../../utils/filter'
 import * as tokenActions from '../../actions/token'
 
 import './token.css'
@@ -32,7 +34,8 @@ class TokenDetails extends PureComponent {
   }
 
   state = {
-    token: null
+    token: null,
+    filter: defaultFilter()
   }
 
   componentDidMount() {
@@ -47,7 +50,7 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { token } = this.state
+    const { token, filter } = this.state
 
     if (token) {
       // Fake data
@@ -60,6 +63,10 @@ class TokenDetails extends PureComponent {
 
       return (
         <div className="Page">
+          <FilterBar
+            filter={filter}
+            handleFilterChange={this.handleFilterChange}
+          />
           <div className="TokenDetails">
             <Img className="TokenDetails-img" src={token.URL} />
             <div className="TokenDetails-card">
