@@ -6,7 +6,7 @@ import Img from 'react-image'
 
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
-import FilterBar from '../../components/filter-bar'
+import FilterBar from '../filter-bar'
 import { defaultFilter } from '../../utils/filter'
 import * as tokenActions from '../../actions/token'
 
@@ -36,6 +36,12 @@ class TokenDetails extends PureComponent {
   state = {
     token: null,
     filter: defaultFilter()
+  }
+
+  handleFilterChange = key => {
+    const { filter } = this.state
+    filter[key] = !filter[key]
+    this.setState({ filter })
   }
 
   componentDidMount() {

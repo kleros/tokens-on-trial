@@ -2,7 +2,7 @@ import React, { Component, PureComponent } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
-import Button from '../button'
+import Button from '../../components/button'
 import * as tokenConstants from '../../constants/token'
 
 import './filter-bar.css'
