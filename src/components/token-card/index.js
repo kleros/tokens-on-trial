@@ -2,6 +2,7 @@ import React from 'react'
 import Img from 'react-image'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { Link } from 'react-router-dom'
 
 import './token-card.css'
 import EtherScanLogo from '../../../src/assets/images/etherscan.png'
@@ -26,13 +27,13 @@ const TokenCard = ({ token }) => (
         <Img src={EtherScanLogo} />
       </a>
     </div>
-    <div className="TokenCard-content">
+    <Link className="TokenCard-content" to={`${token.ID}`}>
       <Img
         src={token.URL}
         alt={`Doge List Submission`}
         className="TokenCard-image"
       />
-    </div>
+    </Link>
     <div
       className={`TokenCard-footer${
         !token.badges || token.badges.length === 0 ? ' TokenCard-hidden' : ''
