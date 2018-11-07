@@ -26,7 +26,8 @@ class TokenModal extends PureComponent {
 
     closeTokenModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
-    submitTokenForm: PropTypes.func.isRequired
+    submitTokenForm: PropTypes.func.isRequired,
+    createToken: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -34,7 +35,8 @@ class TokenModal extends PureComponent {
   }
 
   handleSubmitTokenClick = token => {
-    console.info('clicked', token)
+    const { createToken } = this.props
+    createToken({ tokenData: token, metaEvidence: 'meta evidence' })
   }
 
   componentDidMount() {
@@ -76,7 +78,7 @@ export default connect(
   }),
   {
     closeTokenModal: modalActions.closeTokenModal,
-    submitToken: tokenActions.createToken,
+    createToken: tokenActions.createToken,
     submitTokenForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData

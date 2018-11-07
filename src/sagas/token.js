@@ -1,17 +1,15 @@
 import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import {
-  STORE_AWS_PROVIDER,
-  arbitrableTokenList,
-  web3
-} from '../bootstrap/dapp-api'
+import { arbitrableTokenList } from '../bootstrap/dapp-api'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
 import * as tokenConstants from '../constants/token'
 import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
 import * as errorConstants from '../constants/error'
+
+import storeApi from './api/store'
 
 /**
  * Fetches a paginatable list of tokens.
@@ -59,8 +57,10 @@ const contractStatusToClientStatus = ({ status, disputed }) => {
       return tokenConstants.STATUS_ENUM.REGISTERED
     case 'Cleared':
       return tokenConstants.STATUS_ENUM.CLEARED
+    case 'Absent':
+      return tokenConstants.STATUS_ENUM.ABSENT
     default:
-      throw new Error('Unknown status')
+      throw new Error('Unknown status: ', status, ' disputed: ', disputed)
   }
 }
 
@@ -98,22 +98,14 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* createToken({ payload: { token, metaEvidence } }) {
-  const ID = web3.utils.keccak256(token)
-
   // Upload token
-  yield call(fetch, STORE_AWS_PROVIDER, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      payload: {
-        fileName: `${web3.utils.keccak256(token)}.json`,
-        base64EncodedData: btoa(token)
-      }
-    })
-  })
+  const response = yield call(storeApi.postFile, JSON.stringify(token))
+
+  const { payload } = response
+  const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
 
   // Add to contract if absent
-  if (Number((yield call(fetchToken, { payload: { ID } }))._status) === 0)
+  if (Number((yield call(fetchToken, { payload: { ID } })).status) === 0)
     yield call(
       arbitrableTokenList.methods.requestRegistration(ID, metaEvidence).send,
       {

@@ -14,9 +14,9 @@ export const token = {
 /* Action Creators */
 
 // Token
-export const createToken = tokenData => ({
+export const createToken = ({ tokenData, metaEvidence }) => ({
   type: token.CREATE,
-  payload: { token: tokenData }
+  payload: { token: tokenData, metaEvidence }
 })
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,
