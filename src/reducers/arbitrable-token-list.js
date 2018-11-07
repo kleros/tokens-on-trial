@@ -33,13 +33,9 @@ export default createReducer({
 // Selectors
 export const getSubmitCost = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&
-  web3.utils
-    .toBN(state.arbitrableTokenList.arbitrableTokenListData.data.stake)
-    .add(
-      web3.utils.toBN(
-        state.arbitrableTokenList.arbitrableTokenListData.data.arbitrationCost
-      )
-    )
+  web3.utils.toBN(
+    state.arbitrableTokenList.arbitrableTokenListData.data.challengeReward
+  )
 
 export const getTimeToChallenge = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&
