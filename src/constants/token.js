@@ -16,7 +16,8 @@ export const STATUS_ENUM = createEnum([
   'PENDING',
   'CHALLENGED',
   'REGISTERED',
-  'CLEARED'
+  'CLEARED',
+  'ABSENT'
 ])
 
 export const STATUS_ICON_ENUM = createEnum([
