@@ -48,7 +48,6 @@ TokenCard.propTypes = {
     URI: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
-    badges: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
     status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
   }).isRequired

@@ -39,27 +39,8 @@ class Tokens extends Component {
     this.fetchTokens(true)
   }
 
-  componentDidUpdate(prevProps) {
-    const { tokens: prevTokens } = prevProps
-    const { tokens } = this.props
-    clearTimeout(this.fillPageTimeout)
-    this.fillPageTimeout = setTimeout(() => {
-      if (
-        prevTokens !== tokens &&
-        !tokens.loading &&
-        tokens.data &&
-        tokens.data.hasMore &&
-        this.ref.current.clientHeight === this.ref.current.scrollHeight
-      )
-        this.fetchTokens()
-    }, 500)
-  }
-
   mapTokens = memoizeOne(tokens =>
-    tokens.map(token => {
-      token.badges = []
-      return <TokenCard key={token.ID} token={token} />
-    })
+    tokens.map(token => <TokenCard key={token.ID} token={token} />)
   )
 
   handleFilterChange = key => {
