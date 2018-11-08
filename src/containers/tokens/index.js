@@ -75,7 +75,9 @@ class Tokens extends Component {
         />
         <SortBar />
         <div className="TokenGrid">
-          {tokens.data && this.mapTokens(tokens.data)}
+          <div className="TokenGrid-container">
+            {tokens.data && this.mapTokens(tokens.data)}
+          </div>
         </div>
       </div>
     )
