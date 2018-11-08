@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import memoizeOne from 'memoize-one'
 
-import TitleBar from '../../components/title-bar'
 import TokenCard from '../../components/token-card'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
@@ -94,7 +93,6 @@ class Tokens extends Component {
     const { filter } = this.state
     return (
       <div ref={this.ref} className="Page">
-        <TitleBar />
         <FilterBar
           filter={filter}
           handleFilterChange={this.handleFilterChange}

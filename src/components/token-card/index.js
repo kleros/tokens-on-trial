@@ -30,7 +30,7 @@ const TokenCard = ({ token }) => (
     <Link className="TokenCard-content" to={`${token.ID}`}>
       <Img
         src={token.URL}
-        alt={`Doge List Submission`}
+        alt={`Token List Submission`}
         className="TokenCard-image"
       />
     </Link>

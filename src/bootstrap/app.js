@@ -1,29 +1,67 @@
-import React from 'react'
+import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
 import { Switch, Route } from 'react-router-dom'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Tokens from '../containers/tokens'
 import TokenDetail from '../containers/token'
 import PageNotFound from '../components/page-not-found'
 import NavBar from '../components/nav-bar'
 import TokenModal from '../containers/token-modal'
+import * as modalConstants from '../constants/modal'
+import * as modalActions from '../actions/modal'
+import Button from '../components/button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
+import { isInfura } from './dapp-api'
 import './fontawesome'
 
 import './app.css'
 
-const _ConnectedNavBar = () => (
-  <NavBar routes={[{ title: 'KLEROS', to: '/' }]} extras={[<div />]} />
-)
+class _ConnectedNavBar extends PureComponent {
+  static propTypes = {
+    // Action Dispatchers
+    openTokenModal: PropTypes.func.isRequired
+  }
 
-const ConnectedNavBar = connect(state => ({
-  accounts: state.wallet.accounts
-}))(_ConnectedNavBar)
+  handleSubmitTokenClick = () => {
+    const { openTokenModal } = this.props
+    openTokenModal(modalConstants.TOKEN_MODAL_ENUM.Submit)
+  }
+
+  render() {
+    return (
+      <NavBar
+        routes={[{ title: 'KLEROS', to: '/' }]}
+        extras={[
+          <Button
+            tooltip={isInfura ? 'Please install MetaMask.' : null}
+            onClick={this.handleSubmitTokenClick}
+            type="primary"
+            disabled={isInfura}
+            className="Button-submitToken"
+          >
+            <FontAwesomeIcon icon="plus" className="Button-submitToken-icon" />
+            Submit Token
+          </Button>
+        ]}
+      />
+    )
+  }
+}
+
+const ConnectedNavBar = connect(
+  state => ({
+    accounts: state.wallet.accounts
+  }),
+  {
+    openTokenModal: modalActions.openTokenModal
+  }
+)(_ConnectedNavBar)
 
 const App = ({ store, history }) => (
   <Provider store={store}>
