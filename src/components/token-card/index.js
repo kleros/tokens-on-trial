@@ -21,7 +21,7 @@ const TokenCard = ({ token }) => (
         color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
       />
       <h5>
-        {token.name} - {token.ticker}
+        {token.tokenName} - {token.ticker}
       </h5>
       <a href={`https://etherscan.io/token/${token.address}`}>
         <Img src={EtherScanLogo} />
@@ -29,7 +29,7 @@ const TokenCard = ({ token }) => (
     </div>
     <Link className="TokenCard-content" to={`${token.ID}`}>
       <Img
-        src={token.URL}
+        src={token.URI}
         alt={`Token List Submission`}
         className="TokenCard-image"
       />
@@ -44,8 +44,8 @@ const TokenCard = ({ token }) => (
 
 TokenCard.propTypes = {
   token: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    URL: PropTypes.string.isRequired,
+    tokenName: PropTypes.string.isRequired,
+    URI: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     badges: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
