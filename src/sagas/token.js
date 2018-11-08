@@ -75,8 +75,14 @@ export function* fetchToken({ payload: { ID } }) {
     arbitrableTokenList.methods.getAgreementInfo(token.latestAgreementID).call
   )
 
+  const { tokenName, address, ticker, URI } = yield call(storeApi.getFile, ID)
+
   return {
     ID,
+    tokenName,
+    address,
+    ticker,
+    URI,
     status: Number(token.status),
     balance: String(token.balance),
     challengeReward: String(token.balance),

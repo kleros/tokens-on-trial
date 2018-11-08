@@ -1,9 +1,13 @@
-import { web3, STORE_AWS_PROVIDER } from '../../bootstrap/dapp-api'
 import statusHelper from '../../utils/api-status-helper'
+import {
+  web3,
+  TOKEN_UPLOAD_URL,
+  TOKEN_BASE_URL
+} from '../../bootstrap/dapp-api'
 
 const storeApi = {
   postFile(file) {
-    return fetch(STORE_AWS_PROVIDER, {
+    return fetch(TOKEN_UPLOAD_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -12,6 +16,16 @@ const storeApi = {
           base64EncodedData: btoa(file)
         }
       })
+    })
+      .then(statusHelper)
+      .then(response => response.json())
+      .catch(err => err)
+      .then(data => data)
+  },
+  getFile(ID) {
+    return fetch(`${TOKEN_BASE_URL}/${ID}.json`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
     })
       .then(statusHelper)
       .then(response => response.json())
