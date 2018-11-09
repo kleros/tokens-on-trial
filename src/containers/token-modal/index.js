@@ -6,6 +6,7 @@ import * as modalActions from '../../actions/modal'
 import * as modalSelectors from '../../reducers/modal'
 import * as modalConstants from '../../constants/modal'
 import * as tokenActions from '../../actions/token'
+import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import Modal from '../../components/modal'
@@ -21,6 +22,7 @@ import './token-modal.css'
 
 class TokenModal extends PureComponent {
   static propTypes = {
+    token: tokenSelectors.tokenShape,
     tokenFormIsInvalid: PropTypes.bool.isRequired,
     openTokenModal: modalSelectors.openTokenModalShape,
     arbitrableTokenListData:
@@ -29,11 +31,13 @@ class TokenModal extends PureComponent {
     closeTokenModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     submitTokenForm: PropTypes.func.isRequired,
-    createToken: PropTypes.func.isRequired
+    createToken: PropTypes.func.isRequired,
+    clearToken: PropTypes.func.isRequired
   }
 
   static defaultProps = {
-    openTokenModal: null
+    openTokenModal: null,
+    token: null
   }
 
   handleSubmitTokenClick = token => {
@@ -42,7 +46,8 @@ class TokenModal extends PureComponent {
   }
 
   handleClearTokenClick = () => {
-    console.info(`clear token`)
+    const { clearToken, token } = this.props
+    clearToken({ ID: token.data.ID, metaEvidence: 'meta evidence' })
   }
 
   componentDidMount() {
@@ -56,7 +61,8 @@ class TokenModal extends PureComponent {
       closeTokenModal,
       arbitrableTokenListData,
       submitTokenForm,
-      tokenFormIsInvalid
+      tokenFormIsInvalid,
+      token
     } = this.props
     return (
       <Modal
@@ -74,6 +80,7 @@ class TokenModal extends PureComponent {
           />
         ) : (
           <Clear
+            tokenName={token.data.tokenName}
             arbitrableTokenListData={arbitrableTokenListData}
             closeTokenModal={closeTokenModal}
             clearToken={this.handleClearTokenClick}
@@ -88,11 +95,13 @@ export default connect(
   state => ({
     openTokenModal: state.modal.openTokenModal,
     tokenFormIsInvalid: getTokenFormIsInvalid(state),
-    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData
+    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
+    token: state.token.token
   }),
   {
     closeTokenModal: modalActions.closeTokenModal,
     createToken: tokenActions.createToken,
+    clearToken: tokenActions.clearToken,
     submitTokenForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData

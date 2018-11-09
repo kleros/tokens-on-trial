@@ -7,9 +7,14 @@ import Button from '../../../../components/button'
 
 import './clear.css'
 
-const Clear = ({ arbitrableTokenListData, closeTokenModal, clearToken }) => (
+const Clear = ({
+  arbitrableTokenListData,
+  closeTokenModal,
+  clearToken,
+  tokenName
+}) => (
   <div>
-    <h3 className="Modal-title">Clear a Token</h3>
+    <h3 className="Modal-title">Clear {tokenName}</h3>
     <hr />
     <div className="Clear-stake">
       <h4>
@@ -45,6 +50,7 @@ Clear.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+  tokenName: PropTypes.string.isRequired,
 
   // Action Dispatchers
   closeTokenModal: PropTypes.func.isRequired,
