@@ -80,7 +80,7 @@ class TokenModal extends PureComponent {
           />
         ) : (
           <Clear
-            tokenName={token.data.tokenName}
+            tokenName={token && token.data ? token.data.tokenName : 'token'}
             arbitrableTokenListData={arbitrableTokenListData}
             closeTokenModal={closeTokenModal}
             clearToken={this.handleClearTokenClick}
