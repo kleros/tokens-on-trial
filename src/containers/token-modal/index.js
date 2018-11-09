@@ -4,12 +4,14 @@ import { connect } from 'react-redux'
 
 import * as modalActions from '../../actions/modal'
 import * as modalSelectors from '../../reducers/modal'
+import * as modalConstants from '../../constants/modal'
 import * as tokenActions from '../../actions/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import Modal from '../../components/modal'
 
 import Submit from './components/submit'
+import Clear from './components/clear'
 import {
   getTokenFormIsInvalid,
   submitTokenForm
@@ -39,6 +41,10 @@ class TokenModal extends PureComponent {
     createToken({ tokenData: token, metaEvidence: 'meta evidence' })
   }
 
+  handleClearTokenClick = () => {
+    console.info(`clear token`)
+  }
+
   componentDidMount() {
     const { fetchArbitrableTokenListData } = this.props
     fetchArbitrableTokenListData()
@@ -58,13 +64,21 @@ class TokenModal extends PureComponent {
         onRequestClose={closeTokenModal}
         className="TokenModal"
       >
-        <Submit
-          arbitrableTokenListData={arbitrableTokenListData}
-          closeTokenModal={closeTokenModal}
-          submitTokenForm={submitTokenForm}
-          submitToken={this.handleSubmitTokenClick}
-          tokenFormIsInvalid={tokenFormIsInvalid}
-        />
+        {openTokenModal === modalConstants.TOKEN_MODAL_ENUM.Submit ? (
+          <Submit
+            arbitrableTokenListData={arbitrableTokenListData}
+            closeTokenModal={closeTokenModal}
+            submitTokenForm={submitTokenForm}
+            submitToken={this.handleSubmitTokenClick}
+            tokenFormIsInvalid={tokenFormIsInvalid}
+          />
+        ) : (
+          <Clear
+            arbitrableTokenListData={arbitrableTokenListData}
+            closeTokenModal={closeTokenModal}
+            clearToken={this.handleClearTokenClick}
+          />
+        )}
       </Modal>
     )
   }

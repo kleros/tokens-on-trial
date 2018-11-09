@@ -1,4 +1,4 @@
 import createEnum from '../utils/create-enum'
 
 // Token Modal
-export const TOKEN_MODAL_ENUM = createEnum(['Submit', 'Details'])
+export const TOKEN_MODAL_ENUM = createEnum(['Submit', 'Details', 'Clear'])

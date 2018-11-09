@@ -9,12 +9,15 @@ import Button from '../../components/button'
 import FilterBar from '../filter-bar'
 import { defaultFilter } from '../../utils/filter'
 import * as tokenActions from '../../actions/token'
+import * as modalActions from '../../actions/modal'
+import * as modalConstants from '../../constants/modal'
 
 import './token.css'
 
 class TokenDetails extends PureComponent {
   static propTypes = {
     fetchToken: PropTypes.func.isRequired,
+    openTokenModal: PropTypes.func.isRequired,
     token: PropTypes.shape({
       tokenName: PropTypes.string,
       ticker: PropTypes.string,
@@ -42,6 +45,11 @@ class TokenDetails extends PureComponent {
     const { filter } = this.state
     filter[key] = !filter[key]
     this.setState({ filter })
+  }
+
+  handleClearTokenClick = () => {
+    const { openTokenModal } = this.props
+    openTokenModal(modalConstants.TOKEN_MODAL_ENUM.Clear)
   }
 
   componentDidMount() {
@@ -114,7 +122,7 @@ class TokenDetails extends PureComponent {
                 </div>
               </div>
               <div className="TokenDetails-action">
-                <Button type="primary">
+                <Button type="primary" onClick={this.handleClearTokenClick}>
                   <FontAwesomeIcon icon="gavel" className="TokenDetails-icon" />
                   Challenge Registry
                 </Button>
@@ -156,5 +164,8 @@ class TokenDetails extends PureComponent {
 
 export default connect(
   state => ({ token: state.token.token.data }),
-  { fetchToken: tokenActions.fetchToken }
+  {
+    fetchToken: tokenActions.fetchToken,
+    openTokenModal: modalActions.openTokenModal
+  }
 )(TokenDetails)
