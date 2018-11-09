@@ -8,7 +8,8 @@ export const token = {
   ...createActions('TOKEN', {
     withCreate: true,
     withUpdate: true
-  })
+  }),
+  CLEAR: 'CLEAR'
 }
 
 /* Action Creators */
@@ -17,6 +18,10 @@ export const token = {
 export const createToken = ({ tokenData, metaEvidence }) => ({
   type: token.CREATE,
   payload: { token: tokenData, metaEvidence }
+})
+export const clearToken = ({ ID, metaEvidence }) => ({
+  type: token.CLEAR,
+  payload: { ID, metaEvidence }
 })
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,
