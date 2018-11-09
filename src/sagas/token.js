@@ -111,7 +111,10 @@ function* createToken({ payload: { token, metaEvidence } }) {
   const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
 
   // Add to contract if absent
-  if (Number((yield call(fetchToken, { payload: { ID } })).status) === 0)
+  if (
+    Number((yield call(fetchToken, { payload: { ID } })).status) ===
+    tokenConstants.IN_CONTRACT_STATUS_ENUM.Absent
+  )
     yield call(
       arbitrableTokenList.methods.requestRegistration(ID, metaEvidence).send,
       {
@@ -122,6 +125,37 @@ function* createToken({ payload: { token, metaEvidence } }) {
   else throw new Error(errorConstants.TOKEN_ALREADY_SUBMITTED)
 
   return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Request a token to be cleared from the list.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* clearToken({ payload: { ID, metaEvidence } }) {
+  // Add to contract if absent
+  if (
+    Number((yield call(fetchToken, { payload: { ID } })).status) ===
+    tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered
+  )
+    yield call(
+      arbitrableTokenList.methods.requestClearing(ID, metaEvidence).send,
+      {
+        from: yield select(walletSelectors.getAccount),
+        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
+      }
+    )
+  else throw new Error(errorConstants.TOKEN_ALREADY_CLEARED)
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+// Update collection mod flows
+const updateTokensCollectionModFlow = {
+  flow: 'update',
+  collection: tokenActions.tokens.self,
+  updating: ({ payload: { ID } }) => ID,
+  find: ({ payload: { ID } }) => d => d.ID === ID
 }
 
 /**
@@ -154,5 +188,12 @@ export default function* tokenSaga() {
     },
     tokenActions.token,
     createToken
+  )
+  yield takeLatest(
+    tokenActions.token.CLEAR,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    clearToken
   )
 }
