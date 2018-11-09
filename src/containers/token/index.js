@@ -121,6 +121,28 @@ class TokenDetails extends PureComponent {
               </div>
             </div>
           </div>
+          <div className="TokenDescription">
+            <hr className="TokenDescription-separator" />
+            <h3>Description</h3>
+            <p>
+              Assumenda voluptates corporis dolorem inventore fuga possimus.
+              Cupiditate aspernatur vero dolore quasi quasi. Ea sit aut
+              excepturi quia facere ut voluptate. Consequuntur assumenda officia
+              laudantium mollitia dolore. Fugiat iusto quis ducimus aut magnam
+              quasi autem. Doloremque minus nulla aspernatur autem. Ea officia
+              qui officiis. Consequatur harum nobis ab unde impedit quis. Odit
+              error rem rerum corporis. Voluptates ullam placeat ab.
+            </p>
+          </div>
+          <br />
+          <div className="TokenDescription">
+            <hr className="TokenDescription-separator" />
+            <h3>Badges</h3>
+            <span>
+              <span className="TokenDescription--icon--badge TokenDetails-meta--aligned" />
+              Compliant with YY
+            </span>
+          </div>
         </div>
       )
     else

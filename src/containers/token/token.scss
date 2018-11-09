@@ -122,3 +122,33 @@
     color: $orange;
   }
 }
+
+/* @define TokenDescription */
+.TokenDescription {
+  display: flex;
+  flex-direction: column;
+
+  &-separator {
+    border-color: $darkerGrey;
+    border-width: 1px;
+    width: 100%;
+  }
+
+  &--icon {
+    margin-right: 14px;
+
+    &--badge {
+      background-image: url('../../assets/images/badge.svg');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 80%;
+      color: $white;
+      font-size: 14px;
+      font-weight: 500;
+      height: 40px;
+      margin-right: 10px;
+      text-align: center;
+      width: 40px;
+    }
+  }
+}

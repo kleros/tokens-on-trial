@@ -63,6 +63,26 @@ hr {
   border: 1px solid $background;
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: $darkGrey;
+  font-weight: 500;
+}
+
+h4 {
+  margin: 17px;
+}
+
+p {
+  color: $darkGrey;
+  font-size: 0.9em;
+  margin: 0 0;
+}
+
 // Image
 img {
   font-size: 6px;
