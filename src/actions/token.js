@@ -9,7 +9,8 @@ export const token = {
     withCreate: true,
     withUpdate: true
   }),
-  CLEAR: 'CLEAR'
+  CLEAR: 'CLEAR',
+  EXECUTE: 'EXECUTE'
 }
 
 /* Action Creators */
@@ -26,6 +27,10 @@ export const clearToken = ({ ID, metaEvidence }) => ({
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,
   payload: { cursor, count, filterValue, sortValue }
+})
+export const executeRequest = ID => ({
+  type: token.EXECUTE,
+  payload: { ID }
 })
 export const fetchToken = ID => ({
   type: token.FETCH,
