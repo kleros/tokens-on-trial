@@ -66,10 +66,11 @@ class TokenDetails extends PureComponent {
   getActionButton = (token, userAccount) => {
     let method, label, icon
     if (hasPendingRequest(token.status))
-      if (token.creator === userAccount) {
+      if (token.latestAgreement.creator === userAccount) {
         method = this.handleExecuteRequestClick
         icon = 'check'
-        if (isRegistrationRequest(token.status)) label = 'Execute Registration'
+        if (isRegistrationRequest(token.status)) label = 'Confirm Registration'
+        else label = 'Confirm Clearing'
       } else {
         icon = 'gavel'
         if (isRegistrationRequest(token.status))
