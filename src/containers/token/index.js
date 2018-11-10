@@ -8,14 +8,19 @@ import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import FilterBar from '../filter-bar'
 import { defaultFilter } from '../../utils/filter'
+import { hasPendingRequest, isRegistrationRequest } from '../../utils/token'
 import * as tokenActions from '../../actions/token'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
+import * as tokenConstants from '../../constants/token'
+import * as walletSelectors from '../../reducers/wallet'
 
 import './token.css'
 
 class TokenDetails extends PureComponent {
   static propTypes = {
+    accounts: walletSelectors.accountsShape.isRequired,
+    executeRequest: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openTokenModal: PropTypes.func.isRequired,
     token: PropTypes.shape({
@@ -52,6 +57,44 @@ class TokenDetails extends PureComponent {
     openTokenModal(modalConstants.TOKEN_MODAL_ENUM.Clear)
   }
 
+  handleExecuteRequestClick = () => {
+    const { match, executeRequest } = this.props
+    const { tokenID } = match.params
+    executeRequest(tokenID)
+  }
+
+  getActionButton = (token, userAccount) => {
+    let method, label, icon
+    if (hasPendingRequest(token.status))
+      if (token.creator === userAccount) {
+        method = this.handleExecuteRequestClick
+        icon = 'check'
+        if (isRegistrationRequest(token.status)) label = 'Execute Registration'
+      } else {
+        icon = 'gavel'
+        if (isRegistrationRequest(token.status))
+          label = 'Challenge Registration'
+        else label = 'Challenge Clearing'
+      }
+    else if (
+      token.status === tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered']
+    ) {
+      method = this.handleClearTokenClick
+      label = 'Submit Clearing Request'
+      icon = 'gavel'
+    } else {
+      label = 'Resubmit Token'
+      icon = 'plus'
+    }
+
+    return (
+      <Button type="primary" onClick={method}>
+        <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
+        {label}
+      </Button>
+    )
+  }
+
   componentDidMount() {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
@@ -65,6 +108,7 @@ class TokenDetails extends PureComponent {
 
   render() {
     const { token, filter } = this.state
+    const { accounts } = this.props
 
     if (token)
       return (
@@ -122,10 +166,7 @@ class TokenDetails extends PureComponent {
                 </div>
               </div>
               <div className="TokenDetails-action">
-                <Button type="primary" onClick={this.handleClearTokenClick}>
-                  <FontAwesomeIcon icon="gavel" className="TokenDetails-icon" />
-                  Challenge Registry
-                </Button>
+                {this.getActionButton(token, accounts.data[0])}
               </div>
             </div>
           </div>
@@ -163,9 +204,13 @@ class TokenDetails extends PureComponent {
 }
 
 export default connect(
-  state => ({ token: state.token.token.data }),
+  state => ({
+    token: state.token.token.data,
+    accounts: state.wallet.accounts
+  }),
   {
     fetchToken: tokenActions.fetchToken,
+    executeRequest: tokenActions.executeRequest,
     openTokenModal: modalActions.openTokenModal
   }
 )(TokenDetails)
