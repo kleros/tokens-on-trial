@@ -150,6 +150,31 @@ function* clearToken({ payload: { ID, metaEvidence } }) {
   return yield call(fetchToken, { payload: { ID } })
 }
 
+/**
+ * Execute a request for a token.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* executeRequest({ payload: { ID } }) {
+  if (
+    Number((yield call(fetchToken, { payload: { ID } })).status) !==
+      tokenConstants.IN_CONTRACT_STATUS_ENUM.Submitted &&
+    Number((yield call(fetchToken, { payload: { ID } })).status) !==
+      tokenConstants.IN_CONTRACT_STATUS_ENUM.Resubmitted &&
+    Number((yield call(fetchToken, { payload: { ID } })).status) !==
+      tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested &&
+    Number((yield call(fetchToken, { payload: { ID } })).status) !==
+      tokenConstants.IN_CONTRACT_STATUS_ENUM.PreventiveClearingRequested
+  )
+    throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
+
+  yield call(arbitrableTokenList.methods.executeRequest(ID).send, {
+    from: yield select(walletSelectors.getAccount)
+  })
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
 // Update collection mod flows
 const updateTokensCollectionModFlow = {
   flow: 'update',
@@ -195,5 +220,12 @@ export default function* tokenSaga() {
     updateTokensCollectionModFlow,
     tokenActions.token,
     clearToken
+  )
+  yield takeLatest(
+    tokenActions.token.EXECUTE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    executeRequest
   )
 }
