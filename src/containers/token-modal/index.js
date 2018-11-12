@@ -13,6 +13,7 @@ import Modal from '../../components/modal'
 
 import Submit from './components/submit'
 import Clear from './components/clear'
+import Challenge from './components/challenge'
 import {
   getTokenFormIsInvalid,
   submitTokenForm
@@ -32,7 +33,8 @@ class TokenModal extends PureComponent {
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     submitTokenForm: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
-    clearToken: PropTypes.func.isRequired
+    clearToken: PropTypes.func.isRequired,
+    challengeRequest: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -48,6 +50,11 @@ class TokenModal extends PureComponent {
   handleClearTokenClick = () => {
     const { clearToken, token } = this.props
     clearToken({ ID: token.data.ID, metaEvidence: 'meta evidence' })
+  }
+
+  handleChallengeClick = () => {
+    const { challengeRequest, token } = this.props
+    challengeRequest(token.data.latestAgreementID)
   }
 
   componentDidMount() {
@@ -93,6 +100,17 @@ class TokenModal extends PureComponent {
                   clearToken={this.handleClearTokenClick}
                 />
               )
+            case modalConstants.TOKEN_MODAL_ENUM.Challenge:
+              return (
+                <Challenge
+                  tokenName={
+                    token && token.data ? token.data.tokenName : 'token'
+                  }
+                  arbitrableTokenListData={arbitrableTokenListData}
+                  closeTokenModal={closeTokenModal}
+                  challengeRequest={this.handleChallengeClick}
+                />
+              )
             case undefined:
             case null:
               break
@@ -116,6 +134,7 @@ export default connect(
     closeTokenModal: modalActions.closeTokenModal,
     createToken: tokenActions.createToken,
     clearToken: tokenActions.clearToken,
+    challengeRequest: tokenActions.challengeRequest,
     submitTokenForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData

@@ -1,0 +1,36 @@
+@import '../../../../styles/_colors.scss';
+
+/* @define Challenge */
+.Challenge {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  &-icon {
+    margin-left: -25px;
+    margin-right: 12px;
+  }
+
+  &-cost {
+    display: flex;
+    font-size: 14px;
+    font-weight: 400;
+    justify-content: space-between;
+  }
+
+  &-bottom {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &-return {
+    flex: 1 0 0;
+  }
+
+  &-request {
+    flex: 3 0 0;
+    margin-left: 16px;
+  }
+}

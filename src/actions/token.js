@@ -10,7 +10,8 @@ export const token = {
     withUpdate: true
   }),
   CLEAR: 'CLEAR',
-  EXECUTE: 'EXECUTE'
+  EXECUTE: 'EXECUTE',
+  CHALLENGE: 'CHALLENGE'
 }
 
 /* Action Creators */
@@ -23,6 +24,10 @@ export const createToken = ({ tokenData, metaEvidence }) => ({
 export const clearToken = ({ ID, metaEvidence }) => ({
   type: token.CLEAR,
   payload: { ID, metaEvidence }
+})
+export const challengeRequest = agreementID => ({
+  type: token.CHALLENGE,
+  payload: { agreementID }
 })
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,

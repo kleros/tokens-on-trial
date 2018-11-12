@@ -76,9 +76,7 @@ class TokenDetails extends PureComponent {
         if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
           method = () =>
-            this.handleActionClick(
-              modalConstants.TOKEN_MODAL_ENUM.ChallengeRegistration
-            )
+            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
         } else label = 'Challenge Clearing'
       }
     else if (

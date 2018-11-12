@@ -18,7 +18,7 @@ const Submit = ({
   <div>
     <h3 className="Modal-title">Submit a Token</h3>
     <hr />
-    <h5>Fill the required info and stake ETH</h5>
+    <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
     <TokenForm className="Submit-form" onSubmit={submitToken} />
     <div className="Submit-stake">
       <h4>
