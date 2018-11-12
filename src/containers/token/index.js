@@ -62,6 +62,10 @@ class TokenDetails extends PureComponent {
 
   handleActionClick = action => {
     const { openTokenModal } = this.props
+    if (action === modalConstants.TOKEN_MODAL_ENUM.Resubmit) {
+      openTokenModal(action)
+      return
+    }
     openTokenModal(action)
   }
 
@@ -128,7 +132,7 @@ class TokenDetails extends PureComponent {
         label = 'Resubmit Token'
         icon = 'plus'
         method = () =>
-          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Submit)
+          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Resubmit)
       }
     }
 

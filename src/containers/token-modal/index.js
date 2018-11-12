@@ -13,6 +13,7 @@ import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 
 import Submit from './components/submit'
+import Resubmit from './components/resubmit'
 import Clear from './components/clear'
 import Challenge from './components/challenge'
 import {
@@ -35,7 +36,8 @@ class TokenModal extends PureComponent {
     submitTokenForm: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
-    challengeRequest: PropTypes.func.isRequired
+    challengeRequest: PropTypes.func.isRequired,
+    requestRegistration: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -46,6 +48,11 @@ class TokenModal extends PureComponent {
   handleSubmitTokenClick = token => {
     const { createToken } = this.props
     createToken({ tokenData: token, metaEvidence: 'meta evidence' })
+  }
+
+  handleResubmitTokenClick = () => {
+    const { requestRegistration, token } = this.props
+    requestRegistration({ ID: token.data.ID, metaEvidence: 'meta evidence' })
   }
 
   handleClearTokenClick = () => {
@@ -116,6 +123,17 @@ class TokenModal extends PureComponent {
                   challengeRequest={this.handleChallengeClick}
                 />
               )
+            case modalConstants.TOKEN_MODAL_ENUM.Resubmit:
+              return (
+                <Resubmit
+                  tokenName={
+                    token && token.data ? token.data.tokenName : 'token'
+                  }
+                  arbitrableTokenListData={arbitrableTokenListData}
+                  closeTokenModal={closeTokenModal}
+                  resubmitToken={this.handleResubmitTokenClick}
+                />
+              )
             case undefined:
             case null:
               break
@@ -138,6 +156,7 @@ export default connect(
   {
     closeTokenModal: modalActions.closeTokenModal,
     createToken: tokenActions.createToken,
+    requestRegistration: tokenActions.requestRegistration,
     clearToken: tokenActions.clearToken,
     challengeRequest: tokenActions.challengeRequest,
     submitTokenForm,

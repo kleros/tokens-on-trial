@@ -129,6 +129,29 @@ function* createToken({ payload: { token, metaEvidence } }) {
 }
 
 /**
+ * Execute a request for a token.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* requestRegistration({ payload: { ID, metaEvidence } }) {
+  // Add to contract if absent
+  if (
+    Number((yield call(fetchToken, { payload: { ID } })).status) ===
+    tokenConstants.IN_CONTRACT_STATUS_ENUM.Cleared
+  )
+    yield call(
+      arbitrableTokenList.methods.requestRegistration(ID, metaEvidence).send,
+      {
+        from: yield select(walletSelectors.getAccount),
+        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
+      }
+    )
+  else throw new Error(errorConstants.TOKEN_ALREADY_SUBMITTED)
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
  * Request a token to be cleared from the list.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
@@ -239,6 +262,13 @@ export default function* tokenSaga() {
     },
     tokenActions.token,
     createToken
+  )
+  yield takeLatest(
+    tokenActions.token.RESUBMIT,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    requestRegistration
   )
   yield takeLatest(
     tokenActions.token.CLEAR,

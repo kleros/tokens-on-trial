@@ -11,7 +11,8 @@ export const token = {
   }),
   CLEAR: 'CLEAR',
   EXECUTE: 'EXECUTE',
-  CHALLENGE: 'CHALLENGE'
+  CHALLENGE: 'CHALLENGE',
+  RESUBMIT: 'RESUBMIT'
 }
 
 /* Action Creators */
@@ -20,6 +21,10 @@ export const token = {
 export const createToken = ({ tokenData, metaEvidence }) => ({
   type: token.CREATE,
   payload: { token: tokenData, metaEvidence }
+})
+export const requestRegistration = ({ ID, metaEvidence }) => ({
+  type: token.RESUBMIT,
+  payload: { ID, metaEvidence }
 })
 export const clearToken = ({ ID, metaEvidence }) => ({
   type: token.CLEAR,

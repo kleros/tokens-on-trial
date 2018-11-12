@@ -1,0 +1,36 @@
+@import '../../../../styles/_colors.scss';
+
+/* @define Resubmit */
+.Resubmit {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  &-bottom {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  &-form-fieldset {
+    margin: 0 0 !important;
+    padding: 0 0 !important;
+  }
+
+  &-return {
+    flex: 1 0 0;
+  }
+
+  &-request {
+    flex: 3 0 0;
+    margin-left: 16px;
+  }
+
+  &-stake {
+    align-content: flex-start;
+    align-items: center;
+    display: flex;
+    justify-content: space-around;
+  }
+}
