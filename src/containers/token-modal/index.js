@@ -93,6 +93,9 @@ class TokenModal extends PureComponent {
                   clearToken={this.handleClearTokenClick}
                 />
               )
+            case undefined:
+            case null:
+              break
             default:
               throw new Error('Unhandled modal request')
           }

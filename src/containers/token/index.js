@@ -52,9 +52,9 @@ class TokenDetails extends PureComponent {
     this.setState({ filter })
   }
 
-  handleClearTokenClick = () => {
+  handleActionClick = action => {
     const { openTokenModal } = this.props
-    openTokenModal(modalConstants.TOKEN_MODAL_ENUM.Clear)
+    openTokenModal(action)
   }
 
   handleExecuteRequestClick = () => {
@@ -73,19 +73,26 @@ class TokenDetails extends PureComponent {
         else label = 'Confirm Clearing'
       } else {
         icon = 'gavel'
-        if (isRegistrationRequest(token.status))
+        if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
-        else label = 'Challenge Clearing'
+          method = () =>
+            this.handleActionClick(
+              modalConstants.TOKEN_MODAL_ENUM.ChallengeRegistration
+            )
+        } else label = 'Challenge Clearing'
       }
     else if (
       token.status === tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered']
     ) {
-      method = this.handleClearTokenClick
+      method = () =>
+        this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Clear)
       label = 'Submit Clearing Request'
       icon = 'gavel'
     } else {
       label = 'Resubmit Token'
       icon = 'plus'
+      method = () =>
+        this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Submit)
     }
 
     return (
