@@ -25,9 +25,9 @@ export const clearToken = ({ ID, metaEvidence }) => ({
   type: token.CLEAR,
   payload: { ID, metaEvidence }
 })
-export const challengeRequest = agreementID => ({
+export const challengeRequest = ({ ID, value }) => ({
   type: token.CHALLENGE,
-  payload: { agreementID }
+  payload: { ID, value }
 })
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,

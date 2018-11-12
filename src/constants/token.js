@@ -12,6 +12,8 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
 ])
 export const RULING_ENUM = createEnum(['Pending', 'Executed', 'Rejected'])
 
+export const SIDE = createEnum(['Requester', 'Challenger'])
+
 export const STATUS_ENUM = createEnum([
   'PENDING',
   'CHALLENGED',

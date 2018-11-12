@@ -2,6 +2,7 @@ import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import { arbitrableTokenList } from '../bootstrap/dapp-api'
+import { hasPendingRequest } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
@@ -151,6 +152,31 @@ function* clearToken({ payload: { ID, metaEvidence } }) {
 }
 
 /**
+ * Request a token to be cleared from the list.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* challengeRequest({ payload: { ID, value } }) {
+  // Add to contract if absent
+  const token = yield call(fetchToken, { payload: { ID } })
+  if (!hasPendingRequest(token.status))
+    throw new Error(errorConstants.NO_PENDING_REQUEST)
+
+  yield call(
+    arbitrableTokenList.methods.fundDispute(
+      token.latestAgreementID,
+      tokenConstants.SIDE.Challenger
+    ).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value
+    }
+  )
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
  * Execute a request for a token.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
@@ -227,5 +253,12 @@ export default function* tokenSaga() {
     updateTokensCollectionModFlow,
     tokenActions.token,
     executeRequest
+  )
+  yield takeLatest(
+    tokenActions.token.CHALLENGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    challengeRequest
   )
 }

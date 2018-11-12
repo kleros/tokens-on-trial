@@ -9,6 +9,7 @@ import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
+import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 
 import Submit from './components/submit'
@@ -53,8 +54,12 @@ class TokenModal extends PureComponent {
   }
 
   handleChallengeClick = () => {
-    const { challengeRequest, token } = this.props
-    challengeRequest(token.data.latestAgreementID)
+    const { challengeRequest, token, arbitrableTokenListData } = this.props
+    const value = web3.utils
+      .toBN(arbitrableTokenListData.data.challengeReward)
+      .add(web3.utils.toBN(arbitrableTokenListData.data.stake))
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+    challengeRequest({ ID: token.data.ID, value })
   }
 
   componentDidMount() {
