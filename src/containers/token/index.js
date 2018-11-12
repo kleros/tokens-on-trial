@@ -75,7 +75,7 @@ class TokenDetails extends PureComponent {
     const { arbitrableTokenListData } = this.props
     const { timestamp } = this.state
     const timeToChallenge = arbitrableTokenListData.data
-      ? Number(arbitrableTokenListData.data.timeToChallenge)
+      ? Number(arbitrableTokenListData.data.timeToChallenge) / 1000 // convert from milliseconds
       : null
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
 
@@ -99,7 +99,7 @@ class TokenDetails extends PureComponent {
           !timestamp ||
           !token ||
           !timeToChallenge ||
-          timestamp >= lastAction + timeToChallenge
+          timestamp <= lastAction + timeToChallenge
         if (isRegistrationRequest(token.status)) label = 'Confirm Registration'
         else label = 'Confirm Clearing'
       } else {
@@ -108,7 +108,7 @@ class TokenDetails extends PureComponent {
           !timestamp ||
           !token ||
           !timeToChallenge ||
-          timestamp <= lastAction + timeToChallenge
+          timestamp >= lastAction + timeToChallenge
         if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
           method = () =>
