@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
 
+import { web3 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import FilterBar from '../filter-bar'
@@ -14,15 +15,16 @@ import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
 import * as tokenConstants from '../../constants/token'
 import * as walletSelectors from '../../reducers/wallet'
+import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 
 import './token.css'
 
 class TokenDetails extends PureComponent {
   static propTypes = {
+    // State
     accounts: walletSelectors.accountsShape.isRequired,
-    executeRequest: PropTypes.func.isRequired,
-    fetchToken: PropTypes.func.isRequired,
-    openTokenModal: PropTypes.func.isRequired,
+    arbitrableTokenListData:
+      arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     token: PropTypes.shape({
       tokenName: PropTypes.string,
       ticker: PropTypes.string,
@@ -33,7 +35,12 @@ class TokenDetails extends PureComponent {
       params: PropTypes.shape({
         tokenID: PropTypes.string
       })
-    })
+    }),
+
+    // Functions
+    executeRequest: PropTypes.func.isRequired,
+    fetchToken: PropTypes.func.isRequired,
+    openTokenModal: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -43,7 +50,8 @@ class TokenDetails extends PureComponent {
 
   state = {
     token: null,
-    filter: defaultFilter()
+    filter: defaultFilter(),
+    timestamp: null
   }
 
   handleFilterChange = key => {
@@ -64,37 +72,68 @@ class TokenDetails extends PureComponent {
   }
 
   getActionButton = (token, userAccount) => {
+    const { arbitrableTokenListData } = this.props
+    const { timestamp } = this.state
+    const timeToChallenge = arbitrableTokenListData.data
+      ? Number(arbitrableTokenListData.data.timeToChallenge)
+      : null
+    const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
+
     let method, label, icon
+    let disabled = true
     if (hasPendingRequest(token.status))
-      if (token.latestAgreement.creator === userAccount) {
+      if (
+        token &&
+        timestamp &&
+        timeToChallenge &&
+        timestamp >= lastAction + timeToChallenge
+      ) {
         method = this.handleExecuteRequestClick
         icon = 'check'
+        disabled = false
+        label = 'Execute Request'
+      } else if (token.latestAgreement.creator === userAccount) {
+        method = this.handleExecuteRequestClick
+        icon = 'check'
+        disabled =
+          !timestamp ||
+          !token ||
+          !timeToChallenge ||
+          timestamp >= lastAction + timeToChallenge
         if (isRegistrationRequest(token.status)) label = 'Confirm Registration'
         else label = 'Confirm Clearing'
       } else {
         icon = 'gavel'
+        disabled =
+          !timestamp ||
+          !token ||
+          !timeToChallenge ||
+          timestamp <= lastAction + timeToChallenge
         if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
           method = () =>
             this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
         } else label = 'Challenge Clearing'
       }
-    else if (
-      token.status === tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered']
-    ) {
-      method = () =>
-        this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Clear)
-      label = 'Submit Clearing Request'
-      icon = 'gavel'
-    } else {
-      label = 'Resubmit Token'
-      icon = 'plus'
-      method = () =>
-        this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Submit)
+    else {
+      disabled = false
+      if (
+        token.status === tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered']
+      ) {
+        method = () =>
+          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Clear)
+        label = 'Submit Clearing Request'
+        icon = 'gavel'
+      } else {
+        label = 'Resubmit Token'
+        icon = 'plus'
+        method = () =>
+          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Submit)
+      }
     }
 
     return (
-      <Button type="primary" onClick={method}>
+      <Button type="primary" onClick={method} disabled={disabled}>
         <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
         {label}
       </Button>
@@ -105,6 +144,10 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
+    web3.eth.getBlock('latest', (err, block) => {
+      if (err) throw new Error(err)
+      this.setState({ timestamp: block.timestamp })
+    })
   }
 
   componentDidUpdate() {
@@ -212,7 +255,8 @@ class TokenDetails extends PureComponent {
 export default connect(
   state => ({
     token: state.token.token.data,
-    accounts: state.wallet.accounts
+    accounts: state.wallet.accounts,
+    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData
   }),
   {
     fetchToken: tokenActions.fetchToken,
