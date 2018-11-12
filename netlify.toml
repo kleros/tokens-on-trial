@@ -2,8 +2,9 @@
   NODE_VERSION='9.4.0'
   YARN_FLAGS='--pure-lockfile'
   REACT_APP_PROD_ETHEREUM_PROVIDER="https://kovan.infura.io/v3/9c26dd38fd2e44e6bcff6a133eb67930"
-  REACT_APP_PROD_ARBITRABLE_TOKEN_LIST_ADDRESS="0xd73a509f6588eBda3a23DBAa3213e877470dDb4a"
-  REACT_APP_PROD_PATCH_TOKEN_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/token"
+ REACT_APP_DEV_ARBITRABLE_TOKEN_LIST_ADDRESS="0xD057a9c1e09F983F0394a03aDFc80e0bdB90A787"
+  REACT_APP_DEV_TOKEN_BASE_URL="https://staging-cfs.s3.us-east-2.amazonaws.com"
+  REACT_APP_DEV_TOKEN_UPLOAD_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/cfs"
 
 [context.production.environment]
   REACT_APP_PROD_ETHEREUM_PROVIDER="https://mainnet.infura.io/v3/9c26dd38fd2e44e6bcff6a133eb67930"
