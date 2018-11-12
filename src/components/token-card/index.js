@@ -12,12 +12,11 @@ const TokenCard = ({ token }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
       <FontAwesomeIcon
-        className={
+        icon={
           token.clientStatus === tokenConstants.STATUS_ENUM.PENDING
-            ? 'TokenCard-hidden'
-            : ''
+            ? 'clock'
+            : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
         }
-        icon={tokenConstants.STATUS_ICON_ENUM[token.clientStatus]}
         color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
       />
       <h5>
