@@ -70,22 +70,33 @@ class TokenModal extends PureComponent {
         onRequestClose={closeTokenModal}
         className="TokenModal"
       >
-        {openTokenModal === modalConstants.TOKEN_MODAL_ENUM.Submit ? (
-          <Submit
-            arbitrableTokenListData={arbitrableTokenListData}
-            closeTokenModal={closeTokenModal}
-            submitTokenForm={submitTokenForm}
-            submitToken={this.handleSubmitTokenClick}
-            tokenFormIsInvalid={tokenFormIsInvalid}
-          />
-        ) : (
-          <Clear
-            tokenName={token && token.data ? token.data.tokenName : 'token'}
-            arbitrableTokenListData={arbitrableTokenListData}
-            closeTokenModal={closeTokenModal}
-            clearToken={this.handleClearTokenClick}
-          />
-        )}
+        {(() => {
+          switch (openTokenModal) {
+            case modalConstants.TOKEN_MODAL_ENUM.Submit:
+              return (
+                <Submit
+                  arbitrableTokenListData={arbitrableTokenListData}
+                  closeTokenModal={closeTokenModal}
+                  submitTokenForm={submitTokenForm}
+                  submitToken={this.handleSubmitTokenClick}
+                  tokenFormIsInvalid={tokenFormIsInvalid}
+                />
+              )
+            case modalConstants.TOKEN_MODAL_ENUM.Clear:
+              return (
+                <Clear
+                  tokenName={
+                    token && token.data ? token.data.tokenName : 'token'
+                  }
+                  arbitrableTokenListData={arbitrableTokenListData}
+                  closeTokenModal={closeTokenModal}
+                  clearToken={this.handleClearTokenClick}
+                />
+              )
+            default:
+              throw new Error('Unhandled modal request')
+          }
+        })()}
       </Modal>
     )
   }
