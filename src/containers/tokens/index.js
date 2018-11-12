@@ -39,9 +39,11 @@ class Tokens extends Component {
     this.fetchTokens(true)
   }
 
-  mapTokens = memoizeOne(tokens =>
-    tokens.map(token => <TokenCard key={token.ID} token={token} />)
-  )
+  mapTokens = memoizeOne(tokens => {
+    if (tokens)
+      return tokens.map(token => <TokenCard key={token.ID} token={token} />)
+    return null
+  })
 
   handleFilterChange = key => {
     const { filter } = this.state
