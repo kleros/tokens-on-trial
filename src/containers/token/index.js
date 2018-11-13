@@ -80,39 +80,40 @@ class TokenDetails extends PureComponent {
     const { arbitrableTokenListData } = this.props
     const { timestamp } = this.state
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
-    let timeToChallenge, submitterFees, challengerFees
-
-    if (arbitrableTokenListData.data) {
-      timeToChallenge =
-        Number(arbitrableTokenListData.data.timeToChallenge) / 1000 // convert from milliseconds
-      const lastRoundPosition =
-        token.paidFees.totalContributedPerSide.length - 1
-
-      if (token.paidFees.totalContributedPerSide[lastRoundPosition]) {
-        submitterFees = Number(
-          token.paidFees.totalContributedPerSide[lastRoundPosition][
-            tokenConstants.SIDE.Requester
-          ]
-        )
-        challengerFees = Number(
-          token.paidFees.totalContributedPerSide[lastRoundPosition][
-            tokenConstants.SIDE.Challenger
-          ]
-        )
-      }
-    }
+    let submitterFees, challengerFees, firstContributionTime
 
     let method
     let disabled = true
     let label = 'Loading...'
     let icon = 'spinner'
-    if (!token || !timeToChallenge)
+
+    if (!token || !arbitrableTokenListData.data || !token.paidFees)
       return (
         <Button type="primary" disabled={disabled}>
           <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
           {label}
         </Button>
       )
+
+    const timeToChallenge = Number(arbitrableTokenListData.data.timeToChallenge)
+    const arbitrationFeesWaitingTime = Number(
+      arbitrableTokenListData.data.arbitrationFeesWaitingTime
+    )
+
+    const lastRoundPosition = token.paidFees.totalContributedPerSide.length - 1
+    if (token.paidFees.totalContributedPerSide[lastRoundPosition]) {
+      submitterFees = Number(
+        token.paidFees.totalContributedPerSide[lastRoundPosition][
+          tokenConstants.SIDE.Requester
+        ]
+      )
+      challengerFees = Number(
+        token.paidFees.totalContributedPerSide[lastRoundPosition][
+          tokenConstants.SIDE.Challenger
+        ]
+      )
+      firstContributionTime = Number(token.paidFees.firstContributionTime)
+    }
 
     if (hasPendingRequest(token.status))
       if (timestamp >= lastAction + timeToChallenge) {
@@ -121,7 +122,7 @@ class TokenDetails extends PureComponent {
         disabled = false
         label = 'Execute Request'
       } else if (token.latestAgreement.creator === userAccount) {
-        if (challengerFees > submitterFees) {
+        if (timestamp - firstContributionTime < arbitrationFeesWaitingTime) {
           icon = 'gavel'
           label = 'Pay Arbitration Fees'
           disabled = false

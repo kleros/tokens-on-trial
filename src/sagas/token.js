@@ -80,6 +80,10 @@ export function* fetchToken({ payload: { ID } }) {
     arbitrableTokenList.methods.getFeesInfo(token.latestAgreementID).call
   )
 
+  token.paidFees.firstContributionTime = yield call(
+    arbitrableTokenList.methods.paidFees(token.latestAgreementID).call
+  )
+
   const { tokenName, address, ticker, URI } = yield call(storeApi.getFile, ID)
 
   return {
