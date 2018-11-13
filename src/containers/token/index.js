@@ -237,9 +237,15 @@ class TokenDetails extends PureComponent {
                 <span className="TokenDetails-meta--aligned">
                   <FontAwesomeIcon
                     className="TokenDetails-icon"
-                    icon="hourglass-half"
+                    icon={
+                      token.clientStatus === tokenConstants.STATUS_ENUM.PENDING
+                        ? 'hourglass-half'
+                        : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
+                    }
                   />
-                  Registration Requested
+                  {tokenConstants.camelCaseAddSpaces(
+                    tokenConstants.IN_CONTRACT_STATUS_ENUM[token.status]
+                  )}
                 </span>
                 <div
                   className={`TokenDetails-timer ${

@@ -48,3 +48,7 @@ export const FILTER_OPTIONS_ENUM = createEnum([
   'My Challenges'
 ])
 export const SORT_OPTIONS_ENUM = createEnum(['Newest', 'Oldest'])
+
+// helloThere => Hello There
+export const camelCaseAddSpaces = str =>
+  str.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
