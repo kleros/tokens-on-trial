@@ -84,12 +84,13 @@ class TokenDetails extends PureComponent {
       : null
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
 
-    let method, icon
+    let method
     let disabled = true
     let label = 'Loading...'
-    if (!token || !timestamp || !timeToChallenge)
+    let icon = 'spinner'
+    if (!token || !timeToChallenge)
       return (
-        <Button type="primary" onClick={method} disabled={disabled}>
+        <Button type="primary" disabled={disabled}>
           <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
           {label}
         </Button>
@@ -114,7 +115,11 @@ class TokenDetails extends PureComponent {
       } else {
         icon = 'gavel'
         disabled = timestamp >= lastAction + timeToChallenge
-        if (token.paidFees.loserFullyFunded) {
+        if (
+          token.paidFees.loserFullyFunded[
+            token.paidFees.loserFullyFunded.length - 1
+          ]
+        ) {
           label = 'Waiting Submitter Fees'
           disabled = true
         } else if (isRegistrationRequest(token.status)) {
@@ -172,7 +177,7 @@ class TokenDetails extends PureComponent {
 
         let time =
           Number(token.lastAction) +
-          Number(arbitrableTokenListData.data.timeToChallenge) * 1000 -
+          Number(arbitrableTokenListData.data.timeToChallenge) -
           block.timestamp * 1000
         time = time >= 0 ? time : 0
         this.setState({
