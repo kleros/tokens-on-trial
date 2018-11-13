@@ -50,8 +50,6 @@ const arbitrableTokenList = new web3.eth.Contract(
   ArbitrableTokenList.abi,
   ARBITRABLE_TOKEN_LIST_ADDRESS
 )
-console.info('arbitrable', ARBITRABLE_TOKEN_LIST_ADDRESS)
-console.info(arbitrableTokenList)
 const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
