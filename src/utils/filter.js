@@ -8,16 +8,10 @@ export const defaultFilter = () => {
   const filter = tokenConstants.FILTER_OPTIONS_ENUM.values.reduce(
     (acc, curr) => ({
       ...acc,
-      [curr]: false
+      [curr]: true
     }),
     {}
   )
-
-  // Set default filter
-  filter['Registered'] = true
-  filter['My Challenges'] = true
-  filter['My Submissions'] = true
-
   return filter
 }
 
