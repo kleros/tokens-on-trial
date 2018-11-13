@@ -115,8 +115,12 @@ class TokenDetails extends PureComponent {
       firstContributionTime = Number(token.paidFees.firstContributionTime)
     }
 
-    if (hasPendingRequest(token.status))
-      if (timestamp >= lastAction + timeToChallenge) {
+    if (hasPendingRequest(token))
+      if (token.latestAgreement.disputed) {
+        icon = 'hourglass-half'
+        disabled = true
+        label = 'Waiting Arbitration'
+      } else if (timestamp >= lastAction + timeToChallenge) {
         method = this.handleExecuteRequestClick
         icon = 'check'
         disabled = false
@@ -190,7 +194,7 @@ class TokenDetails extends PureComponent {
     const { countdown } = this.state
     if (
       token &&
-      hasPendingRequest(token.status) &&
+      hasPendingRequest(token) &&
       countdown === null &&
       arbitrableTokenListData &&
       arbitrableTokenListData.data
@@ -269,18 +273,18 @@ class TokenDetails extends PureComponent {
                   <FontAwesomeIcon
                     className="TokenDetails-icon"
                     icon={
-                      token.clientStatus === tokenConstants.STATUS_ENUM.PENDING
+                      token.clientStatus === tokenConstants.STATUS_ENUM.Pending
                         ? 'hourglass-half'
                         : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
                     }
                   />
-                  {tokenConstants.camelCaseAddSpaces(
-                    tokenConstants.IN_CONTRACT_STATUS_ENUM[token.status]
-                  )}
+                  {tokenConstants.STATUS_ENUM[token.clientStatus]}
                 </span>
                 <div
                   className={`TokenDetails-timer ${
-                    !hasPendingRequest(token.status) ? `Hidden` : ``
+                    !token.clientStatus !== tokenConstants.STATUS_ENUM.Pending
+                      ? `Hidden`
+                      : ``
                   }`}
                 >
                   Challenge Deadline{' '}

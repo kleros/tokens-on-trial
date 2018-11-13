@@ -15,11 +15,11 @@ export const RULING_ENUM = createEnum(['Pending', 'Executed', 'Rejected'])
 export const SIDE = createEnum(['Requester', 'Challenger'])
 
 export const STATUS_ENUM = createEnum([
-  'PENDING',
-  'CHALLENGED',
-  'REGISTERED',
-  'CLEARED',
-  'ABSENT'
+  'Pending',
+  'Challenged',
+  'Registered',
+  'Cleared',
+  'Absent'
 ])
 
 export const STATUS_ICON_ENUM = createEnum([

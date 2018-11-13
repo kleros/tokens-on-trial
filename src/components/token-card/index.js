@@ -13,7 +13,7 @@ const TokenCard = ({ token }) => (
     <div className="TokenCard-header">
       <FontAwesomeIcon
         icon={
-          token.clientStatus === tokenConstants.STATUS_ENUM.PENDING
+          token.clientStatus === tokenConstants.STATUS_ENUM.Pending
             ? 'clock'
             : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
         }

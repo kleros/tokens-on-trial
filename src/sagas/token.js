@@ -2,7 +2,7 @@ import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import { arbitrableTokenList } from '../bootstrap/dapp-api'
-import { hasPendingRequest } from '../utils/token'
+import { hasPendingRequest, contractStatusToClientStatus } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
@@ -46,25 +46,6 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   return tokens
 }
 
-const contractStatusToClientStatus = ({ status, disputed }) => {
-  if (disputed) return tokenConstants.STATUS_ENUM.CHALLENGED
-  switch (tokenConstants.IN_CONTRACT_STATUS_ENUM[status]) {
-    case 'Submitted':
-    case 'Resubmitted':
-    case 'ClearingRequested':
-    case 'PreventiveClearingRequested':
-      return tokenConstants.STATUS_ENUM.PENDING
-    case 'Registered':
-      return tokenConstants.STATUS_ENUM.REGISTERED
-    case 'Cleared':
-      return tokenConstants.STATUS_ENUM.CLEARED
-    case 'Absent':
-      return tokenConstants.STATUS_ENUM.ABSENT
-    default:
-      throw new Error('Unknown status: ', status, ' disputed: ', disputed)
-  }
-}
-
 /**
  * Fetches a token from the list.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
@@ -101,10 +82,7 @@ export function* fetchToken({ payload: { ID } }) {
     lastAction: token.lastAction
       ? new Date(Number(token.lastAction * 1000))
       : null,
-    clientStatus: contractStatusToClientStatus({
-      status: token.status,
-      disputed: token.latestAgreement.disputed
-    })
+    clientStatus: contractStatusToClientStatus(token)
   }
 }
 
@@ -191,7 +169,7 @@ function* clearToken({ payload: { ID, metaEvidence } }) {
 function* fundDispute({ payload: { ID, value, side } }) {
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
-  if (!hasPendingRequest(token.status))
+  if (!hasPendingRequest(token))
     throw new Error(errorConstants.NO_PENDING_REQUEST)
 
   yield call(
