@@ -87,13 +87,16 @@ class TokenDetails extends PureComponent {
     let method, icon
     let disabled = true
     let label = 'Loading...'
+    if (!token || !timestamp || !timeToChallenge)
+      return (
+        <Button type="primary" onClick={method} disabled={disabled}>
+          <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
+          {label}
+        </Button>
+      )
+
     if (hasPendingRequest(token.status))
-      if (
-        token &&
-        timestamp &&
-        timeToChallenge &&
-        timestamp >= lastAction + timeToChallenge
-      ) {
+      if (timestamp >= lastAction + timeToChallenge) {
         method = this.handleExecuteRequestClick
         icon = 'check'
         disabled = false
