@@ -51,7 +51,8 @@ class TokenDetails extends PureComponent {
   state = {
     token: null,
     filter: defaultFilter(),
-    timestamp: null
+    timestamp: null,
+    countdown: null
   }
 
   handleFilterChange = key => {
@@ -83,8 +84,9 @@ class TokenDetails extends PureComponent {
       : null
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
 
-    let method, label, icon
+    let method, icon
     let disabled = true
+    let label = 'Loading...'
     if (hasPendingRequest(token.status))
       if (
         token &&
@@ -148,19 +150,44 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
-    web3.eth.getBlock('latest', (err, block) => {
-      if (err) throw new Error(err)
-      this.setState({ timestamp: block.timestamp })
-    })
   }
 
   componentDidUpdate() {
-    const { token } = this.props
+    const { token, arbitrableTokenListData } = this.props
     this.setState({ token })
+
+    const { countdown } = this.state
+    if (
+      token &&
+      hasPendingRequest(token.status) &&
+      countdown === null &&
+      arbitrableTokenListData &&
+      arbitrableTokenListData.data
+    ) {
+      this.setState({ countdown: 'Loading...' })
+      web3.eth.getBlock('latest', (err, block) => {
+        if (err) throw new Error(err)
+
+        let time =
+          Number(token.lastAction) +
+          Number(arbitrableTokenListData.data.timeToChallenge) * 1000 -
+          block.timestamp * 1000
+        time = time >= 0 ? time : 0
+        this.setState({
+          timestamp: block.timestamp,
+          countdown: new Date(time)
+        })
+        setInterval(() => {
+          const { countdown } = this.state
+          if (countdown > 0)
+            this.setState({ countdown: new Date(countdown - 1000) })
+        }, 1000)
+      })
+    }
   }
 
   render() {
-    const { token, filter } = this.state
+    const { token, filter, countdown } = this.state
     const { accounts } = this.props
 
     if (token)
@@ -214,8 +241,15 @@ class TokenDetails extends PureComponent {
                   />
                   Registration Requested
                 </span>
-                <div className="TokenDetails-timer">
-                  Challenge Deadline 12:34:56
+                <div
+                  className={`TokenDetails-timer ${
+                    !hasPendingRequest(token.status) ? `Hidden` : ``
+                  }`}
+                >
+                  Challenge Deadline{' '}
+                  {countdown instanceof Date
+                    ? countdown.toISOString().substr(11, 8)
+                    : '--:--:--'}
                 </div>
               </div>
               <div className="TokenDetails-action">
