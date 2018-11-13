@@ -11,7 +11,7 @@ export const token = {
   }),
   CLEAR: 'CLEAR',
   EXECUTE: 'EXECUTE',
-  CHALLENGE: 'CHALLENGE',
+  FUND_DISPUTE: 'FUND_DISPUTE',
   RESUBMIT: 'RESUBMIT'
 }
 
@@ -30,9 +30,9 @@ export const clearToken = ({ ID, metaEvidence }) => ({
   type: token.CLEAR,
   payload: { ID, metaEvidence }
 })
-export const challengeRequest = ({ ID, value }) => ({
-  type: token.CHALLENGE,
-  payload: { ID, value }
+export const fundDispute = ({ ID, value, side }) => ({
+  type: token.FUND_DISPUTE,
+  payload: { ID, value, side }
 })
 export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
   type: tokens.FETCH,

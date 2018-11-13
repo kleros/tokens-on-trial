@@ -180,21 +180,18 @@ function* clearToken({ payload: { ID, metaEvidence } }) {
 }
 
 /**
- * Request a token to be cleared from the list.
+ * Fund a side of a dispute
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* challengeRequest({ payload: { ID, value } }) {
+function* fundDispute({ payload: { ID, value, side } }) {
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
   if (!hasPendingRequest(token.status))
     throw new Error(errorConstants.NO_PENDING_REQUEST)
 
   yield call(
-    arbitrableTokenList.methods.fundDispute(
-      token.latestAgreementID,
-      tokenConstants.SIDE.Challenger
-    ).send,
+    arbitrableTokenList.methods.fundDispute(token.latestAgreementID, side).send,
     {
       from: yield select(walletSelectors.getAccount),
       value
@@ -290,10 +287,10 @@ export default function* tokenSaga() {
     executeRequest
   )
   yield takeLatest(
-    tokenActions.token.CHALLENGE,
+    tokenActions.token.FUND_DISPUTE,
     lessduxSaga,
     updateTokensCollectionModFlow,
     tokenActions.token,
-    challengeRequest
+    fundDispute
   )
 }

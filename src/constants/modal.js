@@ -5,5 +5,6 @@ export const TOKEN_MODAL_ENUM = createEnum([
   'Submit',
   'Clear',
   'Challenge',
-  'Resubmit'
+  'Resubmit',
+  'FundDispute'
 ])

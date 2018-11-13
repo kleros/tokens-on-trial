@@ -125,6 +125,8 @@ class TokenDetails extends PureComponent {
           icon = 'gavel'
           label = 'Pay Arbitration Fees'
           disabled = false
+          method = () =>
+            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.FundDispute)
         } else {
           method = this.handleExecuteRequestClick
           icon = 'check'
@@ -146,7 +148,7 @@ class TokenDetails extends PureComponent {
         } else if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
           method = () =>
-            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.FundDispute)
+            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
         } else label = 'Challenge Clearing'
       }
     else {

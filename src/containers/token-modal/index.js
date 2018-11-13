@@ -5,6 +5,7 @@ import { connect } from 'react-redux'
 import * as modalActions from '../../actions/modal'
 import * as modalSelectors from '../../reducers/modal'
 import * as modalConstants from '../../constants/modal'
+import * as tokenConstants from '../../constants/token'
 import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
@@ -12,6 +13,7 @@ import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-l
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 
+import FundDispute from './components/fund-dispute'
 import Submit from './components/submit'
 import Resubmit from './components/resubmit'
 import Clear from './components/clear'
@@ -36,7 +38,7 @@ class TokenModal extends PureComponent {
     submitTokenForm: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
-    challengeRequest: PropTypes.func.isRequired,
+    fundDispute: PropTypes.func.isRequired,
     requestRegistration: PropTypes.func.isRequired
   }
 
@@ -61,12 +63,28 @@ class TokenModal extends PureComponent {
   }
 
   handleChallengeClick = () => {
-    const { challengeRequest, token, arbitrableTokenListData } = this.props
+    const { fundDispute, token, arbitrableTokenListData } = this.props
     const value = web3.utils
       .toBN(arbitrableTokenListData.data.challengeReward)
       .add(web3.utils.toBN(arbitrableTokenListData.data.stake))
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
-    challengeRequest({ ID: token.data.ID, value })
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2))
+    fundDispute({
+      ID: token.data.ID,
+      value,
+      side: tokenConstants.SIDE.Challenger
+    })
+  }
+
+  handleFundDisputeClick = () => {
+    const { fundDispute, token, arbitrableTokenListData } = this.props
+    const value = web3.utils
+      .toBN(arbitrableTokenListData.data.stake)
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2))
+    fundDispute({
+      ID: token.data.ID,
+      value,
+      side: tokenConstants.SIDE.Requester
+    })
   }
 
   componentDidMount() {
@@ -120,7 +138,7 @@ class TokenModal extends PureComponent {
                   }
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
-                  challengeRequest={this.handleChallengeClick}
+                  fundDispute={this.handleChallengeClick}
                 />
               )
             case modalConstants.TOKEN_MODAL_ENUM.Resubmit:
@@ -132,6 +150,17 @@ class TokenModal extends PureComponent {
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
                   resubmitToken={this.handleResubmitTokenClick}
+                />
+              )
+            case modalConstants.TOKEN_MODAL_ENUM.FundDispute:
+              return (
+                <FundDispute
+                  tokenName={
+                    token && token.data ? token.data.tokenName : 'token'
+                  }
+                  arbitrableTokenListData={arbitrableTokenListData}
+                  closeTokenModal={closeTokenModal}
+                  fundDispute={this.handleFundDisputeClick}
                 />
               )
             case undefined:
@@ -158,7 +187,7 @@ export default connect(
     createToken: tokenActions.createToken,
     requestRegistration: tokenActions.requestRegistration,
     clearToken: tokenActions.clearToken,
-    challengeRequest: tokenActions.challengeRequest,
+    fundDispute: tokenActions.fundDispute,
     submitTokenForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData
