@@ -40,7 +40,7 @@ class Tokens extends Component {
   }
 
   mapTokens = memoizeOne(tokens => {
-    if (tokens)
+    if (Array.isArray(tokens))
       return tokens.map(token => <TokenCard key={token.ID} token={token} />)
     return null
   })
