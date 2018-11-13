@@ -76,6 +76,10 @@ export function* fetchToken({ payload: { ID } }) {
     arbitrableTokenList.methods.getAgreementInfo(token.latestAgreementID).call
   )
 
+  token.paidFees = yield call(
+    arbitrableTokenList.methods.getFeesInfo(token.latestAgreementID).call
+  )
+
   const { tokenName, address, ticker, URI } = yield call(storeApi.getFile, ID)
 
   return {
@@ -89,6 +93,7 @@ export function* fetchToken({ payload: { ID } }) {
     challengeReward: String(token.balance),
     latestAgreementID: String(token.latestAgreementID),
     latestAgreement: token.latestAgreement,
+    paidFees: token.paidFees,
     lastAction: token.lastAction
       ? new Date(Number(token.lastAction * 1000))
       : null,

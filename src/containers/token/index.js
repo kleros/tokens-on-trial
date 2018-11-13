@@ -113,12 +113,11 @@ class TokenDetails extends PureComponent {
         else label = 'Confirm Clearing'
       } else {
         icon = 'gavel'
-        disabled =
-          !timestamp ||
-          !token ||
-          !timeToChallenge ||
-          timestamp >= lastAction + timeToChallenge
-        if (isRegistrationRequest(token.status)) {
+        disabled = timestamp >= lastAction + timeToChallenge
+        if (token.paidFees.loserFullyFunded) {
+          label = 'Waiting Submitter Fees'
+          disabled = true
+        } else if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
           method = () =>
             this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)

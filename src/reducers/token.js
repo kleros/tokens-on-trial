@@ -12,6 +12,15 @@ export const _tokenShape = PropTypes.shape({
   latestAgreementID: PropTypes.string.isRequired,
   balance: PropTypes.string.isRequired,
   challengeReward: PropTypes.string.isRequired,
+  paidFees: PropTypes.shape({
+    ruling: PropTypes.arrayOf(PropTypes.string).isRequired,
+    _stake: PropTypes.arrayOf(PropTypes.string).isRequired,
+    totalValue: PropTypes.arrayOf(PropTypes.string).isRequired,
+    totalContributedPerSide: PropTypes.arrayOf(
+      PropTypes.arrayOf(PropTypes.string).isRequired
+    ).isRequired,
+    loserFullyFunded: PropTypes.arrayOf(PropTypes.bool).isRequired
+  }).isRequired,
   latestAgreement: PropTypes.shape({
     appealed: PropTypes.bool.isRequired,
     arbitrationFeesWaitingTime: PropTypes.string.isRequired,
