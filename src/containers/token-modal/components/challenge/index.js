@@ -11,7 +11,7 @@ import './challenge.css'
 const Challenge = ({
   arbitrableTokenListData,
   closeTokenModal,
-  challengeRequest
+  fundDispute
 }) => (
   <div>
     <h3 className="Modal-title">
@@ -50,7 +50,7 @@ const Challenge = ({
         {`${String(
           web3.utils.fromWei(
             String(
-              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
+              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2)
             )
           )
         )} ETH`}
@@ -67,7 +67,9 @@ const Challenge = ({
                 .toBN(arbitrableTokenListData.data.challengeReward)
                 .add(web3.utils.toBN(arbitrableTokenListData.data.stake))
                 .add(
-                  web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
+                  web3.utils.toBN(
+                    arbitrableTokenListData.data.arbitrationCost / 2
+                  )
                 )
             )
           )
@@ -86,7 +88,7 @@ const Challenge = ({
       <Button
         className="Challenge-request"
         type="primary"
-        onClick={challengeRequest}
+        onClick={fundDispute}
       >
         Challenge
       </Button>
@@ -101,7 +103,7 @@ Challenge.propTypes = {
 
   // Action Dispatchers
   closeTokenModal: PropTypes.func.isRequired,
-  challengeRequest: PropTypes.func.isRequired
+  fundDispute: PropTypes.func.isRequired
 }
 
 export default Challenge
