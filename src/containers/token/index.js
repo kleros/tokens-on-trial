@@ -80,16 +80,24 @@ class TokenDetails extends PureComponent {
     const { arbitrableTokenListData } = this.props
     const { timestamp } = this.state
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
-    const timeToChallenge = arbitrableTokenListData.data
-      ? Number(arbitrableTokenListData.data.timeToChallenge) / 1000 // convert from milliseconds
-      : null
-    const feePerSide = arbitrableTokenListData.data
-      ? Number(
-          token.paidFees.totalContributedPerSide[
-            token.paidFees.totalContributedPerSide.length - 1
-          ][1]
-        )
-      : null
+    let timeToChallenge, submitterFees, challengerFees
+
+    if (arbitrableTokenListData.data) {
+      timeToChallenge =
+        Number(arbitrableTokenListData.data.timeToChallenge) / 1000 // convert from milliseconds
+      const lastRoundPosition =
+        token.paidFees.totalContributedPerSide.length - 1
+      submitterFees = Number(
+        token.paidFees.totalContributedPerSide[lastRoundPosition][
+          tokenConstants.SIDE.Requester
+        ]
+      )
+      challengerFees = Number(
+        token.paidFees.totalContributedPerSide[lastRoundPosition][
+          tokenConstants.SIDE.Challenger
+        ]
+      )
+    }
 
     let method
     let disabled = true
@@ -110,22 +118,26 @@ class TokenDetails extends PureComponent {
         disabled = false
         label = 'Execute Request'
       } else if (token.latestAgreement.creator === userAccount) {
-        method = this.handleExecuteRequestClick
-        icon = 'check'
-        disabled =
-          !timestamp ||
-          !token ||
-          !timeToChallenge ||
-          timestamp <= lastAction + timeToChallenge
-        if (isRegistrationRequest(token.status)) label = 'Confirm Registration'
-        else label = 'Confirm Clearing'
+        if (challengerFees > submitterFees) {
+          icon = 'gavel'
+          label = 'Pay Arbitration Fees'
+          disabled = false
+        } else {
+          method = this.handleExecuteRequestClick
+          icon = 'check'
+          disabled =
+            !timestamp ||
+            !token ||
+            !timeToChallenge ||
+            timestamp <= lastAction + timeToChallenge
+          if (isRegistrationRequest(token.status))
+            label = 'Confirm Registration'
+          else label = 'Confirm Clearing'
+        }
       } else {
         icon = 'gavel'
         disabled = timestamp >= lastAction + timeToChallenge
-        if (
-          feePerSide ===
-          Number(arbitrableTokenListData.data.arbitrationCost) / 2
-        ) {
+        if (challengerFees > submitterFees) {
           label = 'Waiting Submitter Fees'
           disabled = true
         } else if (isRegistrationRequest(token.status)) {
