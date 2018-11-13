@@ -79,10 +79,17 @@ class TokenDetails extends PureComponent {
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp } = this.state
+    const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
     const timeToChallenge = arbitrableTokenListData.data
       ? Number(arbitrableTokenListData.data.timeToChallenge) / 1000 // convert from milliseconds
       : null
-    const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
+    const feePerSide = arbitrableTokenListData.data
+      ? Number(
+          token.paidFees.totalContributedPerSide[
+            token.paidFees.totalContributedPerSide.length - 1
+          ][1]
+        )
+      : null
 
     let method
     let disabled = true
@@ -116,9 +123,8 @@ class TokenDetails extends PureComponent {
         icon = 'gavel'
         disabled = timestamp >= lastAction + timeToChallenge
         if (
-          token.paidFees.loserFullyFunded[
-            token.paidFees.loserFullyFunded.length - 1
-          ]
+          feePerSide ===
+          Number(arbitrableTokenListData.data.arbitrationCost) / 2
         ) {
           label = 'Waiting Submitter Fees'
           disabled = true
