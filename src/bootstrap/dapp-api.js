@@ -7,6 +7,7 @@ const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
 const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
+const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
 const TOKEN_UPLOAD_URL = process.env[`REACT_APP_${env}_TOKEN_UPLOAD_URL`]
 const TOKEN_BASE_URL = process.env[`REACT_APP_${env}_TOKEN_BASE_URL`]
 
@@ -49,7 +50,9 @@ const arbitrableTokenList = new web3.eth.Contract(
   ArbitrableTokenList.abi,
   ARBITRABLE_TOKEN_LIST_ADDRESS
 )
-const arbitrator = new web3.eth.Contract(Arbitrator.abi)
+console.info('arbitrable', ARBITRABLE_TOKEN_LIST_ADDRESS)
+console.info(arbitrableTokenList)
+const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
   web3,
