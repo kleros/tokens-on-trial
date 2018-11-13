@@ -87,16 +87,19 @@ class TokenDetails extends PureComponent {
         Number(arbitrableTokenListData.data.timeToChallenge) / 1000 // convert from milliseconds
       const lastRoundPosition =
         token.paidFees.totalContributedPerSide.length - 1
-      submitterFees = Number(
-        token.paidFees.totalContributedPerSide[lastRoundPosition][
-          tokenConstants.SIDE.Requester
-        ]
-      )
-      challengerFees = Number(
-        token.paidFees.totalContributedPerSide[lastRoundPosition][
-          tokenConstants.SIDE.Challenger
-        ]
-      )
+
+      if (token.paidFees.totalContributedPerSide[lastRoundPosition]) {
+        submitterFees = Number(
+          token.paidFees.totalContributedPerSide[lastRoundPosition][
+            tokenConstants.SIDE.Requester
+          ]
+        )
+        challengerFees = Number(
+          token.paidFees.totalContributedPerSide[lastRoundPosition][
+            tokenConstants.SIDE.Challenger
+          ]
+        )
+      }
     }
 
     let method
@@ -143,7 +146,7 @@ class TokenDetails extends PureComponent {
         } else if (isRegistrationRequest(token.status)) {
           label = 'Challenge Registration'
           method = () =>
-            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
+            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.FundDispute)
         } else label = 'Challenge Clearing'
       }
     else {
