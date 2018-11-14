@@ -284,7 +284,8 @@ class TokenDetails extends PureComponent {
                 </span>
                 <div
                   className={`TokenDetails-timer ${
-                    token.clientStatus !== tokenConstants.STATUS_ENUM.Pending
+                    token.clientStatus !== tokenConstants.STATUS_ENUM.Pending ||
+                    Number(countdown) === 0
                       ? `Hidden`
                       : ``
                   }`}
