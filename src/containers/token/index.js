@@ -150,11 +150,13 @@ class TokenDetails extends PureComponent {
         if (challengerFees > submitterFees) {
           label = 'Waiting Submitter Fees'
           disabled = true
-        } else if (isRegistrationRequest(token.status)) {
-          label = 'Challenge Registration'
+        } else {
           method = () =>
             this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
-        } else label = 'Challenge Clearing'
+          if (isRegistrationRequest(token.status))
+            label = 'Challenge Registration'
+          else label = 'Challenge Clearing'
+        }
       }
     else {
       disabled = false
