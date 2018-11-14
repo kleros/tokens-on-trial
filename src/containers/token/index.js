@@ -78,7 +78,7 @@ class TokenDetails extends PureComponent {
 
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
-    const { timestamp } = this.state
+    const { timestamp, countdown } = this.state
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
     let submitterFees, challengerFees, firstContributionTime
 
@@ -120,7 +120,13 @@ class TokenDetails extends PureComponent {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
-      } else if (timestamp >= lastAction + timeToChallenge) {
+      } else if (
+        timestamp >= lastAction + timeToChallenge ||
+        (countdown &&
+          countdown.getTime &&
+          countdown.getTime() === 0 &&
+          hasPendingRequest(token))
+      ) {
         method = this.handleExecuteRequestClick
         icon = 'check'
         disabled = false
