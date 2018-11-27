@@ -49,17 +49,17 @@ class TokenModal extends PureComponent {
 
   handleSubmitTokenClick = token => {
     const { createToken } = this.props
-    createToken({ tokenData: token, metaEvidence: 'meta evidence' })
+    createToken({ tokenData: token })
   }
 
   handleResubmitTokenClick = () => {
     const { requestRegistration, token } = this.props
-    requestRegistration({ ID: token.data.ID, metaEvidence: 'meta evidence' })
+    requestRegistration({ ID: token.data.ID })
   }
 
   handleClearTokenClick = () => {
     const { clearToken, token } = this.props
-    clearToken({ ID: token.data.ID, metaEvidence: 'meta evidence' })
+    clearToken({ ID: token.data.ID })
   }
 
   handleChallengeClick = () => {

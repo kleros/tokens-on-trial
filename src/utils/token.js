@@ -30,8 +30,8 @@ export const isRegistrationRequest = tokenStatus => {
   }
 }
 
-export const contractStatusToClientStatus = ({ status, latestAgreement }) => {
-  if (latestAgreement.disputed) return tokenConstants.STATUS_ENUM.Challenged
+export const contractStatusToClientStatus = ({ status, latestRequest }) => {
+  if (latestRequest.disputed) return tokenConstants.STATUS_ENUM.Challenged
   switch (tokenConstants.IN_CONTRACT_STATUS_ENUM[status]) {
     case 'Submitted':
     case 'Resubmitted':
@@ -49,7 +49,7 @@ export const contractStatusToClientStatus = ({ status, latestAgreement }) => {
         'Unknown status: ',
         status,
         ' disputed: ',
-        latestAgreement.disputed
+        latestRequest.disputed
       )
   }
 }

@@ -18,17 +18,17 @@ export const token = {
 /* Action Creators */
 
 // Token
-export const createToken = ({ tokenData, metaEvidence }) => ({
+export const createToken = ({ tokenData }) => ({
   type: token.CREATE,
-  payload: { token: tokenData, metaEvidence }
+  payload: { token: tokenData }
 })
-export const requestRegistration = ({ ID, metaEvidence }) => ({
+export const requestRegistration = ({ ID }) => ({
   type: token.RESUBMIT,
-  payload: { ID, metaEvidence }
+  payload: { ID }
 })
-export const clearToken = ({ ID, metaEvidence }) => ({
+export const clearToken = ({ ID }) => ({
   type: token.CLEAR,
-  payload: { ID, metaEvidence }
+  payload: { ID }
 })
 export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,

@@ -10,52 +10,43 @@ const TextInput = ({
   type,
   step,
   className
-}) => {
-  console.info('value: ', value)
-  console.info('touched', touched)
-  console.info(
-    `value !== undefined && value !== null && value !== ''`,
-    value !== undefined && value !== null && value !== ''
-  )
-  console.info('error: ', error)
-  return (
-    <div
-      className={`TextInput ${
-        error && touched ? 'is-error' : valid ? 'is-valid' : ''
-      } ${className}`}
-    >
-      {type === 'textarea' ? (
-        <textarea
-          value={value}
-          onBlur={onBlur}
-          onChange={onChange}
-          className="TextInput-input"
-        />
-      ) : (
-        <input
-          value={value}
-          onBlur={onBlur}
-          onChange={onChange}
-          type={type}
-          step={step}
-          className="TextInput-input"
-        />
-      )}
-      {placeholder && (
-        <div
-          className={`TextInput-placeholder${
-            touched || (value !== undefined && value !== null && value !== '')
-              ? ' is-touched'
-              : ''
-          }`}
-        >
-          {placeholder}
-        </div>
-      )}
-      {error && touched && <div className="TextInput-error">{error}</div>}
-    </div>
-  )
-}
+}) => (
+  <div
+    className={`TextInput ${
+      error && touched ? 'is-error' : valid ? 'is-valid' : ''
+    } ${className}`}
+  >
+    {type === 'textarea' ? (
+      <textarea
+        value={value}
+        onBlur={onBlur}
+        onChange={onChange}
+        className="TextInput-input"
+      />
+    ) : (
+      <input
+        value={value}
+        onBlur={onBlur}
+        onChange={onChange}
+        type={type}
+        step={step}
+        className="TextInput-input"
+      />
+    )}
+    {placeholder && (
+      <div
+        className={`TextInput-placeholder${
+          touched || (value !== undefined && value !== null && value !== '')
+            ? ' is-touched'
+            : ''
+        }`}
+      >
+        {placeholder}
+      </div>
+    )}
+    {error && touched && <div className="TextInput-error">{error}</div>}
+  </div>
+)
 
 TextInput.propTypes = {
   // Redux Form
