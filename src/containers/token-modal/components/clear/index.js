@@ -11,10 +11,10 @@ const Clear = ({
   arbitrableTokenListData,
   closeTokenModal,
   clearToken,
-  tokenName
+  name
 }) => (
   <div>
-    <h3 className="Modal-title">Clear {tokenName}</h3>
+    <h3 className="Modal-title">Clear {name}</h3>
     <hr />
     <div className="Clear-stake">
       <h4>
@@ -50,7 +50,7 @@ Clear.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-  tokenName: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
 
   // Action Dispatchers
   closeTokenModal: PropTypes.func.isRequired,

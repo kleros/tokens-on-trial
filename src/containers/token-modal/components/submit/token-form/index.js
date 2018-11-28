@@ -6,11 +6,11 @@ export const {
   isInvalid: getTokenFormIsInvalid,
   submit: submitTokenForm
 } = form('tokenForm', {
-  tokenName: {
+  name: {
     type: 'text',
     validate: [required]
   },
-  address: {
+  addr: {
     type: 'text',
     validate: [required, ETHAddress]
   },

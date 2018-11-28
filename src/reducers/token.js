@@ -11,12 +11,12 @@ export const _tokenShape = PropTypes.shape({
   lastAction: PropTypes.instanceOf(Date),
   latestRequest: PropTypes.shape({
     disputed: PropTypes.bool.isRequired,
-    disputeID: PropTypes.number,
-    firstContributionTime: PropTypes.number.isRequired,
-    arbitrationFeesWaitingTime: PropTypes.number.isRequired,
-    timeToChallenge: PropTypes.number.isRequired,
-    challengeRewardBalance: PropTypes.number.isRequired,
-    challengeReward: PropTypes.number.isRequired,
+    disputeID: PropTypes.string.isRequired,
+    firstContributionTime: PropTypes.string.isRequired,
+    arbitrationFeesWaitingTime: PropTypes.string.isRequired,
+    timeToChallenge: PropTypes.string.isRequired,
+    challengeRewardBalance: PropTypes.string.isRequired,
+    challengeReward: PropTypes.string.isRequired,
     parties: PropTypes.arrayOf(PropTypes.string).isRequired,
     appealed: PropTypes.bool.isRequired,
     latestRound: PropTypes.shape({

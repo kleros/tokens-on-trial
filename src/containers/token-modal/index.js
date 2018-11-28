@@ -122,9 +122,7 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.Clear:
               return (
                 <Clear
-                  tokenName={
-                    token && token.data ? token.data.tokenName : 'token'
-                  }
+                  name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
                   clearToken={this.handleClearTokenClick}
@@ -133,9 +131,7 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.Challenge:
               return (
                 <Challenge
-                  tokenName={
-                    token && token.data ? token.data.tokenName : 'token'
-                  }
+                  name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
                   fundDispute={this.handleChallengeClick}
@@ -144,9 +140,7 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.Resubmit:
               return (
                 <Resubmit
-                  tokenName={
-                    token && token.data ? token.data.tokenName : 'token'
-                  }
+                  name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
                   resubmitToken={this.handleResubmitTokenClick}
@@ -155,9 +149,7 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.FundDispute:
               return (
                 <FundDispute
-                  tokenName={
-                    token && token.data ? token.data.tokenName : 'token'
-                  }
+                  name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
                   fundDispute={this.handleFundDisputeClick}

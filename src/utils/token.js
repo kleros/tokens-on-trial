@@ -8,10 +8,8 @@ export const hasPendingRequest = ({
   if (clientStatus === tokenConstants.STATUS_ENUM.Pending) return true
   if (latestAgreement && latestAgreement.disputed) return true
   switch (status) {
-    case tokenConstants.IN_CONTRACT_STATUS_ENUM['Submitted']:
-    case tokenConstants.IN_CONTRACT_STATUS_ENUM['Resubmitted']:
+    case tokenConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']:
     case tokenConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']:
-    case tokenConstants.IN_CONTRACT_STATUS_ENUM['PreventiveClearingRequested']:
       return true
     default:
       break
@@ -20,23 +18,15 @@ export const hasPendingRequest = ({
   return false
 }
 
-export const isRegistrationRequest = tokenStatus => {
-  switch (tokenStatus) {
-    case tokenConstants.IN_CONTRACT_STATUS_ENUM['Submitted']:
-    case tokenConstants.IN_CONTRACT_STATUS_ENUM['Resubmitted']:
-      return true
-    default:
-      return false
-  }
-}
+export const isRegistrationRequest = tokenStatus =>
+  tokenStatus ===
+  tokenConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']
 
 export const contractStatusToClientStatus = ({ status, latestRequest }) => {
   if (latestRequest.disputed) return tokenConstants.STATUS_ENUM.Challenged
   switch (tokenConstants.IN_CONTRACT_STATUS_ENUM[status]) {
-    case 'Submitted':
-    case 'Resubmitted':
+    case 'RegistrationRequested':
     case 'ClearingRequested':
-    case 'PreventiveClearingRequested':
       return tokenConstants.STATUS_ENUM.Pending
     case 'Registered':
       return tokenConstants.STATUS_ENUM.Registered

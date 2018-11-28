@@ -39,7 +39,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
             ID !==
             '0x0000000000000000000000000000000000000000000000000000000000000000'
         )
-        .map(ID => call(fetchToken, { payload: { ID } }))
+        .map(ID => call(fetchToken, { payload: ID }))
     ))
   ]
   tokens.hasMore = data.hasMore
@@ -88,19 +88,13 @@ export function* fetchToken({ payload: ID }) {
       }
     }
 
-  const { tokenName, address, ticker, URI } = yield call(storeApi.getFile, ID)
+  const { URI } = yield call(storeApi.getFile, ID)
 
   return {
+    ...token,
     ID,
-    name: tokenName,
-    tokenName,
-    address,
-    ticker,
     URI,
     status: Number(token.status),
-    challengeRewardBalance: String(token.challengeRewardBalance),
-    challengeReward: String(token.balance),
-    latestRequest: token.latestRequest,
     clientStatus: contractStatusToClientStatus(token),
     lastAction: token.lastAction
       ? new Date(Number(token.lastAction * 1000))
@@ -127,9 +121,9 @@ function* createToken({ payload: { token } }) {
     yield call(
       arbitrableTokenList.methods.requestStatusChange(
         ID,
-        token.tokenName,
+        token.name,
         token.ticker,
-        token.address
+        token.addr
       ).send,
       {
         from: yield select(walletSelectors.getAccount),
@@ -158,7 +152,7 @@ function* requestRegistration({ payload: { token } }) {
         ID,
         token.name,
         token.ticker,
-        token.address
+        token.addr
       ).send,
       {
         from: yield select(walletSelectors.getAccount),

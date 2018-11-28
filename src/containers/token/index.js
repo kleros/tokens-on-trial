@@ -26,9 +26,9 @@ class TokenDetails extends PureComponent {
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     token: PropTypes.shape({
-      tokenName: PropTypes.string,
+      name: PropTypes.string,
       ticker: PropTypes.string,
-      address: PropTypes.string,
+      addr: PropTypes.string,
       URI: PropTypes.string
     }),
     match: PropTypes.shape({
@@ -244,9 +244,7 @@ class TokenDetails extends PureComponent {
             <Img className="TokenDetails-img" src={token.URI} />
             <div className="TokenDetails-card">
               <div className="TokenDetails-label">
-                <span className="TokenDetails-label-name">
-                  {token.tokenName}
-                </span>
+                <span className="TokenDetails-label-name">{token.name}</span>
                 <span className="TokenDetails-label-ticker">
                   {token.ticker}
                 </span>
