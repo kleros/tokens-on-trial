@@ -38,8 +38,7 @@ class TokenModal extends PureComponent {
     submitTokenForm: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
-    fundDispute: PropTypes.func.isRequired,
-    requestRegistration: PropTypes.func.isRequired
+    fundDispute: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -53,8 +52,8 @@ class TokenModal extends PureComponent {
   }
 
   handleResubmitTokenClick = () => {
-    const { requestRegistration, token } = this.props
-    requestRegistration({ ID: token.data.ID })
+    const { createToken, token } = this.props
+    createToken({ tokenData: token.data })
   }
 
   handleClearTokenClick = () => {
@@ -64,9 +63,12 @@ class TokenModal extends PureComponent {
 
   handleChallengeClick = () => {
     const { fundDispute, token, arbitrableTokenListData } = this.props
+    const { latestRequest } = token
+    const { latestRound } = latestRequest
+
     const value = web3.utils
-      .toBN(arbitrableTokenListData.data.challengeReward)
-      .add(web3.utils.toBN(arbitrableTokenListData.data.stake))
+      .toBN(latestRequest.challengeReward)
+      .add(web3.utils.toBN(latestRound.requiredFeeStake))
       .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2))
     fundDispute({
       ID: token.data.ID,
@@ -131,6 +133,7 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.Challenge:
               return (
                 <Challenge
+                  token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
@@ -177,7 +180,6 @@ export default connect(
   {
     closeTokenModal: modalActions.closeTokenModal,
     createToken: tokenActions.createToken,
-    requestRegistration: tokenActions.requestRegistration,
     clearToken: tokenActions.clearToken,
     fundDispute: tokenActions.fundDispute,
     submitTokenForm,

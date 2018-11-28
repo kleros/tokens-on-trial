@@ -1,12 +1,8 @@
 import * as tokenConstants from '../constants/token'
 
-export const hasPendingRequest = ({
-  status,
-  clientStatus,
-  latestAgreement
-}) => {
+export const hasPendingRequest = ({ status, clientStatus, latestRequest }) => {
   if (clientStatus === tokenConstants.STATUS_ENUM.Pending) return true
-  if (latestAgreement && latestAgreement.disputed) return true
+  if (latestRequest && latestRequest.disputed) return true
   switch (status) {
     case tokenConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']:
     case tokenConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']:

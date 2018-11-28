@@ -63,10 +63,6 @@ class TokenDetails extends PureComponent {
 
   handleActionClick = action => {
     const { openTokenModal } = this.props
-    if (action === modalConstants.TOKEN_MODAL_ENUM.Resubmit) {
-      openTokenModal(action)
-      return
-    }
     openTokenModal(action)
   }
 
