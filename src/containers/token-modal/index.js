@@ -59,7 +59,7 @@ class TokenModal extends PureComponent {
 
   handleClearTokenClick = () => {
     const { clearToken, token } = this.props
-    clearToken({ ID: token.data.ID })
+    clearToken({ tokenData: token.data })
   }
 
   handleChallengeClick = () => {

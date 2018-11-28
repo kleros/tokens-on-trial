@@ -26,9 +26,9 @@ export const requestRegistration = ({ ID }) => ({
   type: token.RESUBMIT,
   payload: { ID }
 })
-export const clearToken = ({ ID }) => ({
+export const clearToken = ({ tokenData }) => ({
   type: token.CLEAR,
-  payload: { ID }
+  payload: { token: tokenData }
 })
 export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,

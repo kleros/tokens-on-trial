@@ -182,17 +182,23 @@ function* requestRegistration({ payload: { token } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* clearToken({ payload: { ID } }) {
+function* clearToken({ payload: { token } }) {
+  const { ID, name, ticker, addr } = token
+
   // Add to contract if absent
   if (
     Number((yield call(fetchToken, { payload: { ID } })).status) ===
     tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered
   )
-    yield call(arbitrableTokenList.methods.requestClearing(ID).send, {
-      from: yield select(walletSelectors.getAccount),
-      value: yield select(arbitrableTokenListSelectors.getSubmitCost)
-    })
-  else throw new Error(errorConstants.TOKEN_ALREADY_CLEARED)
+    yield call(
+      arbitrableTokenList.methods.requestStatusChange(ID, name, ticker, addr)
+        .send,
+      {
+        from: yield select(walletSelectors.getAccount),
+        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
+      }
+    )
+  else throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 
   return yield call(fetchToken, { payload: { ID } })
 }
