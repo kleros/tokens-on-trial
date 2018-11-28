@@ -12,6 +12,18 @@ import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
 
+// Converts token string data to correct js types.
+const convertFromString = token => {
+  const { latestRound } = token.latestRequest
+  latestRound.ruling = Number(latestRound.ruling)
+  latestRound.requiredFeeStake = Number(latestRound.requiredFeeStake)
+  latestRound.paidFees[0] = Number(latestRound.paidFees[0])
+  latestRound.paidFees[1] = Number(latestRound.paidFees[1])
+  latestRound.paidFees[2] = Number(latestRound.paidFees[2])
+  token.latestRound = latestRound
+  return token
+}
+
 /**
  * Fetches a paginatable list of tokens.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
@@ -39,7 +51,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
             ID !==
             '0x0000000000000000000000000000000000000000000000000000000000000000'
         )
-        .map(ID => call(fetchToken, { payload: ID }))
+        .map(ID => call(fetchToken, { payload: { ID } }))
     ))
   ]
   tokens.hasMore = data.hasMore
@@ -51,8 +63,8 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The fetched token.
  */
-export function* fetchToken({ payload: ID }) {
-  const token = yield call(arbitrableTokenList.methods.getTokenInfo(ID).call)
+export function* fetchToken({ payload: { ID } }) {
+  let token = yield call(arbitrableTokenList.methods.getTokenInfo(ID).call)
 
   if (Number(token.numberOfRequests > 0)) {
     token.latestRequest = yield call(
@@ -62,13 +74,14 @@ export function* fetchToken({ payload: ID }) {
       ).call
     )
 
-    token.latestRequest.round = yield call(
+    token.latestRequest.latestRound = yield call(
       arbitrableTokenList.methods.getRoundInfo(
         ID,
         Number(token.numberOfRequests) - 1,
         Number(token.latestRequest.numberOfRounds) - 1
       ).call
     )
+    token = convertFromString(token)
   } else
     token.latestRequest = {
       disputed: false,
@@ -81,7 +94,7 @@ export function* fetchToken({ payload: ID }) {
       parties: [],
       appealed: false,
       latestRound: {
-        ruling: false,
+        ruling: 0,
         requiredFeeStake: 0,
         paidFees: [],
         loserFullyFunded: false
@@ -115,7 +128,7 @@ function* createToken({ payload: { token } }) {
 
   // Add to contract if absent
   if (
-    Number((yield call(fetchToken, { payload: ID })).status) ===
+    Number((yield call(fetchToken, { payload: { ID } })).status) ===
     tokenConstants.IN_CONTRACT_STATUS_ENUM.Absent
   )
     yield call(
@@ -212,15 +225,10 @@ function* fundDispute({ payload: { ID, value, side } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* executeRequest({ payload: { ID } }) {
+  const status = Number((yield call(fetchToken, { payload: { ID } })).status)
   if (
-    Number((yield call(fetchToken, { payload: { ID } })).status) !==
-      tokenConstants.IN_CONTRACT_STATUS_ENUM.Submitted &&
-    Number((yield call(fetchToken, { payload: { ID } })).status) !==
-      tokenConstants.IN_CONTRACT_STATUS_ENUM.Resubmitted &&
-    Number((yield call(fetchToken, { payload: { ID } })).status) !==
-      tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested &&
-    Number((yield call(fetchToken, { payload: { ID } })).status) !==
-      tokenConstants.IN_CONTRACT_STATUS_ENUM.PreventiveClearingRequested
+    status !== tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
+    status !== tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
   )
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 

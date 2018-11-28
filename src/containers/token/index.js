@@ -87,7 +87,7 @@ class TokenDetails extends PureComponent {
     let label = 'Loading...'
     let icon = 'spinner'
 
-    if (!token || !arbitrableTokenListData.data || !token.paidFees)
+    if (!token || !arbitrableTokenListData.data)
       return (
         <Button type="primary" disabled={disabled}>
           <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
@@ -100,23 +100,8 @@ class TokenDetails extends PureComponent {
       arbitrableTokenListData.data.arbitrationFeesWaitingTime
     )
 
-    const lastRoundPosition = token.paidFees.totalContributedPerSide.length - 1
-    if (token.paidFees.totalContributedPerSide[lastRoundPosition]) {
-      submitterFees = Number(
-        token.paidFees.totalContributedPerSide[lastRoundPosition][
-          tokenConstants.SIDE.Requester
-        ]
-      )
-      challengerFees = Number(
-        token.paidFees.totalContributedPerSide[lastRoundPosition][
-          tokenConstants.SIDE.Challenger
-        ]
-      )
-      firstContributionTime = Number(token.paidFees.firstContributionTime)
-    }
-
     if (hasPendingRequest(token))
-      if (token.latestAgreement.disputed) {
+      if (token.latestRequest.disputed) {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
@@ -131,7 +116,10 @@ class TokenDetails extends PureComponent {
         icon = 'check'
         disabled = false
         label = 'Execute Request'
-      } else if (token.latestAgreement.creator === userAccount) {
+      } else if (
+        token.latestRequest.parties[tokenConstants.SIDE.Requester] ===
+        userAccount
+      ) {
         if (timestamp - firstContributionTime < arbitrationFeesWaitingTime) {
           icon = 'gavel'
           label = 'Pay Arbitration Fees'
