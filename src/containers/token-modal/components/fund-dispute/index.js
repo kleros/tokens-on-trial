@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 
@@ -11,7 +12,8 @@ import './fund-dispute.css'
 const FundDispute = ({
   arbitrableTokenListData,
   closeTokenModal,
-  fundDispute
+  fundDispute,
+  token
 }) => (
   <div>
     <h3 className="Modal-title">
@@ -27,7 +29,9 @@ const FundDispute = ({
       <strong>
         {`${String(
           web3.utils.fromWei(
-            String(web3.utils.toBN(arbitrableTokenListData.data.stake))
+            String(
+              web3.utils.toBN(token.latestRequest.latestRound.requiredFeeStake)
+            )
           )
         )} ETH`}
       </strong>
@@ -52,8 +56,11 @@ const FundDispute = ({
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(arbitrableTokenListData.data.challengeReward)
-                .add(web3.utils.toBN(arbitrableTokenListData.data.stake))
+                .toBN(
+                  web3.utils.toBN(
+                    token.latestRequest.latestRound.requiredFeeStake
+                  )
+                )
                 .add(
                   web3.utils.toBN(
                     arbitrableTokenListData.data.arbitrationCost / 2
@@ -88,6 +95,7 @@ FundDispute.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+  token: tokenSelectors.tokenShape.isRequired,
 
   // Action Dispatchers
   closeTokenModal: PropTypes.func.isRequired,

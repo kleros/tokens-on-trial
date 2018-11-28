@@ -38,7 +38,8 @@ class TokenModal extends PureComponent {
     submitTokenForm: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
-    fundDispute: PropTypes.func.isRequired
+    fundDispute: PropTypes.func.isRequired,
+    requestStatusChange: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -52,8 +53,8 @@ class TokenModal extends PureComponent {
   }
 
   handleResubmitTokenClick = () => {
-    const { createToken, token } = this.props
-    createToken({ tokenData: token.data })
+    const { requestStatusChange, token } = this.props
+    requestStatusChange({ tokenData: token.data })
   }
 
   handleClearTokenClick = () => {
@@ -63,7 +64,7 @@ class TokenModal extends PureComponent {
 
   handleChallengeClick = () => {
     const { fundDispute, token, arbitrableTokenListData } = this.props
-    const { latestRequest } = token
+    const { latestRequest } = token.data
     const { latestRound } = latestRequest
 
     const value = web3.utils
@@ -79,8 +80,11 @@ class TokenModal extends PureComponent {
 
   handleFundDisputeClick = () => {
     const { fundDispute, token, arbitrableTokenListData } = this.props
+    const { latestRequest } = token.data
+    const { latestRound } = latestRequest
+
     const value = web3.utils
-      .toBN(arbitrableTokenListData.data.stake)
+      .toBN(latestRound.requiredFeeStake)
       .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2))
     fundDispute({
       ID: token.data.ID,
@@ -152,6 +156,7 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.FundDispute:
               return (
                 <FundDispute
+                  token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
@@ -182,6 +187,7 @@ export default connect(
     createToken: tokenActions.createToken,
     clearToken: tokenActions.clearToken,
     fundDispute: tokenActions.fundDispute,
+    requestStatusChange: tokenActions.requestStatusChange,
     submitTokenForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData

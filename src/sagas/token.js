@@ -14,7 +14,15 @@ import storeApi from './api/store'
 
 // Converts token string data to correct js types.
 const convertFromString = token => {
-  const { latestRound } = token.latestRequest
+  const { latestRequest } = token
+  latestRequest.firstContributionTime = Number(
+    latestRequest.firstContributionTime
+  )
+  latestRequest.arbitrationFeesWaitingTime = Number(
+    latestRequest.arbitrationFeesWaitingTime
+  )
+  latestRequest.timeToChallenge = Number(latestRequest.timeToChallenge)
+  const { latestRound } = latestRequest
   latestRound.ruling = Number(latestRound.ruling)
   latestRound.requiredFeeStake = Number(latestRound.requiredFeeStake)
   latestRound.paidFees[0] = Number(latestRound.paidFees[0])
@@ -116,13 +124,57 @@ export function* fetchToken({ payload: { ID } }) {
 }
 
 /**
+ * Requests status change.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* requestStatusChange({ payload: { token } }) {
+  // Upload token
+  const response = yield call(storeApi.postFile, JSON.stringify(token))
+  const { payload } = response
+  const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
+  const recentToken = yield call(fetchToken, { payload: { ID } })
+
+  // Add to contract if absent
+  if (
+    recentToken.status ===
+      tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
+    recentToken.status ===
+      tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
+  )
+    throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
+
+  yield call(
+    arbitrableTokenList.methods.requestStatusChange(
+      ID,
+      token.name,
+      token.ticker,
+      token.addr
+    ).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value: yield select(arbitrableTokenListSelectors.getSubmitCost)
+    }
+  )
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
  * Submits a token to the list.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* createToken({ payload: { token } }) {
+  // Only take relevant data
+  const tokenToSubmit = {
+    name: token.name,
+    ticker: token.ticker,
+    addr: token.addr
+  }
+
   // Upload token
-  const response = yield call(storeApi.postFile, JSON.stringify(token))
+  const response = yield call(storeApi.postFile, JSON.stringify(tokenToSubmit))
   const { payload } = response
   const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
 
@@ -134,9 +186,9 @@ function* createToken({ payload: { token } }) {
     yield call(
       arbitrableTokenList.methods.requestStatusChange(
         ID,
-        token.name,
-        token.ticker,
-        token.addr
+        tokenToSubmit.name,
+        tokenToSubmit.ticker,
+        tokenToSubmit.addr
       ).send,
       {
         from: yield select(walletSelectors.getAccount),
@@ -214,13 +266,17 @@ function* fundDispute({ payload: { ID, value, side } }) {
   if (!hasPendingRequest(token))
     throw new Error(errorConstants.NO_PENDING_REQUEST)
 
-  yield call(
-    arbitrableTokenList.methods.fundDispute(token.latestAgreementID, side).send,
-    {
+  if (side === tokenConstants.SIDE.Requester)
+    yield call(arbitrableTokenList.methods.fundRequester(ID).send, {
       from: yield select(walletSelectors.getAccount),
       value
-    }
-  )
+    })
+  else if (side === tokenConstants.SIDE.Challenger)
+    yield call(arbitrableTokenList.methods.fundChallenger(ID).send, {
+      from: yield select(walletSelectors.getAccount),
+      value
+    })
+  else throw new Error(errorConstants.INVALID_SIDE)
 
   return yield call(fetchToken, { payload: { ID } })
 }
@@ -283,6 +339,13 @@ export default function* tokenSaga() {
     },
     tokenActions.token,
     createToken
+  )
+  yield takeLatest(
+    tokenActions.token.STATUS_CHANGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    requestStatusChange
   )
   yield takeLatest(
     tokenActions.token.RESUBMIT,

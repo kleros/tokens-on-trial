@@ -12,12 +12,17 @@ export const token = {
   CLEAR: 'CLEAR',
   EXECUTE: 'EXECUTE',
   FUND_DISPUTE: 'FUND_DISPUTE',
-  RESUBMIT: 'RESUBMIT'
+  RESUBMIT: 'RESUBMIT',
+  STATUS_CHANGE: 'STATUS_CHANGE'
 }
 
 /* Action Creators */
 
 // Token
+export const requestStatusChange = ({ tokenData }) => ({
+  type: token.STATUS_CHANGE,
+  payload: { token: tokenData }
+})
 export const createToken = ({ tokenData }) => ({
   type: token.CREATE,
   payload: { token: tokenData }

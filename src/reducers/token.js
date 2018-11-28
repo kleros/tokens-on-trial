@@ -12,9 +12,9 @@ export const _tokenShape = PropTypes.shape({
   latestRequest: PropTypes.shape({
     disputed: PropTypes.bool.isRequired,
     disputeID: PropTypes.string.isRequired,
-    firstContributionTime: PropTypes.string.isRequired,
-    arbitrationFeesWaitingTime: PropTypes.string.isRequired,
-    timeToChallenge: PropTypes.string.isRequired,
+    firstContributionTime: PropTypes.number.isRequired,
+    arbitrationFeesWaitingTime: PropTypes.number.isRequired,
+    timeToChallenge: PropTypes.number.isRequired,
     challengeRewardBalance: PropTypes.string.isRequired,
     challengeReward: PropTypes.string.isRequired,
     parties: PropTypes.arrayOf(PropTypes.string).isRequired,

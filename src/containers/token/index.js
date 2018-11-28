@@ -76,7 +76,7 @@ class TokenDetails extends PureComponent {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
-    let submitterFees, challengerFees, firstContributionTime
+    // let submitterFees, challengerFees, firstContributionTime
 
     let method
     let disabled = true
@@ -95,6 +95,11 @@ class TokenDetails extends PureComponent {
     const arbitrationFeesWaitingTime = Number(
       arbitrableTokenListData.data.arbitrationFeesWaitingTime
     )
+    const { latestRequest } = token
+    const { latestRound, firstContributionTime } = latestRequest
+    const submitterFees = latestRound.paidFees[tokenConstants.SIDE.Requester]
+    const challengerFees =
+      latestRound.paidFees[tokenConstants.SIDE.challengerFees]
 
     if (hasPendingRequest(token))
       if (token.latestRequest.disputed) {
@@ -289,7 +294,7 @@ class TokenDetails extends PureComponent {
               </div>
             </div>
           </div>
-          <div className="TokenDescription">
+          <div className="TokenDesiption">
             <hr className="TokenDescription-separator" />
             <h3>Description</h3>
             <p>

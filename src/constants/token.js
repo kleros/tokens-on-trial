@@ -14,7 +14,6 @@ export const STATUS_ENUM = createEnum([
   'Pending',
   'Challenged',
   'Registered',
-  'Cleared',
   'Absent'
 ])
 
