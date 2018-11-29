@@ -105,8 +105,8 @@ class FilterBar extends Component {
                           tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 10
                             ? `small`
                             : tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 24
-                              ? `medium`
-                              : `large`
+                            ? `medium`
+                            : `large`
                         }`}
                       type={
                         filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]

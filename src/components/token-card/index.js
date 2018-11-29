@@ -20,7 +20,7 @@ const TokenCard = ({ token }) => (
         color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
       />
       <h5>
-        {token.tokenName} - {token.ticker}
+        {token.name} - {token.ticker}
       </h5>
       <a href={`https://etherscan.io/token/${token.address}`}>
         <Img src={EtherScanLogo} />
@@ -43,10 +43,10 @@ const TokenCard = ({ token }) => (
 
 TokenCard.propTypes = {
   token: PropTypes.shape({
-    tokenName: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
     URI: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
-    address: PropTypes.string.isRequired,
+    addr: PropTypes.string.isRequired,
     status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
   }).isRequired

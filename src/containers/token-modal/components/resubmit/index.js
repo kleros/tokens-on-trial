@@ -11,10 +11,10 @@ const Resubmit = ({
   arbitrableTokenListData,
   closeTokenModal,
   resubmitToken,
-  tokenName
+  name
 }) => (
   <div>
-    <h3 className="Modal-title">Resubmit {tokenName}</h3>
+    <h3 className="Modal-title">Resubmit {name}</h3>
     <hr />
     <div className="Resubmit-stake">
       <h4>
@@ -54,7 +54,7 @@ Resubmit.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-  tokenName: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
 
   // Action Dispatchers
   closeTokenModal: PropTypes.func.isRequired,

@@ -21,28 +21,15 @@ export const defaultFilter = () => {
  * @returns {bool[]} A filter array to be passed as argument to the contract's queryItems() method.
  */
 export const filterToContractParam = filter => {
-  const filterValues = new Array(13).fill(false)
+  const filterValues = new Array(8).fill(false)
 
+  if (filter['Cleared']) filterValues[0] = true
   if (filter['Registered']) filterValues[1] = true
-  if (filter['Cleared']) filterValues[2] = true
-  if (filter['Registration Requests']) {
-    filterValues[3] = true
-    filterValues[4] = true
-  }
-  if (filter['Clearing Requests']) {
-    filterValues[5] = true
-    filterValues[6] = true
-  }
-  if (filter['Challenged Registration Requests']) {
-    filterValues[7] = true
-    filterValues[8] = true
-  }
-  if (filter['Challenged Clearing Requests']) {
-    filterValues[9] = true
-    filterValues[10] = true
-  }
-  if (filter['My Submissions']) filterValues[11] = true
-  if (filter['My Challenges']) filterValues[12] = true
-
+  if (filter['Registration Requests']) filterValues[2] = true
+  if (filter['Clearing Requests']) filterValues[3] = true
+  if (filter['Challenged Registration Requests']) filterValues[4] = true
+  if (filter['Challenged Clearing Requests']) filterValues[5] = true
+  if (filter['My Submissions']) filterValues[6] = true
+  if (filter['My Challenges']) filterValues[7] = true
   return filterValues
 }

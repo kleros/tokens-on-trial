@@ -16,7 +16,7 @@ export function* fetchArbitrableTokenListData() {
     stake: call(arbitrableTokenList.methods.stake().call),
     challengeReward: call(arbitrableTokenList.methods.challengeReward().call),
     timeToChallenge: call(arbitrableTokenList.methods.timeToChallenge().call),
-    itemsCounts: call(arbitrableTokenList.methods.itemsCounts().call),
+    tokensCounts: call(arbitrableTokenList.methods.tokensCounts().call),
     arbitrationFeesWaitingTime: call(
       arbitrableTokenList.methods.arbitrationFeesWaitingTime().call
     )
@@ -32,9 +32,9 @@ export function* fetchArbitrableTokenListData() {
     challengeReward: Number(d.challengeReward),
     stake: String(d.stake),
     timeToChallenge: Number(d.timeToChallenge) * 1000,
-    itemsCounts: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
+    tokensCounts: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
-        acc[value] = Number(d.itemsCounts[value.toLowerCase()])
+        acc[value] = Number(d.tokensCounts[value.toLowerCase()])
         return acc
       },
       {}

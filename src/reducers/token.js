@@ -9,30 +9,22 @@ export const _tokenShape = PropTypes.shape({
   status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
   lastAction: PropTypes.instanceOf(Date),
-  latestAgreementID: PropTypes.string.isRequired,
-  balance: PropTypes.string.isRequired,
-  challengeReward: PropTypes.string.isRequired,
-  paidFees: PropTypes.shape({
-    ruling: PropTypes.arrayOf(PropTypes.string).isRequired,
-    _stake: PropTypes.arrayOf(PropTypes.string).isRequired,
-    totalValue: PropTypes.arrayOf(PropTypes.string).isRequired,
-    totalContributedPerSide: PropTypes.arrayOf(
-      PropTypes.arrayOf(PropTypes.string).isRequired
-    ).isRequired,
-    loserFullyFunded: PropTypes.arrayOf(PropTypes.bool).isRequired
-  }).isRequired,
-  latestAgreement: PropTypes.shape({
-    appealed: PropTypes.bool.isRequired,
-    arbitrationFeesWaitingTime: PropTypes.string.isRequired,
-    arbitrator: PropTypes.string.isRequired,
-    creator: PropTypes.string.isRequired,
-    disputeID: PropTypes.string.isRequired,
+  latestRequest: PropTypes.shape({
     disputed: PropTypes.bool.isRequired,
-    executed: PropTypes.bool.isRequired,
-    extraData: PropTypes.string,
-    numberOfChoices: PropTypes.string.isRequired,
+    disputeID: PropTypes.string.isRequired,
+    firstContributionTime: PropTypes.number.isRequired,
+    arbitrationFeesWaitingTime: PropTypes.number.isRequired,
+    timeToChallenge: PropTypes.number.isRequired,
+    challengeRewardBalance: PropTypes.string.isRequired,
+    challengeReward: PropTypes.string.isRequired,
     parties: PropTypes.arrayOf(PropTypes.string).isRequired,
-    ruling: PropTypes.string.isRequired
+    appealed: PropTypes.bool.isRequired,
+    latestRound: PropTypes.shape({
+      ruling: PropTypes.oneOf(tokenConstants.RULING_OPTIONS.indexes).isRequired,
+      requiredFeeStake: PropTypes.number.isRequired,
+      paidFees: PropTypes.arrayOf(PropTypes.number).isRequired,
+      loserFullyFunded: PropTypes.bool.isRequired
+    })
   }).isRequired
 })
 export const _tokensShape = PropTypes.arrayOf(_tokenShape.isRequired)

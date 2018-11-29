@@ -26,9 +26,9 @@ class TokenDetails extends PureComponent {
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     token: PropTypes.shape({
-      tokenName: PropTypes.string,
+      name: PropTypes.string,
       ticker: PropTypes.string,
-      address: PropTypes.string,
+      addr: PropTypes.string,
       URI: PropTypes.string
     }),
     match: PropTypes.shape({
@@ -63,10 +63,6 @@ class TokenDetails extends PureComponent {
 
   handleActionClick = action => {
     const { openTokenModal } = this.props
-    if (action === modalConstants.TOKEN_MODAL_ENUM.Resubmit) {
-      openTokenModal(action)
-      return
-    }
     openTokenModal(action)
   }
 
@@ -80,14 +76,14 @@ class TokenDetails extends PureComponent {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
-    let submitterFees, challengerFees, firstContributionTime
+    // let submitterFees, challengerFees, firstContributionTime
 
     let method
     let disabled = true
     let label = 'Loading...'
     let icon = 'spinner'
 
-    if (!token || !arbitrableTokenListData.data || !token.paidFees)
+    if (!token || !arbitrableTokenListData.data)
       return (
         <Button type="primary" disabled={disabled}>
           <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
@@ -99,24 +95,14 @@ class TokenDetails extends PureComponent {
     const arbitrationFeesWaitingTime = Number(
       arbitrableTokenListData.data.arbitrationFeesWaitingTime
     )
-
-    const lastRoundPosition = token.paidFees.totalContributedPerSide.length - 1
-    if (token.paidFees.totalContributedPerSide[lastRoundPosition]) {
-      submitterFees = Number(
-        token.paidFees.totalContributedPerSide[lastRoundPosition][
-          tokenConstants.SIDE.Requester
-        ]
-      )
-      challengerFees = Number(
-        token.paidFees.totalContributedPerSide[lastRoundPosition][
-          tokenConstants.SIDE.Challenger
-        ]
-      )
-      firstContributionTime = Number(token.paidFees.firstContributionTime)
-    }
+    const { latestRequest } = token
+    const { latestRound, firstContributionTime } = latestRequest
+    const submitterFees = latestRound.paidFees[tokenConstants.SIDE.Requester]
+    const challengerFees =
+      latestRound.paidFees[tokenConstants.SIDE.challengerFees]
 
     if (hasPendingRequest(token))
-      if (token.latestAgreement.disputed) {
+      if (token.latestRequest.disputed) {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
@@ -131,7 +117,10 @@ class TokenDetails extends PureComponent {
         icon = 'check'
         disabled = false
         label = 'Execute Request'
-      } else if (token.latestAgreement.creator === userAccount) {
+      } else if (
+        token.latestRequest.parties[tokenConstants.SIDE.Requester] ===
+        userAccount
+      ) {
         if (timestamp - firstContributionTime < arbitrationFeesWaitingTime) {
           icon = 'gavel'
           label = 'Pay Arbitration Fees'
@@ -244,9 +233,7 @@ class TokenDetails extends PureComponent {
             <Img className="TokenDetails-img" src={token.URI} />
             <div className="TokenDetails-card">
               <div className="TokenDetails-label">
-                <span className="TokenDetails-label-name">
-                  {token.tokenName}
-                </span>
+                <span className="TokenDetails-label-name">{token.name}</span>
                 <span className="TokenDetails-label-ticker">
                   {token.ticker}
                 </span>
@@ -307,7 +294,7 @@ class TokenDetails extends PureComponent {
               </div>
             </div>
           </div>
-          <div className="TokenDescription">
+          <div className="TokenDesiption">
             <hr className="TokenDescription-separator" />
             <h3>Description</h3>
             <p>
