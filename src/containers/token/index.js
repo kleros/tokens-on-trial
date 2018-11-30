@@ -19,6 +19,10 @@ import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-l
 
 import './token.css'
 
+// Truncate with ellipsis in the middle.
+const truncateMiddle = str =>
+  `${str.slice(0, 6)}...${str.slice(str.length - 5, str.length - 1)}`
+
 class TokenDetails extends PureComponent {
   static propTypes = {
     // State
@@ -41,8 +45,8 @@ class TokenDetails extends PureComponent {
     executeRequest: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openTokenModal: PropTypes.func.isRequired,
-    appealRuling: PropTypes.func.isRequired,
-    feeTimeout: PropTypes.func.isRequired
+    feesTimeout: PropTypes.func.isRequired,
+    appealRuling: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -74,9 +78,9 @@ class TokenDetails extends PureComponent {
     executeRequest(tokenID)
   }
 
-  handleFeeTimeoutClick = () => {
-    const { feeTimeout, token } = this.props
-    feeTimeout(token)
+  handleFeesTimeoutClick = () => {
+    const { feesTimeout, token } = this.props
+    feesTimeout(token)
   }
 
   handleAppealRulingClick = () => {
@@ -115,17 +119,18 @@ class TokenDetails extends PureComponent {
     const { latestRequest } = token
     const { latestRound, firstContributionTime } = latestRequest
     const submitterFees = latestRound.paidFees[tokenConstants.SIDE.Requester]
-    const challengerFees =
-      latestRound.paidFees[tokenConstants.SIDE.challengerFees]
+    const challengerFees = latestRound.paidFees[tokenConstants.SIDE.Challenger]
 
     if (hasPendingRequest(token))
-      if (latestRequest.disputed) {
+      if (token.latestRequest.disputed) {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
+        console.info(token.latestRequest)
         if (
-          latestRequest.dispute.status ===
-          tokenConstants.DISPUTE_STATUS.Appealable
+          Number(latestRequest.dispute.status) ===
+            tokenConstants.DISPUTE_STATUS.Appealable &&
+          timestamp < Number(latestRequest[1])
         ) {
           icon = 'gavel'
           disabled = false
@@ -138,7 +143,7 @@ class TokenDetails extends PureComponent {
       ) {
         icon = 'gavel'
         disabled = false
-        method = this.handleFeesTimeout
+        method = this.handleFeesTimeoutClick
         if (submitterFees > challengerFees) label = 'Timeout Challenger'
         else label = 'Timeout Submitter'
       } else if (
@@ -150,39 +155,43 @@ class TokenDetails extends PureComponent {
         disabled = false
         label = 'Execute Request'
       } else if (
-        latestRequest.parties[tokenConstants.SIDE.Requester] === userAccount
+        firstContributionTime > 0 &&
+        timestamp - firstContributionTime < arbitrationFeesWaitingTime
       ) {
-        if (timestamp - firstContributionTime < arbitrationFeesWaitingTime) {
-          icon = 'gavel'
-          label = 'Pay Arbitration Fees'
-          disabled = false
+        icon = 'gavel'
+        label = 'Pay Arbitration Fees'
+        disabled = false
+        if (
+          challengerFees > submitterFees &&
+          userAccount ===
+            token.latestRequest.parties[tokenConstants.SIDE.Requester]
+        )
           method = () =>
-            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.FundDispute)
-        } else {
-          method = this.handleExecuteRequestClick
-          icon = 'check'
-          disabled =
-            !timestamp ||
-            !token ||
-            !timeToChallenge ||
-            timestamp <= lastAction + timeToChallenge
-          if (isRegistrationRequest(token.status))
-            label = 'Confirm Registration'
-          else label = 'Confirm Clearing'
+            this.handleActionClick(
+              modalConstants.TOKEN_MODAL_ENUM.FundRequester
+            )
+        else if (
+          submitterFees > challengerFees &&
+          userAccount ===
+            token.latestRequest.parties[tokenConstants.SIDE.Challenger]
+        )
+          method = () =>
+            this.handleActionClick(
+              modalConstants.TOKEN_MODAL_ENUM.FundChallenger
+            )
+        else {
+          icon = 'hourglass-half'
+          label = 'Waiting Requester Fees'
+          disabled = true
         }
       } else {
         icon = 'gavel'
-        disabled = timestamp >= lastAction + timeToChallenge
-        if (challengerFees > submitterFees) {
-          label = 'Waiting Submitter Fees'
-          disabled = true
-        } else {
-          method = () =>
-            this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
-          if (isRegistrationRequest(token.status))
-            label = 'Challenge Registration'
-          else label = 'Challenge Clearing'
-        }
+        disabled = false
+        method = () =>
+          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
+        if (isRegistrationRequest(token.status))
+          label = 'Challenge Registration'
+        else label = 'Challenge Clearing'
       }
     else {
       disabled = false
@@ -275,13 +284,13 @@ class TokenDetails extends PureComponent {
                   <span>
                     <a
                       className="TokenDetails--link"
-                      href={`https://etherscan.io/token/${token.address}`}
+                      href={`https://etherscan.io/token/${token.addr}`}
                     >
                       <Img
                         className="TokenDetails-icon TokenDetails-meta--aligned"
                         src={EtherScanLogo}
                       />
-                      00a041...31ae
+                      {truncateMiddle(token.addr)}
                     </a>
                   </span>
                 </div>
@@ -368,7 +377,7 @@ export default connect(
     fetchToken: tokenActions.fetchToken,
     executeRequest: tokenActions.executeRequest,
     openTokenModal: modalActions.openTokenModal,
-    appealRuling: tokenActions.appealRuling,
-    feeTimeout: tokenActions.feeTimeout
+    feesTimeout: tokenActions.feesTimeout,
+    appealRuling: tokenActions.appealRuling
   }
 )(TokenDetails)

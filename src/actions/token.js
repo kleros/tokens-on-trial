@@ -15,7 +15,7 @@ export const token = {
   RESUBMIT: 'RESUBMIT',
   STATUS_CHANGE: 'STATUS_CHANGE',
   FUND_APPEAL: 'FUND_APPEAL',
-  FEE_TIMEOUT: 'FEE_TIMEOUT'
+  FEES_TIMEOUT: 'FEES_TIMEOUT'
 }
 
 /* Action Creators */
@@ -28,10 +28,6 @@ export const requestStatusChange = ({ tokenData }) => ({
 export const createToken = ({ tokenData }) => ({
   type: token.CREATE,
   payload: { token: tokenData }
-})
-export const requestRegistration = ({ ID }) => ({
-  type: token.RESUBMIT,
-  payload: { ID }
 })
 export const clearToken = ({ tokenData }) => ({
   type: token.CLEAR,
@@ -57,7 +53,11 @@ export const appealRuling = (ID, side) => ({
   type: token.FUND_APPEAL,
   payload: { ID, side }
 })
-export const feeTimeout = tokenData => ({
-  type: token.FEE_TIMEOUT,
+export const feesTimeout = tokenData => ({
+  type: token.FEES_TIMEOUT,
+  payload: { token: tokenData }
+})
+export const resubmitToken = ({ tokenData }) => ({
+  type: token.RESUBMIT,
   payload: { token: tokenData }
 })

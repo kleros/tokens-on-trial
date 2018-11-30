@@ -1,11 +1,12 @@
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import PropTypes from 'prop-types'
 
 import './sort-bar.css'
 
-const SortBar = () => (
+const SortBar = ({ numTokens }) => (
   <div className="SortBar">
-    <div className="SortBar-count">123.456 Tokens</div>
+    <div className="SortBar-count">{numTokens} Submissions</div>
     <div className="SortBar-sort">
       <div className="SortBar-sort-label">Sort by period:</div>
       <div className="SortBar-sort-choice">All</div>
@@ -19,5 +20,10 @@ const SortBar = () => (
     </div>
   </div>
 )
+
+SortBar.propTypes = {
+  numTokens: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+    .isRequired
+}
 
 export default SortBar

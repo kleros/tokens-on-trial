@@ -22,6 +22,7 @@ const convertFromString = token => {
     latestRequest.arbitrationFeesWaitingTime
   )
   latestRequest.timeToChallenge = Number(latestRequest.timeToChallenge)
+
   const { latestRound } = latestRequest
   latestRound.ruling = Number(latestRound.ruling)
   latestRound.requiredFeeStake = Number(latestRound.requiredFeeStake)
@@ -82,10 +83,18 @@ export function* fetchToken({ payload: { ID } }) {
       ).call
     )
 
-    if (token.latestRequest.disputed)
+    if (token.latestRequest.disputed) {
       token.latestRequest.dispute = yield call(
         arbitrator.methods.disputes(token.latestRequest.disputeID).call
       )
+      if (
+        token.latestRequest.status ===
+        tokenConstants.DISPUTE_STATUS.Appealable.toString()
+      )
+        token.latestRequest.appealPeriod = yield call(
+          arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
+        )
+    }
 
     token.latestRequest.latestRound = yield call(
       arbitrableTokenList.methods.getRoundInfo(
@@ -424,7 +433,7 @@ export default function* tokenSaga() {
     fundDispute
   )
   yield takeLatest(
-    tokenActions.token.FEE_TIMEOUT,
+    tokenActions.token.FEES_TIMEOUT,
     lessduxSaga,
     updateTokensCollectionModFlow,
     tokenActions.token,

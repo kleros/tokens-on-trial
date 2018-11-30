@@ -39,7 +39,7 @@ class TokenModal extends PureComponent {
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
     fundDispute: PropTypes.func.isRequired,
-    requestStatusChange: PropTypes.func.isRequired
+    resubmitToken: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -53,8 +53,8 @@ class TokenModal extends PureComponent {
   }
 
   handleResubmitTokenClick = () => {
-    const { requestStatusChange, token } = this.props
-    requestStatusChange({ tokenData: token.data })
+    const { resubmitToken, token } = this.props
+    resubmitToken({ tokenData: token.data })
   }
 
   handleClearTokenClick = () => {
@@ -78,7 +78,7 @@ class TokenModal extends PureComponent {
     })
   }
 
-  handleFundDisputeClick = () => {
+  handleFundRequesterClick = () => {
     const { fundDispute, token, arbitrableTokenListData } = this.props
     const { latestRequest } = token.data
     const { latestRound } = latestRequest
@@ -90,6 +90,22 @@ class TokenModal extends PureComponent {
       ID: token.data.ID,
       value,
       side: tokenConstants.SIDE.Requester
+    })
+  }
+
+  handleFundChallengerClick = () => {
+    const { fundDispute, token, arbitrableTokenListData } = this.props
+    const { latestRequest } = token.data
+    const { latestRound } = latestRequest
+    const { arbitrationCost } = arbitrableTokenListData.data
+
+    const value = web3.utils
+      .toBN(latestRound.requiredFeeStake)
+      .add(web3.utils.toBN(arbitrationCost))
+    fundDispute({
+      ID: token.data.ID,
+      value,
+      side: tokenConstants.SIDE.Challenger
     })
   }
 
@@ -147,20 +163,31 @@ class TokenModal extends PureComponent {
             case modalConstants.TOKEN_MODAL_ENUM.Resubmit:
               return (
                 <Resubmit
+                  token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
                   resubmitToken={this.handleResubmitTokenClick}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.FundDispute:
+            case modalConstants.TOKEN_MODAL_ENUM.FundRequester:
               return (
                 <FundDispute
                   token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
                   closeTokenModal={closeTokenModal}
-                  fundDispute={this.handleFundDisputeClick}
+                  fundDispute={this.handleFundRequesterClick}
+                />
+              )
+            case modalConstants.TOKEN_MODAL_ENUM.FundChallenger:
+              return (
+                <FundDispute
+                  token={token.data}
+                  name={token && token.data ? token.data.name : 'token'}
+                  arbitrableTokenListData={arbitrableTokenListData}
+                  closeTokenModal={closeTokenModal}
+                  fundDispute={this.handleFundChallengerClick}
                 />
               )
             case undefined:
@@ -186,8 +213,8 @@ export default connect(
     closeTokenModal: modalActions.closeTokenModal,
     createToken: tokenActions.createToken,
     clearToken: tokenActions.clearToken,
+    resubmitToken: tokenActions.resubmitToken,
     fundDispute: tokenActions.fundDispute,
-    requestStatusChange: tokenActions.requestStatusChange,
     submitTokenForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData

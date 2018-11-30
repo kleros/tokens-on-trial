@@ -69,13 +69,17 @@ class Tokens extends Component {
   render() {
     const { tokens } = this.props
     const { filter } = this.state
+
+    let numTokens = 'Loading...'
+    if (tokens && tokens.data) numTokens = tokens.data.length
+
     return (
       <div ref={this.ref} className="Page">
         <FilterBar
           filter={filter}
           handleFilterChange={this.handleFilterChange}
         />
-        <SortBar />
+        <SortBar numTokens={numTokens} />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
             {tokens.data && this.mapTokens(tokens.data)}
