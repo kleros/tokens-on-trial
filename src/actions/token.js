@@ -13,7 +13,9 @@ export const token = {
   EXECUTE: 'EXECUTE',
   FUND_DISPUTE: 'FUND_DISPUTE',
   RESUBMIT: 'RESUBMIT',
-  STATUS_CHANGE: 'STATUS_CHANGE'
+  STATUS_CHANGE: 'STATUS_CHANGE',
+  FUND_APPEAL: 'FUND_APPEAL',
+  FEE_TIMEOUT: 'FEE_TIMEOUT'
 }
 
 /* Action Creators */
@@ -50,4 +52,12 @@ export const executeRequest = ID => ({
 export const fetchToken = ID => ({
   type: token.FETCH,
   payload: { ID }
+})
+export const appealRuling = (ID, side) => ({
+  type: token.FUND_APPEAL,
+  payload: { ID, side }
+})
+export const feeTimeout = tokenData => ({
+  type: token.FEE_TIMEOUT,
+  payload: { token: tokenData }
 })

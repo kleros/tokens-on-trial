@@ -1,7 +1,7 @@
 import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import { arbitrableTokenList } from '../bootstrap/dapp-api'
+import { arbitrableTokenList, arbitrator } from '../bootstrap/dapp-api'
 import { hasPendingRequest, contractStatusToClientStatus } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
@@ -82,6 +82,11 @@ export function* fetchToken({ payload: { ID } }) {
       ).call
     )
 
+    if (token.latestRequest.disputed)
+      token.latestRequest.dispute = yield call(
+        arbitrator.methods.disputes(token.latestRequest.disputeID).call
+      )
+
     token.latestRequest.latestRound = yield call(
       arbitrableTokenList.methods.getRoundInfo(
         ID,
@@ -89,11 +94,13 @@ export function* fetchToken({ payload: { ID } }) {
         Number(token.latestRequest.numberOfRounds) - 1
       ).call
     )
+
     token = convertFromString(token)
   } else
     token.latestRequest = {
       disputed: false,
       disputeID: 0,
+      dispute: {},
       firstContributionTime: 0,
       arbitrationFeesWaitingTime: 0,
       timeToChallenge: 0,
@@ -109,10 +116,11 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-  const { URI } = yield call(storeApi.getFile, ID)
+  const { URI, name } = yield call(storeApi.getFile, ID)
 
   return {
     ...token,
+    name,
     ID,
     URI,
     status: Number(token.status),
@@ -170,7 +178,8 @@ function* createToken({ payload: { token } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: token.addr
+    addr: token.addr,
+    URI: token.URI
   }
 
   // Upload token
@@ -282,6 +291,32 @@ function* fundDispute({ payload: { ID, value, side } }) {
 }
 
 /**
+ * Fund a side of a dispute
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* fundAppeal({ payload: { ID, value, side } }) {
+  // Add to contract if absent
+  const token = yield call(fetchToken, { payload: { ID } })
+  if (!hasPendingRequest(token))
+    throw new Error(errorConstants.NO_PENDING_REQUEST)
+
+  if (side === tokenConstants.SIDE.Requester)
+    yield call(arbitrableTokenList.methods.fundRequester(ID).send, {
+      from: yield select(walletSelectors.getAccount),
+      value
+    })
+  else if (side === tokenConstants.SIDE.Challenger)
+    yield call(arbitrableTokenList.methods.fundChallenger(ID).send, {
+      from: yield select(walletSelectors.getAccount),
+      value
+    })
+  else throw new Error(errorConstants.INVALID_SIDE)
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
  * Execute a request for a token.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
@@ -299,6 +334,19 @@ function* executeRequest({ payload: { ID } }) {
   })
 
   return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Execute a request for a token.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* feeTimeout({ payload: { token } }) {
+  yield call(arbitrableTokenList.methods.feeTimeoutFirstRound(token.ID).send, {
+    from: yield select(walletSelectors.getAccount)
+  })
+
+  return yield call(fetchToken, { payload: { ID: token.ID } })
 }
 
 // Update collection mod flows
@@ -374,5 +422,19 @@ export default function* tokenSaga() {
     updateTokensCollectionModFlow,
     tokenActions.token,
     fundDispute
+  )
+  yield takeLatest(
+    tokenActions.token.FEE_TIMEOUT,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    feeTimeout
+  )
+  yield takeLatest(
+    tokenActions.token.FUND_APPEAL,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    fundAppeal
   )
 }

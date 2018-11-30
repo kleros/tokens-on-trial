@@ -8,6 +8,8 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
   'ClearingRequested' // The item is registered, but someone has requested to remove it.
 ])
 
+export const DISPUTE_STATUS = createEnum(['Waiting', 'Appealable', 'Solved'])
+
 export const RULING_OPTIONS = createEnum(['Other', 'Accept', 'Reject'])
 export const SIDE = createEnum(['None', 'Requester', 'Challenger'])
 export const STATUS_ENUM = createEnum([

@@ -7,9 +7,9 @@ import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 
-import './challenge.css'
+import './appeal.css'
 
-const Challenge = ({
+const Appeal = ({
   arbitrableTokenListData,
   closeTokenModal,
   fundDispute,
@@ -17,24 +17,24 @@ const Challenge = ({
 }) => (
   <div>
     <h3 className="Modal-title">
-      <FontAwesomeIcon icon="gavel" className="Challenge-icon" />
-      Challenge
+      <FontAwesomeIcon icon="gavel" className="Appeal-icon" />
+      Appeal
     </h3>
     <hr />
     <h5 className="Modal-subtitle">
-      In order to challenge, the following <br /> amount of ETH is required
+      In order to appeal, the following <br /> amount of ETH is required
     </h5>
-    <div className="Challenge-cost">
-      <span>Challenge Stake</span>
+    <div className="Appeal-cost">
+      <span>Appeal Stake</span>
       <strong>
         {`${String(
           web3.utils.fromWei(
-            String(web3.utils.toBN(token.latestRequest.challengeReward))
+            String(web3.utils.toBN(token.latestRequest.appealReward))
           )
         )} ETH`}
       </strong>
     </div>
-    <div className="Challenge-cost">
+    <div className="Appeal-cost">
       <span>Arbitration Stake</span>
       <strong>
         {`${String(
@@ -46,7 +46,7 @@ const Challenge = ({
         )} ETH`}
       </strong>
     </div>
-    <div className="Challenge-cost">
+    <div className="Appeal-cost">
       <span>Required Arbitration Fee</span>
       <strong>
         {`${String(
@@ -59,14 +59,14 @@ const Challenge = ({
       </strong>
     </div>
     <br />
-    <div className="Challenge-cost">
+    <div className="Appeal-cost">
       <span>Total Due:</span>
-      <strong className="Challenge-total-value">
+      <strong className="Appeal-total-value">
         {`${String(
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(token.latestRequest.challengeReward)
+                .toBN(token.latestRequest.appealReward)
                 .add(
                   web3.utils.toBN(
                     token.latestRequest.latestRound.requiredFeeStake
@@ -83,24 +83,20 @@ const Challenge = ({
     <br />
     <div className="Modal-actions">
       <Button
-        className="Challenge-return"
+        className="Appeal-return"
         type="secondary"
         onClick={closeTokenModal}
       >
         Return
       </Button>
-      <Button
-        className="Challenge-request"
-        type="primary"
-        onClick={fundDispute}
-      >
-        Challenge
+      <Button className="Appeal-request" type="primary" onClick={fundDispute}>
+        Appeal
       </Button>
     </div>
   </div>
 )
 
-Challenge.propTypes = {
+Appeal.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
@@ -111,4 +107,4 @@ Challenge.propTypes = {
   fundDispute: PropTypes.func.isRequired
 }
 
-export default Challenge
+export default Appeal

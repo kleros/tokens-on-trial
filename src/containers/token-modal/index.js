@@ -70,7 +70,7 @@ class TokenModal extends PureComponent {
     const value = web3.utils
       .toBN(latestRequest.challengeReward)
       .add(web3.utils.toBN(latestRound.requiredFeeStake))
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2))
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
     fundDispute({
       ID: token.data.ID,
       value,
@@ -85,7 +85,7 @@ class TokenModal extends PureComponent {
 
     const value = web3.utils
       .toBN(latestRound.requiredFeeStake)
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2))
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
     fundDispute({
       ID: token.data.ID,
       value,

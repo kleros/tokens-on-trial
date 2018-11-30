@@ -42,7 +42,7 @@ const FundDispute = ({
         {`${String(
           web3.utils.fromWei(
             String(
-              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost / 2)
+              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
             )
           )
         )} ETH`}
@@ -62,9 +62,7 @@ const FundDispute = ({
                   )
                 )
                 .add(
-                  web3.utils.toBN(
-                    arbitrableTokenListData.data.arbitrationCost / 2
-                  )
+                  web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
                 )
             )
           )

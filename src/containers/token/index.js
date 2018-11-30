@@ -40,7 +40,9 @@ class TokenDetails extends PureComponent {
     // Functions
     executeRequest: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
-    openTokenModal: PropTypes.func.isRequired
+    openTokenModal: PropTypes.func.isRequired,
+    appealRuling: PropTypes.func.isRequired,
+    feeTimeout: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -72,12 +74,27 @@ class TokenDetails extends PureComponent {
     executeRequest(tokenID)
   }
 
+  handleFeeTimeoutClick = () => {
+    const { feeTimeout, token } = this.props
+    feeTimeout(token)
+  }
+
+  handleAppealRulingClick = () => {
+    const { match, appealRuling, accounts, token } = this.props
+    const { tokenID } = match.params
+    const side =
+      accounts.data[0] ===
+      token.latestRequest.parties[tokenConstants.SIDE.Requester]
+        ? tokenConstants.SIDE.Requester
+        : tokenConstants.SIDE.Challenger
+
+    appealRuling(tokenID, side)
+  }
+
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
     const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
-    // let submitterFees, challengerFees, firstContributionTime
-
     let method
     let disabled = true
     let label = 'Loading...'
@@ -102,24 +119,38 @@ class TokenDetails extends PureComponent {
       latestRound.paidFees[tokenConstants.SIDE.challengerFees]
 
     if (hasPendingRequest(token))
-      if (token.latestRequest.disputed) {
+      if (latestRequest.disputed) {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
+        if (
+          latestRequest.dispute.status ===
+          tokenConstants.DISPUTE_STATUS.Appealable
+        ) {
+          icon = 'gavel'
+          disabled = false
+          label = 'Appeal Ruling'
+          method = this.handleAppealRuling
+        }
+      } else if (
+        (submitterFees > 0 || challengerFees > 0) &&
+        timestamp > firstContributionTime + arbitrationFeesWaitingTime
+      ) {
+        icon = 'gavel'
+        disabled = false
+        method = this.handleFeesTimeout
+        if (submitterFees > challengerFees) label = 'Timeout Challenger'
+        else label = 'Timeout Submitter'
       } else if (
         timestamp >= lastAction + timeToChallenge ||
-        (countdown &&
-          countdown.getTime &&
-          countdown.getTime() === 0 &&
-          hasPendingRequest(token))
+        (countdown && countdown.getTime && countdown.getTime() === 0)
       ) {
         method = this.handleExecuteRequestClick
         icon = 'check'
         disabled = false
         label = 'Execute Request'
       } else if (
-        token.latestRequest.parties[tokenConstants.SIDE.Requester] ===
-        userAccount
+        latestRequest.parties[tokenConstants.SIDE.Requester] === userAccount
       ) {
         if (timestamp - firstContributionTime < arbitrationFeesWaitingTime) {
           icon = 'gavel'
@@ -336,6 +367,8 @@ export default connect(
   {
     fetchToken: tokenActions.fetchToken,
     executeRequest: tokenActions.executeRequest,
-    openTokenModal: modalActions.openTokenModal
+    openTokenModal: modalActions.openTokenModal,
+    appealRuling: tokenActions.appealRuling,
+    feeTimeout: tokenActions.feeTimeout
   }
 )(TokenDetails)
