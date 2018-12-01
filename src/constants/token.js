@@ -10,7 +10,7 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
 
 export const DISPUTE_STATUS = createEnum(['Waiting', 'Appealable', 'Solved'])
 
-export const RULING_OPTIONS = createEnum(['Other', 'Accept', 'Reject'])
+export const RULING_OPTIONS = createEnum(['Other', 'Accept', 'Refuse'])
 export const SIDE = createEnum(['None', 'Requester', 'Challenger'])
 export const STATUS_ENUM = createEnum([
   'Pending',

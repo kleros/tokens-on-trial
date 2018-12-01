@@ -4,6 +4,7 @@ import { spawn, call, all } from 'redux-saga/effects'
 
 import walletSaga from './wallet'
 import arbitrableTokenListSaga from './arbitrable-token-list'
+import arbitratorSaga from './arbitrator'
 import tokenSaga from './token'
 
 /**
@@ -32,9 +33,12 @@ export function makeRestartable(saga) {
   }
 }
 
-const rootSagas = [walletSaga, arbitrableTokenListSaga, tokenSaga].map(
-  makeRestartable
-)
+const rootSagas = [
+  walletSaga,
+  arbitrableTokenListSaga,
+  tokenSaga,
+  arbitratorSaga
+].map(makeRestartable)
 
 /**
  * The root saga.

@@ -45,8 +45,7 @@ class TokenDetails extends PureComponent {
     executeRequest: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openTokenModal: PropTypes.func.isRequired,
-    feesTimeout: PropTypes.func.isRequired,
-    appealRuling: PropTypes.func.isRequired
+    feesTimeout: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -83,18 +82,6 @@ class TokenDetails extends PureComponent {
     feesTimeout(token)
   }
 
-  handleAppealRulingClick = () => {
-    const { match, appealRuling, accounts, token } = this.props
-    const { tokenID } = match.params
-    const side =
-      accounts.data[0] ===
-      token.latestRequest.parties[tokenConstants.SIDE.Requester]
-        ? tokenConstants.SIDE.Requester
-        : tokenConstants.SIDE.Challenger
-
-    appealRuling(tokenID, side)
-  }
-
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
@@ -122,20 +109,54 @@ class TokenDetails extends PureComponent {
     const challengerFees = latestRound.paidFees[tokenConstants.SIDE.Challenger]
 
     if (hasPendingRequest(token))
-      if (token.latestRequest.disputed) {
+      if (latestRequest.disputed) {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
-        console.info(token.latestRequest)
         if (
           Number(latestRequest.dispute.status) ===
             tokenConstants.DISPUTE_STATUS.Appealable &&
-          timestamp < Number(latestRequest[1])
+          !latestRequest.appealed
         ) {
-          icon = 'gavel'
-          disabled = false
-          label = 'Appeal Ruling'
-          method = this.handleAppealRuling
+          const appealPeriodStart = Number(latestRequest.appealPeriod[0])
+          const appealPeriodEnd = Number(latestRequest.appealPeriod[1])
+          const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
+          const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
+          let losingSide = false
+          if (
+            userAccount ===
+              token.latestRequest.parties[tokenConstants.SIDE.Requester] &&
+            token.latestRequest.dispute.ruling ===
+              tokenConstants.RULING_OPTIONS.Refuse.toString()
+          )
+            losingSide = true
+          else if (
+            userAccount ===
+              token.latestRequest.parties[tokenConstants.SIDE.Challenger] &&
+            token.latestRequest.dispute.ruling ===
+              tokenConstants.RULING_OPTIONS.Accept.toString()
+          )
+            losingSide = true
+          if (timestamp < endOfFirstHalf)
+            if (losingSide) {
+              icon = 'gavel'
+              disabled = false
+              label = 'Appeal Ruling'
+              method = () =>
+                this.handleActionClick(
+                  modalConstants.TOKEN_MODAL_ENUM.FundAppeal
+                )
+            } else label = 'Appeal Period'
+          else if (timestamp < appealPeriodEnd && latestRound.loserFullyFunded)
+            if (losingSide) label = 'Waiting Winner Fees'
+            else {
+              label = 'Pay Appeal Fees'
+              disabled = false
+              method = () =>
+                this.handleActionClick(
+                  modalConstants.TOKEN_MODAL_ENUM.FundAppeal
+                )
+            }
         }
       } else if (
         (submitterFees > 0 || challengerFees > 0) &&
@@ -184,6 +205,12 @@ class TokenDetails extends PureComponent {
           label = 'Waiting Requester Fees'
           disabled = true
         }
+      } else if (
+        userAccount === latestRequest.parties[tokenConstants.SIDE.Requester]
+      ) {
+        icon = 'hourglass-half'
+        disabled = true
+        label = 'Waiting Challenges'
       } else {
         icon = 'gavel'
         disabled = false
@@ -377,7 +404,6 @@ export default connect(
     fetchToken: tokenActions.fetchToken,
     executeRequest: tokenActions.executeRequest,
     openTokenModal: modalActions.openTokenModal,
-    feesTimeout: tokenActions.feesTimeout,
-    appealRuling: tokenActions.appealRuling
+    feesTimeout: tokenActions.feesTimeout
   }
 )(TokenDetails)

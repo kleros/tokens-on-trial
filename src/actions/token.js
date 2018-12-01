@@ -49,9 +49,9 @@ export const fetchToken = ID => ({
   type: token.FETCH,
   payload: { ID }
 })
-export const appealRuling = (ID, side) => ({
+export const fundAppeal = (ID, losingSide, value) => ({
   type: token.FUND_APPEAL,
-  payload: { ID, side }
+  payload: { ID, losingSide, value }
 })
 export const feesTimeout = tokenData => ({
   type: token.FEES_TIMEOUT,

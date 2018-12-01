@@ -88,12 +88,18 @@ export function* fetchToken({ payload: { ID } }) {
         arbitrator.methods.disputes(token.latestRequest.disputeID).call
       )
       if (
-        token.latestRequest.status ===
-        tokenConstants.DISPUTE_STATUS.Appealable.toString()
-      )
+        token.latestRequest.dispute.status ===
+          tokenConstants.DISPUTE_STATUS.Appealable.toString() &&
+        !token.latestRequest.appealed
+      ) {
         token.latestRequest.appealPeriod = yield call(
           arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
         )
+        token.latestRequest.appealCost = yield call(
+          arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
+            .call
+        )
+      }
     }
 
     token.latestRequest.latestRound = yield call(
@@ -147,7 +153,14 @@ export function* fetchToken({ payload: { ID } }) {
  */
 function* requestStatusChange({ payload: { token } }) {
   // Upload token
-  const response = yield call(storeApi.postFile, JSON.stringify(token))
+  const tokenToSubmit = {
+    name: token.name,
+    ticker: token.ticker,
+    addr: token.addr,
+    URI: token.URI
+  }
+
+  const response = yield call(storeApi.postFile, JSON.stringify(tokenToSubmit))
   const { payload } = response
   const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
   const recentToken = yield call(fetchToken, { payload: { ID } })
@@ -164,9 +177,9 @@ function* requestStatusChange({ payload: { token } }) {
   yield call(
     arbitrableTokenList.methods.requestStatusChange(
       ID,
-      token.name,
-      token.ticker,
-      token.addr
+      tokenToSubmit.name,
+      tokenToSubmit.ticker,
+      tokenToSubmit.addr
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
@@ -207,35 +220,6 @@ function* createToken({ payload: { token } }) {
         tokenToSubmit.name,
         tokenToSubmit.ticker,
         tokenToSubmit.addr
-      ).send,
-      {
-        from: yield select(walletSelectors.getAccount),
-        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
-      }
-    )
-  else throw new Error(errorConstants.TOKEN_ALREADY_SUBMITTED)
-
-  return yield call(fetchToken, { payload: { ID } })
-}
-
-/**
- * Execute a request for a token.
- * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
- * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
- */
-function* requestRegistration({ payload: { token } }) {
-  // Add to contract if absent
-  const ID = token.ID
-  if (
-    Number((yield call(fetchToken, { payload: { ID } })).status) ===
-    tokenConstants.IN_CONTRACT_STATUS_ENUM.Cleared
-  )
-    yield call(
-      arbitrableTokenList.methods.requestStatusChange(
-        ID,
-        token.name,
-        token.ticker,
-        token.addr
       ).send,
       {
         from: yield select(walletSelectors.getAccount),
@@ -304,23 +288,17 @@ function* fundDispute({ payload: { ID, value, side } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* fundAppeal({ payload: { ID, value, side } }) {
-  // Add to contract if absent
-  const token = yield call(fetchToken, { payload: { ID } })
-  if (!hasPendingRequest(token))
-    throw new Error(errorConstants.NO_PENDING_REQUEST)
-
-  if (side === tokenConstants.SIDE.Requester)
-    yield call(arbitrableTokenList.methods.fundRequester(ID).send, {
+function* fundAppeal({ payload: { ID, losingSide, value } }) {
+  if (losingSide)
+    yield call(arbitrableTokenList.methods.fundAppealLosingSide(ID).send, {
       from: yield select(walletSelectors.getAccount),
       value
     })
-  else if (side === tokenConstants.SIDE.Challenger)
-    yield call(arbitrableTokenList.methods.fundChallenger(ID).send, {
+  else
+    yield call(arbitrableTokenList.methods.fundAppealWinningSide(ID).send, {
       from: yield select(walletSelectors.getAccount),
       value
     })
-  else throw new Error(errorConstants.INVALID_SIDE)
 
   return yield call(fetchToken, { payload: { ID } })
 }
@@ -409,7 +387,7 @@ export default function* tokenSaga() {
     lessduxSaga,
     updateTokensCollectionModFlow,
     tokenActions.token,
-    requestRegistration
+    requestStatusChange
   )
   yield takeLatest(
     tokenActions.token.CLEAR,

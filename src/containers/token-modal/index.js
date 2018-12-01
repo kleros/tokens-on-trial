@@ -10,9 +10,11 @@ import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
+import * as walletSelectors from '../../reducers/wallet'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 
+import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
 import Submit from './components/submit'
 import Resubmit from './components/resubmit'
@@ -32,6 +34,7 @@ class TokenModal extends PureComponent {
     openTokenModal: modalSelectors.openTokenModalShape,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+    accounts: walletSelectors.accountsShape.isRequired,
 
     closeTokenModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
@@ -39,7 +42,8 @@ class TokenModal extends PureComponent {
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
     fundDispute: PropTypes.func.isRequired,
-    resubmitToken: PropTypes.func.isRequired
+    resubmitToken: PropTypes.func.isRequired,
+    fundAppeal: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -109,6 +113,43 @@ class TokenModal extends PureComponent {
     })
   }
 
+  handleFundAppealClick = () => {
+    const { fundAppeal, token, accounts } = this.props
+    const tokenData = token.data
+    const { latestRequest } = tokenData
+    const { latestRound } = latestRequest
+
+    const userAccount = accounts.data[0]
+    let losingSide = false
+    if (
+      userAccount === latestRequest.parties[tokenConstants.SIDE.Requester] &&
+      latestRequest.dispute.ruling ===
+        tokenConstants.RULING_OPTIONS.Refuse.toString()
+    )
+      losingSide = true
+    else if (
+      userAccount === latestRequest.parties[tokenConstants.SIDE.Challenger] &&
+      latestRequest.dispute.ruling ===
+        tokenConstants.RULING_OPTIONS.Accept.toString()
+    )
+      losingSide = true
+
+    const value = losingSide
+      ? String(
+          web3.utils
+            .toBN(latestRound.requiredFeeStake)
+            .mul(web3.utils.toBN(2))
+            .add(web3.utils.toBN(latestRequest.appealCost))
+        )
+      : String(
+          web3.utils
+            .toBN(latestRound.requiredFeeStake)
+            .add(web3.utils.toBN(latestRequest.appealCost))
+        )
+
+    fundAppeal(tokenData.ID, losingSide, value)
+  }
+
   componentDidMount() {
     const { fetchArbitrableTokenListData } = this.props
     fetchArbitrableTokenListData()
@@ -123,6 +164,7 @@ class TokenModal extends PureComponent {
       tokenFormIsInvalid,
       token
     } = this.props
+
     return (
       <Modal
         isOpen={openTokenModal !== null}
@@ -190,6 +232,14 @@ class TokenModal extends PureComponent {
                   fundDispute={this.handleFundChallengerClick}
                 />
               )
+            case modalConstants.TOKEN_MODAL_ENUM.FundAppeal:
+              return (
+                <FundAppeal
+                  token={token.data}
+                  closeTokenModal={closeTokenModal}
+                  fundAppeal={this.handleFundAppealClick}
+                />
+              )
             case undefined:
             case null:
               break
@@ -207,7 +257,8 @@ export default connect(
     openTokenModal: state.modal.openTokenModal,
     tokenFormIsInvalid: getTokenFormIsInvalid(state),
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
-    token: state.token.token
+    token: state.token.token,
+    accounts: state.wallet.accounts
   }),
   {
     closeTokenModal: modalActions.closeTokenModal,
@@ -217,6 +268,7 @@ export default connect(
     fundDispute: tokenActions.fundDispute,
     submitTokenForm,
     fetchArbitrableTokenListData:
-      arbitrableTokenListActions.fetchArbitrableTokenListData
+      arbitrableTokenListActions.fetchArbitrableTokenListData,
+    fundAppeal: tokenActions.fundAppeal
   }
 )(TokenModal)
