@@ -10,8 +10,7 @@ const storeApi = {
     return fetch(TOKEN_UPLOAD_URL, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         payload: {
@@ -27,10 +26,7 @@ const storeApi = {
   },
   getFile(ID) {
     return fetch(`${TOKEN_BASE_URL}/${ID}.json`, {
-      method: 'GET',
-      headers: {
-        'Access-Control-Allow-Origin': '*'
-      }
+      method: 'GET'
     })
       .then(statusHelper)
       .then(response => response.json())
