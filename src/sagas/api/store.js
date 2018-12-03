@@ -29,7 +29,6 @@ const storeApi = {
     return fetch(`${TOKEN_BASE_URL}/${ID}.json`, {
       method: 'GET',
       headers: {
-        'Content-Type': 'application/json',
         'Access-Control-Allow-Origin': '*'
       }
     })
