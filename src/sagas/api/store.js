@@ -9,7 +9,10 @@ const storeApi = {
   postFile(file) {
     return fetch(TOKEN_UPLOAD_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({
         payload: {
           fileName: `${web3.utils.sha3(file)}.json`,
@@ -25,7 +28,10 @@ const storeApi = {
   getFile(ID) {
     return fetch(`${TOKEN_BASE_URL}/${ID}.json`, {
       method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      }
     })
       .then(statusHelper)
       .then(response => response.json())
