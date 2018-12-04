@@ -25,9 +25,7 @@ const storeApi = {
       .then(data => data)
   },
   getFile(ID) {
-    return fetch(`${TOKEN_BASE_URL}/${ID}.json`, {
-      method: 'GET'
-    })
+    return fetch(`${TOKEN_BASE_URL}/${ID}.json`)
       .then(statusHelper)
       .then(response => response.json())
       .catch(err => err)
