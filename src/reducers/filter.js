@@ -10,7 +10,7 @@ import { arbitrableTokenList } from '../bootstrap/dapp-api'
 const oldestFirstShape = PropTypes.oneOf(
   filterConstants.SORT_OPTIONS_ENUM.indexes
 )
-const filtersShape = PropTypes.shapeOf({
+const filtersShape = PropTypes.shape({
   Registered: PropTypes.bool.isRequired,
   'Registration Requests': PropTypes.bool.isRequired,
   'Challenged Registration Requests': PropTypes.bool.isRequired,
