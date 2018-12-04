@@ -16,8 +16,7 @@ class SortBar extends PureComponent {
   static propTypes = {
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
-    oldestFirst: filterSelectors.oldestFirstShape.isRequired,
-    filters: filterSelectors.filtersShape.isRequired,
+    filter: filterSelectors.filterShape.isRequired,
 
     // Action Dispatchers
     setOldestFirst: PropTypes.func.isRequired,
@@ -25,14 +24,16 @@ class SortBar extends PureComponent {
   }
 
   handleSortChange = oldestFirst => {
-    const { setOldestFirst, fetchTokens, tokens, filters } = this.props
+    const { setOldestFirst, fetchTokens, tokens, filter } = this.props
+    const { filters } = filter
     setOldestFirst(oldestFirst)
     const filterValue = filterToContractParam(filters)
     if (!tokens.loading) fetchTokens('0x00', 10, filterValue, oldestFirst)
   }
 
   render() {
-    const { tokens, oldestFirst } = this.props
+    const { tokens, filter } = this.props
+    const { oldestFirst } = filter
     const tokensData = tokens.data
     return (
       <div className="SortBar">
@@ -40,6 +41,7 @@ class SortBar extends PureComponent {
           {tokensData ? tokensData.length : 'Loading'} submissions
         </div>
         <div className="SortBar-sort">
+          Sort by:
           <Dropdown
             value={oldestFirst || 0}
             type="radio"
@@ -57,8 +59,7 @@ class SortBar extends PureComponent {
 export default connect(
   state => ({
     tokens: state.token.tokens,
-    oldestFirst: state.filter.oldestFirst,
-    filters: state.filter.filters
+    filter: state.filter
   }),
   {
     setOldestFirst: filterActions.setOldestFirst,

@@ -27,7 +27,7 @@ const truncateMiddle = str =>
 class TokenDetails extends PureComponent {
   static propTypes = {
     // State
-    filters: filterSelectors.filtersShape.isRequired,
+    filter: filterSelectors.filterShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
@@ -288,7 +288,8 @@ class TokenDetails extends PureComponent {
 
   render() {
     const { token, countdown } = this.state
-    const { accounts, filters } = this.props
+    const { accounts, filter } = this.props
+    const { filters } = filter
 
     if (token)
       return (
@@ -389,7 +390,7 @@ export default connect(
     token: state.token.token.data,
     accounts: state.wallet.accounts,
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
-    filters: state.filter.filters
+    filter: state.filter
   }),
   {
     fetchToken: tokenActions.fetchToken,

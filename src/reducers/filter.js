@@ -7,20 +7,20 @@ import { defaultFilter } from '../utils/filter'
 import { arbitrableTokenList } from '../bootstrap/dapp-api'
 
 // Shapes
-const oldestFirstShape = PropTypes.oneOf(
-  filterConstants.SORT_OPTIONS_ENUM.indexes
-)
-const filtersShape = PropTypes.shape({
-  Registered: PropTypes.bool.isRequired,
-  'Registration Requests': PropTypes.bool.isRequired,
-  'Challenged Registration Requests': PropTypes.bool.isRequired,
-  Cleared: PropTypes.bool.isRequired,
-  'Clearing Requests': PropTypes.bool.isRequired,
-  'Challenged Clearing Requests': PropTypes.bool.isRequired,
-  'My Submissions': PropTypes.bool.isRequired,
-  'My Challenges': PropTypes.bool.isRequired
-}).isRequired
-export { oldestFirstShape, filtersShape }
+const filterShape = PropTypes.shape({
+  oldestFirst: PropTypes.oneOf(filterConstants.SORT_OPTIONS_ENUM.indexes),
+  filters: PropTypes.shape({
+    Registered: PropTypes.bool.isRequired,
+    'Registration Requests': PropTypes.bool.isRequired,
+    'Challenged Registration Requests': PropTypes.bool.isRequired,
+    Cleared: PropTypes.bool.isRequired,
+    'Clearing Requests': PropTypes.bool.isRequired,
+    'Challenged Clearing Requests': PropTypes.bool.isRequired,
+    'My Submissions': PropTypes.bool.isRequired,
+    'My Challenges': PropTypes.bool.isRequired
+  }).isRequired
+})
+export { filterShape }
 
 // Reducer
 const cachedFilters = localStorage.getItem(

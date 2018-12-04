@@ -3,6 +3,8 @@
 /* @define Dropdown */
 .Dropdown {
   color: $grey;
+  margin-left: 10px;
+  margin-top: -5px;
   position: relative;
   user-select: none;
   width: 65px;
@@ -13,7 +15,6 @@
 
   &-box {
     background: $background;
-    height: 25px;
     line-height: 25px;
 
     .Dropdown--checkbox & {
@@ -26,6 +27,7 @@
     }
 
     &-caret {
+      margin-left: 10px;
       position: absolute;
       top: 5px;
       transition: transform 0.25s;
@@ -38,7 +40,7 @@
 
   &-options {
     background: $background;
-    border: 1px solid $mint;
+    border: 1px solid $lightGrey;
     border-radius: 4px;
     box-shadow: 0 -1px 0 0 $mint;
     color: $lightText;

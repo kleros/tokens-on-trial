@@ -19,7 +19,7 @@ class Tokens extends Component {
   static propTypes = {
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
-    filter: filterSelectors.filtersShape.isRequired,
+    filter: filterSelectors.filterShape.isRequired,
 
     // Action Dispatchers
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
