@@ -26,11 +26,11 @@
   cursor: pointer;
   display: inline-flex;
   max-width: 100%;
-  padding: 0 2vw;
+  padding: 0 2em;
   user-select: none;
 
   @media only screen and (min-width: 800px) {
-    padding: 0 1.5vw;
+    padding: 0 1.5em;
   }
 
   @include buttonType(
@@ -76,11 +76,11 @@
     // stylelint-disable-next-line plugin/selector-bem-pattern
     .Button-label {
       font-size: 0.8em;
-      margin: 1.5vw 0;
+      margin: 1em 0;
 
       @media only screen and (min-width: 800px) {
-        font-size: 1vw;
-        margin: 1vw 0;
+        font-size: 0.7em;
+        margin: 1em 0;
       }
     }
   }

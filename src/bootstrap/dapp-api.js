@@ -12,14 +12,14 @@ const TOKEN_UPLOAD_URL = process.env[`REACT_APP_${env}_TOKEN_UPLOAD_URL`]
 const TOKEN_BASE_URL = process.env[`REACT_APP_${env}_TOKEN_BASE_URL`]
 
 let web3
-let isInfura = false
+let onlyInfura = false
 if (process.env.NODE_ENV === 'test')
   web3 = new Web3(require('ganache-cli').provider())
 else if (window.web3 && window.web3.currentProvider)
   web3 = new Web3(window.web3.currentProvider)
 else {
   web3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
-  isInfura = true
+  onlyInfura = true
 }
 
 const network =
@@ -54,7 +54,7 @@ const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
   web3,
-  isInfura,
+  onlyInfura,
   network,
   ETHAddressRegExpCaptureGroup,
   ETHAddressRegExp,

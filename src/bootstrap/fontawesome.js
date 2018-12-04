@@ -15,6 +15,8 @@ import faTimesCircle from '@fortawesome/fontawesome-free-solid/faTimesCircle'
 import faHourglassHalf from '@fortawesome/fontawesome-free-solid/faHourglassHalf'
 import faClock from '@fortawesome/fontawesome-free-solid/faClock'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
+import faBell from '@fortawesome/fontawesome-free-solid/faBell'
+import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 
 library.add(
   faCaretDown,
@@ -32,5 +34,7 @@ library.add(
   faTimesCircle,
   faHourglassHalf,
   faClock,
-  faSpinner
+  faSpinner,
+  faBell,
+  faEnvelope
 )
