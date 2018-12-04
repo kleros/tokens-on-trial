@@ -52,7 +52,7 @@ class SortBar extends PureComponent {
           <Dropdown
             value={oldestFirst || 0}
             type="radio"
-            label="Sort order"
+            label="Sort"
             options={filterConstants.SORT_OPTIONS_ENUM.values}
             onChange={this.handleSortChange}
             className="SortBar-dropdowns-dropdown"

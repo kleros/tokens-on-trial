@@ -5,7 +5,7 @@
   color: $grey;
   position: relative;
   user-select: none;
-  width: 230px;
+  width: 65px;
 
   &--checkbox {
     width: initial;
@@ -13,12 +13,8 @@
 
   &-box {
     background: $background;
-    border: 1px solid $mint;
-    border-radius: 4px;
-    box-shadow: 0 -1px 0 0 $mint;
-    height: 50px;
-    line-height: 50px;
-    padding-left: 29px;
+    height: 25px;
+    line-height: 25px;
 
     .Dropdown--checkbox & {
       padding-right: 39px;
@@ -31,8 +27,7 @@
 
     &-caret {
       position: absolute;
-      right: 23px;
-      top: 20px;
+      top: 5px;
       transition: transform 0.25s;
 
       .Dropdown.is-open & {
@@ -48,14 +43,14 @@
     box-shadow: 0 -1px 0 0 $mint;
     color: $lightText;
     font-size: 14px;
-    left: 1px;
+    left: -25px;
     position: absolute;
-    top: 56px;
-    width: 232px;
+    top: 30px;
+    width: 90px;
     z-index: 1;
 
     &-option {
-      padding: 15px 29px;
+      padding: 15px 15px;
       position: relative;
 
       &:hover,
