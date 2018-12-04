@@ -8,8 +8,9 @@ import { web3 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import FilterBar from '../filter-bar'
-import { defaultFilter } from '../../utils/filter'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/token'
+import * as filterActions from '../../actions/filter'
+import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
@@ -26,6 +27,7 @@ const truncateMiddle = str =>
 class TokenDetails extends PureComponent {
   static propTypes = {
     // State
+    filters: filterSelectors.filtersShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
@@ -45,7 +47,8 @@ class TokenDetails extends PureComponent {
     executeRequest: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openTokenModal: PropTypes.func.isRequired,
-    feesTimeout: PropTypes.func.isRequired
+    feesTimeout: PropTypes.func.isRequired,
+    toggleFilter: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -55,15 +58,13 @@ class TokenDetails extends PureComponent {
 
   state = {
     token: null,
-    filter: defaultFilter(),
     timestamp: null,
     countdown: null
   }
 
   handleFilterChange = key => {
-    const { filter } = this.state
-    filter[key] = !filter[key]
-    this.setState({ filter })
+    const { toggleFilter } = this.props
+    toggleFilter(key)
   }
 
   handleActionClick = action => {
@@ -286,14 +287,14 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { token, filter, countdown } = this.state
-    const { accounts } = this.props
+    const { token, countdown } = this.state
+    const { accounts, filters } = this.props
 
     if (token)
       return (
         <div className="Page">
           <FilterBar
-            filter={filter}
+            filter={filters}
             handleFilterChange={this.handleFilterChange}
           />
           <div className="TokenDetails">
@@ -387,12 +388,14 @@ export default connect(
   state => ({
     token: state.token.token.data,
     accounts: state.wallet.accounts,
-    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData
+    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
+    filters: state.filter.filters
   }),
   {
     fetchToken: tokenActions.fetchToken,
     executeRequest: tokenActions.executeRequest,
     openTokenModal: modalActions.openTokenModal,
-    feesTimeout: tokenActions.feesTimeout
+    feesTimeout: tokenActions.feesTimeout,
+    toggleFilter: filterActions.toggleFilter
   }
 )(TokenDetails)

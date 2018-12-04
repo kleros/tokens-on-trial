@@ -22,7 +22,7 @@ const TokenCard = ({ token }) => (
       <h5>
         {token.name} - {token.ticker}
       </h5>
-      <a href={`https://etherscan.io/token/${token.address}`}>
+      <a href={`https://etherscan.io/token/${token.addr}`}>
         <Img src={EtherScanLogo} />
       </a>
     </div>

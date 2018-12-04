@@ -9,8 +9,9 @@ import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as tokenActions from '../../actions/token'
-import * as filterConstants from '../../constants/filter'
-import { filterToContractParam, defaultFilter } from '../../utils/filter'
+import * as filterActions from '../../actions/filter'
+import * as filterSelectors from '../../reducers/filter'
+import { filterToContractParam } from '../../utils/filter'
 
 import './tokens.css'
 
@@ -18,16 +19,12 @@ class Tokens extends Component {
   static propTypes = {
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
+    filter: filterSelectors.filtersShape.isRequired,
 
     // Action Dispatchers
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired
-  }
-
-  state = {
-    sortValue: 0,
-    sort: { [filterConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
-    filter: defaultFilter()
+    fetchTokens: PropTypes.func.isRequired,
+    toggleFilter: PropTypes.func.isRequired
   }
 
   ref = React.createRef()
@@ -46,15 +43,21 @@ class Tokens extends Component {
   })
 
   handleFilterChange = key => {
-    const { filter } = this.state
-    filter[key] = !filter[key]
-    this.setState({ filter }, () => this.fetchTokens(true))
+    const { toggleFilter } = this.props
+    toggleFilter(key)
+    this.fetchTokens(true, key)
   }
 
-  fetchTokens = clear => {
-    const { tokens, fetchTokens } = this.props
-    const { filter, sortValue } = this.state
-    const filterValue = filterToContractParam(filter)
+  fetchTokens = (clear, key) => {
+    const { tokens, fetchTokens, filter } = this.props
+    const { filters, oldestFirst } = filter
+    const updatedFilters = {
+      ...filters,
+      [key]: !filters[key]
+    }
+
+    const filterValue = filterToContractParam(updatedFilters)
+
     if (!tokens.loading)
       fetchTokens(
         tokens.data && clear !== true
@@ -62,13 +65,13 @@ class Tokens extends Component {
           : '0x00',
         10,
         filterValue,
-        sortValue
+        oldestFirst
       )
   }
 
   render() {
-    const { tokens } = this.props
-    const { filter } = this.state
+    const { tokens, filter } = this.props
+    const { filters } = filter
 
     let numTokens = 'Loading...'
     if (tokens && tokens.data) numTokens = tokens.data.length
@@ -76,7 +79,7 @@ class Tokens extends Component {
     return (
       <div ref={this.ref} className="Page">
         <FilterBar
-          filter={filter}
+          filter={filters}
           handleFilterChange={this.handleFilterChange}
         />
         <SortBar numTokens={numTokens} />
@@ -92,11 +95,13 @@ class Tokens extends Component {
 
 export default connect(
   state => ({
-    tokens: state.token.tokens
+    tokens: state.token.tokens,
+    filter: state.filter
   }),
   {
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData,
-    fetchTokens: tokenActions.fetchTokens
+    fetchTokens: tokenActions.fetchTokens,
+    toggleFilter: filterActions.toggleFilter
   }
 )(Tokens)

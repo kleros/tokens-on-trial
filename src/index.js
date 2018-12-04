@@ -22,12 +22,16 @@ const render = Component => {
 render(App)
 registerServiceWorker()
 
-window.addEventListener('unload', () =>
+window.addEventListener('unload', () => {
   localStorage.setItem(
     arbitrableTokenList.options.address + 'notifications',
     JSON.stringify(store.getState().notification.notifications.data)
   )
-)
+  localStorage.setItem(
+    arbitrableTokenList.options.address + 'filter',
+    JSON.stringify(store.getState().filter)
+  )
+})
 
 if (module.hot)
   module.hot.accept('./bootstrap/app', () => {

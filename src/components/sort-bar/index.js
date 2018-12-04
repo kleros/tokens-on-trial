@@ -17,6 +17,7 @@ class SortBar extends PureComponent {
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
     oldestFirst: filterSelectors.oldestFirstShape.isRequired,
+    filters: filterSelectors.filtersShape.isRequired,
 
     // Action Dispatchers
     setOldestFirst: PropTypes.func.isRequired,
@@ -24,19 +25,9 @@ class SortBar extends PureComponent {
   }
 
   handleSortChange = oldestFirst => {
-    const { setOldestFirst, fetchTokens, tokens } = this.props
+    const { setOldestFirst, fetchTokens, tokens, filters } = this.props
     setOldestFirst(oldestFirst)
-    const filterValue = filterToContractParam({
-      'Challenged Clearing Requests': true,
-      'Challenged Registration Requests': true,
-      Cleared: true,
-      'Clearing Requests': true,
-      'My Challenges': true,
-      'My Submissions': true,
-      Registered: true,
-      'Registration Requests': true
-    })
-
+    const filterValue = filterToContractParam(filters)
     if (!tokens.loading) fetchTokens('0x00', 10, filterValue, oldestFirst)
   }
 
@@ -66,10 +57,12 @@ class SortBar extends PureComponent {
 export default connect(
   state => ({
     tokens: state.token.tokens,
-    oldestFirst: state.filter.oldestFirst
+    oldestFirst: state.filter.oldestFirst,
+    filters: state.filter.filters
   }),
   {
     setOldestFirst: filterActions.setOldestFirst,
-    fetchTokens: tokenActions.fetchTokens
+    fetchTokens: tokenActions.fetchTokens,
+    toggleFilter: filterActions.toggleFilter
   }
 )(SortBar)
