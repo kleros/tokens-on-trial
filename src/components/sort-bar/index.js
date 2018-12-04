@@ -42,10 +42,11 @@ class SortBar extends PureComponent {
 
   render() {
     const { tokens, oldestFirst } = this.props
+    const tokensData = tokens.data
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokens ? tokens.length : 'Loading'} submissions
+          {tokensData ? tokensData.length : 'Loading'} submissions
         </div>
         <div className="SortBar-sort">
           <Dropdown
@@ -64,7 +65,7 @@ class SortBar extends PureComponent {
 
 export default connect(
   state => ({
-    tokens: state.token.tokens.data,
+    tokens: state.token.tokens,
     oldestFirst: state.filter.oldestFirst
   }),
   {
