@@ -8,6 +8,7 @@ import notification from './notification'
 import arbitrator from './arbitrator'
 import token from './token'
 import modal from './modal'
+import filter from './filter'
 
 // Export root reducer
 export default combineReducers({
@@ -18,5 +19,6 @@ export default combineReducers({
   arbitrableTokenList,
   arbitrator,
   token,
-  modal
+  modal,
+  filter
 })

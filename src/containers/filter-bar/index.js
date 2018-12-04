@@ -3,7 +3,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
 import Button from '../../components/button'
-import * as tokenConstants from '../../constants/token'
+import * as filterConstants from '../../constants/filter'
 
 import './filter-bar.css'
 
@@ -17,7 +17,7 @@ class FilterButton extends PureComponent {
 
   onFilterChange = () => {
     const { option, handleFilterChange } = this.props
-    handleFilterChange(tokenConstants.FILTER_OPTIONS_ENUM[option])
+    handleFilterChange(filterConstants.FILTER_OPTIONS_ENUM[option])
   }
 
   render() {
@@ -29,7 +29,7 @@ class FilterButton extends PureComponent {
         type={type}
         onClick={this.onFilterChange}
       >
-        {tokenConstants.FILTER_OPTIONS_ENUM[option]}
+        {filterConstants.FILTER_OPTIONS_ENUM[option]}
       </Button>
     )
   }
@@ -75,7 +75,7 @@ class FilterBar extends Component {
           <div>
             <div className="FilterBar-filterSelect">
               <div className="FilterBar-my">
-                {tokenConstants.FILTER_OPTIONS_ENUM.indexes
+                {filterConstants.FILTER_OPTIONS_ENUM.indexes
                   .filter(i => i >= 6)
                   .map(i => (
                     <FilterButton
@@ -83,18 +83,18 @@ class FilterBar extends Component {
                       option={i}
                       className="FilterBar-my-button"
                       type={
-                        filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]
+                        filter[filterConstants.FILTER_OPTIONS_ENUM[i]]
                           ? 'primary'
                           : 'secondary'
                       }
                       handleFilterChange={handleFilterChange}
                     >
-                      {tokenConstants.FILTER_OPTIONS_ENUM[i]}
+                      {filterConstants.FILTER_OPTIONS_ENUM[i]}
                     </FilterButton>
                   ))}
               </div>
               <div className="FilterBar-status">
-                {tokenConstants.FILTER_OPTIONS_ENUM.indexes
+                {filterConstants.FILTER_OPTIONS_ENUM.indexes
                   .filter(i => i < 6)
                   .map(i => (
                     <FilterButton
@@ -102,20 +102,21 @@ class FilterBar extends Component {
                       option={i}
                       className={`FilterBar-status-button
                         FilterBar-status-button-${
-                          tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 10
+                          filterConstants.FILTER_OPTIONS_ENUM[i].length <= 10
                             ? `small`
-                            : tokenConstants.FILTER_OPTIONS_ENUM[i].length <= 24
+                            : filterConstants.FILTER_OPTIONS_ENUM[i].length <=
+                              24
                             ? `medium`
                             : `large`
                         }`}
                       type={
-                        filter[tokenConstants.FILTER_OPTIONS_ENUM[i]]
+                        filter[filterConstants.FILTER_OPTIONS_ENUM[i]]
                           ? 'primary'
                           : 'secondary'
                       }
                       handleFilterChange={handleFilterChange}
                     >
-                      {tokenConstants.FILTER_OPTIONS_ENUM[i]}
+                      {filterConstants.FILTER_OPTIONS_ENUM[i]}
                     </FilterButton>
                   ))}
               </div>

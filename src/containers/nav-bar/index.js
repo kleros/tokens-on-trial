@@ -57,7 +57,7 @@ export default class NavBar extends PureComponent {
       )),
       ...extras.map((e, i) => (
         <div
-          key={e.key}
+          key={i}
           className={`NavBar-extra ${isMobile ? 'is-mobile' : ''} ${
             i === 0 ? 'NavBar-extra--first' : ''
           }`}

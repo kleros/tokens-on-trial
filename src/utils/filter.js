@@ -1,11 +1,11 @@
-import * as tokenConstants from '../constants/token'
+import * as filterConstants from '../constants/filter'
 
 /**
  * Creates a default filter for the client.
  * @returns {object} - The filter.
  */
 export const defaultFilter = () => {
-  const filter = tokenConstants.FILTER_OPTIONS_ENUM.values.reduce(
+  const filter = filterConstants.FILTER_OPTIONS_ENUM.values.reduce(
     (acc, curr) => ({
       ...acc,
       [curr]: true

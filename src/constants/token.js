@@ -33,19 +33,6 @@ export const STATUS_COLOR_ENUM = createEnum([
   '#EF0101'
 ])
 
-// Gallery Settings
-export const FILTER_OPTIONS_ENUM = createEnum([
-  'Registered',
-  'Registration Requests',
-  'Challenged Registration Requests',
-  'Cleared',
-  'Clearing Requests',
-  'Challenged Clearing Requests',
-  'My Submissions',
-  'My Challenges'
-])
-export const SORT_OPTIONS_ENUM = createEnum(['Newest', 'Oldest'])
-
 // helloThere => Hello There
 export const camelCaseAddSpaces = str =>
   str.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())

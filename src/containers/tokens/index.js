@@ -9,7 +9,7 @@ import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as tokenActions from '../../actions/token'
-import * as tokenConstants from '../../constants/token'
+import * as filterConstants from '../../constants/filter'
 import { filterToContractParam, defaultFilter } from '../../utils/filter'
 
 import './tokens.css'
@@ -26,7 +26,7 @@ class Tokens extends Component {
 
   state = {
     sortValue: 0,
-    sort: { [tokenConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
+    sort: { [filterConstants.SORT_OPTIONS_ENUM[0]]: 'ascending' },
     filter: defaultFilter()
   }
 
