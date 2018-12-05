@@ -30,6 +30,23 @@ class Initializer extends PureComponent {
     fetchAccounts()
   }
 
+  componentDidUpdate({ accounts }) {
+    web3.currentProvider.publicConfigStore.on(
+      'update',
+      ({ selectedAddress }) => {
+        if (
+          accounts &&
+          accounts.data &&
+          accounts.data.length > 0 &&
+          selectedAddress &&
+          selectedAddress !== accounts.data[0].toLowerCase()
+        )
+          // switching accounts
+          window.location.reload()
+      }
+    )
+  }
+
   render() {
     const { accounts, children } = this.props
     return (
@@ -37,7 +54,9 @@ class Initializer extends PureComponent {
         resource={accounts}
         loading={<ClimbingBoxLoader color="#3d464d" />}
         done={children}
-        failedLoading={<RequiresMetaMaskPage needsUnlock={Boolean(web3.eth)} />}
+        failedLoading={
+          <RequiresMetaMaskPage needsUnlock={Boolean(web3.eth)} web3={web3} />
+        }
         extraValues={[
           accounts.data && (accounts.data[0] || onlyInfura || null)
         ]}
