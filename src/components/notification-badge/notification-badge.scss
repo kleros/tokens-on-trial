@@ -5,22 +5,24 @@
   position: relative;
 
   &-badge {
-    background: $error;
+    background: $badgeBlue;
+    border: 1px solid black;
     border-radius: 9px;
     color: $invertedText;
     font-size: 11px;
-    height: 18px;
-    left: 0;
-    line-height: 18px;
+    font-weight: 500;
+    height: 15px;
+    left: 8px;
+    line-height: 15px;
     position: absolute;
     text-align: center;
-    top: 0;
+    top: 22px;
     transition: background-color 1s;
     user-select: none;
-    width: 18px;
+    width: 15px;
 
     &:hover {
-      background: darken($error, 20%);
+      background: darken($badgeBlue, 20%);
     }
   }
 
@@ -31,8 +33,8 @@
     box-shadow: 0 2px 5px 0 $mint;
     position: absolute;
     right: calc(100% - 21px);
-    top: 26px;
-    width: 250px;
+    top: 69px;
+    width: 177px;
 
     &::after {
       border-bottom: 5px solid $mint;

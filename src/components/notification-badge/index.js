@@ -76,18 +76,13 @@ export default class NotificationBadge extends PureComponent {
             {(useMaxShown
               ? notifications.data.slice(0, maxShown)
               : notifications.data
-            ).map(n => (
+            ).map((n, i) => (
               <div
-                key={n.ID}
+                key={n.ID + i}
                 id={n.ID}
                 onClick={onNotificationClick}
                 className="NotificationBadge-notifications-notification"
               >
-                <img
-                  src={n.thumbnailURL}
-                  alt="Notification Thumbnail"
-                  className="NotificationBadge-notifications-notification-thumbnail"
-                />
                 <div className="NotificationBadge-notifications-notification-content">
                   {n.message}
                   <br />

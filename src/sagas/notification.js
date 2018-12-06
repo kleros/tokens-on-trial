@@ -34,28 +34,30 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
   let oldestNonDisputedSubmittedStatusEvent
 
   for (const event of events.reverse()) {
+    const { returnValues } = event
+
     if (notifiedIDs[event.returnValues.tokenID]) continue
-    const isSubmitter = account === event.returnValues.submitter
-    if (!isSubmitter || account !== event.returnValues.challenger) continue
+    const isRequester = account === event.returnValues.requester
+    if (!isRequester && account !== event.returnValues.challenger) continue
 
     let message
-    switch (Number(event.returnValues.status)) {
+    switch (Number(returnValues.status)) {
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
-        if (event.returnValues.disputed === true && isSubmitter)
+        if (returnValues.disputed === true && isRequester)
           message = 'Your request has been challenged.'
-        else if (event.returnValues.disputed === false)
+        else if (returnValues.disputed === false)
           oldestNonDisputedSubmittedStatusEvent = event
         break
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered:
-        if (event.returnValues.disputed === false)
+        if (returnValues.disputed === false)
           message = `${
-            isSubmitter ? 'Your request' : 'A request you challenged'
+            isRequester ? 'Your request' : 'A request you challenged'
           } has been executed.`
         break
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.Cleared:
-        if (event.returnValues.disputed === false)
+        if (returnValues.disputed === false)
           message = `${
-            isSubmitter ? 'Your request' : 'A request you challenged'
+            isRequester ? 'Your request' : 'A request you challenged'
           } has been rejected.`
         break
       default:
@@ -119,9 +121,9 @@ function* pushNotificationsListener() {
               arbitrableTokenList.options.address + 'nextEventsBlockNumber'
             ) || 0
         })
-        .then(events =>
+        .then(events => {
           emitNotifications(account, timeToChallenge, emitter, events)
-        )
+        })
       arbitrableTokenList.events.TokenStatusChange().on('data', event => {
         emitNotifications(account, timeToChallenge, emitter, [event])
         emitter(event.returnValues.tokenID)
@@ -151,9 +153,7 @@ function* pushNotificationsListener() {
                 collection: tokenActions.tokens.self,
                 resource: yield call(fetchToken, {
                   payload: { ID: notification }
-                }),
-                updating: notification,
-                find: d => d.ID === notification
+                })
               }
             })
           : action(notificationActions.notification.RECEIVE, {
