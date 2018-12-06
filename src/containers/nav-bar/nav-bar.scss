@@ -28,9 +28,9 @@
   }
 
   &-kleros {
-    align-items: stretch;
+    align-items: center !important;
     color: $white;
-    display: flex;
+    display: flex !important;
     font-size: 14px;
     font-style: normal;
     font-weight: 400;
@@ -40,9 +40,10 @@
   }
 
   &-route {
+    align-items: center !important;
     background-color: $absoluteBlack;
     color: $white;
-    display: block;
+    display: flex !important;
     flex: 0 1;
     font-size: 15px;
     font-style: normal;

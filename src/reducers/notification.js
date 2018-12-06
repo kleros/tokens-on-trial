@@ -7,8 +7,7 @@ import { arbitrableTokenList } from '../bootstrap/dapp-api'
 export const _notificationShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
   date: PropTypes.instanceOf(Date).isRequired,
-  message: PropTypes.string.isRequired,
-  thumbnailURL: PropTypes.string.isRequired
+  message: PropTypes.string.isRequired
 })
 export const _notificationsShape = PropTypes.arrayOf(
   _notificationShape.isRequired

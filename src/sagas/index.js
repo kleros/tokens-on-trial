@@ -6,6 +6,7 @@ import walletSaga from './wallet'
 import arbitrableTokenListSaga from './arbitrable-token-list'
 import arbitratorSaga from './arbitrator'
 import tokenSaga from './token'
+import notificationSaga from './notification'
 
 /**
  * Makes a saga restart after an uncaught error.
@@ -37,7 +38,8 @@ const rootSagas = [
   walletSaga,
   arbitrableTokenListSaga,
   tokenSaga,
-  arbitratorSaga
+  arbitratorSaga,
+  notificationSaga
 ].map(makeRestartable)
 
 /**

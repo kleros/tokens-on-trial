@@ -50,6 +50,7 @@ export default class NavBar extends PureComponent {
             target="_blank"
             rel="noopener noreferrer"
             className={`NavBar-route ${r.extraStyle}`}
+            style={{ height: '55px', verticalAlign: 'center' }}
           >
             {r.title}
           </a>

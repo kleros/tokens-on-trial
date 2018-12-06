@@ -160,6 +160,18 @@ function* requestStatusChange({ payload: { token } }) {
     URI: token.URI
   }
 
+  const { name, ticker, addr, URI } = tokenToSubmit
+
+  if (
+    isInvalid(name) ||
+    isInvalid(ticker) ||
+    isInvalid(addr) ||
+    isInvalid(URI)
+  ) {
+    console.error(tokenToSubmit)
+    throw new Error('Missing data on token submit')
+  }
+
   const response = yield call(storeApi.postFile, JSON.stringify(tokenToSubmit))
   const { payload } = response
   const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
@@ -334,6 +346,15 @@ function* feeTimeout({ payload: { token } }) {
   })
 
   return yield call(fetchToken, { payload: { ID: token.ID } })
+}
+
+/**
+ * Check if a string is undefined, not a string or empty.
+ * @param {string} str input string.
+ * @returns {bool} Weather it passes the test.
+ */
+function isInvalid(str) {
+  return !str || typeof str !== 'string' || str.trim().length === 0
 }
 
 // Update collection mod flows
