@@ -55,11 +55,7 @@ class _ConnectedNavBar extends PureComponent {
           { title: 'Token² Curated List', extraStyle: 'NavBar-route-title' }
         ]}
         extras={[
-          <NotificationBadge
-            key="1"
-            notifications={notifications}
-            onNotificationClick={this.handleNotificationClick}
-          >
+          <NotificationBadge key="1" notifications={notifications}>
             <FontAwesomeIcon icon="bell" color="white" />
           </NotificationBadge>,
           <FontAwesomeIcon icon="envelope" color="white" />,
@@ -83,7 +79,8 @@ class _ConnectedNavBar extends PureComponent {
 const ConnectedNavBar = connect(
   state => ({
     accounts: state.wallet.accounts,
-    notifications: state.notification.notifications
+    notifications: state.notification.notifications,
+    isNotificationsModalOpen: state.modal.isNotificationsModalOpen
   }),
   {
     deleteNotification: notificationActions.deleteNotification,

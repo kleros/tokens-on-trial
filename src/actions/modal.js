@@ -5,8 +5,8 @@ export const OPEN_TOKEN_MODAL = 'OPEN_TOKEN_MODAL'
 export const CLOSE_TOKEN_MODAL = 'CLOSE_TOKEN_MODAL'
 
 // Notification Modal
-export const OPEN_NOTIFICATION_MODAL = 'OPEN_NOTIFICATION_MODAL'
-export const CLOSE_NOTIFICATION_MODAL = 'CLOSE_NOTIFICATION_MODAL'
+export const OPEN_NOTIFICATIONS_MODAL = 'OPEN_NOTIFICATIONS_MODAL'
+export const CLOSE_NOTIFICATIONS_MODAL = 'CLOSE_NOTIFICATIONS_MODAL'
 
 /* Action Creators */
 
@@ -18,8 +18,9 @@ export const openTokenModal = tokenModal => ({
 export const closeTokenModal = () => ({ type: CLOSE_TOKEN_MODAL })
 
 // Notification Modal
-export const openNotificationModal = notificationModal => ({
-  type: OPEN_NOTIFICATION_MODAL,
-  payload: { notificationModal }
+export const openNotificationsModal = () => ({
+  type: OPEN_NOTIFICATIONS_MODAL
 })
-export const closeNotificationModal = () => ({ type: CLOSE_NOTIFICATION_MODAL })
+export const closeNotificationsModal = () => ({
+  type: CLOSE_NOTIFICATIONS_MODAL
+})

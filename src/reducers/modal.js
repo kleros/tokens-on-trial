@@ -8,16 +8,13 @@ import * as modalConstants from '../constants/modal'
 const openTokenModalShape = PropTypes.oneOf(
   modalConstants.TOKEN_MODAL_ENUM.indexes
 )
-const openNotificationModalShape = PropTypes.oneOf(
-  modalConstants.NOTIFICATION_MODAL_ENUM.indexes
-)
-export { openTokenModalShape, openNotificationModalShape }
+export { openTokenModalShape }
 
 // Reducer
 export default createReducer(
   {
     openTokenModal: null,
-    openNotificationModal: null
+    isNotificationsModalOpen: false
   },
   {
     [modalActions.OPEN_TOKEN_MODAL]: (state, { payload: { tokenModal } }) => ({
@@ -28,16 +25,13 @@ export default createReducer(
       ...state,
       openTokenModal: null
     }),
-    [modalActions.OPEN_NOTIFICATION_MODAL]: (
-      state,
-      { payload: { notificationModal } }
-    ) => ({
+    [modalActions.OPEN_NOTIFICATIONS_MODAL]: state => ({
       ...state,
-      openNotificationModal: notificationModal
+      isNotificationsModalOpen: true
     }),
-    [modalActions.CLOSE_NOTIFICATION_MODAL]: state => ({
+    [modalActions.CLOSE_NOTIFICATIONS_MODAL]: state => ({
       ...state,
-      openNotificationModal: null
+      isNotificationsModalOpen: false
     })
   }
 )

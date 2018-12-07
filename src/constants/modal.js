@@ -10,5 +10,3 @@ export const TOKEN_MODAL_ENUM = createEnum([
   'FundChallenger',
   'FundAppeal'
 ])
-
-export const NOTIFICATION_MODAL_ENUM = createEnum(['History', 'Settings'])

@@ -1,21 +1,26 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import TimeAgo from 'timeago-react'
+import { connect } from 'react-redux'
 
 import * as notificationSelectors from '../../reducers/notification'
+import * as modalActions from '../../actions/modal'
+import NavOverlay from '../../components/nav-overlay'
 
 import './notification-badge.css'
 
-export default class NotificationBadge extends PureComponent {
+class NotificationBadge extends PureComponent {
   static propTypes = {
     // State
     children: PropTypes.node.isRequired,
     notifications: notificationSelectors.notificationsShape.isRequired,
     maxShown: PropTypes.number,
+    isNotificationsModalOpen: PropTypes.oneOf([true, false]).isRequired,
 
     // Handlers
-    onNotificationClick: PropTypes.func.isRequired,
-    onShowAll: PropTypes.func
+    onShowAll: PropTypes.func,
+    openNotificationsModal: PropTypes.func.isRequired,
+    closeNotificationsModal: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -26,83 +31,90 @@ export default class NotificationBadge extends PureComponent {
     onShowAll: null
   }
 
-  state = { isOpen: false }
-
-  timeout = null
-
-  componentWillUnmount() {
-    clearTimeout(this.timeout)
+  handleOpenNotificationClick = () => {
+    const { openNotificationsModal, isNotificationsModalOpen } = this.props
+    if (isNotificationsModalOpen) return // This method is triggered when clicking on the overlay so we avoid opening it again.
+    openNotificationsModal()
   }
 
-  handleMouseEnter = () => {
-    clearTimeout(this.timeout)
-    this.setState({ isOpen: true })
+  handleOverlayClick = () => {
+    const { closeNotificationsModal } = this.props
+    closeNotificationsModal()
   }
 
-  handleMouseLeave = () =>
-    (this.timeout = setTimeout(() => this.setState({ isOpen: false }), 750))
+  onNotificationClick = () => {
+    // TODO
+  }
 
   render() {
     const {
       children,
       notifications,
       maxShown,
-      onNotificationClick,
-      onShowAll
+      onShowAll,
+      isNotificationsModalOpen
     } = this.props
-    const { isOpen } = this.state
+
     if (!notifications.data) return null
 
     const hasNotifications = notifications.data.length > 0
     const useMaxShown = maxShown && notifications.data.length > maxShown
     return (
-      <div className="NotificationBadge">
+      <div
+        className="NotificationBadge"
+        onClick={this.handleOpenNotificationClick}
+      >
         {children}
         {hasNotifications && (
-          <div
-            onMouseEnter={this.handleMouseEnter}
-            onMouseLeave={this.handleMouseLeave}
-            className="NotificationBadge-badge"
-          >
+          <div className="NotificationBadge-badge">
             {notifications.data.length}
           </div>
         )}
-        {hasNotifications && isOpen && (
-          <div
-            onMouseEnter={this.handleMouseEnter}
-            onMouseLeave={this.handleMouseLeave}
-            className="NotificationBadge-notifications"
-          >
-            {(useMaxShown
-              ? notifications.data.slice(0, maxShown)
-              : notifications.data
-            ).map((n, i) => (
-              <div
-                key={n.ID + i}
-                id={n.ID}
-                onClick={onNotificationClick}
-                className="NotificationBadge-notifications-notification"
-              >
-                <div className="NotificationBadge-notifications-notification-content">
-                  {n.message}
-                  <br />
-                  <small>
-                    <TimeAgo datetime={n.date} />
-                  </small>
+        {hasNotifications && isNotificationsModalOpen && (
+          <div>
+            <NavOverlay onClick={this.handleOverlayClick} />
+            <div className="NotificationBadge-notifications">
+              {(useMaxShown
+                ? notifications.data.slice(0, maxShown)
+                : notifications.data
+              ).map((n, i) => (
+                <div
+                  key={n.ID + i}
+                  id={n.ID}
+                  onClick={this.onNotificationClick}
+                  className="NotificationBadge-notifications-notification"
+                >
+                  <div className="NotificationBadge-notifications-notification-content">
+                    {n.message}
+                    <br />
+                    <small>
+                      <TimeAgo datetime={n.date} />
+                    </small>
+                  </div>
                 </div>
-              </div>
-            ))}
-            {useMaxShown && (
-              <div
-                onClick={onShowAll}
-                className="NotificationBadge-notifications-showAll"
-              >
-                <small>SHOW ALL</small>
-              </div>
-            )}
+              ))}
+              {useMaxShown && (
+                <div
+                  onClick={onShowAll}
+                  className="NotificationBadge-notifications-showAll"
+                >
+                  <small>SHOW ALL</small>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
     )
   }
 }
+
+export default connect(
+  state => ({
+    isNotificationsModalOpen: state.modal.isNotificationsModalOpen
+  }),
+  {
+    openNotificationsModal: modalActions.openNotificationsModal,
+    closeNotificationsModal: modalActions.closeNotificationsModal
+  }
+)(NotificationBadge)
