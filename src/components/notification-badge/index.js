@@ -20,7 +20,8 @@ class NotificationBadge extends PureComponent {
     // Handlers
     onShowAll: PropTypes.func,
     openNotificationsModal: PropTypes.func.isRequired,
-    closeNotificationsModal: PropTypes.func.isRequired
+    closeNotificationsModal: PropTypes.func.isRequired,
+    onNotificationClick: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -42,16 +43,13 @@ class NotificationBadge extends PureComponent {
     closeNotificationsModal()
   }
 
-  onNotificationClick = () => {
-    // TODO
-  }
-
   render() {
     const {
       children,
       notifications,
       maxShown,
       onShowAll,
+      onNotificationClick,
       isNotificationsModalOpen
     } = this.props
 
@@ -81,7 +79,7 @@ class NotificationBadge extends PureComponent {
                 <div
                   key={n.ID + i}
                   id={n.ID}
-                  onClick={this.onNotificationClick}
+                  onClick={onNotificationClick}
                   className="NotificationBadge-notifications-notification"
                 >
                   <div className="NotificationBadge-notifications-notification-content">

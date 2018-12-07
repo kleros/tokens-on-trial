@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Tokens from '../containers/tokens'
@@ -29,12 +29,19 @@ import './app.css'
 
 class _ConnectedNavBar extends PureComponent {
   static propTypes = {
+    // Navigation
+    history: PropTypes.shape({
+      push: PropTypes.func.isRequired
+    }).isRequired,
+
     // Redux State
     accounts: walletSelectors.accountsShape.isRequired,
     notifications: notificationSelectors.notificationsShape.isRequired,
 
     // Action Dispatchers
-    openTokenModal: PropTypes.func.isRequired
+    openTokenModal: PropTypes.func.isRequired,
+    deleteNotification: PropTypes.func.isRequired,
+    closeNotificationsModal: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
@@ -42,8 +49,11 @@ class _ConnectedNavBar extends PureComponent {
     openTokenModal(modalConstants.TOKEN_MODAL_ENUM.Submit)
   }
 
-  handleNotificationClick = () => {
-    // TODO
+  handleNotificationClick = ({ currentTarget: { id } }) => {
+    const { deleteNotification, history, closeNotificationsModal } = this.props
+    deleteNotification(id)
+    closeNotificationsModal()
+    history.push(`/${id}`)
   }
 
   render() {
@@ -55,7 +65,11 @@ class _ConnectedNavBar extends PureComponent {
           { title: 'Token² Curated List', extraStyle: 'NavBar-route-title' }
         ]}
         extras={[
-          <NotificationBadge key="1" notifications={notifications}>
+          <NotificationBadge
+            key="1"
+            notifications={notifications}
+            onNotificationClick={this.handleNotificationClick}
+          >
             <FontAwesomeIcon icon="bell" color="white" />
           </NotificationBadge>,
           <FontAwesomeIcon icon="envelope" color="white" />,
@@ -76,17 +90,20 @@ class _ConnectedNavBar extends PureComponent {
   }
 }
 
-const ConnectedNavBar = connect(
-  state => ({
-    accounts: state.wallet.accounts,
-    notifications: state.notification.notifications,
-    isNotificationsModalOpen: state.modal.isNotificationsModalOpen
-  }),
-  {
-    deleteNotification: notificationActions.deleteNotification,
-    openTokenModal: modalActions.openTokenModal
-  }
-)(_ConnectedNavBar)
+const ConnectedNavBar = withRouter(
+  connect(
+    state => ({
+      accounts: state.wallet.accounts,
+      notifications: state.notification.notifications,
+      isNotificationsModalOpen: state.modal.isNotificationsModalOpen
+    }),
+    {
+      deleteNotification: notificationActions.deleteNotification,
+      openTokenModal: modalActions.openTokenModal,
+      closeNotificationsModal: modalActions.closeNotificationsModal
+    }
+  )(_ConnectedNavBar)
+)
 
 const App = ({ store, history }) => (
   <Provider store={store}>

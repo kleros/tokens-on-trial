@@ -62,6 +62,8 @@ class TokenDetails extends PureComponent {
     countdown: null
   }
 
+  interval = null
+
   handleFilterChange = key => {
     const { toggleFilter } = this.props
     toggleFilter(key)
@@ -277,13 +279,17 @@ class TokenDetails extends PureComponent {
           timestamp: block.timestamp,
           countdown: new Date(time)
         })
-        setInterval(() => {
+        this.interval = setInterval(() => {
           const { countdown } = this.state
           if (countdown > 0)
             this.setState({ countdown: new Date(countdown - 1000) })
         }, 1000)
       })
     }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
   }
 
   render() {
