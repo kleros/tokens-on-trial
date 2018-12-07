@@ -43,6 +43,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     let message
     switch (Number(returnValues.status)) {
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
+      case tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested:
         if (returnValues.disputed === true && isRequester)
           message = 'Your request has been challenged.'
         else if (returnValues.disputed === false)
