@@ -23,7 +23,6 @@
     display: flex;
     flex-grow: 2;
     justify-content: space-between;
-    margin-left: 46px;
     min-height: 102px;
     padding-left: 36px;
 
@@ -38,7 +37,6 @@
     flex-direction: column;
     font-size: 21px;
     justify-content: center;
-    margin-right: 10px;
 
     &-name {
       color: $darkGrey;
@@ -53,7 +51,7 @@
 
   &-divider {
     border-left: 1px solid $border;
-    margin: 17px 16px;
+    margin: 17px 0;
   }
 
   &--link {
@@ -91,7 +89,7 @@
       font-size: 14px;
       font-weight: 500;
       height: 25px;
-      margin-right: 10px;
+      margin-right: 8px;
       padding-top: 4px;
       text-align: center;
       width: 25px;
@@ -102,7 +100,7 @@
     align-items: center;
     background: $action;
     display: flex;
-    padding-left: 56px;
+    padding-left: 36px;
     padding-right: 36px;
     position: relative;
 
@@ -114,7 +112,6 @@
       height: 0;
       left: 0;
       position: absolute;
-      width: 0;
     }
   }
 
