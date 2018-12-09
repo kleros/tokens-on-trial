@@ -2,9 +2,11 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import TimeAgo from 'timeago-react'
 import { connect } from 'react-redux'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as notificationSelectors from '../../reducers/notification'
 import * as modalActions from '../../actions/modal'
+import * as tokenConstants from '../../constants/token'
 import NavOverlay from '../../components/nav-overlay'
 
 import './notification-badge.css'
@@ -72,6 +74,10 @@ class NotificationBadge extends PureComponent {
           <div>
             <NavOverlay onClick={this.handleOverlayClick} />
             <div className="NotificationBadge-notifications">
+              <h4 className="NotificationBadge-notifications-title">
+                Notifications
+              </h4>
+              <hr style={{ margin: 0, marginBottom: '15px' }} />
               {(useMaxShown
                 ? notifications.data.slice(0, maxShown)
                 : notifications.data
@@ -82,12 +88,34 @@ class NotificationBadge extends PureComponent {
                   onClick={onNotificationClick}
                   className="NotificationBadge-notifications-notification"
                 >
+                  <FontAwesomeIcon
+                    icon={
+                      n.clientStatus
+                        ? tokenConstants.STATUS_ICON_ENUM[n.clientStatus]
+                        : 'bell'
+                    }
+                    color={
+                      n.clientStatus
+                        ? tokenConstants.STATUS_COLOR_ENUM[n.clientStatus]
+                        : tokenConstants.STATUS_COLOR_ENUM[0]
+                    }
+                    className="NotificationBadge-notifications-notification-icon"
+                    size="lg"
+                  />
                   <div className="NotificationBadge-notifications-notification-content">
-                    {n.message}
-                    <br />
-                    <small>
+                    <div className="NotificationBadge-notifications-notification-content-message">
+                      {n.message}
+                    </div>
+                    <div
+                      style={{
+                        color: n.clientStatus
+                          ? tokenConstants.STATUS_COLOR_ENUM[n.clientStatus]
+                          : tokenConstants.STATUS_COLOR_ENUM[0]
+                      }}
+                      className="NotificationBadge-notifications-notification-content-footer"
+                    >
                       <TimeAgo datetime={n.date} />
-                    </small>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -96,7 +124,7 @@ class NotificationBadge extends PureComponent {
                   onClick={onShowAll}
                   className="NotificationBadge-notifications-showAll"
                 >
-                  <small>SHOW ALL</small>
+                  <div className="NotificationBadge-notifications-showAll-down" />
                 </div>
               )}
             </div>

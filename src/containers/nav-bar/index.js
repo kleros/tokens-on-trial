@@ -45,15 +45,13 @@ export default class NavBar extends PureComponent {
     const routesAndExtras = [
       ...routes.map(r => (
         <div key={r.title}>
-          <a
-            href={r.to}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            to={`/`}
             className={`NavBar-route ${r.extraStyle}`}
             style={{ height: '55px', verticalAlign: 'center' }}
           >
             {r.title}
-          </a>
+          </Link>
         </div>
       )),
       ...extras.map((e, i) => (

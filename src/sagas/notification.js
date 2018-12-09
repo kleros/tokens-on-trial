@@ -21,6 +21,7 @@ import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
 import { web3, arbitrableTokenList } from '../bootstrap/dapp-api'
 import * as tokenConstants from '../constants/token'
+import { contractStatusToClientStatus } from '../utils/token'
 
 import { fetchToken } from './token'
 
@@ -52,26 +53,36 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered:
         if (returnValues.disputed === false)
           message = `${
-            isRequester ? 'Your request' : 'A request you challenged'
+            isRequester
+              ? 'Your registration request'
+              : 'A registration request you challenged'
           } has been executed.`
         break
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.Cleared:
         if (returnValues.disputed === false)
           message = `${
-            isRequester ? 'Your request' : 'A request you challenged'
+            isRequester
+              ? 'Your clearing request'
+              : 'A clearing request you challenged'
           } has been rejected.`
         break
       default:
         break
     }
 
+    const clientStatus = contractStatusToClientStatus(
+      returnValues.status,
+      returnValues.disputed
+    )
+
     if (message) {
-      notifiedIDs[event.returnValues.tokenID] =
-        event.returnValues.disputed === true ? 'disputed' : true
+      notifiedIDs[returnValues.tokenID] =
+        returnValues.disputed === true ? 'disputed' : true
       emitter({
-        ID: event.returnValues.tokenID,
+        ID: returnValues.tokenID,
         date: await getBlockDate(event.blockHash),
-        message
+        message,
+        clientStatus
       })
     }
   }

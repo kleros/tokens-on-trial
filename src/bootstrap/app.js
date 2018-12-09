@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Provider, connect } from 'react-redux'
@@ -27,7 +27,7 @@ import './fontawesome'
 
 import './app.css'
 
-class _ConnectedNavBar extends PureComponent {
+class _ConnectedNavBar extends Component {
   static propTypes = {
     // Navigation
     history: PropTypes.shape({
@@ -56,19 +56,31 @@ class _ConnectedNavBar extends PureComponent {
     history.push(`/${id}`)
   }
 
+  handleShowAllClick = () => {
+    const { history, closeNotificationsModal } = this.props
+    closeNotificationsModal()
+    history.push(`/notifications`)
+  }
+
   render() {
     const { accounts, notifications } = this.props
     return (
       <NavBar
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
-          { title: 'Token² Curated List', extraStyle: 'NavBar-route-title' }
+          {
+            title: 'Token² Curated List',
+            to: '/',
+            extraStyle: 'NavBar-route-title'
+          }
         ]}
         extras={[
           <NotificationBadge
             key="1"
             notifications={notifications}
             onNotificationClick={this.handleNotificationClick}
+            maxShown={5}
+            onShowAll={this.handleShowAllClick}
           >
             <FontAwesomeIcon icon="bell" color="white" />
           </NotificationBadge>,
@@ -117,6 +129,7 @@ const App = ({ store, history }) => (
           <div id="scroll-root">
             <Switch>
               <Route exact path="/" component={Tokens} />
+              <Route exact path="/notifications" component={PageNotFound} />
               <Route exact path="/:tokenID" component={TokenDetail} />
               <Route component={PageNotFound} />
             </Switch>

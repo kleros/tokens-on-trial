@@ -2,6 +2,7 @@
 
 /* @define NotificationBadge */
 .NotificationBadge {
+  cursor: pointer;
   position: relative;
   width: 40px;
 
@@ -33,10 +34,16 @@
     border-radius: 3px;
     box-shadow: 0 3 6 $shadow;
     box-sizing: border-box;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    line-height: normal;
+    padding: 31px 34px 24px 31px;
     position: absolute;
     right: calc(100% - 285px);
     top: 62px;
-    width: 390px;
+    width: 352px;
 
     &::after {
       border-bottom: 15px solid $white;
@@ -48,28 +55,67 @@
       top: -15px;
     }
 
+    &-title {
+      font-size: 20px;
+      font-weight: 500;
+      margin: 0;
+      margin-bottom: 23px;
+    }
+
     &-notification {
-      align-items: center;
       border-bottom: 1px solid $mint;
+      cursor: pointer;
       display: flex;
-      height: 50px;
+      flex-direction: row;
+      height: 60px;
 
       &:hover {
         background: $mint;
       }
 
+      &-icon {
+        width: 31px;
+      }
+
       &-content {
-        font-size: 0.8em;
-        line-height: 12px;
+        display: flex;
+        flex-direction: column;
+        font-size: 14px;
+        padding-left: 21px;
+        text-align: left;
         width: 100%;
+
+        &-message {
+          font-size: 14px;
+        }
+
+        &-footer {
+          color: $badgeBlue;
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
       }
     }
 
     &-showAll {
+      align-items: center;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
       height: 32.5px;
+      justify-content: flex-end;
       line-height: 32.5px;
       text-align: center;
       user-select: none;
+
+      &-down {
+        border-left: 20px solid transparent;
+        border-right: 20px solid transparent;
+        border-top: 20px solid $border;
+        height: 0;
+        width: 0;
+      }
 
       &:hover {
         background: $mint;

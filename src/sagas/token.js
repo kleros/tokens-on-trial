@@ -139,7 +139,10 @@ export function* fetchToken({ payload: { ID } }) {
     ID,
     URI,
     status: Number(token.status),
-    clientStatus: contractStatusToClientStatus(token),
+    clientStatus: contractStatusToClientStatus(
+      token.status,
+      token.latestRequest.disputed
+    ),
     lastAction: token.lastAction
       ? new Date(Number(token.lastAction * 1000))
       : null
@@ -177,7 +180,6 @@ function* requestStatusChange({ payload: { token } }) {
   const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
-  // Add to contract if absent
   if (
     recentToken.status ===
       tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
@@ -198,73 +200,6 @@ function* requestStatusChange({ payload: { token } }) {
       value: yield select(arbitrableTokenListSelectors.getSubmitCost)
     }
   )
-
-  return yield call(fetchToken, { payload: { ID } })
-}
-
-/**
- * Submits a token to the list.
- * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
- * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
- */
-function* createToken({ payload: { token } }) {
-  // Only take relevant data
-  const tokenToSubmit = {
-    name: token.name,
-    ticker: token.ticker,
-    addr: token.addr,
-    URI: token.URI
-  }
-
-  // Upload token
-  const response = yield call(storeApi.postFile, JSON.stringify(tokenToSubmit))
-  const { payload } = response
-  const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
-
-  // Add to contract if absent
-  if (
-    Number((yield call(fetchToken, { payload: { ID } })).status) ===
-    tokenConstants.IN_CONTRACT_STATUS_ENUM.Absent
-  )
-    yield call(
-      arbitrableTokenList.methods.requestStatusChange(
-        ID,
-        tokenToSubmit.name,
-        tokenToSubmit.ticker,
-        tokenToSubmit.addr
-      ).send,
-      {
-        from: yield select(walletSelectors.getAccount),
-        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
-      }
-    )
-  else throw new Error(errorConstants.TOKEN_ALREADY_SUBMITTED)
-
-  return yield call(fetchToken, { payload: { ID } })
-}
-
-/**
- * Request a token to be cleared from the list.
- * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
- * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
- */
-function* clearToken({ payload: { token } }) {
-  const { ID, name, ticker, addr } = token
-
-  // Add to contract if absent
-  if (
-    Number((yield call(fetchToken, { payload: { ID } })).status) ===
-    tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered
-  )
-    yield call(
-      arbitrableTokenList.methods.requestStatusChange(ID, name, ticker, addr)
-        .send,
-      {
-        from: yield select(walletSelectors.getAccount),
-        value: yield select(arbitrableTokenListSelectors.getSubmitCost)
-      }
-    )
-  else throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 
   return yield call(fetchToken, { payload: { ID } })
 }
@@ -394,7 +329,7 @@ export default function* tokenSaga() {
       collection: tokenActions.tokens.self
     },
     tokenActions.token,
-    createToken
+    requestStatusChange
   )
   yield takeLatest(
     tokenActions.token.STATUS_CHANGE,
@@ -415,7 +350,7 @@ export default function* tokenSaga() {
     lessduxSaga,
     updateTokensCollectionModFlow,
     tokenActions.token,
-    clearToken
+    requestStatusChange
   )
   yield takeLatest(
     tokenActions.token.EXECUTE,
