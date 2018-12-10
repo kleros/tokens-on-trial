@@ -57,7 +57,6 @@ class TokenDetails extends PureComponent {
   }
 
   state = {
-    token: null,
     timestamp: null,
     countdown: null
   }
@@ -256,7 +255,6 @@ class TokenDetails extends PureComponent {
 
   componentDidUpdate() {
     const { token, arbitrableTokenListData } = this.props
-    this.setState({ token })
 
     const { countdown } = this.state
     if (
@@ -293,101 +291,101 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { token, countdown } = this.state
-    const { accounts, filter } = this.props
+    const { countdown } = this.state
+    const { token, accounts, filter, match } = this.props
     const { filters } = filter
+    const { tokenID } = match.params
 
-    if (token)
-      return (
-        <div className="Page">
-          <FilterBar
-            filter={filters}
-            handleFilterChange={this.handleFilterChange}
-          />
-          <div className="TokenDetails">
-            <Img className="TokenDetails-img" src={token.URI} />
-            <div className="TokenDetails-card">
-              <div className="TokenDetails-label">
-                <span className="TokenDetails-label-name">{token.name}</span>
-                <span className="TokenDetails-label-ticker">
-                  {token.ticker}
-                </span>
-              </div>
-              <div className="TokenDetails-divider" />
-              <div className="TokenDetails-meta">
-                <div className="TokenDetails-meta--aligned">
-                  <span>
-                    <a
-                      className="TokenDetails--link"
-                      href={`https://etherscan.io/token/${token.addr}`}
-                    >
-                      <Img
-                        className="TokenDetails-icon TokenDetails-meta--aligned"
-                        src={EtherScanLogo}
-                      />
-                      {truncateMiddle(token.addr)}
-                    </a>
-                  </span>
-                </div>
-                <div>
-                  <span>
-                    <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
-                      1
-                    </span>
-                    Badges
-                  </span>
-                </div>
-              </div>
-              <div className="TokenDetails-meta">
-                <span className="TokenDetails-meta--aligned">
-                  <FontAwesomeIcon
-                    className="TokenDetails-icon"
-                    icon={
-                      token.clientStatus === tokenConstants.STATUS_ENUM.Pending
-                        ? 'hourglass-half'
-                        : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
-                    }
-                  />
-                  {tokenConstants.STATUS_ENUM[token.clientStatus]}
-                </span>
-                <div
-                  className={`TokenDetails-timer ${
-                    token.clientStatus !== tokenConstants.STATUS_ENUM.Pending ||
-                    Number(countdown) === 0
-                      ? `Hidden`
-                      : ``
-                  }`}
-                >
-                  Challenge Deadline{' '}
-                  {countdown instanceof Date
-                    ? countdown.toISOString().substr(11, 8)
-                    : '--:--:--'}
-                </div>
-              </div>
-              <div className="TokenDetails-action">
-                {this.getActionButton(token, accounts.data[0])}
-              </div>
-            </div>
-          </div>
-          <br />
-          {token.badges && token.badges.length > 0 && (
-            <div className="TokenDescription">
-              <hr className="TokenDescription-separator" />
-              <h3>Badges</h3>
-              <span>
-                <span className="TokenDescription--icon--badge TokenDetails-meta--aligned" />
-                Compliant with YY
-              </span>
-            </div>
-          )}
-        </div>
-      )
-    else
+    if (!token || token.ID !== tokenID)
+      // Also prevent component from displaying stale data.
       return (
         <div className="Page">
           <h5>Loading...</h5>
         </div>
       )
+
+    return (
+      <div className="Page">
+        <FilterBar
+          filter={filters}
+          handleFilterChange={this.handleFilterChange}
+        />
+        <div className="TokenDetails">
+          <Img className="TokenDetails-img" src={token.URI} />
+          <div className="TokenDetails-card">
+            <div className="TokenDetails-label">
+              <span className="TokenDetails-label-name">{token.name}</span>
+              <span className="TokenDetails-label-ticker">{token.ticker}</span>
+            </div>
+            <div className="TokenDetails-divider" />
+            <div className="TokenDetails-meta">
+              <div className="TokenDetails-meta--aligned">
+                <span>
+                  <a
+                    className="TokenDetails--link"
+                    href={`https://etherscan.io/token/${token.addr}`}
+                  >
+                    <Img
+                      className="TokenDetails-icon TokenDetails-meta--aligned"
+                      src={EtherScanLogo}
+                    />
+                    {truncateMiddle(token.addr)}
+                  </a>
+                </span>
+              </div>
+              <div>
+                <span>
+                  <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
+                    1
+                  </span>
+                  Badges
+                </span>
+              </div>
+            </div>
+            <div className="TokenDetails-meta">
+              <span className="TokenDetails-meta--aligned">
+                <FontAwesomeIcon
+                  className="TokenDetails-icon"
+                  icon={
+                    token.clientStatus === tokenConstants.STATUS_ENUM.Pending
+                      ? 'hourglass-half'
+                      : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
+                  }
+                />
+                {tokenConstants.STATUS_ENUM[token.clientStatus]}
+              </span>
+              <div
+                className={`TokenDetails-timer ${
+                  token.clientStatus !== tokenConstants.STATUS_ENUM.Pending ||
+                  Number(countdown) === 0
+                    ? `Hidden`
+                    : ``
+                }`}
+              >
+                Challenge Deadline{' '}
+                {countdown instanceof Date
+                  ? countdown.toISOString().substr(11, 8)
+                  : '--:--:--'}
+              </div>
+            </div>
+            <div className="TokenDetails-action">
+              {this.getActionButton(token, accounts.data[0])}
+            </div>
+          </div>
+        </div>
+        <br />
+        {token.badges && token.badges.length > 0 && (
+          <div className="TokenDescription">
+            <hr className="TokenDescription-separator" />
+            <h3>Badges</h3>
+            <span>
+              <span className="TokenDescription--icon--badge TokenDetails-meta--aligned" />
+              Compliant with YY
+            </span>
+          </div>
+        )}
+      </div>
+    )
   }
 }
 
