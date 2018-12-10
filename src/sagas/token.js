@@ -131,7 +131,8 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-  const { URI, name } = yield call(storeApi.getFile, ID)
+  const tokenFile = yield call(storeApi.getFile, ID)
+  const { URI, name } = tokenFile
 
   return {
     ...token,
@@ -155,25 +156,21 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestStatusChange({ payload: { token } }) {
+  if (isInvalid(token.addr))
+    throw new Error('Missing address on token submit', token)
+
   // Upload token
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: token.addr,
+    addr: token.addr.toLowerCase(),
     URI: token.URI
   }
 
-  const { name, ticker, addr, URI } = tokenToSubmit
+  const { name, ticker, URI } = tokenToSubmit
 
-  if (
-    isInvalid(name) ||
-    isInvalid(ticker) ||
-    isInvalid(addr) ||
-    isInvalid(URI)
-  ) {
-    console.error(tokenToSubmit)
-    throw new Error('Missing data on token submit')
-  }
+  if (isInvalid(name) || isInvalid(ticker) || isInvalid(URI))
+    throw new Error('Missing data on token submit', tokenToSubmit)
 
   const response = yield call(storeApi.postFile, JSON.stringify(tokenToSubmit))
   const { payload } = response
