@@ -32,7 +32,7 @@ class Initializer extends PureComponent {
     fetchAccounts()
   }
 
-  static getDerivedStateFromProps({ accounts }, prevState) {
+  static getDerivedStateFromProps({ accounts, fetchAccounts }, prevState) {
     clearInterval(prevState.interval)
     return {
       interval: setInterval(() => {
@@ -40,7 +40,7 @@ class Initializer extends PureComponent {
           window.web3.eth.defaultAccount
         )
         if (accounts.data && currAcc && accounts.data[0] !== currAcc)
-          window.location.reload()
+          fetchAccounts()
       }, 100)
     }
   }
