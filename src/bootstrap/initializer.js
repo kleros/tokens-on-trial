@@ -25,29 +25,28 @@ class Initializer extends PureComponent {
     ]).isRequired
   }
 
+  state = { interval: null }
+
   componentDidMount() {
     const { fetchAccounts } = this.props
     fetchAccounts()
   }
 
-  componentDidUpdate({ accounts }) {
-    web3.currentProvider.publicConfigStore.on(
-      'update',
-      ({ selectedAddress }) => {
-        console.info('update', accounts.data)
-        console.info('selected', selectedAddress)
-        if (
-          accounts &&
-          accounts.data &&
-          accounts.data.length > 0 &&
-          selectedAddress &&
-          web3.utils.toChecksumAddress(selectedAddress) !==
-            web3.utils.toChecksumAddress(accounts.data[0])
+  static getDerivedStateFromProps({ accounts }, prevState) {
+    clearInterval(prevState.interval)
+    return {
+      interval: setInterval(() => {
+        const currAcc = web3.utils.toChecksumAddress(
+          window.web3.eth.defaultAccount
         )
-          // switching accounts
+        if (accounts.data && currAcc && accounts.data[0] !== currAcc)
           window.location.reload()
-      }
-    )
+      }, 100)
+    }
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
   }
 
   render() {
