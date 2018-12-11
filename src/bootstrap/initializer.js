@@ -34,12 +34,15 @@ class Initializer extends PureComponent {
     web3.currentProvider.publicConfigStore.on(
       'update',
       ({ selectedAddress }) => {
+        console.info('update', accounts.data)
+        console.info('selected', selectedAddress)
         if (
           accounts &&
           accounts.data &&
           accounts.data.length > 0 &&
           selectedAddress &&
-          selectedAddress !== accounts.data[0].toLowerCase()
+          web3.utils.toChecksumAddress(selectedAddress) !==
+            web3.utils.toChecksumAddress(accounts.data[0])
         )
           // switching accounts
           window.location.reload()

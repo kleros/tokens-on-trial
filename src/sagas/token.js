@@ -1,7 +1,7 @@
 import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import { arbitrableTokenList, arbitrator } from '../bootstrap/dapp-api'
+import { arbitrableTokenList, arbitrator, web3 } from '../bootstrap/dapp-api'
 import { hasPendingRequest, contractStatusToClientStatus } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
@@ -163,7 +163,7 @@ function* requestStatusChange({ payload: { token } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: token.addr.toLowerCase(),
+    addr: web3.utils.toChecksumAddress(token.addr),
     URI: token.URI
   }
 
