@@ -14,7 +14,8 @@ export { openTokenModalShape }
 export default createReducer(
   {
     openTokenModal: null,
-    isNotificationsModalOpen: false
+    isNotificationsModalOpen: false,
+    isSettingsModalOpen: false
   },
   {
     [modalActions.OPEN_TOKEN_MODAL]: (state, { payload: { tokenModal } }) => ({
@@ -32,6 +33,14 @@ export default createReducer(
     [modalActions.CLOSE_NOTIFICATIONS_MODAL]: state => ({
       ...state,
       isNotificationsModalOpen: false
+    }),
+    [modalActions.OPEN_SETTINGS_MODAL]: state => ({
+      ...state,
+      isSettingsModalOpen: true
+    }),
+    [modalActions.CLOSE_SETTINGS_MODAL]: state => ({
+      ...state,
+      isSettingsModalOpen: false
     })
   }
 )

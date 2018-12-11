@@ -59,7 +59,8 @@ body,
 
 // Horizontal Rule
 hr {
-  border: 1px solid $darkerGrey;
+  border: 0;
+  border-top: 1px solid $darkerGrey;
 }
 
 h1,

@@ -1,0 +1,65 @@
+@import '../../styles/_colors.scss';
+
+/* @define SettingsModal */
+.SettingsModal {
+  cursor: pointer;
+  position: relative;
+  width: 40px;
+
+  &-window {
+    background: $white;
+    border: 1px solid $border;
+    border-radius: 3px;
+    box-shadow: 0 15px 35px $shadow;
+    box-sizing: border-box;
+    cursor: default;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    justify-content: start;
+    line-height: normal;
+    padding: 31px 34px 24px 31px;
+    position: absolute;
+    right: calc(100% - 190px);
+    top: 62px;
+    width: 352px;
+    z-index: 1002;
+
+    &::after {
+      border-bottom: 15px solid $white;
+      border-left: 19px solid transparent;
+      border-right: 19px solid transparent;
+      content: '';
+      position: absolute;
+      right: 162px;
+      top: -15px;
+    }
+
+    &-title {
+      font-size: 19px;
+      font-weight: 500;
+      margin: 0;
+      margin-bottom: 23px;
+      text-align: center;
+    }
+
+    &-checkboxGroup {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-form {
+      margin: 0 -40px;
+      margin-top: 30px;
+    }
+
+    &-submit {
+      display: flex;
+      justify-content: flex-end;
+
+      &-button {
+        width: 120px;
+      }
+    }
+  }
+}

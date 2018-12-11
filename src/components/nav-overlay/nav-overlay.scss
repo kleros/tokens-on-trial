@@ -2,10 +2,11 @@
 
 /* @define NavOverlay */
 .NavOverlay {
-  background: rgba(0, 0, 0, 0.302);
+  background: rgba(0, 0, 0, 0.3);
   height: 100%;
   left: 0;
   position: fixed;
   top: 0;
   width: 100%;
+  z-index: 1001;
 }

@@ -1,0 +1,57 @@
+@import '../../styles/_colors.scss';
+
+/* @define CheckboxInput */
+.CheckboxInput {
+  display: flex;
+  flex-direction: row;
+  font-size: 14px;
+  margin-bottom: 12px;
+
+  &-checkbox {
+    margin-right: 17px;
+    position: relative;
+    width: 15px;
+
+    &-overlay {
+      background: $white;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      cursor: pointer;
+      height: 15px;
+      left: 0;
+      position: absolute;
+      top: 0;
+      width: 15px;
+
+      &::after {
+        background: transparent;
+        border: 2px solid $lightGrey;
+        border-right: none;
+        border-top: none;
+        content: '';
+        height: 3px;
+        left: 2px;
+        opacity: 0;
+        position: absolute;
+        top: 2px;
+        transform: rotate(-45deg);
+        width: 6px;
+      }
+
+      &:hover::after {
+        opacity: 0.5;
+      }
+    }
+
+    &-marked {
+      background: $badgeBlue;
+      border: 2px solid $badgeBlue;
+      border-radius: 2px;
+
+      &::after {
+        border-color: $white;
+        opacity: 1;
+      }
+    }
+  }
+}

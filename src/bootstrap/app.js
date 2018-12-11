@@ -19,6 +19,7 @@ import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
+import SettingsModal from '../components/settings-modal'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -84,7 +85,9 @@ class _ConnectedNavBar extends Component {
           >
             <FontAwesomeIcon icon="bell" color="white" />
           </NotificationBadge>,
-          <FontAwesomeIcon icon="envelope" color="white" />,
+          <SettingsModal key="2">
+            <FontAwesomeIcon icon="envelope" color="white" />
+          </SettingsModal>,
           <Identicon address={accounts.data[0]} round scale={2} size={15} />,
           <Button
             tooltip={onlyInfura ? 'Please install MetaMask.' : null}

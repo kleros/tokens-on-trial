@@ -10,13 +10,35 @@ const {
   shape: balanceShape,
   initialState: balanceInitialState
 } = createResource(PropTypes.string)
+const {
+  shape: settingsShape,
+  initialState: settingsInitialState
+} = createResource(
+  PropTypes.shape({
+    executeReady: PropTypes.bool.isRequired
+  }),
+  {
+    withUpdate: true
+  }
+)
 
-export { accountsShape, balanceShape }
+export { accountsShape, balanceShape, settingsShape }
 
 // Reducer
 export default createReducer({
   accounts: accountsInitialState,
-  balance: balanceInitialState
+  balance: balanceInitialState,
+  settings: {
+    ...settingsInitialState,
+    data: {
+      executeReady: true,
+      challenged: true,
+      shouldFund: true,
+      rulingGiven: true,
+      name: '',
+      email: ''
+    }
+  }
 })
 
 // Selectors
