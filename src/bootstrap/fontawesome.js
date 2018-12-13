@@ -17,6 +17,7 @@ import faClock from '@fortawesome/fontawesome-free-solid/faClock'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faBell from '@fortawesome/fontawesome-free-solid/faBell'
 import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
+import faFileAlt from '@fortawesome/fontawesome-free-solid/faFileAlt'
 
 library.add(
   faCaretDown,
@@ -36,5 +37,6 @@ library.add(
   faClock,
   faSpinner,
   faBell,
-  faEnvelope
+  faEnvelope,
+  faFileAlt
 )

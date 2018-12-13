@@ -1,0 +1,18 @@
+@import '../../../../styles/_colors.scss';
+
+/* @define SubmitEvidence */
+.SubmitEvidence {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  &-form {
+    margin: 0 -34px;
+  }
+
+  &-actions {
+    display: flex;
+    flex-direction: row;
+    width: 290px;
+  }
+}

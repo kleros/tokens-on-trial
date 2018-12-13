@@ -20,10 +20,15 @@ import Submit from './components/submit'
 import Resubmit from './components/resubmit'
 import Clear from './components/clear'
 import Challenge from './components/challenge'
+import SubmitEvidence from './components/submit-evidence'
 import {
   getTokenFormIsInvalid,
   submitTokenForm
 } from './components/submit/token-form'
+import {
+  getEvidenceFormIsInvalid,
+  submitEvidenceForm
+} from './components/submit-evidence/evidence-form'
 
 import './action-modal.css'
 
@@ -31,6 +36,7 @@ class ActionModal extends PureComponent {
   static propTypes = {
     token: tokenSelectors.tokenShape,
     tokenFormIsInvalid: PropTypes.bool.isRequired,
+    evidenceFormIsInvalid: PropTypes.bool.isRequired,
     openActionModal: modalSelectors.openActionModalShape,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
@@ -64,6 +70,11 @@ class ActionModal extends PureComponent {
   handleClearTokenClick = () => {
     const { clearToken, token } = this.props
     clearToken({ tokenData: token.data })
+  }
+
+  handleSubmitEvidenceClick = () => {
+    // TODO
+    console.info('TODO')
   }
 
   handleChallengeClick = () => {
@@ -162,6 +173,7 @@ class ActionModal extends PureComponent {
       arbitrableTokenListData,
       submitTokenForm,
       tokenFormIsInvalid,
+      evidenceFormIsInvalid,
       token
     } = this.props
 
@@ -240,6 +252,15 @@ class ActionModal extends PureComponent {
                   fundAppeal={this.handleFundAppealClick}
                 />
               )
+            case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:
+              return (
+                <SubmitEvidence
+                  closeActionModal={closeActionModal}
+                  submitEvidenceForm={submitEvidenceForm}
+                  submitEvidence={this.handleSubmitEvidenceClick}
+                  evidenceFormIsInvalid={evidenceFormIsInvalid}
+                />
+              )
             case undefined:
             case null:
               break
@@ -256,6 +277,7 @@ export default connect(
   state => ({
     openActionModal: state.modal.openActionModal,
     tokenFormIsInvalid: getTokenFormIsInvalid(state),
+    evidenceFormIsInvalid: getEvidenceFormIsInvalid(state),
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
     token: state.token.token,
     accounts: state.wallet.accounts

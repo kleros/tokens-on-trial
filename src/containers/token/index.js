@@ -84,6 +84,11 @@ class TokenDetails extends PureComponent {
     feesTimeout(token)
   }
 
+  handleOpenEvidenceModal = () => {
+    const { openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidence)
+  }
+
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
@@ -386,7 +391,7 @@ class TokenDetails extends PureComponent {
                   className="TokenDescription-evidence-icon"
                 />
               </div>
-              <Button type="secondary" onClick={this.openSubmitEvidence}>
+              <Button type="secondary" onClick={this.handleOpenEvidenceModal}>
                 Submit Evidence
               </Button>
             </div>
