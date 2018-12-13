@@ -46,7 +46,7 @@ class TokenDetails extends PureComponent {
     // Functions
     executeRequest: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
-    openTokenModal: PropTypes.func.isRequired,
+    openActionModal: PropTypes.func.isRequired,
     feesTimeout: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired
   }
@@ -69,8 +69,8 @@ class TokenDetails extends PureComponent {
   }
 
   handleActionClick = action => {
-    const { openTokenModal } = this.props
-    openTokenModal(action)
+    const { openActionModal } = this.props
+    openActionModal(action)
   }
 
   handleExecuteRequestClick = () => {
@@ -146,7 +146,7 @@ class TokenDetails extends PureComponent {
               label = 'Appeal Ruling'
               method = () =>
                 this.handleActionClick(
-                  modalConstants.TOKEN_MODAL_ENUM.FundAppeal
+                  modalConstants.ACTION_MODAL_ENUM.FundAppeal
                 )
             } else label = 'Appeal Period'
           else if (timestamp < appealPeriodEnd && latestRound.loserFullyFunded)
@@ -156,7 +156,7 @@ class TokenDetails extends PureComponent {
               disabled = false
               method = () =>
                 this.handleActionClick(
-                  modalConstants.TOKEN_MODAL_ENUM.FundAppeal
+                  modalConstants.ACTION_MODAL_ENUM.FundAppeal
                 )
             }
         }
@@ -191,7 +191,7 @@ class TokenDetails extends PureComponent {
         )
           method = () =>
             this.handleActionClick(
-              modalConstants.TOKEN_MODAL_ENUM.FundRequester
+              modalConstants.ACTION_MODAL_ENUM.FundRequester
             )
         else if (
           submitterFees > challengerFees &&
@@ -200,7 +200,7 @@ class TokenDetails extends PureComponent {
         )
           method = () =>
             this.handleActionClick(
-              modalConstants.TOKEN_MODAL_ENUM.FundChallenger
+              modalConstants.ACTION_MODAL_ENUM.FundChallenger
             )
         else {
           icon = 'hourglass-half'
@@ -217,7 +217,7 @@ class TokenDetails extends PureComponent {
         icon = 'gavel'
         disabled = false
         method = () =>
-          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Challenge)
+          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Challenge)
         if (isRegistrationRequest(token.status))
           label = 'Challenge Registration'
         else label = 'Challenge Clearing'
@@ -228,14 +228,14 @@ class TokenDetails extends PureComponent {
         token.status === tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered']
       ) {
         method = () =>
-          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Clear)
+          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Clear)
         label = 'Submit Clearing Request'
         icon = 'gavel'
       } else {
         label = 'Resubmit Token'
         icon = 'plus'
         method = () =>
-          this.handleActionClick(modalConstants.TOKEN_MODAL_ENUM.Resubmit)
+          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Resubmit)
       }
     }
 
@@ -374,6 +374,25 @@ class TokenDetails extends PureComponent {
           </div>
         </div>
         <br />
+        {token.latestRequest.disputed && (
+          <div className="TokenDescription">
+            <hr className="TokenDescription-separator" />
+            <h3>Evidence</h3>
+            <div className="TokenDescription-evidence">
+              <div>
+                <FontAwesomeIcon
+                  icon="file-alt"
+                  size="2x"
+                  className="TokenDescription-evidence-icon"
+                />
+              </div>
+              <Button type="secondary" onClick={this.openSubmitEvidence}>
+                Submit Evidence
+              </Button>
+            </div>
+          </div>
+        )}
+        <br />
         {token.badges && token.badges.length > 0 && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
@@ -399,7 +418,7 @@ export default connect(
   {
     fetchToken: tokenActions.fetchToken,
     executeRequest: tokenActions.executeRequest,
-    openTokenModal: modalActions.openTokenModal,
+    openActionModal: modalActions.openActionModal,
     feesTimeout: tokenActions.feesTimeout,
     toggleFilter: filterActions.toggleFilter
   }

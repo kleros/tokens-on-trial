@@ -8,7 +8,7 @@ import Button from '../../../../components/button'
 
 import './appeal.css'
 
-const Appeal = ({ closeTokenModal, fundAppeal, token, losingSide }) => (
+const Appeal = ({ closeActionModal, fundAppeal, token, losingSide }) => (
   <div>
     <h3 className="Modal-title">
       <FontAwesomeIcon icon="gavel" className="Appeal-icon" />
@@ -67,7 +67,7 @@ const Appeal = ({ closeTokenModal, fundAppeal, token, losingSide }) => (
       <Button
         className="Appeal-return"
         type="secondary"
-        onClick={closeTokenModal}
+        onClick={closeActionModal}
       >
         Return
       </Button>
@@ -84,7 +84,7 @@ Appeal.propTypes = {
   losingSide: PropTypes.bool.isRequired,
 
   // Action Dispatchers
-  closeTokenModal: PropTypes.func.isRequired,
+  closeActionModal: PropTypes.func.isRequired,
   fundAppeal: PropTypes.func.isRequired
 }
 

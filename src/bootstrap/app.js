@@ -10,7 +10,7 @@ import Tokens from '../containers/tokens'
 import TokenDetail from '../containers/token'
 import PageNotFound from '../components/page-not-found'
 import NavBar from '../containers/nav-bar'
-import TokenModal from '../containers/token-modal'
+import ActionModal from '../containers/action-modal'
 import Identicon from '../components/identicon'
 import * as modalConstants from '../constants/modal'
 import * as modalActions from '../actions/modal'
@@ -40,14 +40,14 @@ class _ConnectedNavBar extends Component {
     notifications: notificationSelectors.notificationsShape.isRequired,
 
     // Action Dispatchers
-    openTokenModal: PropTypes.func.isRequired,
+    openActionModal: PropTypes.func.isRequired,
     deleteNotification: PropTypes.func.isRequired,
     closeNotificationsModal: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
-    const { openTokenModal } = this.props
-    openTokenModal(modalConstants.TOKEN_MODAL_ENUM.Submit)
+    const { openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.Submit)
   }
 
   handleNotificationClick = ({ currentTarget: { id } }) => {
@@ -114,7 +114,7 @@ const ConnectedNavBar = withRouter(
     }),
     {
       deleteNotification: notificationActions.deleteNotification,
-      openTokenModal: modalActions.openTokenModal,
+      openActionModal: modalActions.openActionModal,
       closeNotificationsModal: modalActions.closeNotificationsModal
     }
   )(_ConnectedNavBar)
@@ -138,7 +138,7 @@ const App = ({ store, history }) => (
             </Switch>
           </div>
           <Switch>
-            <Route exact path="*" component={TokenModal} />
+            <Route exact path="*" component={ActionModal} />
           </Switch>
           <Route exact path="*" component={GlobalComponents} />
         </div>

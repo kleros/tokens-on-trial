@@ -4,19 +4,23 @@ import PropTypes from 'prop-types'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { TokenForm } from '../../components/submit/token-form'
 
-import './resubmit.css'
+import './submit.css'
 
-const Resubmit = ({
+const Submit = ({
   arbitrableTokenListData,
-  closeTokenModal,
-  resubmitToken,
-  name
+  closeActionModal,
+  submitToken,
+  tokenFormIsInvalid,
+  submitTokenForm
 }) => (
   <div>
-    <h3 className="Modal-title">Resubmit {name}</h3>
+    <h3 className="Modal-title">Submit a Token</h3>
     <hr />
-    <div className="Resubmit-stake">
+    <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
+    <TokenForm className="Submit-form" onSubmit={submitToken} />
+    <div className="Submit-stake">
       <h4>
         <strong>Stake:</strong>
       </h4>
@@ -33,32 +37,36 @@ const Resubmit = ({
     <br />
     <div className="Modal-actions">
       <Button
-        className="Resubmit-return"
+        className="Submit-return"
         type="secondary"
-        onClick={closeTokenModal}
+        onClick={closeActionModal}
       >
         Return
       </Button>
       <Button
-        className="Resubmit-request"
+        className="Submit-request"
         type="primary"
-        onClick={resubmitToken}
+        onClick={submitTokenForm}
+        disabled={tokenFormIsInvalid}
       >
-        Resubmit token
+        Request Registration
       </Button>
     </div>
   </div>
 )
 
-Resubmit.propTypes = {
+Submit.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-  name: PropTypes.string.isRequired,
 
   // Action Dispatchers
-  closeTokenModal: PropTypes.func.isRequired,
-  resubmitToken: PropTypes.func.isRequired
+  closeActionModal: PropTypes.func.isRequired,
+  submitToken: PropTypes.func.isRequired,
+
+  // Token Form
+  tokenFormIsInvalid: PropTypes.bool.isRequired,
+  submitTokenForm: PropTypes.func.isRequired
 }
 
-export default Resubmit
+export default Submit

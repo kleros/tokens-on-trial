@@ -1,8 +1,8 @@
 /* Actions */
 
 // Token Modal
-export const OPEN_TOKEN_MODAL = 'OPEN_TOKEN_MODAL'
-export const CLOSE_TOKEN_MODAL = 'CLOSE_TOKEN_MODAL'
+export const OPEN_ACTION_MODAL = 'OPEN_ACTION_MODAL'
+export const CLOSE_ACTION_MODAL = 'CLOSE_ACTION_MODAL'
 
 // Notification Modal
 export const OPEN_NOTIFICATIONS_MODAL = 'OPEN_NOTIFICATIONS_MODAL'
@@ -15,11 +15,11 @@ export const CLOSE_SETTINGS_MODAL = 'CLOSE_SETTINGS_MODAL'
 /* Action Creators */
 
 // Token Modal
-export const openTokenModal = tokenModal => ({
-  type: OPEN_TOKEN_MODAL,
-  payload: { tokenModal }
+export const openActionModal = actionModal => ({
+  type: OPEN_ACTION_MODAL,
+  payload: { actionModal }
 })
-export const closeTokenModal = () => ({ type: CLOSE_TOKEN_MODAL })
+export const closeActionModal = () => ({ type: CLOSE_ACTION_MODAL })
 
 // Notification Modal
 export const openNotificationsModal = () => ({

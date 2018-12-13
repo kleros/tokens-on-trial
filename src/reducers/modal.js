@@ -5,26 +5,29 @@ import * as modalActions from '../actions/modal'
 import * as modalConstants from '../constants/modal'
 
 // Shapes
-const openTokenModalShape = PropTypes.oneOf(
-  modalConstants.TOKEN_MODAL_ENUM.indexes
+const openActionModalShape = PropTypes.oneOf(
+  modalConstants.ACTION_MODAL_ENUM.indexes
 )
-export { openTokenModalShape }
+export { openActionModalShape }
 
 // Reducer
 export default createReducer(
   {
-    openTokenModal: null,
+    openActionModal: null,
     isNotificationsModalOpen: false,
     isSettingsModalOpen: false
   },
   {
-    [modalActions.OPEN_TOKEN_MODAL]: (state, { payload: { tokenModal } }) => ({
+    [modalActions.OPEN_ACTION_MODAL]: (
+      state,
+      { payload: { actionModal } }
+    ) => ({
       ...state,
-      openTokenModal: tokenModal
+      openActionModal: actionModal
     }),
-    [modalActions.CLOSE_TOKEN_MODAL]: state => ({
+    [modalActions.CLOSE_ACTION_MODAL]: state => ({
       ...state,
-      openTokenModal: null
+      openActionModal: null
     }),
     [modalActions.OPEN_NOTIFICATIONS_MODAL]: state => ({
       ...state,

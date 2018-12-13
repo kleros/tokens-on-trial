@@ -4,23 +4,19 @@ import PropTypes from 'prop-types'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
-import { TokenForm } from '../../components/submit/token-form'
 
-import './submit.css'
+import './resubmit.css'
 
-const Submit = ({
+const Resubmit = ({
   arbitrableTokenListData,
-  closeTokenModal,
-  submitToken,
-  tokenFormIsInvalid,
-  submitTokenForm
+  closeActionModal,
+  resubmitToken,
+  name
 }) => (
   <div>
-    <h3 className="Modal-title">Submit a Token</h3>
+    <h3 className="Modal-title">Resubmit {name}</h3>
     <hr />
-    <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
-    <TokenForm className="Submit-form" onSubmit={submitToken} />
-    <div className="Submit-stake">
+    <div className="Resubmit-stake">
       <h4>
         <strong>Stake:</strong>
       </h4>
@@ -37,36 +33,32 @@ const Submit = ({
     <br />
     <div className="Modal-actions">
       <Button
-        className="Submit-return"
+        className="Resubmit-return"
         type="secondary"
-        onClick={closeTokenModal}
+        onClick={closeActionModal}
       >
         Return
       </Button>
       <Button
-        className="Submit-request"
+        className="Resubmit-request"
         type="primary"
-        onClick={submitTokenForm}
-        disabled={tokenFormIsInvalid}
+        onClick={resubmitToken}
       >
-        Request Registration
+        Resubmit token
       </Button>
     </div>
   </div>
 )
 
-Submit.propTypes = {
+Resubmit.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+  name: PropTypes.string.isRequired,
 
   // Action Dispatchers
-  closeTokenModal: PropTypes.func.isRequired,
-  submitToken: PropTypes.func.isRequired,
-
-  // Token Form
-  tokenFormIsInvalid: PropTypes.bool.isRequired,
-  submitTokenForm: PropTypes.func.isRequired
+  closeActionModal: PropTypes.func.isRequired,
+  resubmitToken: PropTypes.func.isRequired
 }
 
-export default Submit
+export default Resubmit

@@ -25,18 +25,18 @@ import {
   submitTokenForm
 } from './components/submit/token-form'
 
-import './token-modal.css'
+import './action-modal.css'
 
-class TokenModal extends PureComponent {
+class ActionModal extends PureComponent {
   static propTypes = {
     token: tokenSelectors.tokenShape,
     tokenFormIsInvalid: PropTypes.bool.isRequired,
-    openTokenModal: modalSelectors.openTokenModalShape,
+    openActionModal: modalSelectors.openActionModalShape,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
 
-    closeTokenModal: PropTypes.func.isRequired,
+    closeActionModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     submitTokenForm: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
@@ -47,7 +47,7 @@ class TokenModal extends PureComponent {
   }
 
   static defaultProps = {
-    openTokenModal: null,
+    openActionModal: null,
     token: null
   }
 
@@ -157,8 +157,8 @@ class TokenModal extends PureComponent {
 
   render() {
     const {
-      openTokenModal,
-      closeTokenModal,
+      openActionModal,
+      closeActionModal,
       arbitrableTokenListData,
       submitTokenForm,
       tokenFormIsInvalid,
@@ -167,76 +167,76 @@ class TokenModal extends PureComponent {
 
     return (
       <Modal
-        isOpen={openTokenModal !== null}
-        onRequestClose={closeTokenModal}
-        className="TokenModal"
+        isOpen={openActionModal !== null}
+        onRequestClose={closeActionModal}
+        className="ActionModal"
       >
         {(() => {
-          switch (openTokenModal) {
-            case modalConstants.TOKEN_MODAL_ENUM.Submit:
+          switch (openActionModal) {
+            case modalConstants.ACTION_MODAL_ENUM.Submit:
               return (
                 <Submit
                   arbitrableTokenListData={arbitrableTokenListData}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   submitTokenForm={submitTokenForm}
                   submitToken={this.handleSubmitTokenClick}
                   tokenFormIsInvalid={tokenFormIsInvalid}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.Clear:
+            case modalConstants.ACTION_MODAL_ENUM.Clear:
               return (
                 <Clear
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   clearToken={this.handleClearTokenClick}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.Challenge:
+            case modalConstants.ACTION_MODAL_ENUM.Challenge:
               return (
                 <Challenge
                   token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   fundDispute={this.handleChallengeClick}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.Resubmit:
+            case modalConstants.ACTION_MODAL_ENUM.Resubmit:
               return (
                 <Resubmit
                   token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   resubmitToken={this.handleResubmitTokenClick}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.FundRequester:
+            case modalConstants.ACTION_MODAL_ENUM.FundRequester:
               return (
                 <FundDispute
                   token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   fundDispute={this.handleFundRequesterClick}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.FundChallenger:
+            case modalConstants.ACTION_MODAL_ENUM.FundChallenger:
               return (
                 <FundDispute
                   token={token.data}
                   name={token && token.data ? token.data.name : 'token'}
                   arbitrableTokenListData={arbitrableTokenListData}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   fundDispute={this.handleFundChallengerClick}
                 />
               )
-            case modalConstants.TOKEN_MODAL_ENUM.FundAppeal:
+            case modalConstants.ACTION_MODAL_ENUM.FundAppeal:
               return (
                 <FundAppeal
                   token={token.data}
-                  closeTokenModal={closeTokenModal}
+                  closeActionModal={closeActionModal}
                   fundAppeal={this.handleFundAppealClick}
                 />
               )
@@ -254,14 +254,14 @@ class TokenModal extends PureComponent {
 
 export default connect(
   state => ({
-    openTokenModal: state.modal.openTokenModal,
+    openActionModal: state.modal.openActionModal,
     tokenFormIsInvalid: getTokenFormIsInvalid(state),
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
     token: state.token.token,
     accounts: state.wallet.accounts
   }),
   {
-    closeTokenModal: modalActions.closeTokenModal,
+    closeActionModal: modalActions.closeActionModal,
     createToken: tokenActions.createToken,
     clearToken: tokenActions.clearToken,
     resubmitToken: tokenActions.resubmitToken,
@@ -271,4 +271,4 @@ export default connect(
       arbitrableTokenListActions.fetchArbitrableTokenListData,
     fundAppeal: tokenActions.fundAppeal
   }
-)(TokenModal)
+)(ActionModal)

@@ -9,7 +9,7 @@ import './clear.css'
 
 const Clear = ({
   arbitrableTokenListData,
-  closeTokenModal,
+  closeActionModal,
   clearToken,
   name
 }) => (
@@ -35,7 +35,7 @@ const Clear = ({
       <Button
         className="Clear-return"
         type="secondary"
-        onClick={closeTokenModal}
+        onClick={closeActionModal}
       >
         Return
       </Button>
@@ -53,7 +53,7 @@ Clear.propTypes = {
   name: PropTypes.string.isRequired,
 
   // Action Dispatchers
-  closeTokenModal: PropTypes.func.isRequired,
+  closeActionModal: PropTypes.func.isRequired,
   clearToken: PropTypes.func.isRequired
 }
 

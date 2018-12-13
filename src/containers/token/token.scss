@@ -131,6 +131,16 @@
     width: 100%;
   }
 
+  &-evidence {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &-icon {
+      color: $badgeBlue;
+    }
+  }
+
   &--icon {
     margin-right: 14px;
 
