@@ -11,6 +11,7 @@ import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import * as walletSelectors from '../../reducers/wallet'
+import * as evidenceActions from '../../actions/evidence'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 
@@ -45,6 +46,8 @@ class ActionModal extends PureComponent {
     closeActionModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     submitTokenForm: PropTypes.func.isRequired,
+    submitEvidenceForm: PropTypes.func.isRequired,
+    submitEvidence: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
     fundDispute: PropTypes.func.isRequired,
@@ -56,6 +59,8 @@ class ActionModal extends PureComponent {
     openActionModal: null,
     token: null
   }
+
+  state = { file: null, fileInfoMessage: null }
 
   handleSubmitTokenClick = token => {
     const { createToken } = this.props
@@ -72,9 +77,23 @@ class ActionModal extends PureComponent {
     clearToken({ tokenData: token.data })
   }
 
-  handleSubmitEvidenceClick = () => {
-    // TODO
-    console.info('TODO')
+  handleOnFileDropAccepted = ([file]) => {
+    if (file.size > 15e6)
+      return this.setState({
+        file: null,
+        fileInfoMessage: 'File is too big. It must be less than 15MB.'
+      })
+
+    this.setState({
+      file,
+      fileInfoMessage: null
+    })
+  }
+
+  handleSubmitEvidenceClick = evidence => {
+    const { submitEvidence } = this.props
+    const { file } = this.state
+    submitEvidence({ file, evidenceData: evidence })
   }
 
   handleChallengeClick = () => {
@@ -172,10 +191,13 @@ class ActionModal extends PureComponent {
       closeActionModal,
       arbitrableTokenListData,
       submitTokenForm,
+      submitEvidenceForm,
       tokenFormIsInvalid,
       evidenceFormIsInvalid,
       token
     } = this.props
+
+    const { fileInfoMessage, file } = this.state
 
     return (
       <Modal
@@ -259,6 +281,9 @@ class ActionModal extends PureComponent {
                   submitEvidenceForm={submitEvidenceForm}
                   submitEvidence={this.handleSubmitEvidenceClick}
                   evidenceFormIsInvalid={evidenceFormIsInvalid}
+                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  fileInfoMessage={fileInfoMessage}
+                  file={file}
                 />
               )
             case undefined:
@@ -285,10 +310,12 @@ export default connect(
   {
     closeActionModal: modalActions.closeActionModal,
     createToken: tokenActions.createToken,
+    submitEvidence: evidenceActions.submitEvidence,
     clearToken: tokenActions.clearToken,
     resubmitToken: tokenActions.resubmitToken,
     fundDispute: tokenActions.fundDispute,
     submitTokenForm,
+    submitEvidenceForm,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData,
     fundAppeal: tokenActions.fundAppeal

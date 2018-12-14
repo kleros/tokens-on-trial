@@ -12,6 +12,9 @@ export const {
   },
   description: {
     type: 'text',
-    validate: [required]
+    validate: [required],
+    props: {
+      type: 'textarea'
+    }
   }
 })

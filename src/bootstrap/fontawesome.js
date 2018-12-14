@@ -17,7 +17,13 @@ import faClock from '@fortawesome/fontawesome-free-solid/faClock'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faBell from '@fortawesome/fontawesome-free-solid/faBell'
 import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
+import faFile from '@fortawesome/fontawesome-free-solid/faFile'
 import faFileAlt from '@fortawesome/fontawesome-free-solid/faFileAlt'
+import faFileImage from '@fortawesome/fontawesome-free-solid/faFileImage'
+import faFileAudio from '@fortawesome/fontawesome-free-solid/faFileAudio'
+import faFileVideo from '@fortawesome/fontawesome-free-solid/faFileVideo'
+import faFilePdf from '@fortawesome/fontawesome-free-solid/faFilePdf'
+import faFileWord from '@fortawesome/fontawesome-free-solid/faFileWord'
 
 library.add(
   faCaretDown,
@@ -38,5 +44,11 @@ library.add(
   faSpinner,
   faBell,
   faEnvelope,
-  faFileAlt
+  faFile,
+  faFileAlt,
+  faFileImage,
+  faFileAudio,
+  faFileVideo,
+  faFilePdf,
+  faFileWord
 )

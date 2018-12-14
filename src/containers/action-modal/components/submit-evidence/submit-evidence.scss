@@ -11,8 +11,9 @@
   }
 
   &-actions {
+    align-content: center;
     display: flex;
     flex-direction: row;
-    width: 290px;
+    width: 100%;
   }
 }

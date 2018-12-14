@@ -11,28 +11,28 @@ const SubmitEvidence = ({
   closeActionModal,
   submitEvidence,
   fileInfoMessage,
-  fileDataURL,
   handleOnFileDropAccepted,
   evidenceFormIsInvalid,
-  submitEvidenceForm
+  submitEvidenceForm,
+  file
 }) => (
   <div className="SubmitEvidence">
-    {fileInfoMessage && <div>{fileInfoMessage}</div>}
     <h3 className="Modal-title">Submit Evidence</h3>
     <br />
     <EvidenceForm className="SubmitEvidence-form" onSubmit={submitEvidence} />
     <FilePicker
       multiple={false}
       onDropAccepted={handleOnFileDropAccepted}
-      filePreviewURL={fileDataURL}
+      file={file}
       message={
         <span>
-          (Max Size: 20MB)
+          (Max Size: 15MB)
           <br />
           Drag file here or
         </span>
       }
     />
+    {fileInfoMessage && <div>{fileInfoMessage}</div>}
     <br />
     <div className="SubmitEvidence-actions">
       <Button
@@ -64,12 +64,16 @@ SubmitEvidence.propTypes = {
   evidenceFormIsInvalid: PropTypes.bool.isRequired,
   submitEvidenceForm: PropTypes.func.isRequired,
   fileInfoMessage: PropTypes.string,
-  fileDataURL: PropTypes.string
+  file: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    size: PropTypes.number.isRequired,
+    type: PropTypes.string.isRequired
+  })
 }
 
 SubmitEvidence.defaultProps = {
   fileInfoMessage: '',
-  fileDataURL: ''
+  file: null
 }
 
 export default SubmitEvidence
