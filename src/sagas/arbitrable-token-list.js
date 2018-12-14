@@ -1,9 +1,13 @@
-import { takeLatest, call, all } from 'redux-saga/effects'
+import { takeLatest, call, all, select } from 'redux-saga/effects'
 
-import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import { lessduxSaga } from '../utils/saga'
-import { arbitrableTokenList, arbitrator } from '../bootstrap/dapp-api'
+import { arbitrableTokenList, arbitrator, archon } from '../bootstrap/dapp-api'
+import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tokenConstants from '../constants/token'
+import * as evidenceActions from '../actions/evidence'
+import * as walletSelectors from '../reducers/wallet'
+
+import storeApi from './api/store'
 
 /**
  * Fetches the arbitrable token list's data.
@@ -45,6 +49,56 @@ export function* fetchArbitrableTokenListData() {
 }
 
 /**
+ * Submits evidence for a dispute
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
+  let evidenceURL = ''
+  let fileTypeExtension = ''
+  let multihash = ''
+
+  /* eslint-disable unicorn/number-literal-case */
+  if (file) {
+    multihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
+    evidenceURL = (yield call(storeApi.postFile, fileData, file.name)).payload
+      .fileURL
+    fileTypeExtension = file.name.split('.')[1]
+  }
+  /* eslint-enable */
+
+  const evidenceJSON = {
+    name: evidenceData.name,
+    description: evidenceData.description,
+    fileURI: evidenceURL,
+    fileHash: multihash,
+    fileTypeExtension
+  }
+
+  /* eslint-disable unicorn/number-literal-case */
+  const evidenceJSONHash = archon.utils.multihashFile(
+    evidenceJSON,
+    0x1b // keccak-256
+  )
+  /* eslint-enable */
+
+  const evidenceJSONURL = (yield call(
+    storeApi.postFile,
+    JSON.stringify(evidenceJSON),
+    evidenceJSONHash
+  )).payload.fileURL
+
+  yield call(
+    arbitrableTokenList.methods.submitEvidence(ID, evidenceJSONURL).send,
+    {
+      from: yield select(walletSelectors.getAccount)
+    }
+  )
+
+  return evidenceJSON
+}
+
+/**
  * The root of the arbitrable token list saga.
  */
 export default function* arbitrableTokenListSaga() {
@@ -55,5 +109,16 @@ export default function* arbitrableTokenListSaga() {
     'fetch',
     arbitrableTokenListActions.arbitrableTokenListData,
     fetchArbitrableTokenListData
+  )
+  // Actions
+  yield takeLatest(
+    evidenceActions.evidence.CREATE,
+    lessduxSaga,
+    {
+      flow: 'create',
+      collection: evidenceActions.evidence.self
+    },
+    evidenceActions.evidence,
+    submitEvidence
   )
 }

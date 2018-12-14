@@ -14,6 +14,7 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as evidenceActions from '../../actions/evidence'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
+import asyncReadFile from '../../utils/async-file-reader'
 
 import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
@@ -77,7 +78,7 @@ class ActionModal extends PureComponent {
     clearToken({ tokenData: token.data })
   }
 
-  handleOnFileDropAccepted = ([file]) => {
+  handleOnFileDropAccepted = async ([file]) => {
     if (file.size > 15e6)
       return this.setState({
         file: null,
@@ -90,10 +91,16 @@ class ActionModal extends PureComponent {
     })
   }
 
-  handleSubmitEvidenceClick = evidence => {
-    const { submitEvidence } = this.props
+  handleSubmitEvidenceClick = async evidence => {
+    const {
+      submitEvidence,
+      token: {
+        data: { ID }
+      }
+    } = this.props
     const { file } = this.state
-    submitEvidence({ file, evidenceData: evidence })
+    const fileData = await asyncReadFile(file)
+    submitEvidence({ file, evidenceData: evidence, ID, fileData })
   }
 
   handleChallengeClick = () => {

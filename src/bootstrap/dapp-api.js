@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import Archon from '@kleros/archon'
 
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list.json'
 import Arbitrator from '../assets/contracts/enhanced-appealable-arbitrator.json'
@@ -8,8 +9,8 @@ const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
 const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
-const TOKEN_UPLOAD_URL = process.env[`REACT_APP_${env}_TOKEN_UPLOAD_URL`]
-const TOKEN_BASE_URL = process.env[`REACT_APP_${env}_TOKEN_BASE_URL`]
+const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
+const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
 
 let web3
 let onlyInfura = false
@@ -21,6 +22,8 @@ else {
   web3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
   onlyInfura = true
 }
+
+const archon = new Archon(ETHEREUM_PROVIDER)
 
 const network =
   web3.eth &&
@@ -61,6 +64,7 @@ export {
   strictETHAddressRegExp,
   arbitrableTokenList,
   arbitrator,
-  TOKEN_UPLOAD_URL,
-  TOKEN_BASE_URL
+  FILE_UPLOAD_URL,
+  FILE_BASE_URL,
+  archon
 }
