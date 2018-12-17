@@ -3,12 +3,14 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
+import * as mime from 'mime-types'
 
-import { web3 } from '../../bootstrap/dapp-api'
+import { web3, arbitrableTokenList, arbitrator } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import FilterBar from '../filter-bar'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/token'
+import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
@@ -58,7 +60,9 @@ class TokenDetails extends PureComponent {
 
   state = {
     timestamp: null,
-    countdown: null
+    countdown: null,
+    listeningForEvidence: false,
+    evidences: []
   }
 
   interval = null
@@ -260,8 +264,8 @@ class TokenDetails extends PureComponent {
 
   componentDidUpdate() {
     const { token, arbitrableTokenListData } = this.props
+    const { countdown, listeningForEvidence } = this.state
 
-    const { countdown } = this.state
     if (
       token &&
       hasPendingRequest(token) &&
@@ -270,6 +274,31 @@ class TokenDetails extends PureComponent {
       arbitrableTokenListData.data
     ) {
       this.setState({ countdown: 'Loading...' })
+
+      if (!listeningForEvidence && token.latestRequest.disputed) {
+        // Listen for evidence events.
+        this.setState({ listeningForEvidence: true })
+        arbitrableTokenList.events
+          .Evidence({
+            filter: {
+              arbitrator: arbitrator._address,
+              disputeID: token.latestRequest.disputeID
+            }, // Using an array means OR: e.g. 20 or 23
+            fromBlock: 0
+          })
+          .on('data', async e => {
+            const evidence = await (await fetch(
+              e.returnValues._evidence
+            )).json()
+            evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
+            const { evidences } = this.state
+            this.setState({
+              evidences: [...evidences, evidence]
+            })
+          })
+      }
+
+      // Set timer once we have data.
       web3.eth.getBlock('latest', (err, block) => {
         if (err) throw new Error(err)
 
@@ -296,7 +325,7 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { countdown } = this.state
+    const { countdown, evidences } = this.state
     const { token, accounts, filter, match } = this.props
     const { filters } = filter
     const { tokenID } = match.params
@@ -385,11 +414,15 @@ class TokenDetails extends PureComponent {
             <h3>Evidence</h3>
             <div className="TokenDescription-evidence">
               <div>
-                <FontAwesomeIcon
-                  icon="file-alt"
-                  size="2x"
-                  className="TokenDescription-evidence-icon"
-                />
+                {evidences.map(evidence => (
+                  <a
+                    href={evidence.fileURI}
+                    key={evidence.fileHash}
+                    className="TokenDescription-evidence--item"
+                  >
+                    <FontAwesomeIcon icon={evidence.icon} size="2x" />
+                  </a>
+                ))}
               </div>
               <Button type="secondary" onClick={this.handleOpenEvidenceModal}>
                 Submit Evidence

@@ -84,9 +84,12 @@ export function* fetchToken({ payload: { ID } }) {
     )
 
     if (token.latestRequest.disputed) {
+      // Fetch dispute data.
       token.latestRequest.dispute = yield call(
         arbitrator.methods.disputes(token.latestRequest.disputeID).call
       )
+
+      // Fetch appeal period and cost if in appeal period.
       if (
         token.latestRequest.dispute.status ===
           tokenConstants.DISPUTE_STATUS.Appealable.toString() &&
@@ -115,7 +118,7 @@ export function* fetchToken({ payload: { ID } }) {
     token.latestRequest = {
       disputed: false,
       disputeID: 0,
-      dispute: {},
+      dispute: null,
       firstContributionTime: 0,
       arbitrationFeesWaitingTime: 0,
       timeToChallenge: 0,
@@ -176,7 +179,7 @@ function* requestStatusChange({ payload: { token } }) {
   const { payload } = yield call(
     storeApi.postFile,
     file,
-    `${web3.utils.sha3(file)}.json`
+    `${web3.utils.sha3(file)}`
   )
 
   const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.

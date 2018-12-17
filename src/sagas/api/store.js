@@ -2,7 +2,7 @@ import statusHelper from '../../utils/api-status-helper'
 import { FILE_UPLOAD_URL, FILE_BASE_URL } from '../../bootstrap/dapp-api'
 
 const storeApi = {
-  postFile(file, fileName) {
+  postFile(file, fileName, extension = 'json') {
     return fetch(FILE_UPLOAD_URL, {
       method: 'POST',
       headers: {
@@ -10,7 +10,7 @@ const storeApi = {
       },
       body: JSON.stringify({
         payload: {
-          fileName,
+          fileName: `${fileName}.${extension}`,
           base64EncodedData: btoa(file)
         }
       })

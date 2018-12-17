@@ -136,8 +136,9 @@
     flex-direction: row;
     justify-content: space-between;
 
-    &--icon {
+    &--item {
       color: $badgeBlue;
+      margin-right: 12px;
     }
   }
 

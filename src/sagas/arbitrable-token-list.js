@@ -85,8 +85,11 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
   const evidenceJSONURL = (yield call(
     storeApi.postFile,
     JSON.stringify(evidenceJSON),
-    evidenceJSONHash
+    evidenceJSONHash,
+    fileTypeExtension
   )).payload.fileURL
+
+  console.info('evidenceJSONURL', evidenceJSONURL)
 
   yield call(
     arbitrableTokenList.methods.submitEvidence(ID, evidenceJSONURL).send,
