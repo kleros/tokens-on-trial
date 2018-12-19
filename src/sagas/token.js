@@ -38,7 +38,28 @@ const convertFromString = token => {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object[]} - The fetched tokens.
  */
-function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
+function* fetchTokens({
+  payload: { cursor, count, filterValue, sortValue, requestedPage }
+}) {
+  const totalCount = yield call(arbitrableTokenList.methods.tokenCount().call, {
+    from: yield select(walletSelectors.getAccount)
+  })
+
+  if (requestedPage * count > totalCount) {
+    // Page does not exist. Set to closest.
+    requestedPage =
+      totalCount % 2 === 0 ? totalCount / count : totalCount / count + 1
+    requestedPage = Math.trunc(requestedPage)
+  }
+
+  if (requestedPage > 1)
+    cursor = yield call(
+      arbitrableTokenList.methods.tokensList(requestedPage - 1).call,
+      {
+        from: yield select(walletSelectors.getAccount)
+      }
+    )
+
   const data = yield call(
     arbitrableTokenList.methods.queryTokens(
       cursor,
@@ -64,6 +85,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
     ))
   ]
   tokens.hasMore = data.hasMore
+  tokens.totalCount = Number(totalCount)
   return tokens
 }
 

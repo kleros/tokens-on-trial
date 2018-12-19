@@ -3,13 +3,56 @@
 /* @define TokenGrid */
 .TokenGrid {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-start;
+  flex-direction: column;
   margin-top: 1em;
 
   &-container {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-start;
     margin: 0 -13px;
+  }
+
+  &-paging {
+    display: flex;
+    justify-content: space-between;
+    margin: 50px 0;
+    width: 100%;
+
+    &-numbers {
+      display: flex;
+
+      &-number {
+        color: $border;
+        font-size: 14px;
+        font-weight: bold;
+        height: 27px;
+        line-height: 27px;
+        text-align: center;
+        vertical-align: middle;
+        width: 27px;
+      }
+
+      &--current {
+        background-color: $darkGrey;
+        border-radius: 3px;
+        color: white;
+      }
+    }
+
+    &-navigation {
+      display: flex;
+
+      &-button {
+        color: $border;
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: 24px;
+      }
+
+      &-clickable {
+        color: $darkGrey;
+      }
+    }
   }
 }

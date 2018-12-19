@@ -14,7 +14,7 @@ const {
     challengeReward: PropTypes.number.isRequired,
     stake: PropTypes.string.isRequired,
     timeToChallenge: PropTypes.number.isRequired,
-    tokensCounts: PropTypes.shape(
+    countByStatus: PropTypes.shape(
       tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
         acc[value] = PropTypes.number.isRequired
         return acc

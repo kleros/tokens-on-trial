@@ -37,9 +37,15 @@ export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,
   payload: { ID, value, side }
 })
-export const fetchTokens = (cursor, count, filterValue, sortValue) => ({
+export const fetchTokens = (
+  cursor,
+  count,
+  filterValue,
+  sortValue,
+  requestedPage
+) => ({
   type: tokens.FETCH,
-  payload: { cursor, count, filterValue, sortValue }
+  payload: { cursor, count, filterValue, sortValue, requestedPage }
 })
 export const executeRequest = ID => ({
   type: token.EXECUTE,

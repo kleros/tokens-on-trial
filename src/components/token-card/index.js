@@ -26,7 +26,7 @@ const TokenCard = ({ token }) => (
         <Img src={EtherScanLogo} />
       </a>
     </div>
-    <Link className="TokenCard-content" to={`${token.ID}`}>
+    <Link className="TokenCard-content" to={`/token/${token.ID}`}>
       <Img
         src={token.URI}
         alt={`Token List Submission`}

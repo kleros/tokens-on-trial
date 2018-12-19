@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
-import { Switch, Route, withRouter } from 'react-router-dom'
+import { Switch, Route, withRouter, Redirect } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Tokens from '../containers/tokens'
@@ -54,7 +54,7 @@ class _ConnectedNavBar extends Component {
     const { deleteNotification, history, closeNotificationsModal } = this.props
     deleteNotification(id)
     closeNotificationsModal()
-    history.push(`/${id}`)
+    history.push(`/token/${id}`)
   }
 
   handleShowAllClick = () => {
@@ -131,9 +131,10 @@ const App = ({ store, history }) => (
           <Route exact path="*" component={ConnectedNavBar} />
           <div id="scroll-root">
             <Switch>
-              <Route exact path="/" component={Tokens} />
+              <Redirect exact from="/" to="/tokens/1" />
+              <Route exact path="/tokens/:page" component={Tokens} />
+              <Route exact path="/token/:tokenID" component={TokenDetail} />
               <Route exact path="/notifications" component={PageNotFound} />
-              <Route exact path="/:tokenID" component={TokenDetail} />
               <Route component={PageNotFound} />
             </Switch>
           </div>

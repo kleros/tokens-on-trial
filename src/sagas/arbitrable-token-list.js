@@ -1,3 +1,5 @@
+import * as mime from 'mime-types'
+
 import { takeLatest, call, all, select } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
@@ -20,7 +22,7 @@ export function* fetchArbitrableTokenListData() {
     stake: call(arbitrableTokenList.methods.stake().call),
     challengeReward: call(arbitrableTokenList.methods.challengeReward().call),
     timeToChallenge: call(arbitrableTokenList.methods.timeToChallenge().call),
-    tokensCounts: call(arbitrableTokenList.methods.tokensCounts().call),
+    countByStatus: call(arbitrableTokenList.methods.countByStatus().call),
     arbitrationFeesWaitingTime: call(
       arbitrableTokenList.methods.arbitrationFeesWaitingTime().call
     )
@@ -36,9 +38,9 @@ export function* fetchArbitrableTokenListData() {
     challengeReward: Number(d.challengeReward),
     stake: String(d.stake),
     timeToChallenge: Number(d.timeToChallenge) * 1000,
-    tokensCounts: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
+    countByStatus: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
-        acc[value] = Number(d.tokensCounts[value.toLowerCase()])
+        acc[value] = Number(d.countByStatus[value.toLowerCase()])
         return acc
       },
       {}
@@ -61,9 +63,16 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
     multihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
-    evidenceURL = (yield call(storeApi.postFile, fileData, file.name)).payload
-      .fileURL
     fileTypeExtension = file.name.split('.')[1]
+    const mimeType = mime.lookup(fileTypeExtension)
+    evidenceURL = (yield call(
+      storeApi.postFile,
+      fileData,
+      multihash,
+      fileTypeExtension,
+      mimeType,
+      false
+    )).payload.fileURL
   }
   /* eslint-enable */
 
@@ -85,8 +94,7 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
   const evidenceJSONURL = (yield call(
     storeApi.postFile,
     JSON.stringify(evidenceJSON),
-    evidenceJSONHash,
-    fileTypeExtension
+    evidenceJSONHash
   )).payload.fileURL
 
   console.info('evidenceJSONURL', evidenceJSONURL)

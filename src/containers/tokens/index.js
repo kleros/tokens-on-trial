@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import memoizeOne from 'memoize-one'
 
 import TokenCard from '../../components/token-card'
@@ -15,8 +16,20 @@ import { filterToContractParam } from '../../utils/filter'
 
 import './tokens.css'
 
+const TOKENS_PER_PAGE = 5
+
 class Tokens extends Component {
   static propTypes = {
+    // Navigation
+    history: PropTypes.shape({
+      push: PropTypes.func.isRequired
+    }).isRequired,
+    match: PropTypes.shape({
+      params: PropTypes.shape({
+        page: PropTypes.string.isRequired
+      }).isRequired
+    }).isRequired,
+
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
     filter: filterSelectors.filterShape.isRequired,
@@ -48,8 +61,27 @@ class Tokens extends Component {
     this.fetchTokens(true, key)
   }
 
+  handlePageClicked = page => () => {
+    const { history } = this.props
+    history.push(`/tokens/${page}`)
+  }
+
+  handleNextPageClicked = () => {
+    const { match, history } = this.props
+    const { page } = match.params
+    history.push(`/tokens/${page + 1}`)
+  }
+
+  handlePreviousPageClicked = () => {
+    const { match, history } = this.props
+    const { page } = match.params
+    history.push(`/tokens/${page - 1}`)
+  }
+
   fetchTokens = (clear, key) => {
-    const { tokens, fetchTokens, filter } = this.props
+    const { tokens, fetchTokens, filter, match } = this.props
+    const { page } = match.params
+
     const { filters, oldestFirst } = filter
     const updatedFilters = {
       ...filters,
@@ -63,9 +95,10 @@ class Tokens extends Component {
         tokens.data && clear !== true
           ? tokens.data[tokens.data.length - 1].ID
           : '0x00',
-        10,
+        TOKENS_PER_PAGE,
         filterValue,
-        oldestFirst
+        oldestFirst,
+        page
       )
   }
 
@@ -74,7 +107,15 @@ class Tokens extends Component {
     const { filters } = filter
 
     let numTokens = 'Loading...'
-    if (tokens && tokens.data) numTokens = tokens.data.length
+    let numPages = 0
+
+    if (tokens && tokens.data) {
+      numTokens = tokens.data.length
+      numPages =
+        tokens.totalCount % 2 === 0
+          ? tokens.totalCount / TOKENS_PER_PAGE
+          : tokens.totalCount / TOKENS_PER_PAGE + 1
+    }
 
     return (
       <div ref={this.ref} className="Page">
@@ -87,21 +128,52 @@ class Tokens extends Component {
           <div className="TokenGrid-container">
             {tokens.data && this.mapTokens(tokens.data)}
           </div>
+          <div className="TokenGrid-paging">
+            <div className="TokenGrid-paging-numbers">
+              {numPages > 0 &&
+                [...new Array(numPages).keys()].map(key => (
+                  <button
+                    className="TokenGrid-paging-numbers-number TokenGrid-paging-numbers"
+                    onClick={this.handlePageClicked(key + 1)}
+                  >
+                    {key}
+                  </button>
+                ))}
+            </div>
+            {numPages > 0 && (
+              <div className="TokenGrid-paging-navigation">
+                <button
+                  className="TokenGrid-paging-navigation-button"
+                  onClick={this.handleNextPageClicked}
+                >
+                  Previous
+                </button>
+                <button
+                  className="TokenGrid-paging-navigation-button TokenGrid-paging-navigation-clickable"
+                  onClick={this.handlePreviousPageClicked}
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     )
   }
 }
 
-export default connect(
-  state => ({
-    tokens: state.token.tokens,
-    filter: state.filter
-  }),
-  {
-    fetchArbitrableTokenListData:
-      arbitrableTokenListActions.fetchArbitrableTokenListData,
-    fetchTokens: tokenActions.fetchTokens,
-    toggleFilter: filterActions.toggleFilter
-  }
-)(Tokens)
+export default withRouter(
+  connect(
+    state => ({
+      tokens: state.token.tokens,
+      filter: state.filter
+    }),
+    {
+      fetchArbitrableTokenListData:
+        arbitrableTokenListActions.fetchArbitrableTokenListData,
+      fetchTokens: tokenActions.fetchTokens,
+      toggleFilter: filterActions.toggleFilter
+    }
+  )(Tokens)
+)
