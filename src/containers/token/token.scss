@@ -136,8 +136,13 @@
     flex-direction: row;
     justify-content: space-between;
 
+    &--list {
+      display: flex;
+    }
+
     &--item {
       color: $badgeBlue;
+      cursor: pointer;
       margin-right: 12px;
     }
   }

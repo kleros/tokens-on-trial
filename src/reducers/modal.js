@@ -20,14 +20,16 @@ export default createReducer(
   {
     [modalActions.OPEN_ACTION_MODAL]: (
       state,
-      { payload: { actionModal } }
+      { payload: { actionModal, param } }
     ) => ({
       ...state,
-      openActionModal: actionModal
+      openActionModal: actionModal,
+      actionModalParam: param
     }),
     [modalActions.CLOSE_ACTION_MODAL]: state => ({
       ...state,
-      openActionModal: null
+      openActionModal: null,
+      actionModalParam: null
     }),
     [modalActions.OPEN_NOTIFICATIONS_MODAL]: state => ({
       ...state,

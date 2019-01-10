@@ -15,9 +15,9 @@ export const CLOSE_SETTINGS_MODAL = 'CLOSE_SETTINGS_MODAL'
 /* Action Creators */
 
 // Token Modal
-export const openActionModal = actionModal => ({
+export const openActionModal = (actionModal, param) => ({
   type: OPEN_ACTION_MODAL,
-  payload: { actionModal }
+  payload: { actionModal, param }
 })
 export const closeActionModal = () => ({ type: CLOSE_ACTION_MODAL })
 

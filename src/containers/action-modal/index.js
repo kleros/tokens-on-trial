@@ -23,6 +23,7 @@ import Resubmit from './components/resubmit'
 import Clear from './components/clear'
 import Challenge from './components/challenge'
 import SubmitEvidence from './components/submit-evidence'
+import ViewEvidence from './components/view-evidence'
 import {
   getTokenFormIsInvalid,
   submitTokenForm
@@ -40,6 +41,7 @@ class ActionModal extends PureComponent {
     tokenFormIsInvalid: PropTypes.bool.isRequired,
     evidenceFormIsInvalid: PropTypes.bool.isRequired,
     openActionModal: modalSelectors.openActionModalShape,
+    actionModalParam: PropTypes.shape({}),
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
@@ -58,6 +60,7 @@ class ActionModal extends PureComponent {
 
   static defaultProps = {
     openActionModal: null,
+    actionModalParam: null,
     token: null
   }
 
@@ -99,7 +102,7 @@ class ActionModal extends PureComponent {
       }
     } = this.props
     const { file } = this.state
-    const fileData = await asyncReadFile(file)
+    const fileData = (await asyncReadFile(file))[0]
     submitEvidence({ file, evidenceData: evidence, ID, fileData })
   }
 
@@ -201,7 +204,8 @@ class ActionModal extends PureComponent {
       submitEvidenceForm,
       tokenFormIsInvalid,
       evidenceFormIsInvalid,
-      token
+      token,
+      actionModalParam
     } = this.props
 
     const { fileInfoMessage, file } = this.state
@@ -293,6 +297,13 @@ class ActionModal extends PureComponent {
                   file={file}
                 />
               )
+            case modalConstants.ACTION_MODAL_ENUM.ViewEvidence:
+              return (
+                <ViewEvidence
+                  closeActionModal={closeActionModal}
+                  evidence={actionModalParam}
+                />
+              )
             case undefined:
             case null:
               break
@@ -312,7 +323,8 @@ export default connect(
     evidenceFormIsInvalid: getEvidenceFormIsInvalid(state),
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
     token: state.token.token,
-    accounts: state.wallet.accounts
+    accounts: state.wallet.accounts,
+    actionModalParam: state.modal.actionModalParam
   }),
   {
     closeActionModal: modalActions.closeActionModal,

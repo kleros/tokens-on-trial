@@ -9,5 +9,6 @@ export const ACTION_MODAL_ENUM = createEnum([
   'FundRequester',
   'FundChallenger',
   'FundAppeal',
-  'SubmitEvidence'
+  'SubmitEvidence',
+  'ViewEvidence'
 ])

@@ -93,6 +93,11 @@ class TokenDetails extends PureComponent {
     openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidence)
   }
 
+  handleViewEvidenceClick = evidence => () => {
+    const { openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.ViewEvidence, evidence)
+  }
+
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
@@ -413,15 +418,15 @@ class TokenDetails extends PureComponent {
             <hr className="TokenDescription-separator" />
             <h3>Evidence</h3>
             <div className="TokenDescription-evidence">
-              <div>
+              <div className="TokenDescription-evidence--list">
                 {evidences.map(evidence => (
-                  <a
-                    href={evidence.fileURI}
+                  <div
                     key={evidence.fileHash}
+                    onClick={this.handleViewEvidenceClick(evidence)}
                     className="TokenDescription-evidence--item"
                   >
                     <FontAwesomeIcon icon={evidence.icon} size="2x" />
-                  </a>
+                  </div>
                 ))}
               </div>
               <Button type="secondary" onClick={this.handleOpenEvidenceModal}>

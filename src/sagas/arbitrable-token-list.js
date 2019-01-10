@@ -66,12 +66,10 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
     fileTypeExtension = file.name.split('.')[1]
     const mimeType = mime.lookup(fileTypeExtension)
     evidenceURL = (yield call(
-      storeApi.postFile,
+      storeApi.postEncodedFile,
       fileData,
       multihash,
-      fileTypeExtension,
-      mimeType,
-      false
+      mimeType
     )).payload.fileURL
   }
   /* eslint-enable */
@@ -84,16 +82,18 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
     fileTypeExtension
   }
 
+  const stringified = JSON.stringify(evidenceJSON)
+
   /* eslint-disable unicorn/number-literal-case */
   const evidenceJSONHash = archon.utils.multihashFile(
-    evidenceJSON,
+    stringified,
     0x1b // keccak-256
   )
   /* eslint-enable */
 
   const evidenceJSONURL = (yield call(
-    storeApi.postFile,
-    JSON.stringify(evidenceJSON),
+    storeApi.postJSONFile,
+    stringified,
     evidenceJSONHash
   )).payload.fileURL
 

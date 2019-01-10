@@ -1,0 +1,19 @@
+@import '../../../../styles/_colors.scss';
+
+/* @define ViewEvidence */
+.ViewEvidence {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+
+  &-form {
+    margin: 0 -34px;
+  }
+
+  &-actions {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+  }
+}

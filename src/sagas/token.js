@@ -197,14 +197,8 @@ function* requestStatusChange({ payload: { token } }) {
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(URI))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const file = JSON.stringify(tokenToSubmit)
-  const { payload } = yield call(
-    storeApi.postFile,
-    file,
-    `${web3.utils.sha3(file)}`
-  )
-
-  const ID = payload.fileURL.split('/')[3].split('.')[0] // Taking tokenID from URL.
+  yield call(storeApi.postJSONFile, tokenToSubmit)
+  const ID = web3.utils.keccak256(JSON.stringify(tokenToSubmit))
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
   if (
