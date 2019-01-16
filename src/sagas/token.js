@@ -15,20 +15,19 @@ import storeApi from './api/store'
 // Converts token string data to correct js types.
 const convertFromString = token => {
   const { latestRequest } = token
-  latestRequest.firstContributionTime = Number(
-    latestRequest.firstContributionTime
+  latestRequest.submissionTime = Number(latestRequest.submissionTime)
+  latestRequest.challengerDepositTime = Number(
+    latestRequest.challengerDepositTime
   )
-  latestRequest.arbitrationFeesWaitingTime = Number(
-    latestRequest.arbitrationFeesWaitingTime
-  )
-  latestRequest.timeToChallenge = Number(latestRequest.timeToChallenge)
 
   const { latestRound } = latestRequest
   latestRound.ruling = Number(latestRound.ruling)
-  latestRound.requiredFeeStake = Number(latestRound.requiredFeeStake)
   latestRound.paidFees[0] = Number(latestRound.paidFees[0])
   latestRound.paidFees[1] = Number(latestRound.paidFees[1])
   latestRound.paidFees[2] = Number(latestRound.paidFees[2])
+  latestRound.requiredForSide[0] = Number(latestRound.requiredForSide[0])
+  latestRound.requiredForSide[1] = Number(latestRound.requiredForSide[1])
+  latestRound.requiredForSide[2] = Number(latestRound.paidFees[2])
   token.latestRound = latestRound
   return token
 }
@@ -141,29 +140,23 @@ export function* fetchToken({ payload: { ID } }) {
       disputed: false,
       disputeID: 0,
       dispute: null,
-      firstContributionTime: 0,
-      arbitrationFeesWaitingTime: 0,
-      timeToChallenge: 0,
+      submissionTime: 0,
       challengeRewardBalance: 0,
-      challengeReward: 0,
+      challengerDepositTime: 0,
+      feeRewards: 0,
+      pot: [],
+      resolved: false,
       parties: [],
-      appealed: false,
       latestRound: {
-        ruling: 0,
-        requiredFeeStake: 0,
+        appealed: false,
         paidFees: [],
-        loserFullyFunded: false
+        requiredForSide: []
       }
     }
 
-  const tokenFile = yield call(storeApi.getFile, ID)
-  const { URI, name } = tokenFile
-
   return {
     ...token,
-    name,
     ID,
-    URI,
     status: Number(token.status),
     clientStatus: contractStatusToClientStatus(
       token.status,

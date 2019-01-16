@@ -11,16 +11,20 @@ const {
 } = createResource(
   PropTypes.shape({
     arbitrator: PropTypes.string.isRequired,
+    governor: PropTypes.string.isRequired,
     challengeReward: PropTypes.number.isRequired,
-    stake: PropTypes.string.isRequired,
-    timeToChallenge: PropTypes.number.isRequired,
+    challengePeriodDuration: PropTypes.number.isRequired,
+    arbitrationFeesWaitingTime: PropTypes.number.isRequired,
+    arbitrationCost: PropTypes.number.isRequired,
+    winnerStakeMultiplier: PropTypes.number.isRequired,
+    loserStakeMultiplier: PropTypes.number.isRequired,
+    sharedStakeMultiplier: PropTypes.number.isRequired,
     countByStatus: PropTypes.shape(
       tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
         acc[value] = PropTypes.number.isRequired
         return acc
       }, {})
-    ).isRequired,
-    arbitrationFeesWaitingTime: PropTypes.number.isRequired
+    ).isRequired
   })
 )
 export { arbitrableTokenListDataShape }

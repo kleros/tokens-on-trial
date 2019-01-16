@@ -19,13 +19,24 @@ import storeApi from './api/store'
 export function* fetchArbitrableTokenListData() {
   const d = yield all({
     arbitrator: call(arbitrableTokenList.methods.arbitrator().call),
-    stake: call(arbitrableTokenList.methods.stake().call),
     challengeReward: call(arbitrableTokenList.methods.challengeReward().call),
-    timeToChallenge: call(arbitrableTokenList.methods.timeToChallenge().call),
-    countByStatus: call(arbitrableTokenList.methods.countByStatus().call),
+    challengePeriodDuration: call(
+      arbitrableTokenList.methods.challengePeriodDuration().call
+    ),
     arbitrationFeesWaitingTime: call(
       arbitrableTokenList.methods.arbitrationFeesWaitingTime().call
-    )
+    ),
+    governor: call(arbitrableTokenList.methods.governor().call),
+    winnerStakeMultiplier: call(
+      arbitrableTokenList.methods.winnerStakeMultiplier().call
+    ),
+    loserStakeMultiplier: call(
+      arbitrableTokenList.methods.loserStakeMultiplier().call
+    ),
+    sharedStakeMultiplier: call(
+      arbitrableTokenList.methods.sharedStakeMultiplier().call
+    ),
+    countByStatus: call(arbitrableTokenList.methods.countByStatus().call)
   })
 
   arbitrator.options.address = d.arbitrator
@@ -35,18 +46,21 @@ export function* fetchArbitrableTokenListData() {
 
   return {
     arbitrator: d.arbitrator,
+    governor: d.governor,
     challengeReward: Number(d.challengeReward),
-    stake: String(d.stake),
-    timeToChallenge: Number(d.timeToChallenge) * 1000,
+    challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
+    arbitrationFeesWaitingTime: Number(d.arbitrationFeesWaitingTime) * 1000,
+    arbitrationCost: Number(arbitrationCost),
+    winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
+    loserStakeMultiplier: Number(d.loserStakeMultiplier),
+    sharedStakeMultiplier: Number(d.sharedStakeMultiplier),
     countByStatus: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
         acc[value] = Number(d.countByStatus[value.toLowerCase()])
         return acc
       },
       {}
-    ),
-    arbitrationCost: String(arbitrationCost),
-    arbitrationFeesWaitingTime: Number(d.arbitrationFeesWaitingTime)
+    )
   }
 }
 
