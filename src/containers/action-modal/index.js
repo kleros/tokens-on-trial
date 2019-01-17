@@ -54,6 +54,7 @@ class ActionModal extends PureComponent {
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
     fundDispute: PropTypes.func.isRequired,
+    challengeRequest: PropTypes.func.isRequired,
     resubmitToken: PropTypes.func.isRequired,
     fundAppeal: PropTypes.func.isRequired
   }
@@ -107,29 +108,43 @@ class ActionModal extends PureComponent {
   }
 
   handleChallengeClick = () => {
-    const { fundDispute, token, arbitrableTokenListData } = this.props
-    const { latestRequest } = token.data
-    const { latestRound } = latestRequest
+    const { challengeRequest, token, arbitrableTokenListData } = this.props
 
     const value = web3.utils
-      .toBN(latestRequest.challengeReward)
-      .add(web3.utils.toBN(latestRound.requiredFeeStake))
+      .toBN(arbitrableTokenListData.data.challengeReward)
       .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
-    fundDispute({
+      .add(
+        web3.utils
+          .toBN(arbitrableTokenListData.data.arbitrationCost)
+          .mul(
+            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
+          )
+          .div(
+            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
+          )
+      )
+    challengeRequest({
       ID: token.data.ID,
-      value,
-      side: tokenConstants.SIDE.Challenger
+      value
     })
   }
 
   handleFundRequesterClick = () => {
     const { fundDispute, token, arbitrableTokenListData } = this.props
-    const { latestRequest } = token.data
-    const { latestRound } = latestRequest
 
     const value = web3.utils
-      .toBN(latestRound.requiredFeeStake)
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+      .toBN(arbitrableTokenListData.data.arbitrationCost)
+      .add(
+        web3.utils
+          .toBN(arbitrableTokenListData.data.arbitrationCost)
+          .mul(
+            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
+          )
+          .div(
+            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
+          )
+      )
+
     fundDispute({
       ID: token.data.ID,
       value,
@@ -333,6 +348,7 @@ export default connect(
     clearToken: tokenActions.clearToken,
     resubmitToken: tokenActions.resubmitToken,
     fundDispute: tokenActions.fundDispute,
+    challengeRequest: tokenActions.challengeRequest,
     submitTokenForm,
     submitEvidenceForm,
     fetchArbitrableTokenListData:

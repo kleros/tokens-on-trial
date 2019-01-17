@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
-import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 
@@ -12,8 +11,7 @@ import './fund-dispute.css'
 const FundDispute = ({
   arbitrableTokenListData,
   closeActionModal,
-  fundDispute,
-  token
+  fundDispute
 }) => (
   <div>
     <h3 className="Modal-title">
@@ -24,19 +22,30 @@ const FundDispute = ({
     <h5 className="Modal-subtitle">
       To defend your case, the following <br /> amount of ETH is required
     </h5>
-    <div className="FundDispute-cost">
-      <span>Fee Stake</span>
+    <div className="Challenge-cost">
+      <span>Arbitration Stake</span>
       <strong>
         {`${String(
           web3.utils.fromWei(
             String(
-              web3.utils.toBN(token.latestRequest.latestRound.requiredFeeStake)
+              web3.utils
+                .toBN(arbitrableTokenListData.data.arbitrationCost)
+                .mul(
+                  web3.utils.toBN(
+                    arbitrableTokenListData.data.sharedStakeMultiplier
+                  )
+                )
+                .div(
+                  web3.utils.toBN(
+                    arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                  )
+                )
             )
           )
         )} ETH`}
       </strong>
     </div>
-    <div className="FundDispute-cost">
+    <div className="Challenge-cost">
       <span>Required Arbitration Fee</span>
       <strong>
         {`${String(
@@ -57,9 +66,18 @@ const FundDispute = ({
             String(
               web3.utils
                 .toBN(
-                  web3.utils.toBN(
-                    token.latestRequest.latestRound.requiredFeeStake
-                  )
+                  web3.utils
+                    .toBN(arbitrableTokenListData.data.arbitrationCost)
+                    .mul(
+                      web3.utils.toBN(
+                        arbitrableTokenListData.data.sharedStakeMultiplier
+                      )
+                    )
+                    .div(
+                      web3.utils.toBN(
+                        arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                      )
+                    )
                 )
                 .add(
                   web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
@@ -93,7 +111,6 @@ FundDispute.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-  token: tokenSelectors.tokenShape.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,

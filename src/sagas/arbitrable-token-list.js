@@ -36,6 +36,9 @@ export function* fetchArbitrableTokenListData() {
     sharedStakeMultiplier: call(
       arbitrableTokenList.methods.sharedStakeMultiplier().call
     ),
+    MULTIPLIER_PRECISION: call(
+      arbitrableTokenList.methods.MULTIPLIER_PRECISION().call
+    ),
     countByStatus: call(arbitrableTokenList.methods.countByStatus().call)
   })
 
@@ -54,6 +57,7 @@ export function* fetchArbitrableTokenListData() {
     winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
     loserStakeMultiplier: Number(d.loserStakeMultiplier),
     sharedStakeMultiplier: Number(d.sharedStakeMultiplier),
+    MULTIPLIER_PRECISION: Number(d.MULTIPLIER_PRECISION),
     countByStatus: tokenConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
         acc[value] = Number(d.countByStatus[value.toLowerCase()])

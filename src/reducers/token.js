@@ -6,12 +6,20 @@ import * as tokenConstants from '../constants/token'
 // Common Shapes
 export const _tokenShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
+  ticker: PropTypes.string.isRequired,
+  symbolURI: PropTypes.string.isRequired,
+  networkID: PropTypes.string.isRequired,
   status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
-  lastAction: PropTypes.instanceOf(Date),
   latestRequest: PropTypes.shape({
     disputed: PropTypes.bool.isRequired,
     disputeID: PropTypes.string.isRequired,
+    submissionTime: PropTypes.number.isRequired,
+    challengerDepositTime: PropTypes.number.isRequired,
+    challengeRewardBalance: PropTypes.string.isRequired,
+    numberOfRounds: PropTypes.number.isRequired,
+    parties: PropTypes.arrayOf(PropTypes.string).isRequired,
     dispute: PropTypes.shape({
       arbitrated: PropTypes.string.isRequired,
       choices: PropTypes.string.isRequired,
@@ -19,18 +27,10 @@ export const _tokenShape = PropTypes.shape({
       ruling: PropTypes.string.isRequired,
       status: PropTypes.string.isRequired
     }),
-    firstContributionTime: PropTypes.number.isRequired,
-    arbitrationFeesWaitingTime: PropTypes.number.isRequired,
-    timeToChallenge: PropTypes.number.isRequired,
-    challengeRewardBalance: PropTypes.string.isRequired,
-    challengeReward: PropTypes.string.isRequired,
-    parties: PropTypes.arrayOf(PropTypes.string).isRequired,
-    appealed: PropTypes.bool.isRequired,
     latestRound: PropTypes.shape({
-      ruling: PropTypes.oneOf(tokenConstants.RULING_OPTIONS.indexes).isRequired,
-      requiredFeeStake: PropTypes.number.isRequired,
-      paidFees: PropTypes.arrayOf(PropTypes.number).isRequired,
-      loserFullyFunded: PropTypes.bool.isRequired
+      appealed: PropTypes.bool.isRequired,
+      requiredForSide: PropTypes.arrayOf(PropTypes.number).isRequired,
+      paidFees: PropTypes.arrayOf(PropTypes.number).isRequired
     })
   }).isRequired
 })

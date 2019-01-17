@@ -10,15 +10,13 @@ import * as tokenConstants from '../constants/token'
 import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
 import * as errorConstants from '../constants/error'
 
-import storeApi from './api/store'
-
 // Converts token string data to correct js types.
 const convertFromString = token => {
   const { latestRequest } = token
-  latestRequest.submissionTime = Number(latestRequest.submissionTime)
-  latestRequest.challengerDepositTime = Number(
-    latestRequest.challengerDepositTime
-  )
+  latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
+  latestRequest.challengerDepositTime =
+    Number(latestRequest.challengerDepositTime) * 1000
+  latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
 
   const { latestRound } = latestRequest
   latestRound.ruling = Number(latestRound.ruling)
@@ -161,10 +159,7 @@ export function* fetchToken({ payload: { ID } }) {
     clientStatus: contractStatusToClientStatus(
       token.status,
       token.latestRequest.disputed
-    ),
-    lastAction: token.lastAction
-      ? new Date(Number(token.lastAction * 1000))
-      : null
+    )
   }
 }
 
@@ -182,16 +177,17 @@ function* requestStatusChange({ payload: { token } }) {
     name: token.name,
     ticker: token.ticker,
     addr: web3.utils.toChecksumAddress(token.addr),
-    URI: token.URI
+    symbolURI: token.symbolURI,
+    networkID: 'ETH'
   }
 
-  const { name, ticker, URI } = tokenToSubmit
+  const { name, ticker, addr, networkID, symbolURI } = tokenToSubmit
 
-  if (isInvalid(name) || isInvalid(ticker) || isInvalid(URI))
+  if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolURI))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  yield call(storeApi.postJSONFile, tokenToSubmit)
-  const ID = web3.utils.keccak256(JSON.stringify(tokenToSubmit))
+  const ID = web3.utils.soliditySha3(name, ticker, addr, symbolURI, networkID)
+
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
   if (
@@ -204,10 +200,11 @@ function* requestStatusChange({ payload: { token } }) {
 
   yield call(
     arbitrableTokenList.methods.requestStatusChange(
-      ID,
       tokenToSubmit.name,
       tokenToSubmit.ticker,
-      tokenToSubmit.addr
+      tokenToSubmit.addr,
+      tokenToSubmit.symbolURI,
+      tokenToSubmit.networkID
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
@@ -219,7 +216,26 @@ function* requestStatusChange({ payload: { token } }) {
 }
 
 /**
- * Fund a side of a dispute
+ * Challenge request.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* challengeRequest({ payload: { ID, value } }) {
+  // Add to contract if absent
+  const token = yield call(fetchToken, { payload: { ID } })
+  if (!hasPendingRequest(token))
+    throw new Error(errorConstants.NO_PENDING_REQUEST)
+
+  yield call(arbitrableTokenList.methods.challengeRequest(ID).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Fund a side of a dispute.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
@@ -229,17 +245,10 @@ function* fundDispute({ payload: { ID, value, side } }) {
   if (!hasPendingRequest(token))
     throw new Error(errorConstants.NO_PENDING_REQUEST)
 
-  if (side === tokenConstants.SIDE.Requester)
-    yield call(arbitrableTokenList.methods.fundRequester(ID).send, {
-      from: yield select(walletSelectors.getAccount),
-      value
-    })
-  else if (side === tokenConstants.SIDE.Challenger)
-    yield call(arbitrableTokenList.methods.fundChallenger(ID).send, {
-      from: yield select(walletSelectors.getAccount),
-      value
-    })
-  else throw new Error(errorConstants.INVALID_SIDE)
+  yield call(arbitrableTokenList.methods.fundLatestRound(ID, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
 
   return yield call(fetchToken, { payload: { ID } })
 }
@@ -269,7 +278,7 @@ function* fundAppeal({ payload: { ID, losingSide, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* executeRequest({ payload: { ID } }) {
+function* timeout({ payload: { ID } }) {
   const status = Number((yield call(fetchToken, { payload: { ID } })).status)
   if (
     status !== tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
@@ -277,7 +286,7 @@ function* executeRequest({ payload: { ID } }) {
   )
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 
-  yield call(arbitrableTokenList.methods.executeRequest(ID).send, {
+  yield call(arbitrableTokenList.methods.timeout(ID).send, {
     from: yield select(walletSelectors.getAccount)
   })
 
@@ -371,7 +380,7 @@ export default function* tokenSaga() {
     lessduxSaga,
     updateTokensCollectionModFlow,
     tokenActions.token,
-    executeRequest
+    timeout
   )
   yield takeLatest(
     tokenActions.token.FUND_DISPUTE,
@@ -393,5 +402,12 @@ export default function* tokenSaga() {
     updateTokensCollectionModFlow,
     tokenActions.token,
     fundAppeal
+  )
+  yield takeLatest(
+    tokenActions.token.CHALLENGE_REQUEST,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    challengeRequest
   )
 }

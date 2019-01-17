@@ -15,7 +15,8 @@ export const token = {
   RESUBMIT: 'RESUBMIT',
   STATUS_CHANGE: 'STATUS_CHANGE',
   FUND_APPEAL: 'FUND_APPEAL',
-  FEES_TIMEOUT: 'FEES_TIMEOUT'
+  FEES_TIMEOUT: 'FEES_TIMEOUT',
+  CHALLENGE_REQUEST: 'CHALLENGE_REQUEST'
 }
 
 /* Action Creators */
@@ -37,6 +38,10 @@ export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,
   payload: { ID, value, side }
 })
+export const challengeRequest = ({ ID, value }) => ({
+  type: token.CHALLENGE_REQUEST,
+  payload: { ID, value }
+})
 export const fetchTokens = (
   cursor,
   count,
@@ -47,7 +52,7 @@ export const fetchTokens = (
   type: tokens.FETCH,
   payload: { cursor, count, filterValue, sortValue, requestedPage }
 })
-export const executeRequest = ID => ({
+export const timeout = ID => ({
   type: token.EXECUTE,
   payload: { ID }
 })

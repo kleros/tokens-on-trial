@@ -46,7 +46,7 @@ class TokenDetails extends PureComponent {
     }),
 
     // Functions
-    executeRequest: PropTypes.func.isRequired,
+    timeout: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
     feesTimeout: PropTypes.func.isRequired,
@@ -78,9 +78,9 @@ class TokenDetails extends PureComponent {
   }
 
   handleExecuteRequestClick = () => {
-    const { match, executeRequest } = this.props
+    const { match, timeout } = this.props
     const { tokenID } = match.params
-    executeRequest(tokenID)
+    timeout(tokenID)
   }
 
   handleFeesTimeoutClick = () => {
@@ -101,7 +101,6 @@ class TokenDetails extends PureComponent {
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
-    const lastAction = Number(token.lastAction) / 1000 // convert from milliseconds
     let method
     let disabled = true
     let label = 'Loading...'
@@ -115,12 +114,14 @@ class TokenDetails extends PureComponent {
         </Button>
       )
 
-    const timeToChallenge = Number(arbitrableTokenListData.data.timeToChallenge)
+    const challengePeriodDuration = Number(
+      arbitrableTokenListData.data.challengePeriodDuration
+    )
     const arbitrationFeesWaitingTime = Number(
       arbitrableTokenListData.data.arbitrationFeesWaitingTime
     )
     const { latestRequest } = token
-    const { latestRound, firstContributionTime } = latestRequest
+    const { latestRound, challengerDepositTime } = latestRequest
     const submitterFees = latestRound.paidFees[tokenConstants.SIDE.Requester]
     const challengerFees = latestRound.paidFees[tokenConstants.SIDE.Challenger]
 
@@ -176,7 +177,7 @@ class TokenDetails extends PureComponent {
         }
       } else if (
         (submitterFees > 0 || challengerFees > 0) &&
-        timestamp > firstContributionTime + arbitrationFeesWaitingTime
+        timestamp > challengerDepositTime + arbitrationFeesWaitingTime
       ) {
         icon = 'gavel'
         disabled = false
@@ -184,7 +185,7 @@ class TokenDetails extends PureComponent {
         if (submitterFees > challengerFees) label = 'Timeout Challenger'
         else label = 'Timeout Submitter'
       } else if (
-        timestamp >= lastAction + timeToChallenge ||
+        timestamp >= latestRequest.submissionTime + challengePeriodDuration ||
         (countdown && countdown.getTime && countdown.getTime() === 0)
       ) {
         method = this.handleExecuteRequestClick
@@ -192,8 +193,8 @@ class TokenDetails extends PureComponent {
         disabled = false
         label = 'Execute Request'
       } else if (
-        firstContributionTime > 0 &&
-        timestamp - firstContributionTime < arbitrationFeesWaitingTime
+        challengerDepositTime > 0 &&
+        timestamp - challengerDepositTime < arbitrationFeesWaitingTime
       ) {
         icon = 'gavel'
         label = 'Pay Arbitration Fees'
@@ -306,10 +307,9 @@ class TokenDetails extends PureComponent {
       // Set timer once we have data.
       web3.eth.getBlock('latest', (err, block) => {
         if (err) throw new Error(err)
-
         let time =
-          Number(token.lastAction) +
-          Number(arbitrableTokenListData.data.timeToChallenge) -
+          token.latestRequest.submissionTime +
+          arbitrableTokenListData.data.challengePeriodDuration -
           block.timestamp * 1000
         time = time >= 0 ? time : 0
         this.setState({
@@ -350,7 +350,7 @@ class TokenDetails extends PureComponent {
           handleFilterChange={this.handleFilterChange}
         />
         <div className="TokenDetails">
-          <Img className="TokenDetails-img" src={token.URI} />
+          <Img className="TokenDetails-img" src={token.symbolURI} />
           <div className="TokenDetails-card">
             <div className="TokenDetails-label">
               <span className="TokenDetails-label-name">{token.name}</span>
@@ -460,7 +460,7 @@ export default connect(
   }),
   {
     fetchToken: tokenActions.fetchToken,
-    executeRequest: tokenActions.executeRequest,
+    timeout: tokenActions.timeout,
     openActionModal: modalActions.openActionModal,
     feesTimeout: tokenActions.feesTimeout,
     toggleFilter: filterActions.toggleFilter

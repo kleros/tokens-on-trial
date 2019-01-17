@@ -18,7 +18,7 @@ export const {
     type: 'text',
     validate: [required]
   },
-  URI: {
+  symbolURI: {
     type: 'text',
     validate: [required]
   }
