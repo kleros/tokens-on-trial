@@ -350,7 +350,12 @@ class TokenDetails extends PureComponent {
           handleFilterChange={this.handleFilterChange}
         />
         <div className="TokenDetails">
-          <Img className="TokenDetails-img" src={token.symbolMultihash} />
+          <Img
+            className="TokenDetails-img"
+            src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+              token.symbolMultihash
+            }`}
+          />
           <div className="TokenDetails-card">
             <div className="TokenDetails-label">
               <span className="TokenDetails-label-name">{token.name}</span>

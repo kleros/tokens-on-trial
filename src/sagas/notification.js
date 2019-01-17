@@ -37,21 +37,21 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
 
-    if (notifiedIDs[event.returnValues.tokenID]) continue
-    const isRequester = account === event.returnValues.requester
-    if (!isRequester && account !== event.returnValues.challenger) continue
+    if (notifiedIDs[event.returnValues._tokenID]) continue
+    const isRequester = account === event.returnValues._requester
+    if (!isRequester && account !== event.returnValues._challenger) continue
 
     let message
-    switch (Number(returnValues.status)) {
+    switch (Number(returnValues._status)) {
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested:
-        if (returnValues.disputed === true && isRequester)
+        if (returnValues._disputed === true && isRequester)
           message = 'Your request has been challenged.'
-        else if (returnValues.disputed === false)
+        else if (returnValues._disputed === false)
           oldestNonDisputedSubmittedStatusEvent = event
         break
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered:
-        if (returnValues.disputed === false)
+        if (returnValues._disputed === false)
           message = `${
             isRequester
               ? 'Your registration request'
@@ -59,7 +59,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
           } has been executed.`
         break
       case tokenConstants.IN_CONTRACT_STATUS_ENUM.Absent:
-        if (returnValues.disputed === false)
+        if (returnValues._disputed === false)
           message = `${
             isRequester
               ? 'Your clearing request'
@@ -71,15 +71,22 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     }
 
     const clientStatus = contractStatusToClientStatus(
-      returnValues.status,
-      returnValues.disputed
+      returnValues._status,
+      returnValues._disputed
     )
 
     if (message) {
-      notifiedIDs[returnValues.tokenID] =
-        returnValues.disputed === true ? 'disputed' : true
+      notifiedIDs[returnValues._tokenID] =
+        returnValues._disputed === true &&
+        returnValues._status ===
+          tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
+        returnValues._status ===
+          tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
+          ? 'disputed'
+          : true
+
       emitter({
-        ID: returnValues.tokenID,
+        ID: returnValues._tokenID,
         date: await getBlockDate(event.blockHash),
         message,
         clientStatus
@@ -89,7 +96,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
 
   if (
     oldestNonDisputedSubmittedStatusEvent &&
-    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.returnValues.tokenID] !==
+    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID] !==
       'disputed'
   ) {
     const date = await getBlockDate(
@@ -97,7 +104,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     )
     if (Date.now() - date > timeToChallenge)
       emitter({
-        ID: oldestNonDisputedSubmittedStatusEvent.returnValues.tokenID,
+        ID: oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID,
         date,
         message: 'Token pending execution.'
       })
@@ -138,7 +145,7 @@ function* pushNotificationsListener() {
         })
       arbitrableTokenList.events.TokenStatusChange().on('data', event => {
         emitNotifications(account, timeToChallenge, emitter, [event])
-        emitter(event.returnValues.tokenID)
+        emitter(event.returnValues._tokenID)
       })
       return () => {} // Unsubscribe function
     })

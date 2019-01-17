@@ -43,4 +43,4 @@ export const getSubmitCost = state =>
 
 export const getTimeToChallenge = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&
-  state.arbitrableTokenList.arbitrableTokenListData.data.timeToChallenge
+  state.arbitrableTokenList.arbitrableTokenListData.data.challengePeriodDuration
