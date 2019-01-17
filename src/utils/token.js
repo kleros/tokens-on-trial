@@ -18,16 +18,14 @@ export const isRegistrationRequest = tokenStatus =>
   tokenStatus ===
   tokenConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']
 
-export const contractStatusToClientStatus = (status, disputed) => {
-  if (disputed) return tokenConstants.STATUS_ENUM.Challenged
+export const contractStatusToClientStatus = (status, disputed, resolved) => {
+  if (disputed && !resolved) return tokenConstants.STATUS_ENUM.Challenged
   switch (tokenConstants.IN_CONTRACT_STATUS_ENUM[status]) {
     case 'RegistrationRequested':
     case 'ClearingRequested':
       return tokenConstants.STATUS_ENUM.Pending
     case 'Registered':
       return tokenConstants.STATUS_ENUM.Registered
-    case 'Cleared':
-      return tokenConstants.STATUS_ENUM.Cleared
     case 'Absent':
       return tokenConstants.STATUS_ENUM.Absent
     default:

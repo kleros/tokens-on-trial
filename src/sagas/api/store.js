@@ -36,10 +36,6 @@ const storeApi = {
       .then(data => data)
   },
   postEncodedFile(file, fileName, contentType) {
-    console.info({
-      fileName: `${fileName}`,
-      base64EncodedData: file
-    })
     return fetch(FILE_UPLOAD_URL, {
       method: 'POST',
       headers: {

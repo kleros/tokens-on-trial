@@ -17,9 +17,5 @@ export const {
   ticker: {
     type: 'text',
     validate: [required]
-  },
-  symbolURI: {
-    type: 'text',
-    validate: [required]
   }
 })

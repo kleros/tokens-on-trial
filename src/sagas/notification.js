@@ -58,7 +58,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
               : 'A registration request you challenged'
           } has been executed.`
         break
-      case tokenConstants.IN_CONTRACT_STATUS_ENUM.Cleared:
+      case tokenConstants.IN_CONTRACT_STATUS_ENUM.Absent:
         if (returnValues.disputed === false)
           message = `${
             isRequester

@@ -350,7 +350,7 @@ class TokenDetails extends PureComponent {
           handleFilterChange={this.handleFilterChange}
         />
         <div className="TokenDetails">
-          <Img className="TokenDetails-img" src={token.symbolURI} />
+          <Img className="TokenDetails-img" src={token.symbolMultihash} />
           <div className="TokenDetails-card">
             <div className="TokenDetails-label">
               <span className="TokenDetails-label-name">{token.name}</span>

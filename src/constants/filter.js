@@ -5,7 +5,7 @@ export const FILTER_OPTIONS_ENUM = createEnum([
   'Registered',
   'Registration Requests',
   'Challenged Registration Requests',
-  'Cleared',
+  'Absent',
   'Clearing Requests',
   'Challenged Clearing Requests',
   'My Submissions',

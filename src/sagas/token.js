@@ -1,7 +1,14 @@
+import * as mime from 'mime-types'
+
 import { takeLatest, call, select, all } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import { arbitrableTokenList, arbitrator, web3 } from '../bootstrap/dapp-api'
+import {
+  arbitrableTokenList,
+  arbitrator,
+  web3,
+  archon
+} from '../bootstrap/dapp-api'
 import { hasPendingRequest, contractStatusToClientStatus } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
@@ -9,6 +16,8 @@ import * as walletSelectors from '../reducers/wallet'
 import * as tokenConstants from '../constants/token'
 import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
 import * as errorConstants from '../constants/error'
+
+import storeApi from './api/store'
 
 // Converts token string data to correct js types.
 const convertFromString = token => {
@@ -158,7 +167,8 @@ export function* fetchToken({ payload: { ID } }) {
     status: Number(token.status),
     clientStatus: contractStatusToClientStatus(
       token.status,
-      token.latestRequest.disputed
+      token.latestRequest.disputed,
+      token.latestRequest.resolved
     )
   }
 }
@@ -168,25 +178,39 @@ export function* fetchToken({ payload: { ID } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* requestStatusChange({ payload: { token } }) {
+function* requestStatusChange({ payload: { token, file, fileData } }) {
   if (isInvalid(token.addr))
     throw new Error('Missing address on token submit', token)
 
-  // Upload token
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
     addr: web3.utils.toChecksumAddress(token.addr),
-    symbolURI: token.symbolURI,
+    symbolMultihash: token.symbolMultihash,
     networkID: 'ETH'
   }
 
-  const { name, ticker, addr, networkID, symbolURI } = tokenToSubmit
+  if (file && fileData) {
+    /* eslint-disable unicorn/number-literal-case */
+    const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
+    const fileTypeExtension = file.name.split('.')[1]
+    const mimeType = mime.lookup(fileTypeExtension)
+    yield call(storeApi.postEncodedFile, fileData, fileMultihash, mimeType)
+    tokenToSubmit.symbolMultihash = fileMultihash
+  }
 
-  if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolURI))
+  const { name, ticker, addr, networkID, symbolMultihash } = tokenToSubmit
+
+  if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = web3.utils.soliditySha3(name, ticker, addr, symbolURI, networkID)
+  const ID = web3.utils.soliditySha3(
+    name,
+    ticker,
+    addr,
+    symbolMultihash,
+    networkID
+  )
 
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
@@ -203,7 +227,7 @@ function* requestStatusChange({ payload: { token } }) {
       tokenToSubmit.name,
       tokenToSubmit.ticker,
       tokenToSubmit.addr,
-      tokenToSubmit.symbolURI,
+      tokenToSubmit.symbolMultihash,
       tokenToSubmit.networkID
     ).send,
     {
@@ -212,7 +236,10 @@ function* requestStatusChange({ payload: { token } }) {
     }
   )
 
-  return yield call(fetchToken, { payload: { ID } })
+  return yield call(fetchToken, {
+    payload:
+      '0x5cd5899f8d5a646dbf403e4a20dc32dab37c7835ef06fbfcb2dbd0a3da19db08'
+  })
 }
 
 /**
@@ -258,17 +285,11 @@ function* fundDispute({ payload: { ID, value, side } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* fundAppeal({ payload: { ID, losingSide, value } }) {
-  if (losingSide)
-    yield call(arbitrableTokenList.methods.fundAppealLosingSide(ID).send, {
-      from: yield select(walletSelectors.getAccount),
-      value
-    })
-  else
-    yield call(arbitrableTokenList.methods.fundAppealWinningSide(ID).send, {
-      from: yield select(walletSelectors.getAccount),
-      value
-    })
+function* fundAppeal({ payload: { ID, side, value } }) {
+  yield call(arbitrableTokenList.methods.fundLatestRound(ID, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
 
   return yield call(fetchToken, { payload: { ID } })
 }
@@ -294,12 +315,12 @@ function* timeout({ payload: { ID } }) {
 }
 
 /**
- * Execute a request for a token.
+ * Timeout challenger.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* feeTimeout({ payload: { token } }) {
-  yield call(arbitrableTokenList.methods.feeTimeoutFirstRound(token.ID).send, {
+  yield call(arbitrableTokenList.methods.timeout(token.ID).send, {
     from: yield select(walletSelectors.getAccount)
   })
 

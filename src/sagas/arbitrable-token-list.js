@@ -115,8 +115,6 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
     evidenceJSONHash
   )).payload.fileURL
 
-  console.info('evidenceJSONURL', evidenceJSONURL)
-
   yield call(
     arbitrableTokenList.methods.submitEvidence(ID, evidenceJSONURL).send,
     {

@@ -13,7 +13,7 @@ const filterShape = PropTypes.shape({
     Registered: PropTypes.bool.isRequired,
     'Registration Requests': PropTypes.bool.isRequired,
     'Challenged Registration Requests': PropTypes.bool.isRequired,
-    Cleared: PropTypes.bool.isRequired,
+    Absent: PropTypes.bool.isRequired,
     'Clearing Requests': PropTypes.bool.isRequired,
     'Challenged Clearing Requests': PropTypes.bool.isRequired,
     'My Submissions': PropTypes.bool.isRequired,

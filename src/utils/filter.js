@@ -8,10 +8,14 @@ export const defaultFilter = () => {
   const filter = filterConstants.FILTER_OPTIONS_ENUM.values.reduce(
     (acc, curr) => ({
       ...acc,
-      [curr]: true
+      [curr]: false
     }),
     {}
   )
+  filter['Registered'] = true
+  filter['Registration Requests'] = true
+  filter['Clearing Requests'] = true
+
   return filter
 }
 
@@ -23,7 +27,7 @@ export const defaultFilter = () => {
 export const filterToContractParam = filter => {
   const filterValues = new Array(8).fill(false)
 
-  if (filter['Cleared']) filterValues[0] = true
+  if (filter['Absent']) filterValues[0] = true
   if (filter['Registered']) filterValues[1] = true
   if (filter['Registration Requests']) filterValues[2] = true
   if (filter['Clearing Requests']) filterValues[3] = true

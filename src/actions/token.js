@@ -22,13 +22,13 @@ export const token = {
 /* Action Creators */
 
 // Token
-export const requestStatusChange = ({ tokenData }) => ({
+export const requestStatusChange = ({ tokenData, file, fileData }) => ({
   type: token.STATUS_CHANGE,
-  payload: { token: tokenData }
+  payload: { token: tokenData, file, fileData }
 })
-export const createToken = ({ tokenData }) => ({
+export const createToken = ({ tokenData, file, fileData }) => ({
   type: token.CREATE,
-  payload: { token: tokenData }
+  payload: { token: tokenData, file, fileData }
 })
 export const clearToken = ({ tokenData }) => ({
   type: token.CLEAR,
@@ -60,9 +60,9 @@ export const fetchToken = ID => ({
   type: token.FETCH,
   payload: { ID }
 })
-export const fundAppeal = (ID, losingSide, value) => ({
+export const fundAppeal = (ID, side, value) => ({
   type: token.FUND_APPEAL,
-  payload: { ID, losingSide, value }
+  payload: { ID, side, value }
 })
 export const feesTimeout = tokenData => ({
   type: token.FEES_TIMEOUT,

@@ -3,12 +3,19 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as tokenSelectors from '../../../../reducers/token'
+import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 
 import './appeal.css'
 
-const Appeal = ({ closeActionModal, fundAppeal, token, losingSide }) => (
+const Appeal = ({
+  closeActionModal,
+  fundAppeal,
+  token,
+  losingSide,
+  arbitrableTokenListData
+}) => (
   <div>
     <h3 className="Modal-title">
       <FontAwesomeIcon icon="gavel" className="Appeal-icon" />
@@ -27,39 +34,50 @@ const Appeal = ({ closeActionModal, fundAppeal, token, losingSide }) => (
     <div className="Appeal-cost">
       <span>Arbitration Stake</span>
       <strong>
-        {`${losingSide ? `2 * ` : ``}${String(
+        {`${String(
           web3.utils.fromWei(
-            String(
-              web3.utils.toBN(token.latestRequest.latestRound.requiredFeeStake)
-            )
+            web3.utils
+              .toBN(arbitrableTokenListData.data.arbitrationCost)
+              .mul(
+                web3.utils.toBN(
+                  losingSide
+                    ? arbitrableTokenListData.data.loserStakeMultiplier
+                    : arbitrableTokenListData.data.winnerStakeMultiplier
+                )
+              )
+              .div(
+                web3.utils.toBN(
+                  arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                )
+              )
           )
-        )} ETH`}
+        )} ETH `}
       </strong>
     </div>
     <br />
     <div className="Appeal-cost">
       <span>Total Due:</span>
       <strong className="Appeal-total-value">
-        {losingSide
-          ? `${String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(token.latestRequest.latestRound.requiredFeeStake)
-                    .mul(web3.utils.toBN(2))
-                    .add(web3.utils.toBN(token.latestRequest.appealCost))
+        {`${String(
+          web3.utils.fromWei(
+            web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost).add(
+              web3.utils
+                .toBN(arbitrableTokenListData.data.arbitrationCost)
+                .mul(
+                  web3.utils.toBN(
+                    losingSide
+                      ? arbitrableTokenListData.data.loserStakeMultiplier
+                      : arbitrableTokenListData.data.winnerStakeMultiplier
+                  )
                 )
-              )
-            )} ETH`
-          : `${String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(token.latestRequest.latestRound.requiredFeeStake)
-                    .add(web3.utils.toBN(token.latestRequest.appealCost))
+                .div(
+                  web3.utils.toBN(
+                    arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                  )
                 )
-              )
-            )} ETH`}
+            )
+          )
+        )} ETH `}
       </strong>
     </div>
     <br />
@@ -82,6 +100,8 @@ Appeal.propTypes = {
   // State
   token: tokenSelectors.tokenShape.isRequired,
   losingSide: PropTypes.bool.isRequired,
+  arbitrableTokenListData:
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,

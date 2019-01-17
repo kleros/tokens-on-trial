@@ -67,9 +67,11 @@ class ActionModal extends PureComponent {
 
   state = { file: null, fileInfoMessage: null }
 
-  handleSubmitTokenClick = token => {
+  handleSubmitTokenClick = async token => {
     const { createToken } = this.props
-    createToken({ tokenData: token })
+    const { file } = this.state
+    const fileData = (await asyncReadFile(file))[0]
+    createToken({ tokenData: token, fileData, file })
   }
 
   handleResubmitTokenClick = () => {
@@ -83,10 +85,10 @@ class ActionModal extends PureComponent {
   }
 
   handleOnFileDropAccepted = async ([file]) => {
-    if (file.size > 15e6)
+    if (file.size > 5e6)
       return this.setState({
         file: null,
-        fileInfoMessage: 'File is too big. It must be less than 15MB.'
+        fileInfoMessage: 'File is too big. It must be less than 5MB.'
       })
 
     this.setState({
@@ -169,10 +171,9 @@ class ActionModal extends PureComponent {
   }
 
   handleFundAppealClick = () => {
-    const { fundAppeal, token, accounts } = this.props
+    const { fundAppeal, token, accounts, arbitrableTokenListData } = this.props
     const tokenData = token.data
     const { latestRequest } = tokenData
-    const { latestRound } = latestRequest
 
     const userAccount = accounts.data[0]
     let losingSide = false
@@ -189,20 +190,29 @@ class ActionModal extends PureComponent {
     )
       losingSide = true
 
-    const value = losingSide
-      ? String(
-          web3.utils
-            .toBN(latestRound.requiredFeeStake)
-            .mul(web3.utils.toBN(2))
-            .add(web3.utils.toBN(latestRequest.appealCost))
-        )
-      : String(
-          web3.utils
-            .toBN(latestRound.requiredFeeStake)
-            .add(web3.utils.toBN(latestRequest.appealCost))
-        )
+    const value = web3.utils
+      .toBN(arbitrableTokenListData.data.arbitrationCost)
+      .add(
+        web3.utils
+          .toBN(arbitrableTokenListData.data.arbitrationCost)
+          .mul(
+            web3.utils.toBN(
+              losingSide
+                ? arbitrableTokenListData.data.loserStakeMultiplier
+                : arbitrableTokenListData.data.winnerStakeMultiplier
+            )
+          )
+          .div(
+            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
+          )
+      )
 
-    fundAppeal(tokenData.ID, losingSide, value)
+    const side =
+      userAccount === latestRequest.parties[tokenConstants.SIDE.Challenger]
+        ? tokenConstants.SIDE.Challenger
+        : tokenConstants.SIDE.Requester
+
+    fundAppeal(tokenData.ID, side, value)
   }
 
   componentDidMount() {
@@ -241,6 +251,9 @@ class ActionModal extends PureComponent {
                   submitTokenForm={submitTokenForm}
                   submitToken={this.handleSubmitTokenClick}
                   tokenFormIsInvalid={tokenFormIsInvalid}
+                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  fileInfoMessage={fileInfoMessage}
+                  file={file}
                 />
               )
             case modalConstants.ACTION_MODAL_ENUM.Clear:

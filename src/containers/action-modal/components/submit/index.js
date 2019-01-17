@@ -5,6 +5,7 @@ import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-t
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
+import FilePicker from '../../../../components/file-picker'
 
 import './submit.css'
 
@@ -13,13 +14,29 @@ const Submit = ({
   closeActionModal,
   submitToken,
   tokenFormIsInvalid,
-  submitTokenForm
+  submitTokenForm,
+  file,
+  fileInfoMessage,
+  handleOnFileDropAccepted
 }) => (
   <div>
     <h3 className="Modal-title">Submit a Token</h3>
     <hr />
     <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
     <TokenForm className="Submit-form" onSubmit={submitToken} />
+    <FilePicker
+      multiple={false}
+      onDropAccepted={handleOnFileDropAccepted}
+      file={file}
+      message={
+        <span>
+          (Max Size: 15MB)
+          <br />
+          Drag file here or
+        </span>
+      }
+    />
+    {fileInfoMessage && <div>{fileInfoMessage}</div>}
     <div className="Submit-stake">
       <h4>
         <strong>Stake:</strong>
@@ -47,7 +64,7 @@ const Submit = ({
         className="Submit-request"
         type="primary"
         onClick={submitTokenForm}
-        disabled={tokenFormIsInvalid}
+        disabled={tokenFormIsInvalid || !file}
       >
         Request Registration
       </Button>
@@ -57,12 +74,15 @@ const Submit = ({
 
 Submit.propTypes = {
   // State
+  file: PropTypes.shape({}).isRequired,
+  fileInfoMessage: PropTypes.string.isRequired,
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   submitToken: PropTypes.func.isRequired,
+  handleOnFileDropAccepted: PropTypes.func.isRequired,
 
   // Token Form
   tokenFormIsInvalid: PropTypes.bool.isRequired,

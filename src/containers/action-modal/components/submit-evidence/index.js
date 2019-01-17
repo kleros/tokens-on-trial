@@ -26,7 +26,7 @@ const SubmitEvidence = ({
       file={file}
       message={
         <span>
-          (Max Size: 15MB)
+          (Max Size: 5MB)
           <br />
           Drag file here or
         </span>

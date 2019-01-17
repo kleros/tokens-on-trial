@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { pushRotate as ReactBurgerMenu } from 'react-burger-menu'
-import debounce from 'debounce'
 
 import logo from '../../assets/images/kleros-logo.png'
 
@@ -23,19 +22,6 @@ export default class NavBar extends PureComponent {
   state = {
     isMobile: document.body.clientWidth < 780
   }
-
-  constructor(props) {
-    super(props)
-    window.addEventListener('resize', this.handleWindowResize)
-  }
-
-  componentWillUnmount() {
-    window.removeEventListener('resize', this.handleWindowResize)
-  }
-
-  handleWindowResize = debounce(({ currentTarget: { innerWidth } }) =>
-    this.setState({ isMobile: innerWidth < 780 })
-  )
 
   render() {
     const { routes, extras } = this.props

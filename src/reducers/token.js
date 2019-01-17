@@ -8,7 +8,7 @@ export const _tokenShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
   name: PropTypes.string.isRequired,
   ticker: PropTypes.string.isRequired,
-  symbolURI: PropTypes.string.isRequired,
+  symbolMultihash: PropTypes.string.isRequired,
   networkID: PropTypes.string.isRequired,
   status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,

@@ -28,7 +28,9 @@ const TokenCard = ({ token }) => (
     </div>
     <Link className="TokenCard-content" to={`/token/${token.ID}`}>
       <Img
-        src={token.symbolURI}
+        src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+          token.symbolMultihash
+        }`}
         alt={`Token List Submission`}
         className="TokenCard-image"
       />
@@ -44,7 +46,7 @@ const TokenCard = ({ token }) => (
 TokenCard.propTypes = {
   token: PropTypes.shape({
     name: PropTypes.string.isRequired,
-    symbolURI: PropTypes.string.isRequired,
+    symbolMultihash: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     addr: PropTypes.string.isRequired,
     status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
