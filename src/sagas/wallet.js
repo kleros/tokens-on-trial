@@ -1,4 +1,4 @@
-import { takeLatest, select, call } from 'redux-saga/effects'
+import { call, select, takeLatest } from 'redux-saga/effects'
 
 import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'

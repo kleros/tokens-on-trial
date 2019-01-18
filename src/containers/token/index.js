@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 import * as mime from 'mime-types'
 
-import { web3, arbitrableTokenList, arbitrator } from '../../bootstrap/dapp-api'
+import { arbitrableTokenList, arbitrator, web3 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import FilterBar from '../filter-bar'
@@ -19,7 +19,6 @@ import * as modalConstants from '../../constants/modal'
 import * as tokenConstants from '../../constants/token'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
-
 import './token.css'
 
 // Truncate with ellipsis in the middle.
@@ -108,8 +107,8 @@ class TokenDetails extends PureComponent {
 
     if (!token || !arbitrableTokenListData.data)
       return (
-        <Button type="primary" disabled={disabled}>
-          <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
+        <Button disabled={disabled} type="primary">
+          <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
           {label}
         </Button>
       )
@@ -255,8 +254,8 @@ class TokenDetails extends PureComponent {
     }
 
     return (
-      <Button type="primary" onClick={method} disabled={disabled}>
-        <FontAwesomeIcon icon={icon} className="TokenDetails-icon" />
+      <Button disabled={disabled} onClick={method} type="primary">
+        <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
         {label}
       </Button>
     )
@@ -426,15 +425,15 @@ class TokenDetails extends PureComponent {
               <div className="TokenDescription-evidence--list">
                 {evidences.map(evidence => (
                   <div
+                    className="TokenDescription-evidence--item"
                     key={evidence.fileHash}
                     onClick={this.handleViewEvidenceClick(evidence)}
-                    className="TokenDescription-evidence--item"
                   >
                     <FontAwesomeIcon icon={evidence.icon} size="2x" />
                   </div>
                 ))}
               </div>
-              <Button type="secondary" onClick={this.handleOpenEvidenceModal}>
+              <Button onClick={this.handleOpenEvidenceModal} type="secondary">
                 Submit Evidence
               </Button>
             </div>

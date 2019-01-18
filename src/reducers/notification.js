@@ -26,7 +26,7 @@ export { notificationsShape, notificationShape }
 
 // Reducer
 const cachedNotifications = localStorage.getItem(
-  arbitrableTokenList.options.address + 'notifications'
+  `${arbitrableTokenList.options.address}notifications`
 )
 export default createReducer({
   notifications: {

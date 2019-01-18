@@ -13,7 +13,6 @@ import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { filterToContractParam } from '../../utils/filter'
-
 import './tokens.css'
 
 const TOKENS_PER_PAGE = 5
@@ -118,7 +117,7 @@ class Tokens extends Component {
     }
 
     return (
-      <div ref={this.ref} className="Page">
+      <div className="Page" ref={this.ref}>
         <FilterBar
           filter={filters}
           handleFilterChange={this.handleFilterChange}

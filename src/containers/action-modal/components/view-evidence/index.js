@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import Button from '../../../../components/button'
-
 import './view-evidence.css'
 
 const downloadClick = url => async () => {
@@ -19,15 +18,15 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
     <div className="ViewEvidence-actions">
       <Button
         className="View-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
       <Button
         className="View-request"
-        type="primary"
         onClick={downloadClick(evidence.fileURI)}
+        type="primary"
       >
         Download Evidence
       </Button>

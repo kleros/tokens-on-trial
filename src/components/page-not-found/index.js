@@ -1,5 +1,4 @@
 import React from 'react'
-
 import './page-not-found.css'
 
 export default () => (

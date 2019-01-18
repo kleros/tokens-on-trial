@@ -34,7 +34,6 @@ import {
   getEvidenceFormIsInvalid,
   submitEvidenceForm
 } from './components/submit-evidence/evidence-form'
-
 import './action-modal.css'
 
 class ActionModal extends PureComponent {
@@ -253,17 +252,17 @@ class ActionModal extends PureComponent {
     if (txResult === 'success' || txResult === 'fail')
       return (
         <Modal
+          className="ActionModal"
           isOpen={openActionModal !== null}
           onRequestClose={closeActionModal}
-          className="ActionModal"
         >
           <h5>
             Transaction {txResult === 'success' ? 'Successful.' : 'Failed.'}
           </h5>
           <Button
             className="Appeal-return"
-            type="secondary"
             onClick={closeActionModal}
+            type="secondary"
           >
             Return
           </Button>
@@ -272,9 +271,9 @@ class ActionModal extends PureComponent {
 
     return (
       <Modal
+        className="ActionModal"
         isOpen={openActionModal !== null}
         onRequestClose={closeActionModal}
-        className="ActionModal"
       >
         {!token.creating && !token.updating ? (
           (() => {
@@ -284,82 +283,82 @@ class ActionModal extends PureComponent {
                   <Submit
                     arbitrableTokenListData={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
+                    file={file}
+                    fileInfoMessage={fileInfoMessage}
+                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                    submitToken={this.handleSubmitTokenClick}
                     submitTokenForm={submitTokenForm}
                     token={token}
-                    submitToken={this.handleSubmitTokenClick}
                     tokenFormIsInvalid={tokenFormIsInvalid}
-                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    fileInfoMessage={fileInfoMessage}
-                    file={file}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.Clear:
                 return (
                   <Clear
-                    name={token && token.data ? token.data.name : 'token'}
                     arbitrableTokenListData={arbitrableTokenListData}
-                    closeActionModal={closeActionModal}
                     clearToken={this.handleClearTokenClick}
+                    closeActionModal={closeActionModal}
+                    name={token && token.data ? token.data.name : 'token'}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.Challenge:
                 return (
                   <Challenge
-                    token={token.data}
-                    name={token && token.data ? token.data.name : 'token'}
                     arbitrableTokenListData={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
                     fundDispute={this.handleChallengeClick}
+                    name={token && token.data ? token.data.name : 'token'}
+                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.Resubmit:
                 return (
                   <Resubmit
-                    token={token.data}
-                    name={token && token.data ? token.data.name : 'token'}
                     arbitrableTokenListData={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
+                    name={token && token.data ? token.data.name : 'token'}
                     resubmitToken={this.handleResubmitTokenClick}
+                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.FundRequester:
                 return (
                   <FundDispute
-                    token={token.data}
-                    name={token && token.data ? token.data.name : 'token'}
                     arbitrableTokenListData={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
                     fundDispute={this.handleFundRequesterClick}
+                    name={token && token.data ? token.data.name : 'token'}
+                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.FundChallenger:
                 return (
                   <FundDispute
-                    token={token.data}
-                    name={token && token.data ? token.data.name : 'token'}
                     arbitrableTokenListData={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
                     fundDispute={this.handleFundChallengerClick}
+                    name={token && token.data ? token.data.name : 'token'}
+                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.FundAppeal:
                 return (
                   <FundAppeal
-                    token={token.data}
                     closeActionModal={closeActionModal}
                     fundAppeal={this.handleFundAppealClick}
+                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:
                 return (
                   <SubmitEvidence
                     closeActionModal={closeActionModal}
-                    submitEvidenceForm={submitEvidenceForm}
-                    submitEvidence={this.handleSubmitEvidenceClick}
                     evidenceFormIsInvalid={evidenceFormIsInvalid}
-                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    fileInfoMessage={fileInfoMessage}
                     file={file}
+                    fileInfoMessage={fileInfoMessage}
+                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                    submitEvidence={this.handleSubmitEvidenceClick}
+                    submitEvidenceForm={submitEvidenceForm}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.ViewEvidence:

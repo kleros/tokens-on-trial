@@ -12,12 +12,12 @@ const TokenCard = ({ token }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
       <FontAwesomeIcon
+        color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
         icon={
           token.clientStatus === tokenConstants.STATUS_ENUM.Pending
             ? 'clock'
             : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
         }
-        color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
       />
       <h5>
         {token.name} - {token.ticker}
@@ -28,11 +28,11 @@ const TokenCard = ({ token }) => (
     </div>
     <Link className="TokenCard-content" to={`/token/${token.ID}`}>
       <Img
+        alt="Token List Submission"
+        className="TokenCard-image"
         src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
           token.symbolMultihash
         }`}
-        alt={`Token List Submission`}
-        className="TokenCard-image"
       />
     </Link>
     <div

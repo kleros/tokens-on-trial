@@ -1,6 +1,6 @@
 import * as mime from 'mime-types'
 
-import { takeLatest, call, all, select } from 'redux-saga/effects'
+import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import { arbitrableTokenList, arbitrator, archon } from '../bootstrap/dapp-api'

@@ -2,13 +2,13 @@ import { eventChannel } from 'redux-saga'
 import memoizeOne from 'memoize-one'
 
 import {
-  fork,
-  takeLatest,
-  take,
-  select,
-  race,
   call,
-  put
+  fork,
+  put,
+  race,
+  select,
+  take,
+  takeLatest
 } from 'redux-saga/effects'
 
 import * as notificationActions from '../actions/notification'
@@ -19,7 +19,7 @@ import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tokenActions from '../actions/token'
 import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
-import { web3, arbitrableTokenList } from '../bootstrap/dapp-api'
+import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
 import * as tokenConstants from '../constants/token'
 import { contractStatusToClientStatus } from '../utils/token'
 
@@ -112,7 +112,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
 
   if (events[0])
     localStorage.setItem(
-      arbitrableTokenList.options.address + 'nextEventsBlockNumber',
+      `${arbitrableTokenList.options.address}nextEventsBlockNumber`,
       events[0].blockNumber + 1
     )
 }
@@ -137,7 +137,7 @@ function* pushNotificationsListener() {
         .getPastEvents('TokenStatusChange', {
           fromBlock:
             localStorage.getItem(
-              arbitrableTokenList.options.address + 'nextEventsBlockNumber'
+              `${arbitrableTokenList.options.address}nextEventsBlockNumber`
             ) || 0
         })
         .then(events => {

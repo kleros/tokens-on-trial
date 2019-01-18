@@ -6,7 +6,6 @@ import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
-
 import './submit.css'
 
 const Submit = ({
@@ -25,8 +24,6 @@ const Submit = ({
     <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
     <TokenForm className="Submit-form" onSubmit={submitToken} />
     <FilePicker
-      multiple={false}
-      onDropAccepted={handleOnFileDropAccepted}
       file={file}
       message={
         <span>
@@ -35,6 +32,8 @@ const Submit = ({
           Drag file here or
         </span>
       }
+      multiple={false}
+      onDropAccepted={handleOnFileDropAccepted}
     />
     {fileInfoMessage && <div>{fileInfoMessage}</div>}
     <div className="Submit-stake">
@@ -55,16 +54,16 @@ const Submit = ({
     <div className="Modal-actions">
       <Button
         className="Submit-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
       <Button
         className="Submit-request"
-        type="primary"
-        onClick={submitTokenForm}
         disabled={tokenFormIsInvalid || !file}
+        onClick={submitTokenForm}
+        type="primary"
       >
         Request Registration
       </Button>

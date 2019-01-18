@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import FilePicker from '../../../../components/file-picker'
 import Button from '../../../../components/button'
 import { EvidenceForm } from '../../components/submit-evidence/evidence-form'
-
 import './submit-evidence.css'
 
 const SubmitEvidence = ({
@@ -21,8 +20,6 @@ const SubmitEvidence = ({
     <br />
     <EvidenceForm className="SubmitEvidence-form" onSubmit={submitEvidence} />
     <FilePicker
-      multiple={false}
-      onDropAccepted={handleOnFileDropAccepted}
       file={file}
       message={
         <span>
@@ -31,22 +28,24 @@ const SubmitEvidence = ({
           Drag file here or
         </span>
       }
+      multiple={false}
+      onDropAccepted={handleOnFileDropAccepted}
     />
     {fileInfoMessage && <div>{fileInfoMessage}</div>}
     <br />
     <div className="SubmitEvidence-actions">
       <Button
         className="Submit-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
       <Button
         className="Submit-request"
-        type="primary"
-        onClick={submitEvidenceForm}
         disabled={evidenceFormIsInvalid}
+        onClick={submitEvidenceForm}
+        type="primary"
       >
         Submit evidence now
       </Button>

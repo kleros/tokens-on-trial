@@ -1,5 +1,5 @@
 import { form } from '../../../../../utils/form-generator'
-import { required, ETHAddress } from '../../../../../utils/validation'
+import { ETHAddress, required } from '../../../../../utils/validation'
 
 export const {
   Form: TokenForm,

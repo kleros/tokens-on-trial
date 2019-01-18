@@ -1,5 +1,5 @@
 import { form } from '../../../../utils/form-generator'
-import { required, email } from '../../../../utils/validation'
+import { email, required } from '../../../../utils/validation'
 
 export const { Form: SettingsForm, submit: submitSettingsForm } = form(
   'settingsForm',

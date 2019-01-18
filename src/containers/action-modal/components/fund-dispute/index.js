@@ -5,7 +5,6 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
-
 import './fund-dispute.css'
 
 const FundDispute = ({
@@ -15,7 +14,7 @@ const FundDispute = ({
 }) => (
   <div>
     <h3 className="Modal-title">
-      <FontAwesomeIcon icon="gavel" className="FundDispute-icon" />
+      <FontAwesomeIcon className="FundDispute-icon" icon="gavel" />
       Fund Dispute
     </h3>
     <hr />
@@ -91,15 +90,15 @@ const FundDispute = ({
     <div className="Modal-actions">
       <Button
         className="FundDispute-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
       <Button
         className="FundDispute-request"
-        type="primary"
         onClick={fundDispute}
+        type="primary"
       >
         Pay Fees
       </Button>

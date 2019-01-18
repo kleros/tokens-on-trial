@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { Helmet } from 'react-helmet'
 import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
-import { Switch, Route, withRouter, Redirect } from 'react-router-dom'
+import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Tokens from '../containers/tokens'
@@ -25,7 +25,6 @@ import Initializer from './initializer'
 import GlobalComponents from './global-components'
 import { onlyInfura } from './dapp-api'
 import './fontawesome'
-
 import './app.css'
 
 class _ConnectedNavBar extends Component {
@@ -67,6 +66,31 @@ class _ConnectedNavBar extends Component {
     const { accounts, notifications } = this.props
     return (
       <NavBar
+        extras={[
+          <NotificationBadge
+            key="1"
+            maxShown={5}
+            notifications={notifications}
+            onNotificationClick={this.handleNotificationClick}
+            onShowAll={this.handleShowAllClick}
+          >
+            <FontAwesomeIcon color="white" icon="bell" />
+          </NotificationBadge>,
+          <SettingsModal key="2">
+            <FontAwesomeIcon color="white" icon="envelope" />
+          </SettingsModal>,
+          <Identicon address={accounts.data[0]} round scale={2} size={15} />,
+          <Button
+            className="Button-submitToken"
+            disabled={onlyInfura}
+            onClick={this.handleSubmitTokenClick}
+            tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+            type="primary"
+          >
+            <FontAwesomeIcon className="Button-submitToken-icon" icon="plus" />
+            Submit Token
+          </Button>
+        ]}
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
           {
@@ -74,31 +98,6 @@ class _ConnectedNavBar extends Component {
             to: '/',
             extraStyle: 'NavBar-route-title'
           }
-        ]}
-        extras={[
-          <NotificationBadge
-            key="1"
-            notifications={notifications}
-            onNotificationClick={this.handleNotificationClick}
-            maxShown={5}
-            onShowAll={this.handleShowAllClick}
-          >
-            <FontAwesomeIcon icon="bell" color="white" />
-          </NotificationBadge>,
-          <SettingsModal key="2">
-            <FontAwesomeIcon icon="envelope" color="white" />
-          </SettingsModal>,
-          <Identicon address={accounts.data[0]} round scale={2} size={15} />,
-          <Button
-            tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-            onClick={this.handleSubmitTokenClick}
-            type="primary"
-            disabled={onlyInfura}
-            className="Button-submitToken"
-          >
-            <FontAwesomeIcon icon="plus" className="Button-submitToken-icon" />
-            Submit Token
-          </Button>
         ]}
       />
     )
@@ -128,20 +127,20 @@ const App = ({ store, history }) => (
           <Helmet>
             <title>Tokens on Trial</title>
           </Helmet>
-          <Route exact path="*" component={ConnectedNavBar} />
+          <Route component={ConnectedNavBar} exact path="*" />
           <div id="scroll-root">
             <Switch>
               <Redirect exact from="/" to="/tokens/1" />
-              <Route exact path="/tokens/:page" component={Tokens} />
-              <Route exact path="/token/:tokenID" component={TokenDetail} />
-              <Route exact path="/notifications" component={PageNotFound} />
+              <Route component={Tokens} exact path="/tokens/:page" />
+              <Route component={TokenDetail} exact path="/token/:tokenID" />
+              <Route component={PageNotFound} exact path="/notifications" />
               <Route component={PageNotFound} />
             </Switch>
           </div>
           <Switch>
-            <Route exact path="*" component={ActionModal} />
+            <Route component={ActionModal} exact path="*" />
           </Switch>
-          <Route exact path="*" component={GlobalComponents} />
+          <Route component={GlobalComponents} exact path="*" />
         </div>
       </ConnectedRouter>
     </Initializer>

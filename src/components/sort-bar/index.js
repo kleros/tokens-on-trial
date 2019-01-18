@@ -9,7 +9,6 @@ import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterSelectors from '../../reducers/filter'
 import { filterToContractParam } from '../../utils/filter'
-
 import './sort-bar.css'
 
 class SortBar extends PureComponent {
@@ -38,18 +37,17 @@ class SortBar extends PureComponent {
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData && tokensData.length ? tokensData.length : 'Loading'}{' '}
-          submissions
+          {tokensData ? tokensData.length : 'Loading'} submissions
         </div>
         <div className="SortBar-sort">
           Sort by:
           <Dropdown
-            value={oldestFirst || 0}
-            type="radio"
-            label="Sort"
-            options={filterConstants.SORT_OPTIONS_ENUM.values}
-            onChange={this.handleSortChange}
             className="SortBar-dropdowns-dropdown"
+            label="Sort"
+            onChange={this.handleSortChange}
+            options={filterConstants.SORT_OPTIONS_ENUM.values}
+            type="radio"
+            value={oldestFirst || 0}
           />
         </div>
       </div>

@@ -8,7 +8,6 @@ import * as notificationSelectors from '../../reducers/notification'
 import * as modalActions from '../../actions/modal'
 import * as tokenConstants from '../../constants/token'
 import NavOverlay from '../../components/nav-overlay'
-
 import './notification-badge.css'
 
 class NotificationBadge extends PureComponent {
@@ -83,23 +82,23 @@ class NotificationBadge extends PureComponent {
                 : notifications.data
               ).map((n, i) => (
                 <div
-                  key={n.ID + i}
-                  id={n.ID}
-                  onClick={onNotificationClick}
                   className="NotificationBadge-notifications-notification"
+                  id={n.ID}
+                  key={n.ID + i}
+                  onClick={onNotificationClick}
                 >
                   <FontAwesomeIcon
-                    icon={
-                      n.clientStatus
-                        ? tokenConstants.STATUS_ICON_ENUM[n.clientStatus]
-                        : 'bell'
-                    }
+                    className="NotificationBadge-notifications-notification-icon"
                     color={
                       n.clientStatus
                         ? tokenConstants.STATUS_COLOR_ENUM[n.clientStatus]
                         : tokenConstants.STATUS_COLOR_ENUM[0]
                     }
-                    className="NotificationBadge-notifications-notification-icon"
+                    icon={
+                      n.clientStatus
+                        ? tokenConstants.STATUS_ICON_ENUM[n.clientStatus]
+                        : 'bell'
+                    }
                     size="lg"
                   />
                   <div className="NotificationBadge-notifications-notification-content">
@@ -107,12 +106,12 @@ class NotificationBadge extends PureComponent {
                       {n.message}
                     </div>
                     <div
+                      className="NotificationBadge-notifications-notification-content-footer"
                       style={{
                         color: n.clientStatus
                           ? tokenConstants.STATUS_COLOR_ENUM[n.clientStatus]
                           : tokenConstants.STATUS_COLOR_ENUM[0]
                       }}
-                      className="NotificationBadge-notifications-notification-content-footer"
                     >
                       <TimeAgo datetime={n.date} />
                     </div>
@@ -121,8 +120,8 @@ class NotificationBadge extends PureComponent {
               ))}
               {useMaxShown && (
                 <div
-                  onClick={onShowAll}
                   className="NotificationBadge-notifications-showAll"
+                  onClick={onShowAll}
                 >
                   <div className="NotificationBadge-notifications-showAll-down" />
                 </div>

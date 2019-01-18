@@ -14,9 +14,9 @@ export default function asyncReadFile(file) {
       resolve(result)
     }
     // Make sure to handle error states
-    reader.onerror = e => {
+    reader.addEventListener('error', e => {
       reject(e)
-    }
+    })
     reader.readAsDataURL(file)
   })
 }

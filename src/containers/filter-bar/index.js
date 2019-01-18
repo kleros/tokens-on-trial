@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 
 import Button from '../../components/button'
 import * as filterConstants from '../../constants/filter'
-
 import './filter-bar.css'
 
 class FilterButton extends PureComponent {
@@ -25,9 +24,9 @@ class FilterButton extends PureComponent {
     return (
       <Button
         className={className}
+        onClick={this.onFilterChange}
         size="small"
         type={type}
-        onClick={this.onFilterChange}
       >
         {filterConstants.FILTER_OPTIONS_ENUM[option]}
       </Button>
@@ -79,15 +78,15 @@ class FilterBar extends Component {
                   .filter(i => i >= 6)
                   .map(i => (
                     <FilterButton
+                      className="FilterBar-my-button"
+                      handleFilterChange={handleFilterChange}
                       key={i}
                       option={i}
-                      className="FilterBar-my-button"
                       type={
                         filter[filterConstants.FILTER_OPTIONS_ENUM[i]]
                           ? 'primary'
                           : 'secondary'
                       }
-                      handleFilterChange={handleFilterChange}
                     >
                       {filterConstants.FILTER_OPTIONS_ENUM[i]}
                     </FilterButton>
@@ -98,8 +97,6 @@ class FilterBar extends Component {
                   .filter(i => i < 6)
                   .map(i => (
                     <FilterButton
-                      key={i}
-                      option={i}
                       className={`FilterBar-status-button
                         FilterBar-status-button-${
                           filterConstants.FILTER_OPTIONS_ENUM[i].length <= 10
@@ -109,12 +106,14 @@ class FilterBar extends Component {
                             ? `medium`
                             : `large`
                         }`}
+                      handleFilterChange={handleFilterChange}
+                      key={i}
+                      option={i}
                       type={
                         filter[filterConstants.FILTER_OPTIONS_ENUM[i]]
                           ? 'primary'
                           : 'secondary'
                       }
-                      handleFilterChange={handleFilterChange}
                     >
                       {filterConstants.FILTER_OPTIONS_ENUM[i]}
                     </FilterButton>

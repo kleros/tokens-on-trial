@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import './button.css'
 
 const Button = ({
@@ -17,11 +16,11 @@ const Button = ({
 }) => {
   const button = (
     <div
-      onClick={disabled ? null : onClick}
       className={`Button Button--${type} Button--${size} ${
         disabled ? 'is-disabled' : ''
       } ${className}`}
       data-tip={tooltip}
+      onClick={disabled ? null : onClick}
       {...rest}
     >
       <h2 className={`Button-label ${labelClassName}`}>{children}</h2>
@@ -29,10 +28,10 @@ const Button = ({
   )
   return to ? (
     <a
-      href={to}
-      target="_blank"
-      rel="noopener noreferrer"
       className="Button--link"
+      href={to}
+      rel="noopener noreferrer"
+      target="_blank"
     >
       {button}
     </a>

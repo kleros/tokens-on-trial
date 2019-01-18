@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
-
 import './resubmit.css'
 
 const Resubmit = ({
@@ -34,15 +33,15 @@ const Resubmit = ({
     <div className="Modal-actions">
       <Button
         className="Resubmit-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
       <Button
         className="Resubmit-request"
-        type="primary"
         onClick={resubmitToken}
+        type="primary"
       >
         Resubmit token
       </Button>

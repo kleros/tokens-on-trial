@@ -5,24 +5,23 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Button from '../button'
 import { getFileIcon } from '../../utils/evidence'
-
 import './file-picker.css'
 
 const FilePicker = ({ message, buttonMessage, file, ...rest }) => (
   <Dropzone className="FilePicker" {...rest}>
     {!file ? (
       <div className="FilePicker-uploadInfo">
-        <FontAwesomeIcon icon="upload" className="FilePicker-icon" />
+        <FontAwesomeIcon className="FilePicker-icon" icon="upload" />
         <small>{message}</small>
-        <Button type="ternary" size="small">
+        <Button size="small" type="ternary">
           {buttonMessage}
         </Button>
       </div>
     ) : (
       <div>
         <FontAwesomeIcon
-          icon={getFileIcon(file.type)}
           className="FilePicker-icon"
+          icon={getFileIcon(file.type)}
         />{' '}
         {file.name}
       </div>

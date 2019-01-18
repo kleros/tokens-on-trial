@@ -1,15 +1,15 @@
 import * as mime from 'mime-types'
 
-import { takeLatest, call, select, all } from 'redux-saga/effects'
+import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableTokenList,
   arbitrator,
-  web3,
-  archon
+  archon,
+  web3
 } from '../bootstrap/dapp-api'
-import { hasPendingRequest, contractStatusToClientStatus } from '../utils/token'
+import { contractStatusToClientStatus, hasPendingRequest } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'

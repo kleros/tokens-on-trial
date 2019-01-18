@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import reactClickOutside from 'react-click-outside'
-
 import './dropdown.css'
 
 class Dropdown extends PureComponent {
@@ -82,7 +81,7 @@ class Dropdown extends PureComponent {
           inverted ? 'Dropdown--inverted' : ''
         } ${isOpen ? 'is-open' : ''} ${className}`}
       >
-        <div onClick={this.handleBoxClick} className="Dropdown-box">
+        <div className="Dropdown-box" onClick={this.handleBoxClick}>
           {isCheckbox ? (
             <span>
               <FontAwesomeIcon icon="sliders-h" />
@@ -91,16 +90,16 @@ class Dropdown extends PureComponent {
           ) : (
             options[value]
           )}
-          <FontAwesomeIcon icon="caret-down" className="Dropdown-box-caret" />
+          <FontAwesomeIcon className="Dropdown-box-caret" icon="caret-down" />
         </div>
         {isOpen && (
           <div className="Dropdown-options">
             {isCheckbox && (
               <div
-                key="select-all"
-                id="select-all"
-                onClick={this.handleSelectAllClick}
                 className="Dropdown-options-option Dropdown-options-option--selectAll"
+                id="select-all"
+                key="select-all"
+                onClick={this.handleSelectAllClick}
               >
                 {value.length === options.length ? 'UN' : ''}SELECT ALL
               </div>
@@ -109,19 +108,19 @@ class Dropdown extends PureComponent {
               const isActive = isCheckbox ? value.includes(i) : value === i
               return (
                 <div
-                  key={i}
-                  id={i}
-                  onClick={this.handleOptionClick}
                   className={`Dropdown-options-option ${
                     isActive ? 'is-active' : ''
                   }`}
+                  id={i}
+                  key={i}
+                  onClick={this.handleOptionClick}
                 >
                   {isCheckbox && (
                     <span className="Dropdown-options-option-checkbox">
                       {isActive && (
                         <FontAwesomeIcon
-                          icon="check"
                           className="Dropdown-options-option-checkbox-check"
+                          icon="check"
                         />
                       )}
                     </span>

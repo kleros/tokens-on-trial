@@ -1,15 +1,16 @@
 import statusHelper from '../../utils/api-status-helper'
 import {
-  FILE_UPLOAD_URL,
   FILE_BASE_URL,
+  FILE_UPLOAD_URL,
   archon
 } from '../../bootstrap/dapp-api'
 
 const storeApi = {
   postJSONFile(file) {
     const stringified = JSON.stringify(file)
-    const base64EncodedData =
-      'data:application/json;base64,' + btoa(stringified)
+    const base64EncodedData = `data:application/json;base64,${btoa(
+      stringified
+    )}`
     /* eslint-disable unicorn/number-literal-case */
     const fileName = archon.utils.multihashFile(
       base64EncodedData,

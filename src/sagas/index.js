@@ -1,6 +1,6 @@
 import { delay } from 'redux-saga'
 
-import { spawn, call, all } from 'redux-saga/effects'
+import { all, call, spawn } from 'redux-saga/effects'
 
 import walletSaga from './wallet'
 import arbitrableTokenListSaga from './arbitrable-token-list'

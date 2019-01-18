@@ -9,7 +9,6 @@ import Button from '../../components/button'
 import NavOverlay from '../../components/nav-overlay'
 
 import { SettingsForm, submitSettingsForm } from './components/settings-form'
-
 import './settings-modal.css'
 
 class SettingsModal extends PureComponent {
@@ -56,18 +55,18 @@ class SettingsModal extends PureComponent {
               <span>You will be informed when:</span>
               <SettingsForm
                 className="SettingsModal-window-form"
-                onSubmit={this.handleOpenSettingsClick}
                 initialValues={{
                   executeReady: settings.data.executeReady,
                   challenged: settings.data.challenged,
                   shouldFund: settings.data.shouldFund,
                   rulingGiven: settings.data.rulingGiven
                 }}
+                onSubmit={this.handleOpenSettingsClick}
               />
               <div className="SettingsModal-window-submit">
                 <Button
-                  onClick={submitSettingsForm}
                   className="SettingsModal-window-submit-button"
+                  onClick={submitSettingsForm}
                 >
                   Register
                 </Button>

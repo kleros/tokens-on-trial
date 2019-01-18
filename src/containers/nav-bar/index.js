@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { pushRotate as ReactBurgerMenu } from 'react-burger-menu'
 
 import logo from '../../assets/images/kleros-logo.png'
-
 import './nav-bar.css'
 
 export default class NavBar extends PureComponent {
@@ -27,14 +26,14 @@ export default class NavBar extends PureComponent {
     const { routes, extras } = this.props
     const { isMobile } = this.state
 
-    const logoImg = <img src={logo} alt="Logo" className="NavBar-logo" />
+    const logoImg = <img alt="Logo" className="NavBar-logo" src={logo} />
     const routesAndExtras = [
       ...routes.map(r => (
         <div key={r.title}>
           <Link
-            to={`/`}
             className={`NavBar-route ${r.extraStyle}`}
             style={{ height: '55px', verticalAlign: 'center' }}
+            to="/"
           >
             {r.title}
           </Link>
@@ -42,10 +41,10 @@ export default class NavBar extends PureComponent {
       )),
       ...extras.map((e, i) => (
         <div
-          key={i}
           className={`NavBar-extra ${isMobile ? 'is-mobile' : ''} ${
             i === 0 ? 'NavBar-extra--first' : ''
           }`}
+          key={i}
         >
           {e}
         </div>
@@ -56,13 +55,13 @@ export default class NavBar extends PureComponent {
         <Link to="/">{logoImg}</Link>
         {isMobile ? (
           <ReactBurgerMenu
-            pageWrapId="scroll-root"
-            outerContainerId="router-root"
+            className="NavBar-burgerMenu"
             customBurgerIcon={<div />}
             customCrossIcon={logoImg}
-            className="NavBar-burgerMenu"
             itemListClassName="NavBar-burgerMenu-itemList"
+            outerContainerId="router-root"
             overlayClassName="NavBar-burgerMenu-overlay"
+            pageWrapId="scroll-root"
           >
             {routesAndExtras}
           </ReactBurgerMenu>

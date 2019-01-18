@@ -1,4 +1,4 @@
-import { takeLatest, call, all } from 'redux-saga/effects'
+import { all, call, takeLatest } from 'redux-saga/effects'
 
 import * as arbitratorActions from '../actions/arbitrator'
 import { lessduxSaga } from '../utils/saga'

@@ -8,7 +8,7 @@ import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
 import RequiresMetaMaskPage from '../containers/requires-meta-mask-page'
 
-import { web3, onlyInfura } from './dapp-api'
+import { onlyInfura, web3 } from './dapp-api'
 
 class Initializer extends PureComponent {
   static propTypes = {
@@ -53,16 +53,16 @@ class Initializer extends PureComponent {
     const { accounts, children } = this.props
     return (
       <RenderIf
-        resource={accounts}
-        loading={<ClimbingBoxLoader color="#3d464d" />}
         done={children}
-        failedLoading={
-          <RequiresMetaMaskPage needsUnlock={Boolean(web3.eth)} web3={web3} />
-        }
+        extraFailedValues={[!web3.eth]}
         extraValues={[
           accounts.data && (accounts.data[0] || onlyInfura || null)
         ]}
-        extraFailedValues={[!web3.eth]}
+        failedLoading={
+          <RequiresMetaMaskPage needsUnlock={Boolean(web3.eth)} web3={web3} />
+        }
+        loading={<ClimbingBoxLoader color="#3d464d" />}
+        resource={accounts}
       />
     )
   }

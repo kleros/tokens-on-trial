@@ -3,15 +3,14 @@ import PropTypes from 'prop-types'
 
 import metaMaskLogo from '../../assets/images/meta-mask-logo.png'
 import Button from '../button'
-
 import './requires-meta-mask.css'
 
 const RequiresMetaMask = ({ needsUnlock }) => (
   <div className="RequiresMetaMask">
     <img
-      src={metaMaskLogo}
       alt="MetaMask Logo"
       className="RequiresMetaMask-logo"
+      src={metaMaskLogo}
     />
     <div className="RequiresMetaMask-content">
       <h1>

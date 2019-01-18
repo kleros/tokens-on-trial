@@ -12,9 +12,9 @@ export default store
 const render = Component => {
   ReactDOM.render(
     <Component
+      history={history}
       key={process.env.NODE_ENV === 'development' ? Math.random() : undefined}
       store={store}
-      history={history}
     />,
     document.getElementById('root')
   )
@@ -24,11 +24,11 @@ registerServiceWorker()
 
 window.addEventListener('unload', () => {
   localStorage.setItem(
-    arbitrableTokenList.options.address + 'notifications',
+    `${arbitrableTokenList.options.address}notifications`,
     JSON.stringify(store.getState().notification.notifications.data)
   )
   localStorage.setItem(
-    arbitrableTokenList.options.address + 'filter',
+    `${arbitrableTokenList.options.address}filter`,
     JSON.stringify(store.getState().filter)
   )
 })

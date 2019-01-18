@@ -24,7 +24,7 @@ export { filterShape }
 
 // Reducer
 const cachedFilters = localStorage.getItem(
-  arbitrableTokenList.options.address + 'filter'
+  `${arbitrableTokenList.options.address}filter`
 )
 const parsedFilters =
   cachedFilters && cachedFilters !== 'undefined'

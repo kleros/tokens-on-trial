@@ -6,7 +6,6 @@ import * as tokenSelectors from '../../../../reducers/token'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
-
 import './appeal.css'
 
 const Appeal = ({
@@ -18,7 +17,7 @@ const Appeal = ({
 }) => (
   <div>
     <h3 className="Modal-title">
-      <FontAwesomeIcon icon="gavel" className="Appeal-icon" />
+      <FontAwesomeIcon className="Appeal-icon" icon="gavel" />
       Appeal
     </h3>
     <hr />
@@ -84,12 +83,12 @@ const Appeal = ({
     <div className="Modal-actions">
       <Button
         className="Appeal-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
-      <Button className="Appeal-request" type="primary" onClick={fundAppeal}>
+      <Button className="Appeal-request" onClick={fundAppeal} type="primary">
         Appeal
       </Button>
     </div>

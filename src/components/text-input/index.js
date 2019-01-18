@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import './text-input.css'
 
 const TextInput = ({
@@ -18,19 +17,19 @@ const TextInput = ({
   >
     {type === 'textarea' ? (
       <textarea
-        value={value}
+        className="TextInput-input"
         onBlur={onBlur}
         onChange={onChange}
-        className="TextInput-input"
+        value={value}
       />
     ) : (
       <input
-        value={value}
+        className="TextInput-input"
         onBlur={onBlur}
         onChange={onChange}
-        type={type}
         step={step}
-        className="TextInput-input"
+        type={type}
+        value={value}
       />
     )}
     {placeholder && (

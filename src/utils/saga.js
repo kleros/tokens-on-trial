@@ -66,7 +66,7 @@ export function* lessduxSaga(
       : yield call(saga, action)
 
     yield put(
-      _action(resourceActions['RECEIVE' + receiveWord], {
+      _action(resourceActions[`RECEIVE${receiveWord}`], {
         [result.collection ? 'collectionMod' : resourceActions.self]: result
       })
     )
@@ -77,7 +77,7 @@ export function* lessduxSaga(
       )
     yield put(
       errorAction(
-        resourceActions['FAIL' + failWord],
+        resourceActions[`FAIL${failWord}`],
         flowOrCollectionModFlow.collection
           ? {
               collectionMod: {

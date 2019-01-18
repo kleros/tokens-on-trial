@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
-
 import './clear.css'
 
 const Clear = ({
@@ -34,12 +33,12 @@ const Clear = ({
     <div className="Modal-actions">
       <Button
         className="Clear-return"
-        type="secondary"
         onClick={closeActionModal}
+        type="secondary"
       >
         Return
       </Button>
-      <Button className="Clear-request" type="primary" onClick={clearToken}>
+      <Button className="Clear-request" onClick={clearToken} type="primary">
         Request Clearing
       </Button>
     </div>

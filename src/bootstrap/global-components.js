@@ -3,6 +3,6 @@ import ReactTooltip from 'react-tooltip'
 
 export default () => (
   <div>
-    <ReactTooltip multiline className="Tooltip" html />
+    <ReactTooltip className="Tooltip" html multiline />
   </div>
 )
