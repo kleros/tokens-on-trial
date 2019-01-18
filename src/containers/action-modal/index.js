@@ -16,7 +16,6 @@ import * as evidenceActions from '../../actions/evidence'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 import asyncReadFile from '../../utils/async-file-reader'
-import Button from '../../components/button'
 
 import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
@@ -66,7 +65,7 @@ class ActionModal extends PureComponent {
     token: null
   }
 
-  state = { file: null, fileInfoMessage: null, txResult: null }
+  state = { file: null, fileInfoMessage: null }
 
   handleSubmitTokenClick = async token => {
     const { createToken } = this.props
@@ -223,15 +222,12 @@ class ActionModal extends PureComponent {
 
   componentDidUpdate(prevProps) {
     const { token: prevToken } = prevProps
-    const { token } = this.props
+    const { token, closeActionModal } = this.props
     if (
       (prevToken.creating && !token.creating) ||
       (prevToken.updating && !token.updating)
     )
-      this.setState({
-        txResult:
-          token.failedCreating || token.failedUpdating ? 'fail' : 'success'
-      })
+      closeActionModal()
   }
 
   render() {
@@ -247,27 +243,7 @@ class ActionModal extends PureComponent {
       actionModalParam
     } = this.props
 
-    const { fileInfoMessage, file, txResult } = this.state
-
-    if (txResult === 'success' || txResult === 'fail')
-      return (
-        <Modal
-          className="ActionModal"
-          isOpen={openActionModal !== null}
-          onRequestClose={closeActionModal}
-        >
-          <h5>
-            Transaction {txResult === 'success' ? 'Successful.' : 'Failed.'}
-          </h5>
-          <Button
-            className="Appeal-return"
-            onClick={closeActionModal}
-            type="secondary"
-          >
-            Return
-          </Button>
-        </Modal>
-      )
+    const { fileInfoMessage, file } = this.state
 
     return (
       <Modal
@@ -376,7 +352,12 @@ class ActionModal extends PureComponent {
             }
           })()
         ) : (
-          <BeatLoader color="#3d464d" />
+          <div>
+            <small>
+              <h5>Transaction pending...</h5>
+            </small>
+            <BeatLoader color="#3d464d" />
+          </div>
         )}
       </Modal>
     )

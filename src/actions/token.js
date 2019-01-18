@@ -21,11 +21,6 @@ export const token = {
 
 /* Action Creators */
 
-// Token
-export const requestStatusChange = ({ tokenData, file, fileData }) => ({
-  type: token.STATUS_CHANGE,
-  payload: { token: tokenData, file, fileData }
-})
 export const createToken = ({ tokenData, file, fileData }) => ({
   type: token.CREATE,
   payload: { token: tokenData, file, fileData }

@@ -48,7 +48,6 @@ class TokenDetails extends PureComponent {
     timeout: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
-    feesTimeout: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired
   }
 
@@ -83,8 +82,8 @@ class TokenDetails extends PureComponent {
   }
 
   handleFeesTimeoutClick = () => {
-    const { feesTimeout, token } = this.props
-    feesTimeout(token)
+    const { timeout, token } = this.props
+    timeout(token)
   }
 
   handleOpenEvidenceModal = () => {
@@ -105,7 +104,12 @@ class TokenDetails extends PureComponent {
     let label = 'Loading...'
     let icon = 'spinner'
 
-    if (!token || !arbitrableTokenListData.data)
+    if (
+      !token ||
+      !arbitrableTokenListData.data ||
+      token.creating ||
+      token.updating
+    )
       return (
         <Button disabled={disabled} type="primary">
           <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
@@ -125,7 +129,7 @@ class TokenDetails extends PureComponent {
     const challengerFees = latestRound.paidFees[tokenConstants.SIDE.Challenger]
 
     if (hasPendingRequest(token))
-      if (latestRequest.disputed) {
+      if (latestRequest.disputed && !latestRequest.resolved) {
         icon = 'hourglass-half'
         disabled = true
         label = 'Waiting Arbitration'
@@ -180,7 +184,7 @@ class TokenDetails extends PureComponent {
       ) {
         icon = 'gavel'
         disabled = false
-        method = this.handleFeesTimeoutClick
+        method = this.handleExecuteRequestClick
         if (submitterFees > challengerFees) label = 'Timeout Challenger'
         else label = 'Timeout Submitter'
       } else if (
@@ -306,6 +310,8 @@ class TokenDetails extends PureComponent {
       // Set timer once we have data.
       web3.eth.getBlock('latest', (err, block) => {
         if (err) throw new Error(err)
+        if (!block) window.location.reload() // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
+
         let time =
           token.latestRequest.submissionTime +
           arbitrableTokenListData.data.challengePeriodDuration -
@@ -334,13 +340,14 @@ class TokenDetails extends PureComponent {
     const { filters } = filter
     const { tokenID } = match.params
 
-    if (!token || token.ID !== tokenID)
-      // Also prevent component from displaying stale data.
+    if (!token)
       return (
         <div className="Page">
           <h5>Loading...</h5>
         </div>
       )
+
+    if (token.ID !== tokenID) return window.location.reload()
 
     return (
       <div className="Page">
@@ -389,13 +396,20 @@ class TokenDetails extends PureComponent {
               <span className="TokenDetails-meta--aligned">
                 <FontAwesomeIcon
                   className="TokenDetails-icon"
+                  color={
+                    tokenConstants.STATUS_COLOR_ENUM[
+                      tokenConstants.STATUS_ENUM[token.clientStatus]
+                    ]
+                  }
                   icon={
-                    token.clientStatus === tokenConstants.STATUS_ENUM.Pending
+                    tokenConstants.STATUS_ENUM[token.clientStatus] > 1
                       ? 'hourglass-half'
-                      : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
+                      : tokenConstants.STATUS_ICON_ENUM[
+                          tokenConstants.STATUS_ENUM[token.clientStatus]
+                        ]
                   }
                 />
-                {tokenConstants.STATUS_ENUM[token.clientStatus]}
+                {token.clientStatus}
               </span>
               <div
                 className={`TokenDetails-timer ${
@@ -417,7 +431,7 @@ class TokenDetails extends PureComponent {
           </div>
         </div>
         <br />
-        {token.latestRequest.disputed && (
+        {token.latestRequest.disputed && !token.latestRequest.resolved && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
             <h3>Evidence</h3>

@@ -13,24 +13,30 @@ export const DISPUTE_STATUS = createEnum(['Waiting', 'Appealable', 'Solved'])
 export const RULING_OPTIONS = createEnum(['Other', 'Accept', 'Refuse'])
 export const SIDE = createEnum(['None', 'Requester', 'Challenger'])
 export const STATUS_ENUM = createEnum([
-  'Pending',
-  'Challenged',
+  'Absent',
   'Registered',
-  'Absent'
+  'Registration Requested',
+  'Clearing Requested',
+  'Challenged Registration Requested',
+  'Challenged Clearing Requested'
 ])
 
 export const STATUS_ICON_ENUM = createEnum([
+  'times-circle',
+  'check',
+  'hourglass-half',
   'hourglass-half',
   'gavel',
-  'check',
-  'times-circle'
+  'gavel'
 ])
 
 export const STATUS_COLOR_ENUM = createEnum([
-  '#0A72BD',
-  '#FB7413',
-  '#11BABD',
-  '#EF0101'
+  '#EF0101', // Red
+  '#11BABD', // Cyan
+  '#0A72BD', // Blue
+  '#0A72BD', // Blue
+  '#FB7413', // Orange
+  '#FB7413' // Orange
 ])
 
 // helloThere => Hello There

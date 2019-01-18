@@ -11,12 +11,25 @@ import * as tokenConstants from '../../constants/token'
 const TokenCard = ({ token }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
+      {console.info(
+        tokenConstants.STATUS_ENUM[token.clientStatus],
+        tokenConstants.STATUS_ENUM.Registered
+      )}
       <FontAwesomeIcon
-        color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+        color={
+          tokenConstants.STATUS_COLOR_ENUM[
+            tokenConstants.STATUS_ENUM[token.clientStatus]
+          ]
+        }
         icon={
-          token.clientStatus === tokenConstants.STATUS_ENUM.Pending
+          tokenConstants.STATUS_ENUM[token.clientStatus] !==
+            tokenConstants.STATUS_ENUM.Absent &&
+          tokenConstants.STATUS_ENUM[token.clientStatus] !==
+            tokenConstants.STATUS_ENUM.Registered
             ? 'clock'
-            : tokenConstants.STATUS_ICON_ENUM[token.clientStatus]
+            : tokenConstants.STATUS_ICON_ENUM[
+                tokenConstants.STATUS_ENUM[token.clientStatus]
+              ]
         }
       />
       <h5>
