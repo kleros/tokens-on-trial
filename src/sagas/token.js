@@ -236,10 +236,7 @@ function* requestStatusChange({ payload: { token, file, fileData } }) {
     }
   )
 
-  return yield call(fetchToken, {
-    payload:
-      '0x5cd5899f8d5a646dbf403e4a20dc32dab37c7835ef06fbfcb2dbd0a3da19db08'
-  })
+  return yield call(fetchToken, { payload: { ID } })
 }
 
 /**

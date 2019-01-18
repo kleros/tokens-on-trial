@@ -38,7 +38,8 @@ class SortBar extends PureComponent {
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData ? tokensData.length : 'Loading'} submissions
+          {tokensData && tokensData.length ? tokensData.length : 'Loading'}{' '}
+          submissions
         </div>
         <div className="SortBar-sort">
           Sort by:
