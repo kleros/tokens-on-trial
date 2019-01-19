@@ -1,4 +1,6 @@
 const getFileIcon = type => {
+  if (!type) return 'file'
+
   switch (type.slice(0, 5)) {
     case 'image':
       return 'file-image'

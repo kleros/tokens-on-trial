@@ -301,9 +301,10 @@ class TokenDetails extends PureComponent {
             fromBlock: 0
           })
           .on('data', async e => {
-            const evidence = await (await fetch(
-              e.returnValues._evidence
-            )).json()
+            const evidence = JSON.parse(
+              await (await fetch(e.returnValues._evidence)).json()
+            )
+
             evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
             const { evidences } = this.state
             this.setState({

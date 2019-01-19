@@ -161,18 +161,6 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-  if (token.name === 'ZRX') {
-    console.info('token.status', token.status)
-    console.info(
-      'clientStatus',
-      contractStatusToClientStatus(
-        token.status,
-        token.latestRequest.disputed,
-        token.latestRequest.resolved
-      )
-    )
-  }
-
   return {
     ...token,
     ID,
