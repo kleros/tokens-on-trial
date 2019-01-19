@@ -27,8 +27,8 @@ export const contractStatusToClientStatus = (status, disputed) => {
       case 'ClearingRequested':
         return tokenConstants.STATUS_ENUM['Clearing Request Challenged']
       default:
-        return tokenConstants.STATUS_ENUM[status]
+        return status
     }
 
-  return tokenConstants.STATUS_ENUM[status]
+  return status
 }

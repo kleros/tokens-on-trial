@@ -17,8 +17,8 @@ export const STATUS_ENUM = createEnum([
   'Registered',
   'Registration Requested',
   'Clearing Requested',
-  'Challenged Registration Requested',
-  'Challenged Clearing Requested'
+  'Registration Request Challenged',
+  'Clearing Request Challenged'
 ])
 
 export const STATUS_ICON_ENUM = createEnum([

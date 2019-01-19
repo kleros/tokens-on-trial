@@ -96,6 +96,11 @@ class TokenDetails extends PureComponent {
     openActionModal(modalConstants.ACTION_MODAL_ENUM.ViewEvidence, evidence)
   }
 
+  toSentenceCase = input => {
+    input = input.toLowerCase()
+    return input.charAt(0).toUpperCase() + input.slice(1)
+  }
+
   getActionButton = (token, userAccount) => {
     const { arbitrableTokenListData } = this.props
     const { timestamp, countdown } = this.state
@@ -396,20 +401,12 @@ class TokenDetails extends PureComponent {
               <span className="TokenDetails-meta--aligned">
                 <FontAwesomeIcon
                   className="TokenDetails-icon"
-                  color={
-                    tokenConstants.STATUS_COLOR_ENUM[
-                      tokenConstants.STATUS_ENUM[token.clientStatus]
-                    ]
-                  }
-                  icon={
-                    tokenConstants.STATUS_ENUM[token.clientStatus] > 1
-                      ? 'hourglass-half'
-                      : tokenConstants.STATUS_ICON_ENUM[
-                          tokenConstants.STATUS_ENUM[token.clientStatus]
-                        ]
-                  }
+                  color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+                  icon={tokenConstants.STATUS_ICON_ENUM[token.clientStatus]}
                 />
-                {token.clientStatus}
+                {this.toSentenceCase(
+                  tokenConstants.STATUS_ENUM[token.clientStatus]
+                )}
               </span>
               <div
                 className={`TokenDetails-timer ${
