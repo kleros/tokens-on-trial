@@ -27,7 +27,7 @@ class SortBar extends PureComponent {
     const { filters } = filter
     setOldestFirst(oldestFirst)
     const filterValue = filterToContractParam(filters)
-    if (!tokens.loading) fetchTokens('0x00', 10, filterValue, oldestFirst)
+    if (!tokens.loading) fetchTokens('', 10, filterValue, oldestFirst)
   }
 
   render() {
@@ -37,7 +37,10 @@ class SortBar extends PureComponent {
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData ? tokensData.length : 'Loading'} submissions
+          {tokensData && tokensData.length !== undefined
+            ? tokensData.length
+            : 'Loading'}{' '}
+          submissions
         </div>
         <div className="SortBar-sort">
           Sort by:

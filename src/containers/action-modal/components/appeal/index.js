@@ -31,7 +31,7 @@ const Appeal = ({
       </strong>
     </div>
     <div className="Appeal-cost">
-      <span>Arbitration Stake</span>
+      <span>Arbitration Fee Stake</span>
       <strong>
         {`${String(
           web3.utils.fromWei(

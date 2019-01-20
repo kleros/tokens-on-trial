@@ -11,7 +11,6 @@ import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
-import * as walletSelectors from '../../reducers/wallet'
 import * as evidenceActions from '../../actions/evidence'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
@@ -20,7 +19,6 @@ import asyncReadFile from '../../utils/async-file-reader'
 import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
 import Submit from './components/submit'
-import Resubmit from './components/resubmit'
 import Clear from './components/clear'
 import Challenge from './components/challenge'
 import SubmitEvidence from './components/submit-evidence'
@@ -44,7 +42,6 @@ class ActionModal extends PureComponent {
     actionModalParam: PropTypes.shape({}),
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-    accounts: walletSelectors.accountsShape.isRequired,
 
     closeActionModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
@@ -68,10 +65,25 @@ class ActionModal extends PureComponent {
   state = { file: null, fileInfoMessage: null }
 
   handleSubmitTokenClick = async token => {
-    const { createToken } = this.props
+    const { createToken, arbitrableTokenListData } = this.props
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
-    createToken({ tokenData: token, fileData, file })
+
+    const value = web3.utils
+      .toBN(arbitrableTokenListData.data.challengeReward)
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+      .add(
+        web3.utils
+          .toBN(arbitrableTokenListData.data.arbitrationCost)
+          .mul(
+            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
+          )
+          .div(
+            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
+          )
+      )
+
+    createToken({ tokenData: token, fileData, file, value })
   }
 
   handleResubmitTokenClick = () => {
@@ -80,8 +92,23 @@ class ActionModal extends PureComponent {
   }
 
   handleClearTokenClick = () => {
-    const { clearToken, token } = this.props
-    clearToken({ tokenData: token.data })
+    const { clearToken, token, arbitrableTokenListData } = this.props
+
+    const value = web3.utils
+      .toBN(arbitrableTokenListData.data.challengeReward)
+      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+      .add(
+        web3.utils
+          .toBN(arbitrableTokenListData.data.arbitrationCost)
+          .mul(
+            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
+          )
+          .div(
+            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
+          )
+      )
+
+    clearToken({ tokenData: token.data, value })
   }
 
   handleOnFileDropAccepted = async ([file]) => {
@@ -171,20 +198,26 @@ class ActionModal extends PureComponent {
   }
 
   handleFundAppealClick = () => {
-    const { fundAppeal, token, accounts, arbitrableTokenListData } = this.props
+    const {
+      fundAppeal,
+      token,
+      arbitrableTokenListData,
+      actionModalParam
+    } = this.props
     const tokenData = token.data
     const { latestRequest } = tokenData
+    const SIDE = actionModalParam
+    console.info('SIDE', SIDE)
 
-    const userAccount = accounts.data[0]
     let losingSide = false
     if (
-      userAccount === latestRequest.parties[tokenConstants.SIDE.Requester] &&
+      SIDE === tokenConstants.SIDE.Requester &&
       latestRequest.dispute.ruling ===
         tokenConstants.RULING_OPTIONS.Refuse.toString()
     )
       losingSide = true
     else if (
-      userAccount === latestRequest.parties[tokenConstants.SIDE.Challenger] &&
+      SIDE === tokenConstants.SIDE.Challenger &&
       latestRequest.dispute.ruling ===
         tokenConstants.RULING_OPTIONS.Accept.toString()
     )
@@ -207,12 +240,7 @@ class ActionModal extends PureComponent {
           )
       )
 
-    const side =
-      userAccount === latestRequest.parties[tokenConstants.SIDE.Challenger]
-        ? tokenConstants.SIDE.Challenger
-        : tokenConstants.SIDE.Requester
-
-    fundAppeal(tokenData.ID, side, value)
+    fundAppeal(tokenData.ID, SIDE, value)
   }
 
   componentDidMount() {
@@ -255,6 +283,7 @@ class ActionModal extends PureComponent {
           (() => {
             switch (openActionModal) {
               case modalConstants.ACTION_MODAL_ENUM.Submit:
+              case modalConstants.ACTION_MODAL_ENUM.Resubmit:
                 return (
                   <Submit
                     arbitrableTokenListData={arbitrableTokenListData}
@@ -287,16 +316,6 @@ class ActionModal extends PureComponent {
                     token={token.data}
                   />
                 )
-              case modalConstants.ACTION_MODAL_ENUM.Resubmit:
-                return (
-                  <Resubmit
-                    arbitrableTokenListData={arbitrableTokenListData}
-                    closeActionModal={closeActionModal}
-                    name={token && token.data ? token.data.name : 'token'}
-                    resubmitToken={this.handleResubmitTokenClick}
-                    token={token.data}
-                  />
-                )
               case modalConstants.ACTION_MODAL_ENUM.FundRequester:
                 return (
                   <FundDispute
@@ -323,6 +342,7 @@ class ActionModal extends PureComponent {
                     closeActionModal={closeActionModal}
                     fundAppeal={this.handleFundAppealClick}
                     token={token.data}
+                    arbitrableTokenListData={arbitrableTokenListData}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:

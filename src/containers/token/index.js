@@ -25,6 +25,33 @@ import './token.css'
 const truncateMiddle = str =>
   `${str.slice(0, 6)}...${str.slice(str.length - 5, str.length - 1)}`
 
+const getRemainingTime = (token, arbitrableTokenListData, currentTime) => {
+  const { latestRequest } = token
+  let time
+  if (
+    !latestRequest.challengerDepositTime ||
+    latestRequest.challengerDepositTime === 0
+  )
+    time =
+      latestRequest.submissionTime +
+      arbitrableTokenListData.data.challengePeriodDuration -
+      currentTime
+  else if (latestRequest.disputed === false)
+    time =
+      latestRequest.challengerDepositTime +
+      arbitrableTokenListData.data.arbitrationFeesWaitingTime -
+      currentTime
+  else if (
+    latestRequest.dispute.status ===
+    tokenConstants.DISPUTE_STATUS.Appealable.toString()
+  ) {
+    const appealPeriodEnd = Number(latestRequest.appealPeriod[1]) * 1000
+    time = appealPeriodEnd - currentTime
+  }
+
+  return time > 0 ? time : 0
+}
+
 class TokenDetails extends PureComponent {
   static propTypes = {
     // State
@@ -70,9 +97,9 @@ class TokenDetails extends PureComponent {
     toggleFilter(key)
   }
 
-  handleActionClick = action => {
+  handleActionClick = (action, side) => {
     const { openActionModal } = this.props
-    openActionModal(action)
+    openActionModal(action, side)
   }
 
   handleExecuteRequestClick = () => {
@@ -147,44 +174,57 @@ class TokenDetails extends PureComponent {
           const appealPeriodEnd = Number(latestRequest.appealPeriod[1])
           const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
           const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
-          let losingSide = false
           if (
-            userAccount ===
-              token.latestRequest.parties[tokenConstants.SIDE.Requester] &&
-            token.latestRequest.dispute.ruling ===
-              tokenConstants.RULING_OPTIONS.Refuse.toString()
-          )
-            losingSide = true
-          else if (
-            userAccount ===
-              token.latestRequest.parties[tokenConstants.SIDE.Challenger] &&
-            token.latestRequest.dispute.ruling ===
-              tokenConstants.RULING_OPTIONS.Accept.toString()
-          )
-            losingSide = true
-          if (timestamp < endOfFirstHalf)
-            if (losingSide) {
-              icon = 'gavel'
-              disabled = false
-              label = 'Appeal Ruling'
-              method = () =>
-                this.handleActionClick(
-                  modalConstants.ACTION_MODAL_ENUM.FundAppeal
-                )
-            } else label = 'Appeal Period'
-          else if (timestamp < appealPeriodEnd && latestRound.loserFullyFunded)
-            if (losingSide) label = 'Waiting Winner Fees'
-            else {
+            (userAccount ===
+              token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
+              userAccount ===
+                token.latestRequest.parties[tokenConstants.SIDE.Challenger]) &&
+            timestamp < appealPeriodEnd
+          ) {
+            let losingSide
+            if (
+              userAccount ===
+                token.latestRequest.parties[tokenConstants.SIDE.Requester] &&
+              token.latestRequest.dispute.ruling ===
+                tokenConstants.RULING_OPTIONS.Refuse.toString()
+            )
+              losingSide = true
+            else if (
+              userAccount ===
+                token.latestRequest.parties[tokenConstants.SIDE.Challenger] &&
+              token.latestRequest.dispute.ruling ===
+                tokenConstants.RULING_OPTIONS.Accept.toString()
+            )
+              losingSide = true
+
+            const SIDE =
+              userAccount ===
+              token.latestRequest.parties[tokenConstants.SIDE.Requester]
+                ? tokenConstants.SIDE.Requester
+                : tokenConstants.SIDE.Challenger
+
+            if (!losingSide) {
               label = 'Pay Appeal Fees'
               disabled = false
               method = () =>
                 this.handleActionClick(
-                  modalConstants.ACTION_MODAL_ENUM.FundAppeal
+                  modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                  SIDE
+                )
+            } else if (timestamp < endOfFirstHalf) {
+              label = 'Pay Appeal Fees'
+              disabled = false
+              method = () =>
+                this.handleActionClick(
+                  modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                  SIDE
                 )
             }
+          }
         }
       } else if (
-        (submitterFees > 0 || challengerFees > 0) &&
+        submitterFees > 0 &&
+        challengerFees > 0 &&
         timestamp > challengerDepositTime + arbitrationFeesWaitingTime
       ) {
         icon = 'gavel'
@@ -253,7 +293,7 @@ class TokenDetails extends PureComponent {
         method = () =>
           this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Clear)
         label = 'Submit Clearing Request'
-        icon = 'gavel'
+        icon = 'times-circle'
       } else {
         label = 'Resubmit Token'
         icon = 'plus'
@@ -317,12 +357,11 @@ class TokenDetails extends PureComponent {
       web3.eth.getBlock('latest', (err, block) => {
         if (err) throw new Error(err)
         if (!block) window.location.reload() // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
-
-        let time =
-          token.latestRequest.submissionTime +
-          arbitrableTokenListData.data.challengePeriodDuration -
+        const time = getRemainingTime(
+          token,
+          arbitrableTokenListData,
           block.timestamp * 1000
-        time = time >= 0 ? time : 0
+        )
         this.setState({
           timestamp: block.timestamp,
           countdown: new Date(time)
@@ -385,7 +424,7 @@ class TokenDetails extends PureComponent {
                       className="TokenDetails-icon TokenDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(token.addr)}
+                    {truncateMiddle(token.ID)}
                   </a>
                 </span>
               </div>
@@ -411,7 +450,11 @@ class TokenDetails extends PureComponent {
               </span>
               <div
                 className={`TokenDetails-timer ${
-                  token.clientStatus !== tokenConstants.STATUS_ENUM.Pending ||
+                  token.clientStatus <= 1 ||
+                  (hasPendingRequest(token.status, token.latestRequest) &&
+                    token.latestRequest.dispute &&
+                    token.latestRequest.dispute.status !==
+                      tokenConstants.DISPUTE_STATUS.Appealable.toString()) ||
                   Number(countdown) === 0
                     ? `Hidden`
                     : ``

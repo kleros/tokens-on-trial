@@ -2,12 +2,15 @@ import Web3 from 'web3'
 import Archon from '@kleros/archon'
 
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list.json'
+import ArbitrableAddressList from '../assets/contracts/arbitrable-address-list.json'
 import Arbitrator from '../assets/contracts/enhanced-appealable-arbitrator.json'
 
 const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
 const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
+const ARBITRABLE_ADDRESS_LIST_ADDRESS =
+  process.env[`REACT_APP_${env}_ARBITRABLE_ADDRESS_LIST_ADDRESS`]
 const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
 const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
 const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
@@ -53,6 +56,10 @@ const arbitrableTokenList = new web3.eth.Contract(
   ArbitrableTokenList.abi,
   ARBITRABLE_TOKEN_LIST_ADDRESS
 )
+const arbitrableAddressList = new web3.eth.Contract(
+  ArbitrableAddressList.abi,
+  ARBITRABLE_ADDRESS_LIST_ADDRESS
+)
 const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
@@ -64,6 +71,7 @@ export {
   strictETHAddressRegExp,
   arbitrableTokenList,
   arbitrator,
+  arbitrableAddressList,
   FILE_UPLOAD_URL,
   FILE_BASE_URL,
   archon

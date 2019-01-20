@@ -14,7 +14,6 @@ import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
 import * as tokenConstants from '../constants/token'
-import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
 import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
@@ -47,6 +46,7 @@ const convertFromString = token => {
 function* fetchTokens({
   payload: { cursor, count, filterValue, sortValue, requestedPage }
 }) {
+  if (cursor === '') cursor = '0x0000000000000000000000000000000000000000'
   const totalCount = yield call(arbitrableTokenList.methods.tokenCount().call, {
     from: yield select(walletSelectors.getAccount)
   })
@@ -77,16 +77,12 @@ function* fetchTokens({
   )
 
   const tokens = [
-    ...(cursor === '0x00'
+    ...(cursor === '0x0000000000000000000000000000000000000000'
       ? []
       : (yield select(tokenSelectors.getTokens)) || []),
     ...(yield all(
       data.values
-        .filter(
-          ID =>
-            ID !==
-            '0x0000000000000000000000000000000000000000000000000000000000000000'
-        )
+        .filter(ID => ID !== '0x0000000000000000000000000000000000000000')
         .map(ID => call(fetchToken, { payload: { ID } }))
     ))
   ]
@@ -178,14 +174,16 @@ export function* fetchToken({ payload: { ID } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* requestStatusChange({ payload: { token, file, fileData } }) {
-  if (isInvalid(token.addr))
+function* requestStatusChange({ payload: { token, file, fileData, value } }) {
+  if (isInvalid(token.ID) && isInvalid(token.addr))
     throw new Error('Missing address on token submit', token)
 
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: web3.utils.toChecksumAddress(token.addr),
+    addr: token.ID
+      ? web3.utils.toChecksumAddress(token.ID)
+      : web3.utils.toChecksumAddress(token.addr),
     symbolMultihash: token.symbolMultihash,
     networkID: 'ETH'
   }
@@ -199,19 +197,12 @@ function* requestStatusChange({ payload: { token, file, fileData } }) {
     tokenToSubmit.symbolMultihash = fileMultihash
   }
 
-  const { name, ticker, addr, networkID, symbolMultihash } = tokenToSubmit
+  const { name, ticker, addr, symbolMultihash } = tokenToSubmit
 
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = web3.utils.soliditySha3(
-    name,
-    ticker,
-    addr,
-    symbolMultihash,
-    networkID
-  )
-
+  const ID = addr
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
   if (
@@ -232,7 +223,7 @@ function* requestStatusChange({ payload: { token, file, fileData } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value: yield select(arbitrableTokenListSelectors.getSubmitCost)
+      value
     }
   )
 

@@ -22,7 +22,7 @@ const FundDispute = ({
       To defend your case, the following <br /> amount of ETH is required
     </h5>
     <div className="Challenge-cost">
-      <span>Arbitration Stake</span>
+      <span>Arbitration Fee Stake</span>
       <strong>
         {`${String(
           web3.utils.fromWei(

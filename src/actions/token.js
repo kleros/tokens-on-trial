@@ -21,13 +21,13 @@ export const token = {
 
 /* Action Creators */
 
-export const createToken = ({ tokenData, file, fileData }) => ({
+export const createToken = ({ tokenData, file, fileData, value }) => ({
   type: token.CREATE,
-  payload: { token: tokenData, file, fileData }
+  payload: { token: tokenData, file, fileData, value }
 })
-export const clearToken = ({ tokenData }) => ({
+export const clearToken = ({ tokenData, value }) => ({
   type: token.CLEAR,
-  payload: { token: tokenData }
+  payload: { token: tokenData, value }
 })
 export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,

@@ -93,7 +93,7 @@ class Tokens extends Component {
       fetchTokens(
         tokens.data && clear !== true
           ? tokens.data[tokens.data.length - 1].ID
-          : '0x00',
+          : '',
         TOKENS_PER_PAGE,
         filterValue,
         oldestFirst,

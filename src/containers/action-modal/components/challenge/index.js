@@ -34,7 +34,7 @@ const Challenge = ({
       </strong>
     </div>
     <div className="Challenge-cost">
-      <span>Arbitration Stake</span>
+      <span>Arbitration Fee Stake</span>
       <strong>
         {`${String(
           web3.utils.fromWei(

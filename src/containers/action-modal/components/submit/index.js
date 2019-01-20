@@ -36,11 +36,9 @@ const Submit = ({
       onDropAccepted={handleOnFileDropAccepted}
     />
     {fileInfoMessage && <div>{fileInfoMessage}</div>}
-    <div className="Submit-stake">
-      <h4>
-        <strong>Stake:</strong>
-      </h4>
-      <span>
+    <div className="Challenge-cost">
+      <span>Challenge Stake</span>
+      <strong>
         {`${String(
           web3.utils.fromWei(
             String(
@@ -48,7 +46,73 @@ const Submit = ({
             )
           )
         )} ETH`}
-      </span>
+      </strong>
+    </div>
+    <div className="Challenge-cost">
+      <span>Arbitration Fee Stake</span>
+      <strong>
+        {`${String(
+          web3.utils.fromWei(
+            String(
+              web3.utils
+                .toBN(arbitrableTokenListData.data.arbitrationCost)
+                .mul(
+                  web3.utils.toBN(
+                    arbitrableTokenListData.data.sharedStakeMultiplier
+                  )
+                )
+                .div(
+                  web3.utils.toBN(
+                    arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                  )
+                )
+            )
+          )
+        )} ETH`}
+      </strong>
+    </div>
+    <div className="Challenge-cost">
+      <span>Required Arbitration Fee</span>
+      <strong>
+        {`${String(
+          web3.utils.fromWei(
+            String(
+              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
+            )
+          )
+        )} ETH`}
+      </strong>
+    </div>
+    <br />
+    <div className="Challenge-cost">
+      <span>Total Due:</span>
+      <strong className="Challenge-total-value">
+        {`${String(
+          web3.utils.fromWei(
+            String(
+              web3.utils
+                .toBN(arbitrableTokenListData.data.challengeReward)
+                .add(
+                  web3.utils
+                    .toBN(arbitrableTokenListData.data.arbitrationCost)
+                    .mul(
+                      web3.utils.toBN(
+                        arbitrableTokenListData.data.sharedStakeMultiplier
+                      )
+                    )
+                    .div(
+                      web3.utils.toBN(
+                        arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                      )
+                    )
+                )
+                .add(
+                  web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
+                )
+            )
+          )
+        )} ETH`}
+      </strong>
     </div>
     <br />
     <div className="Modal-actions">
