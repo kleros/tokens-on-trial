@@ -169,7 +169,11 @@ class TokenDetails extends PureComponent {
         if (
           Number(latestRequest.dispute.status) ===
             tokenConstants.DISPUTE_STATUS.Appealable &&
-          !latestRound.appealed
+          !latestRound.appealed &&
+          (userAccount ===
+            token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
+            userAccount ===
+              token.latestRequest.parties[tokenConstants.SIDE.Challenger])
         ) {
           const appealPeriodStart = Number(
             latestRequest.latestRound.appealPeriod[0]
@@ -247,7 +251,11 @@ class TokenDetails extends PureComponent {
         label = 'Execute Request'
       } else if (
         challengerDepositTime > 0 &&
-        timestamp - challengerDepositTime < arbitrationFeesWaitingTime
+        timestamp - challengerDepositTime < arbitrationFeesWaitingTime &&
+        (userAccount ===
+          token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
+          userAccount ===
+            token.latestRequest.parties[tokenConstants.SIDE.Challenger])
       ) {
         icon = 'gavel'
         label = 'Pay Arbitration Fees'
@@ -361,7 +369,7 @@ class TokenDetails extends PureComponent {
       // Set timer once we have data.
       web3.eth.getBlock('latest', (err, block) => {
         if (err) throw new Error(err)
-        if (!block) window.location.reload() // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
+        if (!block) window.location.reload(true) // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
         const time = getRemainingTime(
           token,
           arbitrableTokenListData,
@@ -465,7 +473,7 @@ class TokenDetails extends PureComponent {
                     : ``
                 }`}
               >
-                Challenge Deadline{' '}
+                Deadline{' '}
                 {countdown instanceof Date
                   ? countdown.toISOString().substr(11, 8)
                   : '--:--:--'}
