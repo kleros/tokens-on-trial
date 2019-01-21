@@ -15,7 +15,7 @@ import * as filterSelectors from '../../reducers/filter'
 import { filterToContractParam } from '../../utils/filter'
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 5
+const TOKENS_PER_PAGE = 10
 
 class Tokens extends Component {
   static propTypes = {
@@ -49,8 +49,16 @@ class Tokens extends Component {
   }
 
   mapTokens = memoizeOne(tokens => {
+    const keys = {}
     if (Array.isArray(tokens))
-      return tokens.map(token => <TokenCard key={token.ID} token={token} />)
+      return tokens
+        .filter(token => {
+          if (!keys[token.ID]) {
+            keys[token.ID] = true
+            return true
+          } else return false
+        })
+        .map(token => <TokenCard key={token.ID} token={token} />)
     return null
   })
 

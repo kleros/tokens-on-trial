@@ -14,7 +14,7 @@ export const _tokenShape = PropTypes.shape({
     .isRequired,
   latestRequest: PropTypes.shape({
     disputed: PropTypes.bool.isRequired,
-    disputeID: PropTypes.string.isRequired,
+    disputeID: PropTypes.number.isRequired,
     submissionTime: PropTypes.number.isRequired,
     challengerDepositTime: PropTypes.number.isRequired,
     challengeRewardBalance: PropTypes.string.isRequired,

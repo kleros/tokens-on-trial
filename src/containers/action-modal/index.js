@@ -207,7 +207,6 @@ class ActionModal extends PureComponent {
     const tokenData = token.data
     const { latestRequest } = tokenData
     const SIDE = actionModalParam
-    console.info('SIDE', SIDE)
 
     let losingSide = false
     if (

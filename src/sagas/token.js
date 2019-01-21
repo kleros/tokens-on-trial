@@ -25,6 +25,7 @@ const convertFromString = token => {
   latestRequest.challengerDepositTime =
     Number(latestRequest.challengerDepositTime) * 1000
   latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
+  latestRequest.disputeID = Number(latestRequest.disputeID)
 
   const { latestRound } = latestRequest
   latestRound.ruling = Number(latestRound.ruling)
@@ -46,7 +47,9 @@ const convertFromString = token => {
 function* fetchTokens({
   payload: { cursor, count, filterValue, sortValue, requestedPage }
 }) {
-  if (cursor === '') cursor = '0x0000000000000000000000000000000000000000'
+  if (cursor === '')
+    cursor =
+      '0x0000000000000000000000000000000000000000000000000000000000000000'
   const totalCount = yield call(arbitrableTokenList.methods.tokenCount().call, {
     from: yield select(walletSelectors.getAccount)
   })
@@ -71,18 +74,24 @@ function* fetchTokens({
       cursor,
       count,
       filterValue,
-      sortValue
+      sortValue,
+      '0x0000000000000000000000000000000000000000'
     ).call,
     { from: yield select(walletSelectors.getAccount) }
   )
 
   const tokens = [
-    ...(cursor === '0x0000000000000000000000000000000000000000'
+    ...(cursor ===
+    '0x0000000000000000000000000000000000000000000000000000000000000000'
       ? []
       : (yield select(tokenSelectors.getTokens)) || []),
     ...(yield all(
       data.values
-        .filter(ID => ID !== '0x0000000000000000000000000000000000000000')
+        .filter(
+          ID =>
+            ID !==
+            '0x0000000000000000000000000000000000000000000000000000000000000000'
+        )
         .map(ID => call(fetchToken, { payload: { ID } }))
     ))
   ]
@@ -107,28 +116,6 @@ export function* fetchToken({ payload: { ID } }) {
       ).call
     )
 
-    if (token.latestRequest.disputed) {
-      // Fetch dispute data.
-      token.latestRequest.dispute = yield call(
-        arbitrator.methods.disputes(token.latestRequest.disputeID).call
-      )
-
-      // Fetch appeal period and cost if in appeal period.
-      if (
-        token.latestRequest.dispute.status ===
-          tokenConstants.DISPUTE_STATUS.Appealable.toString() &&
-        !token.latestRequest.appealed
-      ) {
-        token.latestRequest.appealPeriod = yield call(
-          arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
-        )
-        token.latestRequest.appealCost = yield call(
-          arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
-            .call
-        )
-      }
-    }
-
     token.latestRequest.latestRound = yield call(
       arbitrableTokenList.methods.getRoundInfo(
         ID,
@@ -136,6 +123,32 @@ export function* fetchToken({ payload: { ID } }) {
         Number(token.latestRequest.numberOfRounds) - 1
       ).call
     )
+
+    if (token.latestRequest.disputed) {
+      // Fetch dispute data.
+      token.latestRequest.dispute = yield call(
+        arbitrator.methods.disputes(token.latestRequest.disputeID).call
+      )
+      token.latestRequest.dispute.status = yield call(
+        arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
+      )
+
+      // Fetch appeal period and cost if in appeal period.
+      if (
+        token.latestRequest.dispute.status ===
+          tokenConstants.DISPUTE_STATUS.Appealable.toString() &&
+        !token.latestRequest.latestRound.appealed
+      ) {
+        token.latestRequest.latestRound.appealCost = yield call(
+          arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
+            .call
+        )
+
+        token.latestRequest.latestRound.appealPeriod = yield call(
+          arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
+        )
+      }
+    }
 
     token = convertFromString(token)
   } else
@@ -181,9 +194,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: token.ID
-      ? web3.utils.toChecksumAddress(token.ID)
-      : web3.utils.toChecksumAddress(token.addr),
+    addr: web3.utils.toChecksumAddress(token.addr),
     symbolMultihash: token.symbolMultihash,
     networkID: 'ETH'
   }
@@ -197,12 +208,18 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     tokenToSubmit.symbolMultihash = fileMultihash
   }
 
-  const { name, ticker, addr, symbolMultihash } = tokenToSubmit
+  const { name, ticker, addr, symbolMultihash, networkID } = tokenToSubmit
 
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = addr
+  const ID = web3.utils.soliditySha3(
+    name,
+    ticker,
+    addr,
+    symbolMultihash,
+    networkID
+  )
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
   if (

@@ -45,7 +45,8 @@ const getRemainingTime = (token, arbitrableTokenListData, currentTime) => {
     latestRequest.dispute.status ===
     tokenConstants.DISPUTE_STATUS.Appealable.toString()
   ) {
-    const appealPeriodEnd = Number(latestRequest.appealPeriod[1]) * 1000
+    const appealPeriodEnd =
+      Number(latestRequest.latestRound.appealPeriod[1]) * 1000
     time = appealPeriodEnd - currentTime
   }
 
@@ -168,10 +169,14 @@ class TokenDetails extends PureComponent {
         if (
           Number(latestRequest.dispute.status) ===
             tokenConstants.DISPUTE_STATUS.Appealable &&
-          !latestRequest.appealed
+          !latestRound.appealed
         ) {
-          const appealPeriodStart = Number(latestRequest.appealPeriod[0])
-          const appealPeriodEnd = Number(latestRequest.appealPeriod[1])
+          const appealPeriodStart = Number(
+            latestRequest.latestRound.appealPeriod[0]
+          )
+          const appealPeriodEnd = Number(
+            latestRequest.latestRound.appealPeriod[1]
+          )
           const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
           const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
           if (

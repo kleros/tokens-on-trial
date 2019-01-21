@@ -27,41 +27,18 @@ const Appeal = ({
     <div className="Appeal-cost">
       <span>Appeal Cost</span>
       <strong>
-        {`${web3.utils.fromWei(token.latestRequest.appealCost)} ETH`}
+        {`${token.latestRequest.latestRound.appealCost &&
+          web3.utils.fromWei(token.latestRequest.latestRound.appealCost)} ETH`}
       </strong>
     </div>
     <div className="Appeal-cost">
       <span>Arbitration Fee Stake</span>
       <strong>
         {`${String(
-          web3.utils.fromWei(
-            web3.utils
-              .toBN(arbitrableTokenListData.data.arbitrationCost)
-              .mul(
-                web3.utils.toBN(
-                  losingSide
-                    ? arbitrableTokenListData.data.loserStakeMultiplier
-                    : arbitrableTokenListData.data.winnerStakeMultiplier
-                )
-              )
-              .div(
-                web3.utils.toBN(
-                  arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                )
-              )
-          )
-        )} ETH `}
-      </strong>
-    </div>
-    <br />
-    <div className="Appeal-cost">
-      <span>Total Due:</span>
-      <strong className="Appeal-total-value">
-        {`${String(
-          web3.utils.fromWei(
-            web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost).add(
+          token.latestRequest.latestRound.appealCost &&
+            web3.utils.fromWei(
               web3.utils
-                .toBN(arbitrableTokenListData.data.arbitrationCost)
+                .toBN(token.latestRequest.latestRound.appealCost)
                 .mul(
                   web3.utils.toBN(
                     losingSide
@@ -75,7 +52,33 @@ const Appeal = ({
                   )
                 )
             )
-          )
+        )} ETH `}
+      </strong>
+    </div>
+    <br />
+    <div className="Appeal-cost">
+      <span>Total Due:</span>
+      <strong className="Appeal-total-value">
+        {`${String(
+          token.latestRequest.latestRound.appealCost &&
+            web3.utils.fromWei(
+              web3.utils.toBN(token.latestRequest.latestRound.appealCost).add(
+                web3.utils
+                  .toBN(token.latestRequest.latestRound.appealCost)
+                  .mul(
+                    web3.utils.toBN(
+                      losingSide
+                        ? arbitrableTokenListData.data.loserStakeMultiplier
+                        : arbitrableTokenListData.data.winnerStakeMultiplier
+                    )
+                  )
+                  .div(
+                    web3.utils.toBN(
+                      arbitrableTokenListData.data.MULTIPLIER_PRECISION
+                    )
+                  )
+              )
+            )
         )} ETH `}
       </strong>
     </div>

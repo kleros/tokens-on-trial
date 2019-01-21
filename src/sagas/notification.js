@@ -37,7 +37,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
 
-    if (notifiedIDs[event.returnValues._tokenAddr]) continue
+    if (notifiedIDs[event.returnValues._tokenID]) continue
     const isRequester = account === event.returnValues._requester
     if (!isRequester && account !== event.returnValues._challenger) continue
 
@@ -76,7 +76,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     )
 
     if (message) {
-      notifiedIDs[returnValues._tokenAddr] =
+      notifiedIDs[returnValues._tokenID] =
         returnValues._disputed === true &&
         returnValues._status ===
           tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
@@ -86,7 +86,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
           : true
 
       emitter({
-        ID: returnValues._tokenAddr,
+        ID: returnValues._tokenID,
         date: await getBlockDate(event.blockHash),
         message,
         clientStatus
@@ -96,16 +96,15 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
 
   if (
     oldestNonDisputedSubmittedStatusEvent &&
-    notifiedIDs[
-      oldestNonDisputedSubmittedStatusEvent.returnValues._tokenAddr
-    ] !== 'disputed'
+    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID] !==
+      'disputed'
   ) {
     const date = await getBlockDate(
       oldestNonDisputedSubmittedStatusEvent.blockHash
     )
     if (Date.now() - date > timeToChallenge)
       emitter({
-        ID: oldestNonDisputedSubmittedStatusEvent.returnValues._tokenAddr,
+        ID: oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID,
         date,
         message: 'Token pending execution.'
       })
@@ -146,7 +145,7 @@ function* pushNotificationsListener() {
         })
       arbitrableTokenList.events.TokenStatusChange().on('data', event => {
         emitNotifications(account, timeToChallenge, emitter, [event])
-        emitter(event.returnValues._tokenAddr)
+        emitter(event.returnValues._tokenID)
       })
       return () => {} // Unsubscribe function
     })
