@@ -1,0 +1,65 @@
+@import '../../styles/_colors.scss';
+
+/* @define BadgeCard */
+.BadgeCard {
+  background: $card;
+  border: 1px solid $border;
+  border-radius: 3px;
+  box-shadow: 0 3px 6px $shadow;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  height: 230px;
+  margin-bottom: 40px;
+  width: 248px;
+
+  &-header {
+    align-items: center;
+    background-color: #009aff;
+    border-bottom: 1px solid #ebebeb;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    height: 35px;
+    justify-content: space-between;
+    padding: 0 10px;
+    padding-top: 3px;
+  }
+
+  &-content {
+    align-items: center;
+    display: flex;
+    flex-grow: 1;
+    justify-content: center;
+  }
+
+  &-footer {
+    align-content: center;
+    align-items: center;
+    background-color: #f8f8f8;
+    display: flex;
+    height: 58px;
+    justify-content: center;
+
+    &-badge {
+      width: 30px;
+    }
+
+    &-text {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0;
+      text-align: center;
+      width: 150px;
+    }
+  }
+
+  &-image {
+    height: 90px;
+    object-fit: contain;
+  }
+
+  &-hidden {
+    visibility: hidden;
+  }
+}

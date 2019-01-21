@@ -8,6 +8,7 @@ import * as mime from 'mime-types'
 import { arbitrableTokenList, arbitrator, web3 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
+import BadgeCard from '../../components/badge-card'
 import FilterBar from '../filter-bar'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/token'
 import { getFileIcon } from '../../utils/evidence'
@@ -508,14 +509,16 @@ class TokenDetails extends PureComponent {
           </div>
         )}
         <br />
-        {token.badges && token.badges.length > 0 && (
+        {(Number(token.badgeStatus) ===
+          tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
+          token.badgeStatus ===
+            tokenConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
             <h3>Badges</h3>
-            <span>
-              <span className="TokenDescription--icon--badge TokenDetails-meta--aligned" />
-              Compliant with YY
-            </span>
+            <div className="TokenDescription-evidence">
+              <BadgeCard token={token} />
+            </div>
           </div>
         )}
       </div>

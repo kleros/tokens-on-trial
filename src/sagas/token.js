@@ -5,6 +5,7 @@ import { all, call, select, takeLatest } from 'redux-saga/effects'
 import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableTokenList,
+  arbitrableAddressList,
   arbitrator,
   archon,
   web3
@@ -150,6 +151,9 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
+    token.badgeStatus = yield call(
+      arbitrableAddressList.methods.addresses(token.addr).call
+    )
     token = convertFromString(token)
   } else
     token.latestRequest = {
