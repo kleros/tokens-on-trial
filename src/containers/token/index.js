@@ -438,7 +438,7 @@ class TokenDetails extends PureComponent {
                       className="TokenDetails-icon TokenDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(token.ID)}
+                    {truncateMiddle(token.addr)}
                   </a>
                 </span>
               </div>
