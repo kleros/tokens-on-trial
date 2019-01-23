@@ -21,13 +21,13 @@ import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
 import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
 import * as tokenConstants from '../constants/token'
-import { contractStatusToClientStatus } from '../utils/token'
+import { contractStatusToClientStatus, getBlock } from '../utils/token'
 
 import { fetchToken } from './token'
 
 // Helpers
 const getBlockDate = memoizeOne(blockHash =>
-  web3.eth.getBlock(blockHash).then(block => new Date(block.timestamp * 1000))
+  getBlock(null, web3, blockHash, block => new Date(block.timestamp * 1000))
 )
 
 const emitNotifications = async (account, timeToChallenge, emitter, events) => {

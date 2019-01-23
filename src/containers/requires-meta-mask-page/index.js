@@ -26,12 +26,14 @@ class RequiresMetaMaskPage extends PureComponent {
           !prevAddr
         ) {
           // Logging in
-          window.location.reload()
+          console.info('logging in')
+          window.location.reload(true)
           return
         }
         if (!selectedAddress && prevAddr) {
           // Logging out
-          window.location.reload()
+          window.location.reload(true)
+          console.info('logging out')
           return
         }
         prevAddr = selectedAddress

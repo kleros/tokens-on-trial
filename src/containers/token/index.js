@@ -10,7 +10,11 @@ import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
 import FilterBar from '../filter-bar'
-import { hasPendingRequest, isRegistrationRequest } from '../../utils/token'
+import {
+  hasPendingRequest,
+  isRegistrationRequest,
+  getBlock
+} from '../../utils/token'
 import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
@@ -170,68 +174,73 @@ class TokenDetails extends PureComponent {
         if (
           Number(latestRequest.dispute.status) ===
             tokenConstants.DISPUTE_STATUS.Appealable &&
-          !latestRound.appealed &&
-          (userAccount ===
-            token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
-            userAccount ===
-              token.latestRequest.parties[tokenConstants.SIDE.Challenger])
-        ) {
-          const appealPeriodStart = Number(
-            latestRequest.latestRound.appealPeriod[0]
-          )
-          const appealPeriodEnd = Number(
-            latestRequest.latestRound.appealPeriod[1]
-          )
-          const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
-          const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
+          !latestRound.appealed
+        )
           if (
-            (userAccount ===
+            userAccount ===
               token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
-              userAccount ===
-                token.latestRequest.parties[tokenConstants.SIDE.Challenger]) &&
-            timestamp < appealPeriodEnd
+            userAccount ===
+              token.latestRequest.parties[tokenConstants.SIDE.Challenger]
           ) {
-            let losingSide
-            if (
-              userAccount ===
-                token.latestRequest.parties[tokenConstants.SIDE.Requester] &&
-              token.latestRequest.dispute.ruling ===
-                tokenConstants.RULING_OPTIONS.Refuse.toString()
+            const appealPeriodStart = Number(
+              latestRequest.latestRound.appealPeriod[0]
             )
-              losingSide = true
-            else if (
-              userAccount ===
-                token.latestRequest.parties[tokenConstants.SIDE.Challenger] &&
-              token.latestRequest.dispute.ruling ===
-                tokenConstants.RULING_OPTIONS.Accept.toString()
+            const appealPeriodEnd = Number(
+              latestRequest.latestRound.appealPeriod[1]
             )
-              losingSide = true
+            const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
+            const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
+            if (timestamp < appealPeriodEnd) {
+              const SIDE =
+                userAccount ===
+                token.latestRequest.parties[tokenConstants.SIDE.Requester]
+                  ? tokenConstants.SIDE.Requester
+                  : tokenConstants.SIDE.Challenger
 
-            const SIDE =
-              userAccount ===
-              token.latestRequest.parties[tokenConstants.SIDE.Requester]
-                ? tokenConstants.SIDE.Requester
-                : tokenConstants.SIDE.Challenger
+              if (
+                latestRound.requiredForSide[SIDE] === 0 ||
+                latestRound.paidFees[SIDE] < latestRound.requiredForSide[SIDE]
+              ) {
+                let losingSide
+                if (
+                  userAccount ===
+                    token.latestRequest.parties[
+                      tokenConstants.SIDE.Requester
+                    ] &&
+                  token.latestRequest.dispute.ruling ===
+                    tokenConstants.RULING_OPTIONS.Refuse.toString()
+                )
+                  losingSide = true
+                else if (
+                  userAccount ===
+                    token.latestRequest.parties[
+                      tokenConstants.SIDE.Challenger
+                    ] &&
+                  token.latestRequest.dispute.ruling ===
+                    tokenConstants.RULING_OPTIONS.Accept.toString()
+                )
+                  losingSide = true
 
-            if (!losingSide) {
-              label = 'Pay Appeal Fees'
-              disabled = false
-              method = () =>
-                this.handleActionClick(
-                  modalConstants.ACTION_MODAL_ENUM.FundAppeal,
-                  SIDE
-                )
-            } else if (timestamp < endOfFirstHalf) {
-              label = 'Pay Appeal Fees'
-              disabled = false
-              method = () =>
-                this.handleActionClick(
-                  modalConstants.ACTION_MODAL_ENUM.FundAppeal,
-                  SIDE
-                )
+                if (!losingSide) {
+                  label = 'Pay Appeal Fees'
+                  disabled = false
+                  method = () =>
+                    this.handleActionClick(
+                      modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                      SIDE
+                    )
+                } else if (timestamp < endOfFirstHalf) {
+                  label = 'Pay Appeal Fees'
+                  disabled = false
+                  method = () =>
+                    this.handleActionClick(
+                      modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                      SIDE
+                    )
+                }
+              } else label = 'Waiting For Opponent Fees'
             }
-          }
-        }
+          } else label = 'Wating Parties Appeals'
       } else if (
         submitterFees > 0 &&
         challengerFees > 0 &&
@@ -368,9 +377,7 @@ class TokenDetails extends PureComponent {
       }
 
       // Set timer once we have data.
-      web3.eth.getBlock('latest', (err, block) => {
-        if (err) throw new Error(err)
-        if (!block) window.location.reload(true) // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
+      getBlock(null, web3, 'latest', block => {
         const time = getRemainingTime(
           token,
           arbitrableTokenListData,
@@ -443,12 +450,19 @@ class TokenDetails extends PureComponent {
                 </span>
               </div>
               <div>
-                <span>
-                  <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
-                    1
+                {(Number(token.badgeStatus) ===
+                  tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
+                  token.badgeStatus ===
+                    tokenConstants.IN_CONTRACT_STATUS_ENUM[
+                      'ClearingRequested'
+                    ]) && (
+                  <span>
+                    <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
+                      1
+                    </span>
+                    Badges
                   </span>
-                  Badges
-                </span>
+                )}
               </div>
             </div>
             <div className="TokenDetails-meta">
@@ -509,6 +523,7 @@ class TokenDetails extends PureComponent {
           </div>
         )}
         <br />
+        {console.info()}
         {(Number(token.badgeStatus) ===
           tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
           token.badgeStatus ===

@@ -83,6 +83,7 @@ class ActionModal extends PureComponent {
           )
       )
 
+    this.setState({ file: null, fileInfoMessage: null })
     createToken({ tokenData: token, fileData, file, value })
   }
 
@@ -134,6 +135,7 @@ class ActionModal extends PureComponent {
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
     submitEvidence({ file, evidenceData: evidence, ID, fileData })
+    this.setState({ file: null, fileInfoMessage: null })
   }
 
   handleChallengeClick = () => {
