@@ -134,15 +134,90 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-    token.badgeStatus = yield call(
-      arbitrableAddressList.methods.addresses(token.addr).call
+    const { addr } = token
+    let badge = yield call(
+      arbitrableAddressList.methods.getAddressInfo(addr).call
     )
+
+    if (Number(badge.numberOfRequests > 0)) {
+      badge.latestRequest = yield call(
+        arbitrableAddressList.methods.getRequestInfo(
+          addr,
+          Number(badge.numberOfRequests) - 1
+        ).call
+      )
+
+      badge.latestRequest.latestRound = yield call(
+        arbitrableAddressList.methods.getRoundInfo(
+          addr,
+          Number(badge.numberOfRequests) - 1,
+          Number(badge.latestRequest.numberOfRounds) - 1
+        ).call
+      )
+
+      if (badge.latestRequest.disputed) {
+        // Fetch dispute data.
+        badge.latestRequest.dispute = yield call(
+          arbitrator.methods.disputes(badge.latestRequest.disputeID).call
+        )
+        badge.latestRequest.dispute.status = yield call(
+          arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
+        )
+
+        // Fetch appeal period and cost if in appeal period.
+        if (
+          badge.latestRequest.dispute.status ===
+            tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
+          !badge.latestRequest.latestRound.appealed
+        ) {
+          badge.latestRequest.latestRound.appealCost = yield call(
+            arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
+              .call
+          )
+
+          badge.latestRequest.latestRound.appealPeriod = yield call(
+            arbitrator.methods.appealPeriod(badge.latestRequest.disputeID).call
+          )
+        }
+      }
+
+      badge = convertFromString(badge)
+    } else
+      badge.latestRequest = {
+        disputed: false,
+        disputeID: 0,
+        dispute: null,
+        submissionTime: 0,
+        challengeRewardBalance: 0,
+        challengerDepositTime: 0,
+        feeRewards: 0,
+        pot: [],
+        resolved: false,
+        parties: [],
+        latestRound: {
+          appealed: false,
+          paidFees: [],
+          requiredForSide: []
+        }
+      }
+
+    token.badge = {
+      ...badge,
+      status: Number(badge.status),
+      clientStatus: contractStatusToClientStatus(
+        badge.status,
+        badge.latestRequest.disputed,
+        badge.latestRequest.resolved
+      )
+    }
+
     token = convertFromString(token)
   } else
     token.latestRequest = {
       disputed: false,
       disputeID: 0,
       dispute: null,
+      badge: null,
       submissionTime: 0,
       challengeRewardBalance: 0,
       challengerDepositTime: 0,

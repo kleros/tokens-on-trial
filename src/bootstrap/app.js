@@ -7,7 +7,8 @@ import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Tokens from '../containers/tokens'
-import TokenDetail from '../containers/token'
+import TokenDetails from '../containers/token'
+import BadgeDetails from '../containers/badge'
 import PageNotFound from '../components/page-not-found'
 import NavBar from '../containers/nav-bar'
 import ActionModal from '../containers/action-modal'
@@ -132,7 +133,12 @@ const App = ({ store, history }) => (
             <Switch>
               <Redirect exact from="/" to="/tokens/1" />
               <Route component={Tokens} exact path="/tokens/:page" />
-              <Route component={TokenDetail} exact path="/token/:tokenID" />
+              <Route component={TokenDetails} exact path="/token/:tokenID" />
+              <Route
+                component={BadgeDetails}
+                exact
+                path="/token/:tokenID/badge/:badgeAddr"
+              />
               <Route component={PageNotFound} exact path="/notifications" />
               <Route component={PageNotFound} />
             </Switch>

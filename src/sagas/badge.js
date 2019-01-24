@@ -12,7 +12,8 @@ import * as tcrConstants from '../constants/tcr'
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The fetched address.
  */
-export function* fetchBadgeStatus({ payload: { addr } }) {
+export function* fetchBadgeStatus({ payload: { token } }) {
+  const { addr } = token
   let address = yield call(
     arbitrableAddressList.methods.getAddressInfo(addr).call
   )

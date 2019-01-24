@@ -62,7 +62,8 @@ class ActionModal extends PureComponent {
     fundAppeal: PropTypes.func.isRequired,
 
     // Badge actions
-    createBadge: PropTypes.func.isRequired
+    createBadge: PropTypes.func.isRequired,
+    clearBadge: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -77,19 +78,21 @@ class ActionModal extends PureComponent {
     const { createToken, arbitrableTokenListData } = this.props
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
+    const {
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION,
+      challengeReward
+    } = arbitrableTokenListData.data
 
     const value = web3.utils
-      .toBN(arbitrableTokenListData.data.challengeReward)
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
-          .toBN(arbitrableTokenListData.data.arbitrationCost)
-          .mul(
-            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
-          )
-          .div(
-            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
-          )
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
       )
 
     this.setState({ file: null, fileInfoMessage: null })
@@ -103,22 +106,46 @@ class ActionModal extends PureComponent {
 
   handleClearTokenClick = () => {
     const { clearToken, token, arbitrableTokenListData } = this.props
+    const {
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION,
+      challengeReward
+    } = arbitrableTokenListData.data
 
     const value = web3.utils
-      .toBN(arbitrableTokenListData.data.challengeReward)
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
-          .toBN(arbitrableTokenListData.data.arbitrationCost)
-          .mul(
-            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
-          )
-          .div(
-            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
-          )
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
       )
 
     clearToken({ tokenData: token.data, value })
+  }
+
+  handleClearBadgeClick = () => {
+    const { clearBadge, token, arbitrableAddressListData } = this.props
+    const {
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION,
+      challengeReward
+    } = arbitrableAddressListData.data
+
+    const value = web3.utils
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
+      .add(
+        web3.utils
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
+      )
+
+    clearBadge({ tokenData: token.data, value })
   }
 
   handleOnFileDropAccepted = async ([file]) => {
@@ -151,19 +178,21 @@ class ActionModal extends PureComponent {
 
   handleChallengeClick = () => {
     const { challengeRequest, token, arbitrableTokenListData } = this.props
+    const {
+      challengeReward,
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION
+    } = arbitrableTokenListData.data
 
     const value = web3.utils
-      .toBN(arbitrableTokenListData.data.challengeReward)
-      .add(web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost))
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
-          .toBN(arbitrableTokenListData.data.arbitrationCost)
-          .mul(
-            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
-          )
-          .div(
-            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
-          )
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
       )
     challengeRequest({
       ID: token.data.ID,
@@ -173,19 +202,18 @@ class ActionModal extends PureComponent {
 
   handleFundRequesterClick = () => {
     const { fundDispute, token, arbitrableTokenListData } = this.props
+    const {
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION
+    } = arbitrableTokenListData.data
 
-    const value = web3.utils
-      .toBN(arbitrableTokenListData.data.arbitrationCost)
-      .add(
-        web3.utils
-          .toBN(arbitrableTokenListData.data.arbitrationCost)
-          .mul(
-            web3.utils.toBN(arbitrableTokenListData.data.sharedStakeMultiplier)
-          )
-          .div(
-            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
-          )
-      )
+    const value = web3.utils.toBN(arbitrationCost).add(
+      web3.utils
+        .toBN(arbitrationCost)
+        .mul(web3.utils.toBN(sharedStakeMultiplier))
+        .div(web3.utils.toBN(MULTIPLIER_PRECISION))
+    )
 
     fundDispute({
       ID: token.data.ID,
@@ -235,43 +263,44 @@ class ActionModal extends PureComponent {
     )
       losingSide = true
 
-    const value = web3.utils
-      .toBN(arbitrableTokenListData.data.arbitrationCost)
-      .add(
-        web3.utils
-          .toBN(arbitrableTokenListData.data.arbitrationCost)
-          .mul(
-            web3.utils.toBN(
-              losingSide
-                ? arbitrableTokenListData.data.loserStakeMultiplier
-                : arbitrableTokenListData.data.winnerStakeMultiplier
-            )
+    const {
+      arbitrationCost,
+      loserStakeMultiplier,
+      winnerStakeMultiplier,
+      MULTIPLIER_PRECISION
+    } = arbitrableTokenListData.data
+
+    const value = web3.utils.toBN(arbitrationCost).add(
+      web3.utils
+        .toBN(arbitrationCost)
+        .mul(
+          web3.utils.toBN(
+            losingSide ? loserStakeMultiplier : winnerStakeMultiplier
           )
-          .div(
-            web3.utils.toBN(arbitrableTokenListData.data.MULTIPLIER_PRECISION)
-          )
-      )
+        )
+        .div(web3.utils.toBN(MULTIPLIER_PRECISION))
+    )
 
     fundAppeal(tokenData.ID, SIDE, value)
   }
 
   handleSubmitBadgeClick = () => {
     const { createBadge, arbitrableAddressListData, token } = this.props
+    const {
+      arbitrationCost,
+      sharedStakeMultiplier,
+      challengeReward,
+      MULTIPLIER_PRECISION
+    } = arbitrableAddressListData.data
 
     const value = web3.utils
-      .toBN(arbitrableAddressListData.data.challengeReward)
-      .add(web3.utils.toBN(arbitrableAddressListData.data.arbitrationCost))
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
-          .toBN(arbitrableAddressListData.data.arbitrationCost)
-          .mul(
-            web3.utils.toBN(
-              arbitrableAddressListData.data.sharedStakeMultiplier
-            )
-          )
-          .div(
-            web3.utils.toBN(arbitrableAddressListData.data.MULTIPLIER_PRECISION)
-          )
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
       )
 
     this.setState({ file: null, fileInfoMessage: null })
@@ -413,6 +442,7 @@ class ActionModal extends PureComponent {
                   <Clear
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
+                    clearItem={this.handleClearBadgeClick}
                     item={token}
                     badge
                   />

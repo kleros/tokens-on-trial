@@ -1,0 +1,194 @@
+@import '../../styles/_colors.scss';
+
+/* @define BadgeDetails */
+.BadgeDetails {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  padding: 13px 0;
+
+  &-header {
+    align-items: center;
+    display: flex;
+
+    &-title {
+      margin-right: 2vw;
+    }
+
+    &-img {
+      height: 30px;
+      margin-right: 0.5vw;
+      object-fit: contain;
+      width: 30px;
+    }
+  }
+
+  &-img {
+    height: 115px;
+    margin: 26px 26px 26px 0;
+    object-fit: contain;
+    padding: 15px;
+    width: 115px;
+  }
+
+  &-card {
+    align-items: stretch;
+    background: $card;
+    border: 1px solid $border;
+    border-radius: 3px;
+    box-shadow: 0 3px 6px $shadow;
+    box-sizing: border-box;
+    display: flex;
+    flex-grow: 2;
+    min-height: 102px;
+    padding-left: 36px;
+
+    &-info {
+      padding: 17px 0;
+    }
+  }
+
+  &-label {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    font-size: 21px;
+    justify-content: center;
+
+    &-name {
+      color: $darkGrey;
+      font-weight: 500;
+      margin: 0 0.3vw 0 0;
+    }
+
+    &-ticker {
+      color: $lightGrey;
+      font-weight: 400;
+      margin: 0;
+    }
+  }
+
+  &-divider {
+    border-left: 1px solid $border;
+    margin: 17px 26px 17px 0;
+  }
+
+  &--link {
+    color: $darkGrey;
+    text-decoration: none;
+
+    :visited {
+      color: $darkGrey;
+      text-decoration: none;
+    }
+  }
+
+  &-meta {
+    align-content: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    justify-content: space-evenly;
+    margin: 26px 26px 26px 0;
+    vertical-align: middle;
+
+    &--aligned {
+      display: inline-block;
+      vertical-align: middle;
+    }
+  }
+
+  &-icon {
+    margin-right: 14px;
+
+    &-badge {
+      background-image: url('../../assets/images/badge.svg');
+      background-repeat: no-repeat;
+      color: $white;
+      font-size: 14px;
+      font-weight: 500;
+      height: 25px;
+      margin-right: 8px;
+      padding-top: 4px;
+      text-align: center;
+      width: 25px;
+    }
+  }
+
+  &-action {
+    align-items: center;
+    background: $action;
+    display: flex;
+    margin-left: auto;
+    padding-left: 36px;
+    padding-right: 36px;
+    position: relative;
+
+    &::after {
+      border-bottom: 80px solid transparent;
+      border-left: 20px solid $white;
+      border-top: 80px solid transparent;
+      content: "";
+      height: 0;
+      left: 0;
+      position: absolute;
+    }
+  }
+
+  &-timer {
+    color: $orange;
+  }
+}
+
+/* @define BadgeDescription */
+.BadgeDescription {
+  display: flex;
+  flex-direction: column;
+
+  &-separator {
+    border-color: $darkerGrey;
+    border-width: 1px;
+    width: 100%;
+  }
+
+  &-evidence {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    &--list {
+      display: flex;
+    }
+
+    &--item {
+      color: $badgeBlue;
+      cursor: pointer;
+      margin-right: 12px;
+    }
+  }
+
+  &--icon {
+    margin-right: 14px;
+
+    &--badge {
+      background-image: url('../../assets/images/badge.svg');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 80%;
+      color: $white;
+      font-size: 14px;
+      font-weight: 500;
+      height: 40px;
+      margin-right: 10px;
+      text-align: center;
+      width: 40px;
+    }
+  }
+
+  &-badge-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin: 7px 0 10px 0;
+  }
+}

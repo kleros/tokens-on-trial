@@ -2,20 +2,16 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './clear.css'
 
-const Clear = ({
-  arbitrableTokenListData,
-  closeActionModal,
-  clearToken,
-  item
-}) => (
+const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
   <div>
     <h3 className="Modal-title">
-      {item ? `Clear ${item.name}` : 'Remove badge'}
+      {!badge ? `Clear ${item.name}` : 'Remove badge'}
     </h3>
     <hr />
     <div className="Clear-stake">
@@ -24,11 +20,7 @@ const Clear = ({
       </h4>
       <span>
         {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils.toBN(arbitrableTokenListData.data.challengeReward)
-            )
-          )
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
         )} ETH`}
       </span>
     </div>
@@ -41,7 +33,7 @@ const Clear = ({
       >
         Return
       </Button>
-      <Button className="Clear-request" onClick={clearToken} type="primary">
+      <Button className="Clear-request" onClick={clearItem} type="primary">
         Request Clearing
       </Button>
     </div>
@@ -50,17 +42,21 @@ const Clear = ({
 
 Clear.propTypes = {
   // State
-  arbitrableTokenListData:
-    arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
   item: tokenSelectors.tokenShape,
+  tcr: PropTypes.oneOfType([
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+  ]).isRequired,
+  badge: PropTypes.bool,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  clearToken: PropTypes.func.isRequired
+  clearItem: PropTypes.func.isRequired
 }
 
 Clear.defaultProps = {
-  item: null
+  item: null,
+  badge: false
 }
 
 export default Clear

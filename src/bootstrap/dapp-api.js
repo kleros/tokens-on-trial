@@ -9,7 +9,7 @@ const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
 const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
-const ARBITRABLE_ADDRESS_LIST_ADDRESS =
+export const ARBITRABLE_ADDRESS_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_ADDRESS_LIST_ADDRESS`]
 const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
 const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]

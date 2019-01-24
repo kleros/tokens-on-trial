@@ -2,18 +2,14 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 
 import './resubmit.css'
 
-const Resubmit = ({
-  arbitrableTokenListData,
-  closeActionModal,
-  resubmitToken,
-  item
-}) => (
+const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
   <div>
     <h3 className="Modal-title">Resubmit {item.name}</h3>
     <hr />
@@ -23,11 +19,7 @@ const Resubmit = ({
       </h4>
       <span>
         {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils.toBN(arbitrableTokenListData.data.challengeReward)
-            )
-          )
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
         )} ETH`}
       </span>
     </div>
@@ -53,9 +45,11 @@ const Resubmit = ({
 
 Resubmit.propTypes = {
   // State
-  arbitrableTokenListData:
-    arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
   item: tokenSelectors.tokenShape,
+  tcr: PropTypes.oneOfType([
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+  ]).isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,

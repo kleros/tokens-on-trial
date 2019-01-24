@@ -5,10 +5,15 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 import * as mime from 'mime-types'
 
-import { arbitrableTokenList, arbitrator, web3 } from '../../bootstrap/dapp-api'
+import {
+  arbitrableAddressList,
+  arbitrator,
+  web3,
+  ARBITRABLE_ADDRESS_LIST_ADDRESS
+} from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
+import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import Button from '../../components/button'
-import BadgeCard from '../../components/badge-card'
 import FilterBar from '../filter-bar'
 import {
   hasPendingRequest,
@@ -20,20 +25,22 @@ import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
+import * as badgeActions from '../../actions/badge'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
-import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
-import './token.css'
+import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 
-class TokenDetails extends PureComponent {
+import './badge.css'
+
+class BadgeDetails extends PureComponent {
   static propTypes = {
     // State
     filter: filterSelectors.filterShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
-    arbitrableTokenListData:
-      arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+    arbitrableAddressListData:
+      arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
     token: PropTypes.shape({
       name: PropTypes.string,
       ticker: PropTypes.string,
@@ -47,7 +54,7 @@ class TokenDetails extends PureComponent {
     }),
 
     // Functions
-    timeout: PropTypes.func.isRequired,
+    badgeTimeout: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired
@@ -78,19 +85,18 @@ class TokenDetails extends PureComponent {
   }
 
   handleExecuteRequestClick = () => {
-    const { match, timeout } = this.props
-    const { tokenID } = match.params
-    timeout(tokenID)
+    const { badgeTimeout, token } = this.props
+    badgeTimeout(token)
   }
 
   handleFeesTimeoutClick = () => {
-    const { timeout, token } = this.props
-    timeout(token)
+    const { badgeTimeout, token } = this.props
+    badgeTimeout(token)
   }
 
   handleOpenEvidenceModal = () => {
     const { openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidence)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitBadgeEvidence)
   }
 
   handleViewEvidenceClick = evidence => () => {
@@ -104,7 +110,7 @@ class TokenDetails extends PureComponent {
   }
 
   getActionButton = (token, userAccount) => {
-    const { arbitrableTokenListData } = this.props
+    const { arbitrableAddressListData } = this.props
     const { timestamp, countdown } = this.state
     let method
     let disabled = true
@@ -113,29 +119,30 @@ class TokenDetails extends PureComponent {
 
     if (
       !token ||
-      !arbitrableTokenListData.data ||
+      !arbitrableAddressListData.data ||
       token.creating ||
       token.updating
     )
       return (
         <Button disabled={disabled} type="primary">
-          <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
+          <FontAwesomeIcon className="BadgeDetails-icon" icon={icon} />
           {label}
         </Button>
       )
 
     const challengePeriodDuration = Number(
-      arbitrableTokenListData.data.challengePeriodDuration
+      arbitrableAddressListData.data.challengePeriodDuration
     )
     const arbitrationFeesWaitingTime = Number(
-      arbitrableTokenListData.data.arbitrationFeesWaitingTime
+      arbitrableAddressListData.data.arbitrationFeesWaitingTime
     )
-    const { latestRequest } = token
+    const { badge } = token
+    const { latestRequest } = badge
     const { latestRound, challengerDepositTime } = latestRequest
     const submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
     const challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
 
-    if (hasPendingRequest(token))
+    if (hasPendingRequest(badge))
       if (latestRequest.disputed && !latestRequest.resolved) {
         icon = 'hourglass-half'
         disabled = true
@@ -147,9 +154,8 @@ class TokenDetails extends PureComponent {
         )
           if (
             userAccount ===
-              token.latestRequest.parties[tcrConstants.SIDE.Requester] ||
-            userAccount ===
-              token.latestRequest.parties[tcrConstants.SIDE.Challenger]
+              latestRequest.parties[tcrConstants.SIDE.Requester] ||
+            userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
           ) {
             const appealPeriodStart = Number(
               latestRequest.latestRound.appealPeriod[0]
@@ -162,7 +168,7 @@ class TokenDetails extends PureComponent {
             if (timestamp < appealPeriodEnd) {
               const SIDE =
                 userAccount ===
-                token.latestRequest.parties[tcrConstants.SIDE.Requester]
+                latestRequest.parties[tcrConstants.SIDE.Requester]
                   ? tcrConstants.SIDE.Requester
                   : tcrConstants.SIDE.Challenger
 
@@ -173,15 +179,15 @@ class TokenDetails extends PureComponent {
                 let losingSide
                 if (
                   userAccount ===
-                    token.latestRequest.parties[tcrConstants.SIDE.Requester] &&
-                  token.latestRequest.dispute.ruling ===
+                    latestRequest.parties[tcrConstants.SIDE.Requester] &&
+                  latestRequest.dispute.ruling ===
                     tcrConstants.RULING_OPTIONS.Refuse.toString()
                 )
                   losingSide = true
                 else if (
                   userAccount ===
-                    token.latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-                  token.latestRequest.dispute.ruling ===
+                    latestRequest.parties[tcrConstants.SIDE.Challenger] &&
+                  latestRequest.dispute.ruling ===
                     tcrConstants.RULING_OPTIONS.Accept.toString()
                 )
                   losingSide = true
@@ -227,31 +233,27 @@ class TokenDetails extends PureComponent {
       } else if (
         challengerDepositTime > 0 &&
         timestamp - challengerDepositTime < arbitrationFeesWaitingTime &&
-        (userAccount ===
-          token.latestRequest.parties[tcrConstants.SIDE.Requester] ||
-          userAccount ===
-            token.latestRequest.parties[tcrConstants.SIDE.Challenger])
+        (userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger])
       ) {
         icon = 'gavel'
         label = 'Pay Arbitration Fees'
         disabled = false
         if (
           challengerFees > submitterFees &&
-          userAccount ===
-            token.latestRequest.parties[tcrConstants.SIDE.Requester]
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
         )
           method = () =>
             this.handleActionClick(
-              modalConstants.ACTION_MODAL_ENUM.FundRequester
+              modalConstants.ACTION_MODAL_ENUM.FundRequesterBadge
             )
         else if (
           submitterFees > challengerFees &&
-          userAccount ===
-            token.latestRequest.parties[tcrConstants.SIDE.Challenger]
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
         )
           method = () =>
             this.handleActionClick(
-              modalConstants.ACTION_MODAL_ENUM.FundChallenger
+              modalConstants.ACTION_MODAL_ENUM.FundChallengerBadge
             )
         else {
           icon = 'hourglass-half'
@@ -268,29 +270,30 @@ class TokenDetails extends PureComponent {
         icon = 'gavel'
         disabled = false
         method = () =>
-          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Challenge)
-        if (isRegistrationRequest(token.status))
-          label = 'Challenge Registration'
-        else label = 'Challenge Clearing'
+          this.handleActionClick(
+            modalConstants.ACTION_MODAL_ENUM.ChallengeBadge
+          )
+        if (isRegistrationRequest(token.status)) label = 'Challenge Addition'
+        else label = 'Challenge Removal'
       }
     else {
       disabled = false
       if (token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
         method = () =>
-          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Clear)
-        label = 'Submit Clearing Request'
+          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.ClearBadge)
+        label = 'Remove Badge'
         icon = 'times-circle'
       } else {
-        label = 'Resubmit Token'
+        label = 'Add Badge'
         icon = 'plus'
         method = () =>
-          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Resubmit)
+          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.ResubmitBadge)
       }
     }
 
     return (
       <Button disabled={disabled} onClick={method} type="primary">
-        <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
+        <FontAwesomeIcon className="BadgeDetails-icon" icon={icon} />
         {label}
       </Button>
     )
@@ -303,26 +306,29 @@ class TokenDetails extends PureComponent {
   }
 
   componentDidUpdate() {
-    const { token, arbitrableTokenListData } = this.props
+    const { token, arbitrableAddressListData } = this.props
     const { countdown, listeningForEvidence } = this.state
 
     if (
       token &&
-      hasPendingRequest(token) &&
+      token.badge &&
+      hasPendingRequest(token.badge) &&
       countdown === null &&
-      arbitrableTokenListData &&
-      arbitrableTokenListData.data
+      arbitrableAddressListData &&
+      arbitrableAddressListData.data
     ) {
       this.setState({ countdown: 'Loading...' })
+      const { badge } = token
+      const { latestRequest } = badge
 
-      if (!listeningForEvidence && token.latestRequest.disputed) {
+      if (!listeningForEvidence && latestRequest.disputed) {
         // Listen for evidence events.
         this.setState({ listeningForEvidence: true })
-        arbitrableTokenList.events
+        arbitrableAddressList.events
           .Evidence({
             filter: {
               arbitrator: arbitrator._address,
-              disputeID: token.latestRequest.disputeID
+              disputeID: latestRequest.disputeID
             }, // Using an array means OR: e.g. 20 or 23
             fromBlock: 0
           })
@@ -342,8 +348,8 @@ class TokenDetails extends PureComponent {
       // Set timer once we have data.
       getBlock(null, web3, 'latest', block => {
         const time = getRemainingTime(
-          token,
-          arbitrableTokenListData,
+          badge,
+          arbitrableAddressListData,
           block.timestamp * 1000,
           tcrConstants
         )
@@ -373,12 +379,14 @@ class TokenDetails extends PureComponent {
     const { filters } = filter
     const { tokenID } = match.params
 
-    if (!token)
+    if (!token || !token.badge)
       return (
         <div className="Page">
           <h5>Loading...</h5>
         </div>
       )
+
+    const { badge } = token
 
     if (token.ID !== tokenID) return window.location.reload()
 
@@ -388,67 +396,57 @@ class TokenDetails extends PureComponent {
           filter={filters}
           handleFilterChange={this.handleFilterChange}
         />
-        <div className="TokenDetails">
+        <div className="BadgeDetails-header">
+          <h3 className="BadgeDetails-header-title">Badge Details</h3>
           <Img
-            className="TokenDetails-img"
+            className="BadgeDetails-header-img"
             src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
               token.symbolMultihash
             }`}
           />
-          <div className="TokenDetails-card">
-            <div className="TokenDetails-label">
-              <span className="TokenDetails-label-name">{token.name}</span>
-              <span className="TokenDetails-label-ticker">{token.ticker}</span>
-            </div>
-            <div className="TokenDetails-divider" />
-            <div className="TokenDetails-meta">
-              <div className="TokenDetails-meta--aligned">
+          <h4 className="BadgeDetails-label-name">{token.name}</h4>
+          <h4 className="BadgeDetails-label-ticker">{token.ticker}</h4>
+        </div>
+        <div className="BadgeDetails">
+          <div className="BadgeDetails-card">
+            <Img className="BadgeDetails-img" src={EthfinexLogo} />
+            <div className="BadgeDetails-divider" />
+            <div className="BadgeDetails-meta">
+              <div className="BadgeDetails-meta--aligned">
                 <span>
                   <a
-                    className="TokenDetails--link"
-                    href={`https://etherscan.io/token/${token.addr}`}
+                    className="BadgeDetails--link"
+                    href={`https://etherscan.io/address/${ARBITRABLE_ADDRESS_LIST_ADDRESS}`}
                   >
                     <Img
-                      className="TokenDetails-icon TokenDetails-meta--aligned"
+                      className="BadgeDetails-icon BadgeDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(token.addr)}
+                    {truncateMiddle(ARBITRABLE_ADDRESS_LIST_ADDRESS)}
                   </a>
                 </span>
               </div>
-              <div>
-                {(token.badge.status ===
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
-                  token.badge.status ===
-                    tcrConstants.IN_CONTRACT_STATUS_ENUM[
-                      'ClearingRequested'
-                    ]) && (
-                  <span>
-                    <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
-                      1
-                    </span>
-                    Badges
-                  </span>
-                )}
-              </div>
+              <div />
             </div>
-            <div className="TokenDetails-meta">
-              <span className="TokenDetails-meta--aligned">
+            <div className="BadgeDetails-meta">
+              <span className="BadgeDetails-meta--aligned">
                 <FontAwesomeIcon
-                  className="TokenDetails-icon"
-                  color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
-                  icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
+                  className="BadgeDetails-icon"
+                  color={
+                    tcrConstants.STATUS_COLOR_ENUM[token.badge.clientStatus]
+                  }
+                  icon={tcrConstants.STATUS_ICON_ENUM[token.badge.clientStatus]}
                 />
                 {this.toSentenceCase(
-                  tcrConstants.STATUS_ENUM[token.clientStatus]
+                  tcrConstants.STATUS_ENUM[token.badge.clientStatus]
                 )}
               </span>
               <div
-                className={`TokenDetails-timer ${
-                  token.clientStatus <= 1 ||
-                  (hasPendingRequest(token.status, token.latestRequest) &&
-                    token.latestRequest.dispute &&
-                    token.latestRequest.dispute.status !==
+                className={`BadgeDetails-timer ${
+                  badge.clientStatus <= 1 ||
+                  (hasPendingRequest(badge.status, badge.latestRequest) &&
+                    badge.latestRequest.dispute &&
+                    badge.latestRequest.dispute.status !==
                       tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
                   Number(countdown) === 0
                     ? `Hidden`
@@ -461,13 +459,13 @@ class TokenDetails extends PureComponent {
                   : '--:--:--'}
               </div>
             </div>
-            <div className="TokenDetails-action">
+            <div className="BadgeDetails-action">
               {this.getActionButton(token, accounts.data[0])}
             </div>
           </div>
         </div>
         <br />
-        {token.latestRequest.disputed && !token.latestRequest.resolved && (
+        {badge.latestRequest.disputed && !badge.latestRequest.resolved && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
             <h3>Evidence</h3>
@@ -489,25 +487,6 @@ class TokenDetails extends PureComponent {
             </div>
           </div>
         )}
-        <br />
-        <div className="TokenDescription">
-          <hr className="TokenDescription-separator" />
-          <div className="TokenDescription-badge-header">
-            <h3>Badges</h3>
-            {token.badge.status ===
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-              <Button onClick={this.submitBadgeAction} type="secondary">
-                Add Badge
-              </Button>
-            )}
-          </div>
-          <div className="TokenDescription-evidence">
-            {token.badge.status !==
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-              <BadgeCard token={token} />
-            )}
-          </div>
-        </div>
       </div>
     )
   }
@@ -517,14 +496,14 @@ export default connect(
   state => ({
     token: state.token.token.data,
     accounts: state.wallet.accounts,
-    arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
+    arbitrableAddressListData:
+      state.arbitrableAddressList.arbitrableAddressListData,
     filter: state.filter
   }),
   {
-    fetchToken: tokenActions.fetchToken,
-    timeout: tokenActions.timeout,
     openActionModal: modalActions.openActionModal,
-    feesTimeout: tokenActions.feesTimeout,
+    fetchToken: tokenActions.fetchToken,
+    badgeTimeout: badgeActions.badgeTimeout,
     toggleFilter: filterActions.toggleFilter
   }
-)(TokenDetails)
+)(BadgeDetails)

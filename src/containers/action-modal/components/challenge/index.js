@@ -3,15 +3,12 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './challenge.css'
 
-const Challenge = ({
-  arbitrableTokenListData,
-  closeActionModal,
-  fundDispute
-}) => (
+const Challenge = ({ tcr, closeActionModal, fundDispute }) => (
   <div>
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Challenge-icon" icon="gavel" />
@@ -25,11 +22,7 @@ const Challenge = ({
       <span>Challenge Stake</span>
       <strong>
         {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils.toBN(arbitrableTokenListData.data.challengeReward)
-            )
-          )
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
         )} ETH`}
       </strong>
     </div>
@@ -40,17 +33,9 @@ const Challenge = ({
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(arbitrableTokenListData.data.arbitrationCost)
-                .mul(
-                  web3.utils.toBN(
-                    arbitrableTokenListData.data.sharedStakeMultiplier
-                  )
-                )
-                .div(
-                  web3.utils.toBN(
-                    arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                  )
-                )
+                .toBN(tcr.data.arbitrationCost)
+                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
             )
           )
         )} ETH`}
@@ -60,11 +45,7 @@ const Challenge = ({
       <span>Required Arbitration Fee</span>
       <strong>
         {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
-            )
-          )
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
         )} ETH`}
       </strong>
     </div>
@@ -76,24 +57,14 @@ const Challenge = ({
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(arbitrableTokenListData.data.challengeReward)
+                .toBN(tcr.data.challengeReward)
                 .add(
                   web3.utils
-                    .toBN(arbitrableTokenListData.data.arbitrationCost)
-                    .mul(
-                      web3.utils.toBN(
-                        arbitrableTokenListData.data.sharedStakeMultiplier
-                      )
-                    )
-                    .div(
-                      web3.utils.toBN(
-                        arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                      )
-                    )
+                    .toBN(tcr.data.arbitrationCost)
+                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
                 )
-                .add(
-                  web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
-                )
+                .add(web3.utils.toBN(tcr.data.arbitrationCost))
             )
           )
         )} ETH`}
@@ -121,8 +92,10 @@ const Challenge = ({
 
 Challenge.propTypes = {
   // State
-  arbitrableTokenListData:
-    arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+  tcr: PropTypes.oneOfType([
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+  ]).isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,

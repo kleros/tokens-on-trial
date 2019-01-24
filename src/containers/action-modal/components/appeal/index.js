@@ -4,17 +4,12 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as tokenSelectors from '../../../../reducers/token'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './appeal.css'
 
-const Appeal = ({
-  closeActionModal,
-  fundAppeal,
-  token,
-  losingSide,
-  arbitrableTokenListData
-}) => (
+const Appeal = ({ closeActionModal, fundAppeal, token, losingSide, tcr }) => (
   <div>
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Appeal-icon" icon="gavel" />
@@ -42,15 +37,11 @@ const Appeal = ({
                 .mul(
                   web3.utils.toBN(
                     losingSide
-                      ? arbitrableTokenListData.data.loserStakeMultiplier
-                      : arbitrableTokenListData.data.winnerStakeMultiplier
+                      ? tcr.data.loserStakeMultiplier
+                      : tcr.data.winnerStakeMultiplier
                   )
                 )
-                .div(
-                  web3.utils.toBN(
-                    arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                  )
-                )
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
             )
         )} ETH `}
       </strong>
@@ -68,15 +59,11 @@ const Appeal = ({
                   .mul(
                     web3.utils.toBN(
                       losingSide
-                        ? arbitrableTokenListData.data.loserStakeMultiplier
-                        : arbitrableTokenListData.data.winnerStakeMultiplier
+                        ? tcr.data.loserStakeMultiplier
+                        : tcr.data.winnerStakeMultiplier
                     )
                   )
-                  .div(
-                    web3.utils.toBN(
-                      arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                    )
-                  )
+                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
               )
             )
         )} ETH `}
@@ -102,8 +89,10 @@ Appeal.propTypes = {
   // State
   token: tokenSelectors.tokenShape.isRequired,
   losingSide: PropTypes.bool.isRequired,
-  arbitrableTokenListData:
-    arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+  tcr: PropTypes.oneOfType([
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+  ]).isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,

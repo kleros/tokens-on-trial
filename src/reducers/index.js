@@ -8,6 +8,7 @@ import arbitrableAddressList from './arbitrable-address-list'
 import notification from './notification'
 import arbitrator from './arbitrator'
 import token from './token'
+import badge from './badge'
 import modal from './modal'
 import filter from './filter'
 
@@ -21,6 +22,7 @@ export default combineReducers({
   arbitrableAddressList,
   arbitrator,
   token,
+  badge,
   modal,
   filter
 })
