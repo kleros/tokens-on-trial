@@ -9,6 +9,7 @@ import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
+import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
@@ -35,6 +36,7 @@ class Tokens extends Component {
 
     // Action Dispatchers
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
+    fetchArbitrableAddressListData: PropTypes.func.isRequired,
     fetchTokens: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired
   }
@@ -43,8 +45,12 @@ class Tokens extends Component {
   fillPageTimeout = null
 
   componentDidMount() {
-    const { fetchArbitrableTokenListData } = this.props
+    const {
+      fetchArbitrableTokenListData,
+      fetchArbitrableAddressListData
+    } = this.props
     fetchArbitrableTokenListData()
+    fetchArbitrableAddressListData()
     this.fetchTokens(true)
   }
 
@@ -179,6 +185,8 @@ export default withRouter(
     {
       fetchArbitrableTokenListData:
         arbitrableTokenListActions.fetchArbitrableTokenListData,
+      fetchArbitrableAddressListData:
+        arbitrableAddressListActions.fetchArbitrableAddressListData,
       fetchTokens: tokenActions.fetchTokens,
       toggleFilter: filterActions.toggleFilter
     }

@@ -4,6 +4,7 @@ import { reducer as form } from 'redux-form'
 
 import wallet from './wallet'
 import arbitrableTokenList from './arbitrable-token-list'
+import arbitrableAddressList from './arbitrable-address-list'
 import notification from './notification'
 import arbitrator from './arbitrator'
 import token from './token'
@@ -17,6 +18,7 @@ export default combineReducers({
   wallet,
   notification,
   arbitrableTokenList,
+  arbitrableAddressList,
   arbitrator,
   token,
   modal,

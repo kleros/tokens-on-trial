@@ -20,7 +20,7 @@ import * as tokenActions from '../actions/token'
 import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
 import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
-import * as tokenConstants from '../constants/token'
+import * as tcrConstants from '../constants/tcr'
 import { contractStatusToClientStatus, getBlock } from '../utils/token'
 
 import { fetchToken } from './token'
@@ -43,14 +43,14 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
 
     let message
     switch (Number(returnValues._status)) {
-      case tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
-      case tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested:
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested:
         if (returnValues._disputed === true && isRequester)
           message = 'Your request has been challenged.'
         else if (returnValues._disputed === false)
           oldestNonDisputedSubmittedStatusEvent = event
         break
-      case tokenConstants.IN_CONTRACT_STATUS_ENUM.Registered:
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered:
         if (returnValues._disputed === false)
           message = `${
             isRequester
@@ -58,7 +58,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
               : 'A registration request you challenged'
           } has been executed.`
         break
-      case tokenConstants.IN_CONTRACT_STATUS_ENUM.Absent:
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent:
         if (returnValues._disputed === false)
           message = `${
             isRequester
@@ -79,9 +79,9 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
       notifiedIDs[returnValues._tokenID] =
         returnValues._disputed === true &&
         returnValues._status ===
-          tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
+          tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
         returnValues._status ===
-          tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
+          tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
           ? 'disputed'
           : true
 

@@ -10,5 +10,14 @@ export const ACTION_MODAL_ENUM = createEnum([
   'FundChallenger',
   'FundAppeal',
   'SubmitEvidence',
-  'ViewEvidence'
+  'ViewEvidence',
+  'SubmitBadge',
+  'ClearBadge',
+  'ChallengeBadge',
+  'ResubmitBadge',
+  'FundRequesterBadge',
+  'FundChallengerBadge',
+  'FundAppealBadge',
+  'SubmitEvidenceBadge',
+  'ViewEvidenceBadge'
 ])

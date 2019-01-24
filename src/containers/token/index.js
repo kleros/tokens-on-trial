@@ -21,7 +21,7 @@ import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
-import * as tokenConstants from '../../constants/token'
+import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import './token.css'
@@ -48,7 +48,7 @@ const getRemainingTime = (token, arbitrableTokenListData, currentTime) => {
       currentTime
   else if (
     latestRequest.dispute.status ===
-    tokenConstants.DISPUTE_STATUS.Appealable.toString()
+    tcrConstants.DISPUTE_STATUS.Appealable.toString()
   ) {
     const appealPeriodEnd =
       Number(latestRequest.latestRound.appealPeriod[1]) * 1000
@@ -163,8 +163,8 @@ class TokenDetails extends PureComponent {
     )
     const { latestRequest } = token
     const { latestRound, challengerDepositTime } = latestRequest
-    const submitterFees = latestRound.paidFees[tokenConstants.SIDE.Requester]
-    const challengerFees = latestRound.paidFees[tokenConstants.SIDE.Challenger]
+    const submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
+    const challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
 
     if (hasPendingRequest(token))
       if (latestRequest.disputed && !latestRequest.resolved) {
@@ -173,14 +173,14 @@ class TokenDetails extends PureComponent {
         label = 'Waiting Arbitration'
         if (
           Number(latestRequest.dispute.status) ===
-            tokenConstants.DISPUTE_STATUS.Appealable &&
+            tcrConstants.DISPUTE_STATUS.Appealable &&
           !latestRound.appealed
         )
           if (
             userAccount ===
-              token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
+              token.latestRequest.parties[tcrConstants.SIDE.Requester] ||
             userAccount ===
-              token.latestRequest.parties[tokenConstants.SIDE.Challenger]
+              token.latestRequest.parties[tcrConstants.SIDE.Challenger]
           ) {
             const appealPeriodStart = Number(
               latestRequest.latestRound.appealPeriod[0]
@@ -193,9 +193,9 @@ class TokenDetails extends PureComponent {
             if (timestamp < appealPeriodEnd) {
               const SIDE =
                 userAccount ===
-                token.latestRequest.parties[tokenConstants.SIDE.Requester]
-                  ? tokenConstants.SIDE.Requester
-                  : tokenConstants.SIDE.Challenger
+                token.latestRequest.parties[tcrConstants.SIDE.Requester]
+                  ? tcrConstants.SIDE.Requester
+                  : tcrConstants.SIDE.Challenger
 
               if (
                 latestRound.requiredForSide[SIDE] === 0 ||
@@ -204,20 +204,16 @@ class TokenDetails extends PureComponent {
                 let losingSide
                 if (
                   userAccount ===
-                    token.latestRequest.parties[
-                      tokenConstants.SIDE.Requester
-                    ] &&
+                    token.latestRequest.parties[tcrConstants.SIDE.Requester] &&
                   token.latestRequest.dispute.ruling ===
-                    tokenConstants.RULING_OPTIONS.Refuse.toString()
+                    tcrConstants.RULING_OPTIONS.Refuse.toString()
                 )
                   losingSide = true
                 else if (
                   userAccount ===
-                    token.latestRequest.parties[
-                      tokenConstants.SIDE.Challenger
-                    ] &&
+                    token.latestRequest.parties[tcrConstants.SIDE.Challenger] &&
                   token.latestRequest.dispute.ruling ===
-                    tokenConstants.RULING_OPTIONS.Accept.toString()
+                    tcrConstants.RULING_OPTIONS.Accept.toString()
                 )
                   losingSide = true
 
@@ -263,9 +259,9 @@ class TokenDetails extends PureComponent {
         challengerDepositTime > 0 &&
         timestamp - challengerDepositTime < arbitrationFeesWaitingTime &&
         (userAccount ===
-          token.latestRequest.parties[tokenConstants.SIDE.Requester] ||
+          token.latestRequest.parties[tcrConstants.SIDE.Requester] ||
           userAccount ===
-            token.latestRequest.parties[tokenConstants.SIDE.Challenger])
+            token.latestRequest.parties[tcrConstants.SIDE.Challenger])
       ) {
         icon = 'gavel'
         label = 'Pay Arbitration Fees'
@@ -273,7 +269,7 @@ class TokenDetails extends PureComponent {
         if (
           challengerFees > submitterFees &&
           userAccount ===
-            token.latestRequest.parties[tokenConstants.SIDE.Requester]
+            token.latestRequest.parties[tcrConstants.SIDE.Requester]
         )
           method = () =>
             this.handleActionClick(
@@ -282,7 +278,7 @@ class TokenDetails extends PureComponent {
         else if (
           submitterFees > challengerFees &&
           userAccount ===
-            token.latestRequest.parties[tokenConstants.SIDE.Challenger]
+            token.latestRequest.parties[tcrConstants.SIDE.Challenger]
         )
           method = () =>
             this.handleActionClick(
@@ -294,7 +290,7 @@ class TokenDetails extends PureComponent {
           disabled = true
         }
       } else if (
-        userAccount === latestRequest.parties[tokenConstants.SIDE.Requester]
+        userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
       ) {
         icon = 'hourglass-half'
         disabled = true
@@ -310,9 +306,7 @@ class TokenDetails extends PureComponent {
       }
     else {
       disabled = false
-      if (
-        token.status === tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered']
-      ) {
+      if (token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
         method = () =>
           this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Clear)
         label = 'Submit Clearing Request'
@@ -396,6 +390,9 @@ class TokenDetails extends PureComponent {
     }
   }
 
+  submitBadgeAction = () =>
+    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
+
   componentWillUnmount() {
     clearInterval(this.interval)
   }
@@ -451,9 +448,9 @@ class TokenDetails extends PureComponent {
               </div>
               <div>
                 {(Number(token.badgeStatus) ===
-                  tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
                   token.badgeStatus ===
-                    tokenConstants.IN_CONTRACT_STATUS_ENUM[
+                    tcrConstants.IN_CONTRACT_STATUS_ENUM[
                       'ClearingRequested'
                     ]) && (
                   <span>
@@ -469,11 +466,11 @@ class TokenDetails extends PureComponent {
               <span className="TokenDetails-meta--aligned">
                 <FontAwesomeIcon
                   className="TokenDetails-icon"
-                  color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
-                  icon={tokenConstants.STATUS_ICON_ENUM[token.clientStatus]}
+                  color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+                  icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
                 />
                 {this.toSentenceCase(
-                  tokenConstants.STATUS_ENUM[token.clientStatus]
+                  tcrConstants.STATUS_ENUM[token.clientStatus]
                 )}
               </span>
               <div
@@ -482,7 +479,7 @@ class TokenDetails extends PureComponent {
                   (hasPendingRequest(token.status, token.latestRequest) &&
                     token.latestRequest.dispute &&
                     token.latestRequest.dispute.status !==
-                      tokenConstants.DISPUTE_STATUS.Appealable.toString()) ||
+                      tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
                   Number(countdown) === 0
                     ? `Hidden`
                     : ``
@@ -523,19 +520,24 @@ class TokenDetails extends PureComponent {
           </div>
         )}
         <br />
-        {console.info()}
-        {(Number(token.badgeStatus) ===
-          tokenConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
-          token.badgeStatus ===
-            tokenConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) && (
-          <div className="TokenDescription">
-            <hr className="TokenDescription-separator" />
+        <div className="TokenDescription">
+          <hr className="TokenDescription-separator" />
+          <div className="TokenDescription-badge-header">
             <h3>Badges</h3>
-            <div className="TokenDescription-evidence">
-              <BadgeCard token={token} />
-            </div>
+            {Number(token.badgeStatus) ===
+              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+              <Button onClick={this.submitBadgeAction} type="secondary">
+                Add Badge
+              </Button>
+            )}
           </div>
-        )}
+          <div className="TokenDescription-evidence">
+            {Number(token.badgeStatus) !==
+              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+              <BadgeCard token={token} />
+            )}
+          </div>
+        </div>
       </div>
     )
   }

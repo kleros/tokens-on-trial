@@ -6,11 +6,13 @@ import { BeatLoader } from 'react-spinners'
 import * as modalActions from '../../actions/modal'
 import * as modalSelectors from '../../reducers/modal'
 import * as modalConstants from '../../constants/modal'
-import * as tokenConstants from '../../constants/token'
+import * as tcrConstants from '../../constants/tcr'
 import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
+import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 import * as evidenceActions from '../../actions/evidence'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
@@ -42,9 +44,12 @@ class ActionModal extends PureComponent {
     actionModalParam: PropTypes.shape({}),
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+    arbitrableAddressListData:
+      arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
 
     closeActionModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
+    fetchArbitrableAddressListData: PropTypes.func.isRequired,
     submitTokenForm: PropTypes.func.isRequired,
     submitEvidenceForm: PropTypes.func.isRequired,
     submitEvidence: PropTypes.func.isRequired,
@@ -179,7 +184,7 @@ class ActionModal extends PureComponent {
     fundDispute({
       ID: token.data.ID,
       value,
-      side: tokenConstants.SIDE.Requester
+      side: tcrConstants.SIDE.Requester
     })
   }
 
@@ -195,7 +200,7 @@ class ActionModal extends PureComponent {
     fundDispute({
       ID: token.data.ID,
       value,
-      side: tokenConstants.SIDE.Challenger
+      side: tcrConstants.SIDE.Challenger
     })
   }
 
@@ -212,15 +217,15 @@ class ActionModal extends PureComponent {
 
     let losingSide = false
     if (
-      SIDE === tokenConstants.SIDE.Requester &&
+      SIDE === tcrConstants.SIDE.Requester &&
       latestRequest.dispute.ruling ===
-        tokenConstants.RULING_OPTIONS.Refuse.toString()
+        tcrConstants.RULING_OPTIONS.Refuse.toString()
     )
       losingSide = true
     else if (
-      SIDE === tokenConstants.SIDE.Challenger &&
+      SIDE === tcrConstants.SIDE.Challenger &&
       latestRequest.dispute.ruling ===
-        tokenConstants.RULING_OPTIONS.Accept.toString()
+        tcrConstants.RULING_OPTIONS.Accept.toString()
     )
       losingSide = true
 
@@ -245,8 +250,12 @@ class ActionModal extends PureComponent {
   }
 
   componentDidMount() {
-    const { fetchArbitrableTokenListData } = this.props
+    const {
+      fetchArbitrableTokenListData,
+      fetchArbitrableAddressListData
+    } = this.props
     fetchArbitrableTokenListData()
+    fetchArbitrableAddressListData()
   }
 
   componentDidUpdate(prevProps) {
@@ -264,6 +273,7 @@ class ActionModal extends PureComponent {
       openActionModal,
       closeActionModal,
       arbitrableTokenListData,
+      arbitrableAddressListData,
       submitTokenForm,
       submitEvidenceForm,
       tokenFormIsInvalid,
@@ -287,63 +297,57 @@ class ActionModal extends PureComponent {
               case modalConstants.ACTION_MODAL_ENUM.Resubmit:
                 return (
                   <Submit
-                    arbitrableTokenListData={arbitrableTokenListData}
-                    closeActionModal={closeActionModal}
+                    tcr={arbitrableTokenListData}
+                    form={submitTokenForm}
+                    submitItem={this.handleSubmitTokenClick}
                     file={file}
+                    formIsInvalid={tokenFormIsInvalid}
                     fileInfoMessage={fileInfoMessage}
                     handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    submitToken={this.handleSubmitTokenClick}
-                    submitTokenForm={submitTokenForm}
-                    token={token}
-                    tokenFormIsInvalid={tokenFormIsInvalid}
+                    closeActionModal={closeActionModal}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.Clear:
                 return (
                   <Clear
-                    arbitrableTokenListData={arbitrableTokenListData}
-                    clearToken={this.handleClearTokenClick}
+                    tcr={arbitrableTokenListData}
+                    item={token}
+                    clearItem={this.handleClearTokenClick}
                     closeActionModal={closeActionModal}
-                    name={token && token.data ? token.data.name : 'token'}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.Challenge:
                 return (
                   <Challenge
-                    arbitrableTokenListData={arbitrableTokenListData}
+                    tcr={arbitrableTokenListData}
+                    item={token.data}
                     closeActionModal={closeActionModal}
                     fundDispute={this.handleChallengeClick}
-                    name={token && token.data ? token.data.name : 'token'}
-                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.FundRequester:
                 return (
                   <FundDispute
-                    arbitrableTokenListData={arbitrableTokenListData}
+                    tcr={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
                     fundDispute={this.handleFundRequesterClick}
-                    name={token && token.data ? token.data.name : 'token'}
-                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.FundChallenger:
                 return (
                   <FundDispute
-                    arbitrableTokenListData={arbitrableTokenListData}
+                    tcr={arbitrableTokenListData}
                     closeActionModal={closeActionModal}
                     fundDispute={this.handleFundChallengerClick}
-                    name={token && token.data ? token.data.name : 'token'}
-                    token={token.data}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.FundAppeal:
                 return (
                   <FundAppeal
+                    tcr={arbitrableTokenListData}
+                    item={token.data}
                     closeActionModal={closeActionModal}
                     fundAppeal={this.handleFundAppealClick}
-                    token={token.data}
-                    arbitrableTokenListData={arbitrableTokenListData}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:
@@ -363,6 +367,69 @@ class ActionModal extends PureComponent {
                   <ViewEvidence
                     closeActionModal={closeActionModal}
                     evidence={actionModalParam}
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.SubmitBadge:
+              case modalConstants.ACTION_MODAL_ENUM.ResubmitBadge:
+                return (
+                  <Submit
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    badge
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.ClearBadge:
+                return (
+                  <Clear
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    item={token}
+                    badge
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.ChallengeBadge:
+                return (
+                  <Challenge
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    item={token}
+                    badge
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.FundRequesterBadge:
+                return (
+                  <FundDispute
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    item={token}
+                    badge
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.FundChallengerBadge:
+                return (
+                  <FundDispute
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    item={token}
+                    badge
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.FundAppealBadge:
+                return (
+                  <FundAppeal
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    item={token}
+                    badge
+                  />
+                )
+              case modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge:
+                return (
+                  <SubmitEvidence
+                    tcr={arbitrableAddressListData}
+                    closeActionModal={closeActionModal}
+                    item={token}
+                    badge
                   />
                 )
               case undefined:
@@ -391,6 +458,8 @@ export default connect(
     tokenFormIsInvalid: getTokenFormIsInvalid(state),
     evidenceFormIsInvalid: getEvidenceFormIsInvalid(state),
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
+    arbitrableAddressListData:
+      state.arbitrableAddressList.arbitrableAddressListData,
     token: state.token.token,
     accounts: state.wallet.accounts,
     actionModalParam: state.modal.actionModalParam
@@ -405,8 +474,10 @@ export default connect(
     challengeRequest: tokenActions.challengeRequest,
     submitTokenForm,
     submitEvidenceForm,
+    fundAppeal: tokenActions.fundAppeal,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData,
-    fundAppeal: tokenActions.fundAppeal
+    fetchArbitrableAddressListData:
+      arbitrableAddressListActions.fetchArbitrableAddressListData
   }
 )(ActionModal)

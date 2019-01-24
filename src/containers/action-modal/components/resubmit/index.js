@@ -2,18 +2,20 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+
 import './resubmit.css'
 
 const Resubmit = ({
   arbitrableTokenListData,
   closeActionModal,
   resubmitToken,
-  name
+  item
 }) => (
   <div>
-    <h3 className="Modal-title">Resubmit {name}</h3>
+    <h3 className="Modal-title">Resubmit {item.name}</h3>
     <hr />
     <div className="Resubmit-stake">
       <h4>
@@ -53,11 +55,15 @@ Resubmit.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-  name: PropTypes.string.isRequired,
+  item: tokenSelectors.tokenShape,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   resubmitToken: PropTypes.func.isRequired
+}
+
+Resubmit.defaultProps = {
+  item: null
 }
 
 export default Resubmit

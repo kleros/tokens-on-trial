@@ -1,50 +1,68 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import Img from 'react-image'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
+import EthfinexLogo from '../../../../assets/images/ethfinex.svg'
+
 import './submit.css'
 
 const Submit = ({
-  arbitrableTokenListData,
+  tcr,
   closeActionModal,
-  submitToken,
-  tokenFormIsInvalid,
-  submitTokenForm,
+  submitItem,
+  itemFormIsInvalid,
+  submitItemForm,
   file,
   fileInfoMessage,
-  handleOnFileDropAccepted
+  handleOnFileDropAccepted,
+  badge
 }) => (
   <div>
-    <h3 className="Modal-title">Submit a Token</h3>
+    <div className="Modal-header">
+      {/* <div className="Modal-header-icon"/> */}
+      <span className="Modal-badge" />
+      <h3 className="Modal-title">
+        {badge ? 'Add a badge' : 'Submit a token'}
+      </h3>
+      {badge && (
+        <Img
+          alt="Badge List Submission"
+          className="Modal-header-icon"
+          src={EthfinexLogo}
+        />
+      )}
+    </div>
     <hr />
     <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
-    <TokenForm className="Submit-form" onSubmit={submitToken} />
-    <FilePicker
-      file={file}
-      message={
-        <span>
-          (Max Size: 15MB)
-          <br />
-          Drag file here or
-        </span>
-      }
-      multiple={false}
-      onDropAccepted={handleOnFileDropAccepted}
-    />
-    {fileInfoMessage && <div>{fileInfoMessage}</div>}
+    {!badge && (
+      <>
+        <TokenForm className="Submit-form" onSubmit={submitItem} />
+        <FilePicker
+          file={file}
+          message={
+            <span>
+              (Max Size: 15MB)
+              <br />
+              Drag file here or
+            </span>
+          }
+          multiple={false}
+          onDropAccepted={handleOnFileDropAccepted}
+        />
+      </>
+    )}
+    {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
     <div className="Challenge-cost">
       <span>Challenge Stake</span>
       <strong>
         {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils.toBN(arbitrableTokenListData.data.challengeReward)
-            )
-          )
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
         )} ETH`}
       </strong>
     </div>
@@ -55,17 +73,9 @@ const Submit = ({
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(arbitrableTokenListData.data.arbitrationCost)
-                .mul(
-                  web3.utils.toBN(
-                    arbitrableTokenListData.data.sharedStakeMultiplier
-                  )
-                )
-                .div(
-                  web3.utils.toBN(
-                    arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                  )
-                )
+                .toBN(tcr.data.arbitrationCost)
+                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
             )
           )
         )} ETH`}
@@ -75,11 +85,7 @@ const Submit = ({
       <span>Required Arbitration Fee</span>
       <strong>
         {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
-            )
-          )
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
         )} ETH`}
       </strong>
     </div>
@@ -91,24 +97,14 @@ const Submit = ({
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(arbitrableTokenListData.data.challengeReward)
+                .toBN(tcr.data.challengeReward)
                 .add(
                   web3.utils
-                    .toBN(arbitrableTokenListData.data.arbitrationCost)
-                    .mul(
-                      web3.utils.toBN(
-                        arbitrableTokenListData.data.sharedStakeMultiplier
-                      )
-                    )
-                    .div(
-                      web3.utils.toBN(
-                        arbitrableTokenListData.data.MULTIPLIER_PRECISION
-                      )
-                    )
+                    .toBN(tcr.data.arbitrationCost)
+                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
                 )
-                .add(
-                  web3.utils.toBN(arbitrableTokenListData.data.arbitrationCost)
-                )
+                .add(web3.utils.toBN(tcr.data.arbitrationCost))
             )
           )
         )} ETH`}
@@ -125,8 +121,8 @@ const Submit = ({
       </Button>
       <Button
         className="Submit-request"
-        disabled={tokenFormIsInvalid || !file}
-        onClick={submitTokenForm}
+        disabled={!badge && (itemFormIsInvalid || !file)}
+        onClick={submitItemForm}
         type="primary"
       >
         Request Registration
@@ -137,19 +133,29 @@ const Submit = ({
 
 Submit.propTypes = {
   // State
-  file: PropTypes.shape({}).isRequired,
-  fileInfoMessage: PropTypes.string.isRequired,
-  arbitrableTokenListData:
-    arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
+  file: PropTypes.shape({}),
+  fileInfoMessage: PropTypes.string,
+  tcr: PropTypes.oneOf([
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+  ]).isRequired,
+  badge: PropTypes.bool,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  submitToken: PropTypes.func.isRequired,
+  submitItem: PropTypes.func.isRequired,
   handleOnFileDropAccepted: PropTypes.func.isRequired,
 
-  // Token Form
-  tokenFormIsInvalid: PropTypes.bool.isRequired,
-  submitTokenForm: PropTypes.func.isRequired
+  // Item Form
+  itemFormIsInvalid: PropTypes.bool,
+  submitItemForm: PropTypes.func.isRequired
+}
+
+Submit.defaultProps = {
+  file: null,
+  fileInfoMessage: '',
+  itemFormIsInvalid: null,
+  badge: null
 }
 
 export default Submit

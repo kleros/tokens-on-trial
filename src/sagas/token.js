@@ -14,7 +14,7 @@ import { contractStatusToClientStatus, hasPendingRequest } from '../utils/token'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
-import * as tokenConstants from '../constants/token'
+import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
@@ -137,7 +137,7 @@ export function* fetchToken({ payload: { ID } }) {
       // Fetch appeal period and cost if in appeal period.
       if (
         token.latestRequest.dispute.status ===
-          tokenConstants.DISPUTE_STATUS.Appealable.toString() &&
+          tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
         !token.latestRequest.latestRound.appealed
       ) {
         token.latestRequest.latestRound.appealCost = yield call(
@@ -228,9 +228,9 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
 
   if (
     recentToken.status ===
-      tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
+      tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
     recentToken.status ===
-      tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
+      tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
   )
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 
@@ -311,8 +311,8 @@ function* fundAppeal({ payload: { ID, side, value } }) {
 function* timeout({ payload: { ID } }) {
   const status = Number((yield call(fetchToken, { payload: { ID } })).status)
   if (
-    status !== tokenConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
-    status !== tokenConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
+    status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
+    status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
   )
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 

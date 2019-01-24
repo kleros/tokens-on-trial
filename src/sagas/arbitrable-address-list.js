@@ -3,8 +3,12 @@ import * as mime from 'mime-types'
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import { arbitrableTokenList, arbitrator, archon } from '../bootstrap/dapp-api'
-import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
+import {
+  arbitrableAddressList,
+  arbitrator,
+  archon
+} from '../bootstrap/dapp-api'
+import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as evidenceActions from '../actions/evidence'
 import * as walletSelectors from '../reducers/wallet'
@@ -12,34 +16,34 @@ import * as walletSelectors from '../reducers/wallet'
 import storeApi from './api/store'
 
 /**
- * Fetches the arbitrable token list's data.
+ * Fetches the arbitrable address list's data.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The fetched data.
  */
-export function* fetchArbitrableTokenListData() {
+export function* fetchArbitrableAddressListData() {
   const d = yield all({
-    arbitrator: call(arbitrableTokenList.methods.arbitrator().call),
-    challengeReward: call(arbitrableTokenList.methods.challengeReward().call),
+    arbitrator: call(arbitrableAddressList.methods.arbitrator().call),
+    challengeReward: call(arbitrableAddressList.methods.challengeReward().call),
     challengePeriodDuration: call(
-      arbitrableTokenList.methods.challengePeriodDuration().call
+      arbitrableAddressList.methods.challengePeriodDuration().call
     ),
     arbitrationFeesWaitingTime: call(
-      arbitrableTokenList.methods.arbitrationFeesWaitingTime().call
+      arbitrableAddressList.methods.arbitrationFeesWaitingTime().call
     ),
-    governor: call(arbitrableTokenList.methods.governor().call),
+    governor: call(arbitrableAddressList.methods.governor().call),
     winnerStakeMultiplier: call(
-      arbitrableTokenList.methods.winnerStakeMultiplier().call
+      arbitrableAddressList.methods.winnerStakeMultiplier().call
     ),
     loserStakeMultiplier: call(
-      arbitrableTokenList.methods.loserStakeMultiplier().call
+      arbitrableAddressList.methods.loserStakeMultiplier().call
     ),
     sharedStakeMultiplier: call(
-      arbitrableTokenList.methods.sharedStakeMultiplier().call
+      arbitrableAddressList.methods.sharedStakeMultiplier().call
     ),
     MULTIPLIER_PRECISION: call(
-      arbitrableTokenList.methods.MULTIPLIER_PRECISION().call
+      arbitrableAddressList.methods.MULTIPLIER_PRECISION().call
     ),
-    countByStatus: call(arbitrableTokenList.methods.countByStatus().call)
+    countByStatus: call(arbitrableAddressList.methods.countByStatus().call)
   })
 
   arbitrator.options.address = d.arbitrator
@@ -116,7 +120,7 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
   )).payload.fileURL
 
   yield call(
-    arbitrableTokenList.methods.submitEvidence(ID, evidenceJSONURL).send,
+    arbitrableAddressList.methods.submitEvidence(ID, evidenceJSONURL).send,
     {
       from: yield select(walletSelectors.getAccount)
     }
@@ -128,14 +132,14 @@ function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
 /**
  * The root of the arbitrable token list saga.
  */
-export default function* arbitrableTokenListSaga() {
-  // Arbitrable Token List Data
+export default function* arbitrableAddressListSaga() {
+  // Arbitrable Address List Data
   yield takeLatest(
-    arbitrableTokenListActions.arbitrableTokenListData.FETCH,
+    arbitrableAddressListActions.arbitrableAddressListData.FETCH,
     lessduxSaga,
     'fetch',
-    arbitrableTokenListActions.arbitrableTokenListData,
-    fetchArbitrableTokenListData
+    arbitrableAddressListActions.arbitrableAddressListData,
+    fetchArbitrableAddressListData
   )
   // Actions
   yield takeLatest(

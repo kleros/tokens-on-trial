@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
 
-import * as tokenConstants from '../constants/token'
+import * as tcrConstants from '../constants/tcr'
 
 // Common Shapes
 export const _tokenShape = PropTypes.shape({
@@ -10,7 +10,7 @@ export const _tokenShape = PropTypes.shape({
   ticker: PropTypes.string.isRequired,
   symbolMultihash: PropTypes.string.isRequired,
   networkID: PropTypes.string.isRequired,
-  status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
+  status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
   latestRequest: PropTypes.shape({
     disputed: PropTypes.bool.isRequired,

@@ -2,6 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
+import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './clear.css'
@@ -10,10 +11,12 @@ const Clear = ({
   arbitrableTokenListData,
   closeActionModal,
   clearToken,
-  name
+  item
 }) => (
   <div>
-    <h3 className="Modal-title">Clear {name}</h3>
+    <h3 className="Modal-title">
+      {item ? `Clear ${item.name}` : 'Remove badge'}
+    </h3>
     <hr />
     <div className="Clear-stake">
       <h4>
@@ -49,11 +52,15 @@ Clear.propTypes = {
   // State
   arbitrableTokenListData:
     arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-  name: PropTypes.string.isRequired,
+  item: tokenSelectors.tokenShape,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   clearToken: PropTypes.func.isRequired
+}
+
+Clear.defaultProps = {
+  item: null
 }
 
 export default Clear

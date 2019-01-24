@@ -2,12 +2,12 @@ import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
 
 import { web3 } from '../bootstrap/dapp-api'
-import * as tcrConstants from '../constants/tcr'
+import * as itemConstants from '../constants/tcr'
 
 // Shapes
 const {
-  shape: arbitrableTokenListDataShape,
-  initialState: arbitrableTokenListDataInitialState
+  shape: arbitrableAddressListDataShape,
+  initialState: arbitrableAddressListDataInitialState
 } = createResource(
   PropTypes.shape({
     arbitrator: PropTypes.string.isRequired,
@@ -20,27 +20,28 @@ const {
     loserStakeMultiplier: PropTypes.number.isRequired,
     sharedStakeMultiplier: PropTypes.number.isRequired,
     countByStatus: PropTypes.shape(
-      tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
+      itemConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
         acc[value] = PropTypes.number.isRequired
         return acc
       }, {})
     ).isRequired
   })
 )
-export { arbitrableTokenListDataShape }
+export { arbitrableAddressListDataShape }
 
 // Reducer
 export default createReducer({
-  arbitrableTokenListData: arbitrableTokenListDataInitialState
+  arbitrableAddressListData: arbitrableAddressListDataInitialState
 })
 
 // Selectors
 export const getSubmitCost = state =>
-  state.arbitrableTokenList.arbitrableTokenListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
   web3.utils.toBN(
-    state.arbitrableTokenList.arbitrableTokenListData.data.challengeReward
+    state.arbitrableAddressList.arbitrableAddressListData.data.challengeReward
   )
 
 export const getTimeToChallenge = state =>
-  state.arbitrableTokenList.arbitrableTokenListData.data &&
-  state.arbitrableTokenList.arbitrableTokenListData.data.challengePeriodDuration
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .challengePeriodDuration

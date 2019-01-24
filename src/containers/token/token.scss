@@ -165,4 +165,11 @@
       width: 40px;
     }
   }
+
+  &-badge-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    margin: 7px 0 10px 0;
+  }
 }

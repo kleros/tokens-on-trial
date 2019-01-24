@@ -5,15 +5,15 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 
 import './token-card.css'
-import EtherScanLogo from '../../../src/assets/images/etherscan.png'
-import * as tokenConstants from '../../constants/token'
+import EtherScanLogo from '../../assets/images/etherscan.png'
+import * as tcrConstants from '../../constants/tcr'
 
 const TokenCard = ({ token }) => (
   <div className="TokenCard">
     <div className="TokenCard-header">
       <FontAwesomeIcon
-        color={tokenConstants.STATUS_COLOR_ENUM[token.clientStatus]}
-        icon={tokenConstants.STATUS_ICON_ENUM[token.clientStatus]}
+        color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+        icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
       />
       <h5>
         {token.name} - {token.ticker}
@@ -45,7 +45,7 @@ TokenCard.propTypes = {
     symbolMultihash: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     addr: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
+    status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
   }).isRequired
 }

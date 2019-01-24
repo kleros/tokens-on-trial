@@ -4,22 +4,45 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 
+import EthfinexLogo from '../../assets/images/ethfinex.svg'
+import * as tcrConstants from '../../constants/tcr'
+
 import './badge-card.css'
-import EtherScanLogo from '../../../src/assets/images/etherscan.png'
-import EthfinexLogo from '../../../src/assets/images/ethfinex.svg'
-import * as tokenConstants from '../../constants/token'
+
+const getBadgeHeaderColor = token => {
+  if (
+    Number(token.status) === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']
+  )
+    return '#009aff' // blue
+  if (token.latestRequest.disputed && !token.latestRequest.resolved)
+    return '#ff9900' // orange
+  return '#ccc'
+}
+
+const getBadgeHeaderText = token => {
+  if (
+    Number(token.status) === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']
+  )
+    return 'Registered'
+  if (token.latestRequest.disputed && !token.latestRequest.resolved)
+    return 'Challenged'
+  return 'Waiting'
+}
 
 const BadgeCard = ({ token }) => (
   <div className="BadgeCard">
-    <div className="BadgeCard-header">
+    <div
+      className="BadgeCard-header"
+      style={{ backgroundColor: getBadgeHeaderColor(token) }}
+    >
       <FontAwesomeIcon color="white" icon="check" />
-      <h5 style={{ color: 'white' }}>Registered</h5>
-      <a
-        href={`https://etherscan.io/token/${token.addr}`}
+      <h5 style={{ color: 'white' }}>{getBadgeHeaderText(token)}</h5>
+      <FontAwesomeIcon
+        color="white"
+        icon="check"
         style={{ visibility: 'hidden' }}
-      >
-        <Img src={EtherScanLogo} />
-      </a>
+      />{' '}
+      {/* Used for spacing */}
     </div>
     <Link className="BadgeCard-content" to={`/token/${token.ID}`}>
       <Img
@@ -42,7 +65,7 @@ BadgeCard.propTypes = {
     symbolMultihash: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     addr: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(tokenConstants.IN_CONTRACT_STATUS_ENUM.indexes)
+    status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
   }).isRequired
 }

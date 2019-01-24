@@ -6,7 +6,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as notificationSelectors from '../../reducers/notification'
 import * as modalActions from '../../actions/modal'
-import * as tokenConstants from '../../constants/token'
+import * as tcrConstants from '../../constants/tcr'
 import NavOverlay from '../../components/nav-overlay'
 import './notification-badge.css'
 
@@ -91,12 +91,12 @@ class NotificationBadge extends PureComponent {
                     className="NotificationBadge-notifications-notification-icon"
                     color={
                       n.clientStatus
-                        ? tokenConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                        : tokenConstants.STATUS_COLOR_ENUM[0]
+                        ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
+                        : tcrConstants.STATUS_COLOR_ENUM[0]
                     }
                     icon={
                       n.clientStatus
-                        ? tokenConstants.STATUS_ICON_ENUM[n.clientStatus]
+                        ? tcrConstants.STATUS_ICON_ENUM[n.clientStatus]
                         : 'bell'
                     }
                     size="lg"
@@ -109,8 +109,8 @@ class NotificationBadge extends PureComponent {
                       className="NotificationBadge-notifications-notification-content-footer"
                       style={{
                         color: n.clientStatus
-                          ? tokenConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                          : tokenConstants.STATUS_COLOR_ENUM[0]
+                          ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
+                          : tcrConstants.STATUS_COLOR_ENUM[0]
                       }}
                     >
                       <TimeAgo datetime={n.date} />

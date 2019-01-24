@@ -43,4 +43,28 @@
     display: flex;
     justify-content: space-between;
   }
+
+  &-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+
+    &-icon {
+      height: 50px;
+      width: 50px;
+    }
+  }
+
+  &-badge {
+    background-image: url('../../assets/images/badge.svg');
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    color: $white;
+    font-size: 14px;
+    font-weight: 500;
+    height: 30px;
+    text-align: center;
+    width: 30px;
+  }
 }
