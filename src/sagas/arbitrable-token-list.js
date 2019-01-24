@@ -6,7 +6,6 @@ import { lessduxSaga } from '../utils/saga'
 import { arbitrableTokenList, arbitrator, archon } from '../bootstrap/dapp-api'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
-import * as evidenceActions from '../actions/evidence'
 import * as walletSelectors from '../reducers/wallet'
 
 import storeApi from './api/store'
@@ -73,7 +72,9 @@ export function* fetchArbitrableTokenListData() {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
+function* submitTokenEvidence({
+  payload: { evidenceData, file, ID, fileData }
+}) {
   let evidenceURL = ''
   let fileTypeExtension = ''
   let multihash = ''
@@ -139,13 +140,13 @@ export default function* arbitrableTokenListSaga() {
   )
   // Actions
   yield takeLatest(
-    evidenceActions.evidence.CREATE,
+    arbitrableTokenListActions.tokenEvidence.CREATE,
     lessduxSaga,
     {
       flow: 'create',
-      collection: evidenceActions.evidence.self
+      collection: arbitrableTokenListActions.tokenEvidence.self
     },
-    evidenceActions.evidence,
-    submitEvidence
+    arbitrableTokenListActions.tokenEvidence,
+    submitTokenEvidence
   )
 }

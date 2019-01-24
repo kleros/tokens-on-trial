@@ -14,7 +14,7 @@ import {
   hasPendingRequest,
   isRegistrationRequest,
   getBlock
-} from '../../utils/token'
+} from '../../utils/tcr'
 import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'

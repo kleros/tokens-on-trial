@@ -11,7 +11,8 @@ import './badge-card.css'
 
 const getBadgeHeaderColor = token => {
   if (
-    Number(token.status) === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']
+    Number(token.badgeStatus) ===
+    tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']
   )
     return '#009aff' // blue
   if (token.latestRequest.disputed && !token.latestRequest.resolved)
@@ -21,7 +22,8 @@ const getBadgeHeaderColor = token => {
 
 const getBadgeHeaderText = token => {
   if (
-    Number(token.status) === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']
+    Number(token.badgeStatus) ===
+    tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']
   )
     return 'Registered'
   if (token.latestRequest.disputed && !token.latestRequest.resolved)

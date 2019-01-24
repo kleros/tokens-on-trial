@@ -21,7 +21,7 @@ import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
 import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
-import { contractStatusToClientStatus, getBlock } from '../utils/token'
+import { contractStatusToClientStatus, getBlock } from '../utils/tcr'
 
 import { fetchToken } from './token'
 

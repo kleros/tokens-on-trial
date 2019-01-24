@@ -27,9 +27,7 @@ const Submit = ({
     <div className="Modal-header">
       {/* <div className="Modal-header-icon"/> */}
       <span className="Modal-badge" />
-      <h3 className="Modal-title">
-        {badge ? 'Add a badge' : 'Submit a token'}
-      </h3>
+      <h3 className="Modal-title">{badge ? 'Add Badge' : 'Submit a token'}</h3>
       {badge && (
         <Img
           alt="Badge List Submission"
@@ -122,10 +120,10 @@ const Submit = ({
       <Button
         className="Submit-request"
         disabled={!badge && (itemFormIsInvalid || !file)}
-        onClick={submitItemForm}
+        onClick={!badge ? submitItemForm : submitItem}
         type="primary"
       >
-        Request Registration
+        {!badge ? 'Request Registration' : 'Request Badge Addition'}
       </Button>
     </div>
   </div>
@@ -135,7 +133,7 @@ Submit.propTypes = {
   // State
   file: PropTypes.shape({}),
   fileInfoMessage: PropTypes.string,
-  tcr: PropTypes.oneOf([
+  tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
@@ -144,18 +142,20 @@ Submit.propTypes = {
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   submitItem: PropTypes.func.isRequired,
-  handleOnFileDropAccepted: PropTypes.func.isRequired,
+  handleOnFileDropAccepted: PropTypes.func,
 
   // Item Form
   itemFormIsInvalid: PropTypes.bool,
-  submitItemForm: PropTypes.func.isRequired
+  submitItemForm: PropTypes.func
 }
 
 Submit.defaultProps = {
   file: null,
   fileInfoMessage: '',
   itemFormIsInvalid: null,
-  badge: null
+  badge: null,
+  handleOnFileDropAccepted: null,
+  submitItemForm: null
 }
 
 export default Submit

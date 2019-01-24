@@ -10,7 +10,6 @@ import {
 } from '../bootstrap/dapp-api'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
-import * as evidenceActions from '../actions/evidence'
 import * as walletSelectors from '../reducers/wallet'
 
 import storeApi from './api/store'
@@ -77,7 +76,9 @@ export function* fetchArbitrableAddressListData() {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitEvidence({ payload: { evidenceData, file, ID, fileData } }) {
+function* submitBadgeEvidence({
+  payload: { evidenceData, file, ID, fileData }
+}) {
   let evidenceURL = ''
   let fileTypeExtension = ''
   let multihash = ''
@@ -143,13 +144,13 @@ export default function* arbitrableAddressListSaga() {
   )
   // Actions
   yield takeLatest(
-    evidenceActions.evidence.CREATE,
+    arbitrableAddressListActions.badgeEvidence.CREATE,
     lessduxSaga,
     {
       flow: 'create',
-      collection: evidenceActions.evidence.self
+      collection: arbitrableAddressListActions.badgeEvidence.self
     },
-    evidenceActions.evidence,
-    submitEvidence
+    arbitrableAddressListActions.badgeEvidence,
+    submitBadgeEvidence
   )
 }

@@ -9,11 +9,11 @@ import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
 import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
+import * as badgeActions from '../../actions/badge'
 import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
-import * as evidenceActions from '../../actions/evidence'
 import { web3 } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 import asyncReadFile from '../../utils/async-file-reader'
@@ -41,24 +41,28 @@ class ActionModal extends PureComponent {
     tokenFormIsInvalid: PropTypes.bool.isRequired,
     evidenceFormIsInvalid: PropTypes.bool.isRequired,
     openActionModal: modalSelectors.openActionModalShape,
+    closeActionModal: PropTypes.func.isRequired,
     actionModalParam: PropTypes.shape({}),
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     arbitrableAddressListData:
       arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
 
-    closeActionModal: PropTypes.func.isRequired,
+    // Token actions
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     fetchArbitrableAddressListData: PropTypes.func.isRequired,
     submitTokenForm: PropTypes.func.isRequired,
+    submitTokenEvidence: PropTypes.func.isRequired,
     submitEvidenceForm: PropTypes.func.isRequired,
-    submitEvidence: PropTypes.func.isRequired,
     createToken: PropTypes.func.isRequired,
     clearToken: PropTypes.func.isRequired,
     fundDispute: PropTypes.func.isRequired,
     challengeRequest: PropTypes.func.isRequired,
     resubmitToken: PropTypes.func.isRequired,
-    fundAppeal: PropTypes.func.isRequired
+    fundAppeal: PropTypes.func.isRequired,
+
+    // Badge actions
+    createBadge: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -132,15 +136,17 @@ class ActionModal extends PureComponent {
 
   handleSubmitEvidenceClick = async evidence => {
     const {
-      submitEvidence,
+      submitTokenEvidence,
+      closeActionModal,
       token: {
         data: { ID }
       }
     } = this.props
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
-    submitEvidence({ file, evidenceData: evidence, ID, fileData })
+    submitTokenEvidence({ file, evidenceData: evidence, ID, fileData })
     this.setState({ file: null, fileInfoMessage: null })
+    closeActionModal()
   }
 
   handleChallengeClick = () => {
@@ -247,6 +253,29 @@ class ActionModal extends PureComponent {
       )
 
     fundAppeal(tokenData.ID, SIDE, value)
+  }
+
+  handleSubmitBadgeClick = () => {
+    const { createBadge, arbitrableAddressListData, token } = this.props
+
+    const value = web3.utils
+      .toBN(arbitrableAddressListData.data.challengeReward)
+      .add(web3.utils.toBN(arbitrableAddressListData.data.arbitrationCost))
+      .add(
+        web3.utils
+          .toBN(arbitrableAddressListData.data.arbitrationCost)
+          .mul(
+            web3.utils.toBN(
+              arbitrableAddressListData.data.sharedStakeMultiplier
+            )
+          )
+          .div(
+            web3.utils.toBN(arbitrableAddressListData.data.MULTIPLIER_PRECISION)
+          )
+      )
+
+    this.setState({ file: null, fileInfoMessage: null })
+    createBadge({ tokenData: token.data, value })
   }
 
   componentDidMount() {
@@ -374,6 +403,7 @@ class ActionModal extends PureComponent {
                 return (
                   <Submit
                     tcr={arbitrableAddressListData}
+                    submitItem={this.handleSubmitBadgeClick}
                     closeActionModal={closeActionModal}
                     badge
                   />
@@ -466,8 +496,14 @@ export default connect(
   }),
   {
     closeActionModal: modalActions.closeActionModal,
+    fetchArbitrableAddressListData:
+      arbitrableAddressListActions.fetchArbitrableAddressListData,
+    fetchArbitrableTokenListData:
+      arbitrableTokenListActions.fetchArbitrableTokenListData,
+
+    // Token actions
     createToken: tokenActions.createToken,
-    submitEvidence: evidenceActions.submitEvidence,
+    submitTokenEvidence: arbitrableTokenListActions.submitTokenEvidence,
     clearToken: tokenActions.clearToken,
     resubmitToken: tokenActions.resubmitToken,
     fundDispute: tokenActions.fundDispute,
@@ -475,9 +511,14 @@ export default connect(
     submitTokenForm,
     submitEvidenceForm,
     fundAppeal: tokenActions.fundAppeal,
-    fetchArbitrableTokenListData:
-      arbitrableTokenListActions.fetchArbitrableTokenListData,
-    fetchArbitrableAddressListData:
-      arbitrableAddressListActions.fetchArbitrableAddressListData
+
+    // Badge actions
+    createBadge: badgeActions.createBadge,
+    submitBadgeEvidence: arbitrableAddressListActions.submitBadgeEvidence,
+    clearBadge: badgeActions.clearBadge,
+    resubmitBadge: badgeActions.resubmitBadge,
+    fundBadgeDispute: badgeActions.fundBadgeDispute,
+    challengeBadgeRequest: badgeActions.challengeBadgeRequest,
+    fundBadgeAppeal: badgeActions.fundBadgeAppeal
   }
 )(ActionModal)

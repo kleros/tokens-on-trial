@@ -7,6 +7,7 @@ import arbitrableTokenListSaga from './arbitrable-token-list'
 import arbitrableAddressListSaga from './arbitrable-address-list'
 import arbitratorSaga from './arbitrator'
 import tokenSaga from './token'
+import badgeSaga from './badge'
 import notificationSaga from './notification'
 
 /**
@@ -41,7 +42,8 @@ const rootSagas = [
   arbitrableAddressListSaga,
   tokenSaga,
   arbitratorSaga,
-  notificationSaga
+  notificationSaga,
+  badgeSaga
 ].map(makeRestartable)
 
 /**

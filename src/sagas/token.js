@@ -10,7 +10,11 @@ import {
   archon,
   web3
 } from '../bootstrap/dapp-api'
-import { contractStatusToClientStatus, hasPendingRequest } from '../utils/token'
+import {
+  contractStatusToClientStatus,
+  hasPendingRequest,
+  convertFromString
+} from '../utils/tcr'
 import * as tokenActions from '../actions/token'
 import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
@@ -18,27 +22,6 @@ import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
-
-// Converts token string data to correct js types.
-const convertFromString = token => {
-  const { latestRequest } = token
-  latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
-  latestRequest.challengerDepositTime =
-    Number(latestRequest.challengerDepositTime) * 1000
-  latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
-  latestRequest.disputeID = Number(latestRequest.disputeID)
-
-  const { latestRound } = latestRequest
-  latestRound.ruling = Number(latestRound.ruling)
-  latestRound.paidFees[0] = Number(latestRound.paidFees[0])
-  latestRound.paidFees[1] = Number(latestRound.paidFees[1])
-  latestRound.paidFees[2] = Number(latestRound.paidFees[2])
-  latestRound.requiredForSide[0] = Number(latestRound.requiredForSide[0])
-  latestRound.requiredForSide[1] = Number(latestRound.requiredForSide[1])
-  latestRound.requiredForSide[2] = Number(latestRound.paidFees[2])
-  token.latestRound = latestRound
-  return token
-}
 
 /**
  * Fetches a paginatable list of tokens.
