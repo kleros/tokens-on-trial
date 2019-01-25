@@ -84,16 +84,13 @@
   }
 
   &-meta {
-    align-content: center;
     display: flex;
     flex-direction: column;
     font-size: 14px;
-    justify-content: space-evenly;
-    margin: 26px 26px 26px 0;
-    vertical-align: middle;
+    margin: auto 26px auto 0;
+    padding: 0;
 
     &--aligned {
-      display: inline-block;
       vertical-align: middle;
     }
   }

@@ -224,7 +224,8 @@ class ActionModal extends PureComponent {
     const {
       challengeBadgeRequest,
       token,
-      arbitrableAddressListData
+      arbitrableAddressListData,
+      closeActionModal
     } = this.props
     const {
       challengeReward,
@@ -246,6 +247,7 @@ class ActionModal extends PureComponent {
       addr: token.data.addr,
       value
     })
+    closeActionModal()
   }
 
   handleFundRequesterClick = () => {

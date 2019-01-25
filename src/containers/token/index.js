@@ -322,8 +322,8 @@ class TokenDetails extends PureComponent {
           .Evidence({
             filter: {
               arbitrator: arbitrator._address,
-              disputeID: token.latestRequest.disputeID
-            }, // Using an array means OR: e.g. 20 or 23
+              disputeID: [token.latestRequest.disputeID]
+            },
             fromBlock: 0
           })
           .on('data', async e => {
@@ -331,11 +331,18 @@ class TokenDetails extends PureComponent {
               await (await fetch(e.returnValues._evidence)).json()
             )
 
-            evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
-            const { evidences } = this.state
-            this.setState({
-              evidences: [...evidences, evidence]
-            })
+            if (
+              Number(e.returnValues._disputeID) ===
+              token.latestRequest.disputeID
+            ) {
+              evidence.icon = getFileIcon(
+                mime.lookup(evidence.fileTypeExtension)
+              )
+              const { evidences } = this.state
+              this.setState({
+                evidences: [...evidences, evidence]
+              })
+            }
           })
       }
 
@@ -450,23 +457,19 @@ class TokenDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[token.clientStatus]
                 )}
               </span>
-              <div
-                className={`TokenDetails-timer ${
-                  token.clientStatus <= 1 ||
-                  (hasPendingRequest(token.status, token.latestRequest) &&
-                    token.latestRequest.dispute &&
-                    token.latestRequest.dispute.status !==
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
-                  Number(countdown) === 0
-                    ? `Hidden`
-                    : ``
-                }`}
-              >
-                Deadline{' '}
-                {countdown instanceof Date
-                  ? countdown.toISOString().substr(11, 8)
-                  : '--:--:--'}
-              </div>
+              {(token.clientStatus <= 1 ||
+                (hasPendingRequest(token.status, token.latestRequest) &&
+                  token.latestRequest.dispute &&
+                  token.latestRequest.dispute.status !==
+                    tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
+                Number(countdown) === 0) && (
+                <div className="BadgeDetails-timer">
+                  Deadline{' '}
+                  {countdown instanceof Date
+                    ? countdown.toISOString().substr(11, 8)
+                    : '--:--:--'}
+                </div>
+              )}
             </div>
             <div className="TokenDetails-action">
               {this.getActionButton(token, accounts.data[0])}

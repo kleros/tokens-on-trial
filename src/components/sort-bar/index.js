@@ -50,7 +50,7 @@ class SortBar extends PureComponent {
             onChange={this.handleSortChange}
             options={filterConstants.SORT_OPTIONS_ENUM.values}
             type="radio"
-            value={oldestFirst || 1}
+            value={oldestFirst || 0}
           />
         </div>
       </div>

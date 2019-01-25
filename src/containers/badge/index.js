@@ -337,11 +337,18 @@ class BadgeDetails extends PureComponent {
               await (await fetch(e.returnValues._evidence)).json()
             )
 
-            evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
-            const { evidences } = this.state
-            this.setState({
-              evidences: [...evidences, evidence]
-            })
+            if (
+              Number(e.returnValues._disputeID) ===
+              token.latestRequest.disputeID
+            ) {
+              evidence.icon = getFileIcon(
+                mime.lookup(evidence.fileTypeExtension)
+              )
+              const { evidences } = this.state
+              this.setState({
+                evidences: [...evidences, evidence]
+              })
+            }
           })
       }
 
@@ -441,23 +448,19 @@ class BadgeDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[token.badge.clientStatus]
                 )}
               </span>
-              <div
-                className={`BadgeDetails-timer ${
-                  badge.clientStatus <= 1 ||
-                  (hasPendingRequest(badge.status, badge.latestRequest) &&
-                    badge.latestRequest.dispute &&
-                    badge.latestRequest.dispute.status !==
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
-                  Number(countdown) === 0
-                    ? `Hidden`
-                    : ``
-                }`}
-              >
-                Deadline{' '}
-                {countdown instanceof Date
-                  ? countdown.toISOString().substr(11, 8)
-                  : '--:--:--'}
-              </div>
+              {(badge.clientStatus <= 1 ||
+                (hasPendingRequest(badge.status, badge.latestRequest) &&
+                  badge.latestRequest.dispute &&
+                  badge.latestRequest.dispute.status !==
+                    tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
+                Number(countdown)) === 0 && (
+                <div className="BadgeDetails-timer">
+                  Deadline{' '}
+                  {countdown instanceof Date
+                    ? countdown.toISOString().substr(11, 8)
+                    : '--:--:--'}
+                </div>
+              )}
             </div>
             <div className="BadgeDetails-action">
               {this.getActionButton(token, accounts.data[0])}
