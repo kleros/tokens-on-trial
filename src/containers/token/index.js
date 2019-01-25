@@ -90,7 +90,7 @@ class TokenDetails extends PureComponent {
 
   handleOpenEvidenceModal = () => {
     const { openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidence)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge)
   }
 
   handleViewEvidenceClick = evidence => () => {

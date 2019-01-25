@@ -117,13 +117,12 @@ function* requestStatusChange({ payload: { token, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* challengeRequest({ payload: { token, value } }) {
-  yield call(arbitrableAddressList.methods.challengeRequest(token.addr).send, {
+function* challengeRequest({ payload: { addr, value } }) {
+  yield call(arbitrableAddressList.methods.challengeRequest(addr).send, {
     from: yield select(walletSelectors.getAccount),
     value
   })
 
-  const { addr } = token
   return yield call(fetchBadgeStatus, { payload: { addr } })
 }
 
@@ -132,16 +131,12 @@ function* challengeRequest({ payload: { token, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* fundDispute({ payload: { token, value, side } }) {
-  yield call(
-    arbitrableAddressList.methods.fundLatestRound(token.addr, side).send,
-    {
-      from: yield select(walletSelectors.getAccount),
-      value
-    }
-  )
+function* fundDispute({ payload: { addr, value, side } }) {
+  yield call(arbitrableAddressList.methods.fundLatestRound(addr, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
 
-  const { addr } = token
   return yield call(fetchBadgeStatus, { payload: { addr } })
 }
 
@@ -150,16 +145,12 @@ function* fundDispute({ payload: { token, value, side } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* fundAppeal({ payload: { token, side, value } }) {
-  yield call(
-    arbitrableAddressList.methods.fundLatestRound(token.addr, side).send,
-    {
-      from: yield select(walletSelectors.getAccount),
-      value
-    }
-  )
+function* fundAppealBadge({ payload: { addr, side, value } }) {
+  yield call(arbitrableAddressList.methods.fundLatestRound(addr, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
 
-  const { addr } = token
   return yield call(fetchBadgeStatus, { payload: { addr } })
 }
 
@@ -277,7 +268,7 @@ export default function* badgeSaga() {
     lessduxSaga,
     updateTokensCollectionModFlow,
     badgeActions.badge,
-    fundAppeal
+    fundAppealBadge
   )
   yield takeLatest(
     badgeActions.badge.CHALLENGE_REQUEST,

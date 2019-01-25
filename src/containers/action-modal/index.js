@@ -63,7 +63,11 @@ class ActionModal extends PureComponent {
 
     // Badge actions
     createBadge: PropTypes.func.isRequired,
-    clearBadge: PropTypes.func.isRequired
+    clearBadge: PropTypes.func.isRequired,
+    submitBadgeEvidence: PropTypes.func.isRequired,
+    challengeBadgeRequest: PropTypes.func.isRequired,
+    fundBadgeDispute: PropTypes.func.isRequired,
+    fundBadgeAppeal: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -176,6 +180,21 @@ class ActionModal extends PureComponent {
     closeActionModal()
   }
 
+  handleSubmitEvidenceBadgeClick = async evidence => {
+    const {
+      submitBadgeEvidence,
+      closeActionModal,
+      token: {
+        data: { addr }
+      }
+    } = this.props
+    const { file } = this.state
+    const fileData = file ? (await asyncReadFile(file))[0] : null
+    submitBadgeEvidence({ file, evidenceData: evidence, addr, fileData })
+    this.setState({ file: null, fileInfoMessage: null })
+    closeActionModal()
+  }
+
   handleChallengeClick = () => {
     const { challengeRequest, token, arbitrableTokenListData } = this.props
     const {
@@ -196,6 +215,34 @@ class ActionModal extends PureComponent {
       )
     challengeRequest({
       ID: token.data.ID,
+      value
+    })
+  }
+
+  handleChallengeBadgeClick = () => {
+    const {
+      challengeBadgeRequest,
+      token,
+      arbitrableAddressListData
+    } = this.props
+    const {
+      challengeReward,
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION
+    } = arbitrableAddressListData.data
+
+    const value = web3.utils
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
+      .add(
+        web3.utils
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
+      )
+    challengeBadgeRequest({
+      addr: token.data.addr,
       value
     })
   }
@@ -233,6 +280,23 @@ class ActionModal extends PureComponent {
       .add(web3.utils.toBN(arbitrationCost))
     fundDispute({
       ID: token.data.ID,
+      value,
+      side: tcrConstants.SIDE.Challenger
+    })
+  }
+
+  handleFundChallengerBadgeClick = () => {
+    const { fundBadgeDispute, token, arbitrableTokenListData } = this.props
+    const { badge } = token.data
+    const { latestRequest } = badge.data
+    const { latestRound } = latestRequest
+    const { arbitrationCost } = arbitrableTokenListData.data
+
+    const value = web3.utils
+      .toBN(latestRound.requiredFeeStake)
+      .add(web3.utils.toBN(arbitrationCost))
+    fundBadgeDispute({
+      addr: token.data.addr,
       value,
       side: tcrConstants.SIDE.Challenger
     })
@@ -282,6 +346,52 @@ class ActionModal extends PureComponent {
     )
 
     fundAppeal(tokenData.ID, SIDE, value)
+  }
+
+  handleFundAppealBadgeClick = () => {
+    const {
+      fundBadgeAppeal,
+      token,
+      arbitrableAddressListData,
+      actionModalParam
+    } = this.props
+    const { badge } = token.data
+    const { latestRequest } = badge
+    const SIDE = actionModalParam
+
+    let losingSide = false
+    if (
+      SIDE === tcrConstants.SIDE.Requester &&
+      latestRequest.dispute.ruling ===
+        tcrConstants.RULING_OPTIONS.Refuse.toString()
+    )
+      losingSide = true
+    else if (
+      SIDE === tcrConstants.SIDE.Challenger &&
+      latestRequest.dispute.ruling ===
+        tcrConstants.RULING_OPTIONS.Accept.toString()
+    )
+      losingSide = true
+
+    const {
+      arbitrationCost,
+      loserStakeMultiplier,
+      winnerStakeMultiplier,
+      MULTIPLIER_PRECISION
+    } = arbitrableAddressListData.data
+
+    const value = web3.utils.toBN(arbitrationCost).add(
+      web3.utils
+        .toBN(arbitrationCost)
+        .mul(
+          web3.utils.toBN(
+            losingSide ? loserStakeMultiplier : winnerStakeMultiplier
+          )
+        )
+        .div(web3.utils.toBN(MULTIPLIER_PRECISION))
+    )
+
+    fundBadgeAppeal(token.data.addr, SIDE, value)
   }
 
   handleSubmitBadgeClick = () => {
@@ -443,7 +553,7 @@ class ActionModal extends PureComponent {
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
                     clearItem={this.handleClearBadgeClick}
-                    item={token}
+                    item={token.data.badge}
                     badge
                   />
                 )
@@ -452,7 +562,8 @@ class ActionModal extends PureComponent {
                   <Challenge
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
-                    item={token}
+                    item={token.data.badge}
+                    fundDispute={this.handleChallengeBadgeClick}
                     badge
                   />
                 )
@@ -461,7 +572,7 @@ class ActionModal extends PureComponent {
                   <FundDispute
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
-                    item={token}
+                    item={token.data.badge}
                     badge
                   />
                 )
@@ -470,7 +581,8 @@ class ActionModal extends PureComponent {
                   <FundDispute
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
-                    item={token}
+                    fundDispute={this.handleFundChallengerBadgeClick}
+                    item={token.data.badge}
                     badge
                   />
                 )
@@ -479,8 +591,9 @@ class ActionModal extends PureComponent {
                   <FundAppeal
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
-                    item={token}
+                    item={token.data.badge}
                     badge
+                    fundAppeal={this.handleFundAppealBadgeClick}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge:
@@ -488,7 +601,13 @@ class ActionModal extends PureComponent {
                   <SubmitEvidence
                     tcr={arbitrableAddressListData}
                     closeActionModal={closeActionModal}
-                    item={token}
+                    item={token.data.badge}
+                    evidenceFormIsInvalid={evidenceFormIsInvalid}
+                    file={file}
+                    fileInfoMessage={fileInfoMessage}
+                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                    submitEvidence={this.handleSubmitEvidenceBadgeClick}
+                    submitEvidenceForm={submitEvidenceForm}
                     badge
                   />
                 )

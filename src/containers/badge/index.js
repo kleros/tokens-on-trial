@@ -96,7 +96,7 @@ class BadgeDetails extends PureComponent {
 
   handleOpenEvidenceModal = () => {
     const { openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitBadgeEvidence)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge)
   }
 
   handleViewEvidenceClick = evidence => () => {
@@ -176,7 +176,7 @@ class BadgeDetails extends PureComponent {
                 latestRound.requiredForSide[SIDE] === 0 ||
                 latestRound.paidFees[SIDE] < latestRound.requiredForSide[SIDE]
               ) {
-                let losingSide
+                let losingSide = false
                 if (
                   userAccount ===
                     latestRequest.parties[tcrConstants.SIDE.Requester] &&
@@ -197,7 +197,7 @@ class BadgeDetails extends PureComponent {
                   disabled = false
                   method = () =>
                     this.handleActionClick(
-                      modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                      modalConstants.ACTION_MODAL_ENUM.FundAppealBadge,
                       SIDE
                     )
                 } else if (timestamp < endOfFirstHalf) {
@@ -205,7 +205,7 @@ class BadgeDetails extends PureComponent {
                   disabled = false
                   method = () =>
                     this.handleActionClick(
-                      modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                      modalConstants.ACTION_MODAL_ENUM.FundAppealBadge,
                       SIDE
                     )
                 }
@@ -278,7 +278,7 @@ class BadgeDetails extends PureComponent {
       }
     else {
       disabled = false
-      if (token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
+      if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
         method = () =>
           this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.ClearBadge)
         label = 'Remove Badge'

@@ -77,7 +77,7 @@ export function* fetchArbitrableAddressListData() {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* submitBadgeEvidence({
-  payload: { evidenceData, file, ID, fileData }
+  payload: { evidenceData, file, addr, fileData }
 }) {
   let evidenceURL = ''
   let fileTypeExtension = ''
@@ -121,7 +121,7 @@ function* submitBadgeEvidence({
   )).payload.fileURL
 
   yield call(
-    arbitrableAddressList.methods.submitEvidence(ID, evidenceJSONURL).send,
+    arbitrableAddressList.methods.submitEvidence(addr, evidenceJSONURL).send,
     {
       from: yield select(walletSelectors.getAccount)
     }

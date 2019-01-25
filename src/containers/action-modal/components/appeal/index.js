@@ -9,8 +9,8 @@ import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './appeal.css'
 
-const Appeal = ({ closeActionModal, fundAppeal, token, losingSide, tcr }) => (
-  <div>
+const Appeal = ({ closeActionModal, fundAppeal, item, losingSide, tcr }) => (
+  <>
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Appeal-icon" icon="gavel" />
       Appeal
@@ -22,18 +22,18 @@ const Appeal = ({ closeActionModal, fundAppeal, token, losingSide, tcr }) => (
     <div className="Appeal-cost">
       <span>Appeal Cost</span>
       <strong>
-        {`${token.latestRequest.latestRound.appealCost &&
-          web3.utils.fromWei(token.latestRequest.latestRound.appealCost)} ETH`}
+        {`${item.latestRequest.latestRound.appealCost &&
+          web3.utils.fromWei(item.latestRequest.latestRound.appealCost)} ETH`}
       </strong>
     </div>
     <div className="Appeal-cost">
       <span>Arbitration Fee Stake</span>
       <strong>
         {`${String(
-          token.latestRequest.latestRound.appealCost &&
+          item.latestRequest.latestRound.appealCost &&
             web3.utils.fromWei(
               web3.utils
-                .toBN(token.latestRequest.latestRound.appealCost)
+                .toBN(item.latestRequest.latestRound.appealCost)
                 .mul(
                   web3.utils.toBN(
                     losingSide
@@ -51,11 +51,11 @@ const Appeal = ({ closeActionModal, fundAppeal, token, losingSide, tcr }) => (
       <span>Total Due:</span>
       <strong className="Appeal-total-value">
         {`${String(
-          token.latestRequest.latestRound.appealCost &&
+          item.latestRequest.latestRound.appealCost &&
             web3.utils.fromWei(
-              web3.utils.toBN(token.latestRequest.latestRound.appealCost).add(
+              web3.utils.toBN(item.latestRequest.latestRound.appealCost).add(
                 web3.utils
-                  .toBN(token.latestRequest.latestRound.appealCost)
+                  .toBN(item.latestRequest.latestRound.appealCost)
                   .mul(
                     web3.utils.toBN(
                       losingSide
@@ -82,12 +82,12 @@ const Appeal = ({ closeActionModal, fundAppeal, token, losingSide, tcr }) => (
         Appeal
       </Button>
     </div>
-  </div>
+  </>
 )
 
 Appeal.propTypes = {
   // State
-  token: tokenSelectors.tokenShape.isRequired,
+  item: tokenSelectors.tokenShape.isRequired,
   losingSide: PropTypes.bool.isRequired,
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,

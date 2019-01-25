@@ -37,7 +37,9 @@ const Submit = ({
       )}
     </div>
     <hr />
-    <h5 className="Modal-subtitle">Fill the required info and stake ETH</h5>
+    <h5 className="Modal-subtitle">
+      {!badge ? 'Fill the form and stake ETH' : ''}
+    </h5>
     {!badge && (
       <>
         <TokenForm className="Submit-form" onSubmit={submitItem} />
