@@ -479,7 +479,7 @@ class ActionModal extends PureComponent {
                 return (
                   <Clear
                     tcr={arbitrableTokenListData}
-                    item={token}
+                    item={token.data}
                     clearItem={this.handleClearTokenClick}
                     closeActionModal={closeActionModal}
                   />

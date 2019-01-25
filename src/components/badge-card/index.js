@@ -10,18 +10,20 @@ import { ARBITRABLE_ADDRESS_LIST_ADDRESS } from '../../bootstrap/dapp-api'
 
 import './badge-card.css'
 
-const getBadgeHeaderColor = token => {
-  if (token.badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
+const getBadgeColor = token => {
+  const { badge } = token
+  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
     return '#009aff' // blue
-  if (token.latestRequest.disputed && !token.latestRequest.resolved)
+  if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
     return '#ff9900' // orange
   return '#ccc'
 }
 
 const getBadgeHeaderText = token => {
-  if (token.badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
+  const { badge } = token
+  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
     return 'Registered'
-  if (token.latestRequest.disputed && !token.latestRequest.resolved)
+  if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
     return 'Challenged'
   return 'Waiting'
 }
@@ -30,7 +32,7 @@ const BadgeCard = ({ token }) => (
   <div className="BadgeCard">
     <div
       className="BadgeCard-header"
-      style={{ backgroundColor: getBadgeHeaderColor(token) }}
+      style={{ backgroundColor: getBadgeColor(token) }}
     >
       <FontAwesomeIcon color="white" icon="check" />
       <h5 style={{ color: 'white' }}>{getBadgeHeaderText(token)}</h5>

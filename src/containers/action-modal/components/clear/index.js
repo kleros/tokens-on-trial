@@ -14,15 +14,57 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
       {!badge ? `Clear ${item.name}` : 'Remove badge'}
     </h3>
     <hr />
-    <div className="Clear-stake">
-      <h4>
-        <strong>Stake:</strong>
-      </h4>
-      <span>
+    <div className="Challenge-cost">
+      <span>Challenge Stake</span>
+      <strong>
         {`${String(
           web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
         )} ETH`}
-      </span>
+      </strong>
+    </div>
+    <div className="Challenge-cost">
+      <span>Arbitration Fee Stake</span>
+      <strong>
+        {`${String(
+          web3.utils.fromWei(
+            String(
+              web3.utils
+                .toBN(tcr.data.arbitrationCost)
+                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+            )
+          )
+        )} ETH`}
+      </strong>
+    </div>
+    <div className="Challenge-cost">
+      <span>Required Arbitration Fee</span>
+      <strong>
+        {`${String(
+          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
+        )} ETH`}
+      </strong>
+    </div>
+    <br />
+    <div className="Challenge-cost">
+      <span>Total Due:</span>
+      <strong className="Challenge-total-value">
+        {`${String(
+          web3.utils.fromWei(
+            String(
+              web3.utils
+                .toBN(tcr.data.challengeReward)
+                .add(
+                  web3.utils
+                    .toBN(tcr.data.arbitrationCost)
+                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                )
+                .add(web3.utils.toBN(tcr.data.arbitrationCost))
+            )
+          )
+        )} ETH`}
+      </strong>
     </div>
     <br />
     <div className="Modal-actions">

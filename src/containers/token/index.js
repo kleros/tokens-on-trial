@@ -15,7 +15,7 @@ import {
   isRegistrationRequest,
   getBlock
 } from '../../utils/tcr'
-import { truncateMiddle, getRemainingTime } from '../../utils/ui'
+import { truncateMiddle, getRemainingTime, getBadgeStyle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
@@ -424,10 +424,13 @@ class TokenDetails extends PureComponent {
                       'ClearingRequested'
                     ]) && (
                   <span>
-                    <span className="TokenDetails-icon-badge TokenDetails-meta--aligned">
+                    <span
+                      className="TokenDetails-icon-badge TokenDetails-meta--aligned"
+                      style={getBadgeStyle(token.badge, tcrConstants)}
+                    >
                       1
                     </span>
-                    Badges
+                    Badge
                   </span>
                 )}
               </div>

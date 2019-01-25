@@ -32,12 +32,22 @@
   }
 
   &-footer {
+    align-items: center;
     background-color: #f8f8f8;
     display: flex;
     height: 39px;
+    padding-left: 10px;
 
     &-badge {
-      width: 30px;
+      background-repeat: no-repeat;
+      color: $white;
+      font-size: 14px;
+      font-weight: 500;
+      height: 25px;
+      margin-right: 8px;
+      padding-top: 4px;
+      text-align: center;
+      width: 25px;
     }
   }
 

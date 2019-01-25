@@ -4,9 +4,11 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 
-import './token-card.css'
-import EtherScanLogo from '../../assets/images/etherscan.png'
 import * as tcrConstants from '../../constants/tcr'
+import EtherScanLogo from '../../assets/images/etherscan.png'
+import { getBadgeStyle } from '../../utils/ui'
+
+import './token-card.css'
 
 const TokenCard = ({ token }) => (
   <div className="TokenCard">
@@ -33,9 +35,18 @@ const TokenCard = ({ token }) => (
     </Link>
     <div
       className={`TokenCard-footer${
-        !token.badges || token.badges.length === 0 ? ' TokenCard-hidden' : ''
+        token.badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent']
+          ? ' TokenCard-hidden'
+          : ''
       }`}
-    />
+    >
+      <span
+        className="TokenCard-footer-badge"
+        style={getBadgeStyle(token.badge, tcrConstants)}
+      >
+        1
+      </span>
+    </div>
   </div>
 )
 
