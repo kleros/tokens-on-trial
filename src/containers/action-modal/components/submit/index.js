@@ -21,12 +21,19 @@ const Submit = ({
   file,
   fileInfoMessage,
   handleOnFileDropAccepted,
-  badge
+  badge,
+  item,
+  resubmit
 }) => (
   <div>
-    <div className="Modal-header">
+    <div
+      className="Modal-header"
+      style={!badge && item ? { justifyContent: 'center' } : {}}
+    >
       {badge && <span className="Modal-badge" />}
-      <h3 className="Modal-title">{badge ? 'Add Badge' : 'Submit a token'}</h3>
+      <h3 className="Modal-title">
+        {badge ? 'Add Badge' : item ? 'Resubmit token' : 'Submit a token'}
+      </h3>
       {badge && (
         <Img
           alt="Badge List Submission"
@@ -39,7 +46,7 @@ const Submit = ({
     <h5 className="Modal-subtitle">
       {!badge ? 'Fill the form and stake ETH' : ''}
     </h5>
-    {!badge && (
+    {!badge && !item && (
       <>
         <TokenForm className="Submit-form" onSubmit={submitItem} />
         <FilePicker
@@ -57,57 +64,89 @@ const Submit = ({
       </>
     )}
     {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
-    <div className="Challenge-cost">
-      <span>Challenge Stake</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
-        )} ETH`}
-      </strong>
-    </div>
-    <div className="Challenge-cost">
-      <span>Arbitration Fee Stake</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.arbitrationCost)
-                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
-            )
-          )
-        )} ETH`}
-      </strong>
-    </div>
-    <div className="Challenge-cost">
-      <span>Required Arbitration Fee</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
-        )} ETH`}
-      </strong>
-    </div>
-    <br />
-    <div className="Challenge-cost">
-      <span>Total Due:</span>
-      <strong className="Challenge-total-value">
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.challengeReward)
-                .add(
+    <div className="Challenge-fees">
+      <div>
+        <p className="Challenge-fees-line">Challenge Stake</p>
+        <p className="Challenge-fees-line">Arbitration Fee Stake</p>
+        <p className="Challenge-fees-line">Arbitration Fees</p>
+      </div>
+      <div>
+        <p className="Challenge-fees-line">
+          <strong>
+            {`${String(
+              web3.utils.fromWei(
+                String(web3.utils.toBN(tcr.data.challengeReward))
+              )
+            )}`}
+          </strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>
+            {String(
+              web3.utils.fromWei(
+                String(
                   web3.utils
                     .toBN(tcr.data.arbitrationCost)
                     .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
                     .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
                 )
-                .add(web3.utils.toBN(tcr.data.arbitrationCost))
-            )
-          )
-        )} ETH`}
-      </strong>
+              )
+            )}
+          </strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>
+            {String(
+              web3.utils.fromWei(
+                String(web3.utils.toBN(tcr.data.arbitrationCost))
+              )
+            )}
+          </strong>
+        </p>
+      </div>
+      <div className="Challenge-fees-symbols">
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+      </div>
+    </div>
+    <br />
+    <div className="Challenge-fees">
+      <div>
+        <p className="Challenge-fees-line">Total Due:</p>
+      </div>
+      <div>
+        <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
+          <strong>
+            {String(
+              web3.utils.fromWei(
+                String(
+                  web3.utils
+                    .toBN(tcr.data.challengeReward)
+                    .add(
+                      web3.utils
+                        .toBN(tcr.data.arbitrationCost)
+                        .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                        .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                    )
+                    .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                )
+              )
+            )}
+          </strong>
+        </p>
+      </div>
+      <div className="Challenge-fees-symbols">
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+      </div>
     </div>
     <br />
     <div className="Modal-actions">
@@ -120,8 +159,8 @@ const Submit = ({
       </Button>
       <Button
         className="Submit-request"
-        disabled={!badge && (itemFormIsInvalid || !file)}
-        onClick={!badge ? submitItemForm : submitItem}
+        disabled={!badge && !item && (itemFormIsInvalid || !file)}
+        onClick={badge ? submitItem : item ? resubmit : submitItemForm}
         type="primary"
       >
         {!badge ? 'Request Registration' : 'Request Badge Addition'}
@@ -139,11 +178,13 @@ Submit.propTypes = {
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
   badge: PropTypes.bool,
+  item: PropTypes.shape({}),
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   submitItem: PropTypes.func.isRequired,
   handleOnFileDropAccepted: PropTypes.func,
+  resubmit: PropTypes.func,
 
   // Item Form
   itemFormIsInvalid: PropTypes.bool,
@@ -156,7 +197,9 @@ Submit.defaultProps = {
   itemFormIsInvalid: null,
   badge: null,
   handleOnFileDropAccepted: null,
-  submitItemForm: null
+  submitItemForm: null,
+  resubmit: null,
+  item: null
 }
 
 export default Submit

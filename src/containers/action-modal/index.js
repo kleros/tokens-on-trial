@@ -79,16 +79,15 @@ class ActionModal extends PureComponent {
   state = { file: null, fileInfoMessage: null }
 
   handleSubmitTokenClick = async token => {
-    console.info('test')
     const { createToken, arbitrableTokenListData } = this.props
-    const { file } = this.state
-    const fileData = (await asyncReadFile(file))[0]
     const {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_PRECISION,
       challengeReward
     } = arbitrableTokenListData.data
+    const { file } = this.state
+    const fileData = (await asyncReadFile(file))[0]
 
     const value = web3.utils
       .toBN(challengeReward)
@@ -105,8 +104,23 @@ class ActionModal extends PureComponent {
   }
 
   handleResubmitTokenClick = () => {
-    const { resubmitToken, token } = this.props
-    resubmitToken({ tokenData: token.data })
+    const { resubmitToken, token, arbitrableTokenListData } = this.props
+    const {
+      arbitrationCost,
+      sharedStakeMultiplier,
+      MULTIPLIER_PRECISION,
+      challengeReward
+    } = arbitrableTokenListData.data
+    const value = web3.utils
+      .toBN(challengeReward)
+      .add(web3.utils.toBN(arbitrationCost))
+      .add(
+        web3.utils
+          .toBN(arbitrationCost)
+          .mul(web3.utils.toBN(sharedStakeMultiplier))
+          .div(web3.utils.toBN(MULTIPLIER_PRECISION))
+      )
+    resubmitToken({ tokenData: token.data, value })
   }
 
   handleClearTokenClick = () => {
@@ -483,6 +497,8 @@ class ActionModal extends PureComponent {
                     fileInfoMessage={fileInfoMessage}
                     handleOnFileDropAccepted={this.handleOnFileDropAccepted}
                     closeActionModal={closeActionModal}
+                    item={token}
+                    resubmit={this.handleResubmitTokenClick}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.Clear:

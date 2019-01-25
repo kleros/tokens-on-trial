@@ -14,57 +14,89 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
       {!badge ? `Clear ${item.name}` : 'Remove badge'}
     </h3>
     <hr />
-    <div className="Challenge-cost">
-      <span>Challenge Stake</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
-        )} ETH`}
-      </strong>
-    </div>
-    <div className="Challenge-cost">
-      <span>Arbitration Fee Stake</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.arbitrationCost)
-                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
-            )
-          )
-        )} ETH`}
-      </strong>
-    </div>
-    <div className="Challenge-cost">
-      <span>Required Arbitration Fee</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
-        )} ETH`}
-      </strong>
-    </div>
-    <br />
-    <div className="Challenge-cost">
-      <span>Total Due:</span>
-      <strong className="Challenge-total-value">
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.challengeReward)
-                .add(
+    <div className="Challenge-fees">
+      <div>
+        <p className="Challenge-fees-line">Challenge Stake</p>
+        <p className="Challenge-fees-line">Arbitration Fee Stake</p>
+        <p className="Challenge-fees-line">Arbitration Fees</p>
+      </div>
+      <div>
+        <p className="Challenge-fees-line">
+          <strong>
+            {`${String(
+              web3.utils.fromWei(
+                String(web3.utils.toBN(tcr.data.challengeReward))
+              )
+            )}`}
+          </strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>
+            {String(
+              web3.utils.fromWei(
+                String(
                   web3.utils
                     .toBN(tcr.data.arbitrationCost)
                     .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
                     .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
                 )
-                .add(web3.utils.toBN(tcr.data.arbitrationCost))
-            )
-          )
-        )} ETH`}
-      </strong>
+              )
+            )}
+          </strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>
+            {String(
+              web3.utils.fromWei(
+                String(web3.utils.toBN(tcr.data.arbitrationCost))
+              )
+            )}
+          </strong>
+        </p>
+      </div>
+      <div className="Challenge-fees-symbols">
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+      </div>
+    </div>
+    <br />
+    <div className="Challenge-fees">
+      <div>
+        <p className="Challenge-fees-line">Total Due:</p>
+      </div>
+      <div>
+        <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
+          <strong>
+            {String(
+              web3.utils.fromWei(
+                String(
+                  web3.utils
+                    .toBN(tcr.data.challengeReward)
+                    .add(
+                      web3.utils
+                        .toBN(tcr.data.arbitrationCost)
+                        .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                        .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                    )
+                    .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                )
+              )
+            )}
+          </strong>
+        </p>
+      </div>
+      <div className="Challenge-fees-symbols">
+        <p className="Challenge-fees-line">
+          <strong>ETH</strong>
+        </p>
+      </div>
     </div>
     <br />
     <div className="Modal-actions">

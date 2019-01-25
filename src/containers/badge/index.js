@@ -448,12 +448,16 @@ class BadgeDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[token.badge.clientStatus]
                 )}
               </span>
-              {(badge.clientStatus <= 1 ||
+            </div>
+            <div className="BadgeDetails-meta">
+              {!(
+                badge.clientStatus <= 1 ||
                 (hasPendingRequest(badge.status, badge.latestRequest) &&
                   badge.latestRequest.dispute &&
                   badge.latestRequest.dispute.status !==
                     tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
-                Number(countdown)) === 0 && (
+                Number(countdown)
+              ) === 0 && (
                 <div className="BadgeDetails-timer">
                   Deadline{' '}
                   {countdown instanceof Date
@@ -461,6 +465,7 @@ class BadgeDetails extends PureComponent {
                     : '--:--:--'}
                 </div>
               )}
+              <div />
             </div>
             <div className="BadgeDetails-action">
               {this.getActionButton(token, accounts.data[0])}

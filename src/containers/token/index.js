@@ -423,17 +423,17 @@ class TokenDetails extends PureComponent {
                   </a>
                 </span>
               </div>
-              <div>
-                {(token.badge.status ===
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
-                  token.badge.status ===
-                    tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] ||
-                  token.badge.status ===
-                    tcrConstants.IN_CONTRACT_STATUS_ENUM[
-                      'RegistrationRequested'
-                    ]) &&
-                  token.status !==
-                    tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+              {(token.badge.status ===
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
+                token.badge.status ===
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] ||
+                token.badge.status ===
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM[
+                    'RegistrationRequested'
+                  ]) &&
+                token.status !==
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                  <div>
                     <span>
                       <span
                         className="TokenDetails-icon-badge TokenDetails-meta--aligned"
@@ -443,8 +443,8 @@ class TokenDetails extends PureComponent {
                       </span>
                       Badge
                     </span>
-                  )}
-              </div>
+                  </div>
+                )}
             </div>
             <div className="TokenDetails-meta">
               <span className="TokenDetails-meta--aligned">
@@ -457,12 +457,14 @@ class TokenDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[token.clientStatus]
                 )}
               </span>
-              {(token.clientStatus <= 1 ||
+              {!(
+                token.clientStatus <= 1 ||
                 (hasPendingRequest(token.status, token.latestRequest) &&
                   token.latestRequest.dispute &&
                   token.latestRequest.dispute.status !==
                     tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
-                Number(countdown) === 0) && (
+                Number(countdown) === 0
+              ) && (
                 <div className="BadgeDetails-timer">
                   Deadline{' '}
                   {countdown instanceof Date
@@ -476,7 +478,6 @@ class TokenDetails extends PureComponent {
             </div>
           </div>
         </div>
-        <br />
         {token.latestRequest.disputed && !token.latestRequest.resolved && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />

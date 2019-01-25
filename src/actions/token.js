@@ -63,7 +63,7 @@ export const feesTimeout = tokenData => ({
   type: token.FEES_TIMEOUT,
   payload: { token: tokenData }
 })
-export const resubmitToken = ({ tokenData }) => ({
+export const resubmitToken = ({ tokenData, value }) => ({
   type: token.RESUBMIT,
-  payload: { token: tokenData }
+  payload: { token: tokenData, value }
 })
