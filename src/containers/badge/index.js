@@ -193,7 +193,7 @@ class BadgeDetails extends PureComponent {
                   losingSide = true
 
                 if (!losingSide) {
-                  label = 'Pay Appeal Fees'
+                  label = 'Fund Appeal'
                   disabled = false
                   method = () =>
                     this.handleActionClick(
@@ -201,7 +201,7 @@ class BadgeDetails extends PureComponent {
                       SIDE
                     )
                 } else if (timestamp < endOfFirstHalf) {
-                  label = 'Pay Appeal Fees'
+                  label = 'Fund Appeal'
                   disabled = false
                   method = () =>
                     this.handleActionClick(
@@ -393,10 +393,9 @@ class BadgeDetails extends PureComponent {
         </div>
       )
 
-    const { badge } = token
-
     if (token.ID !== tokenID) return window.location.reload()
 
+    const { badge } = token
     return (
       <div className="Page">
         <FilterBar
@@ -456,8 +455,8 @@ class BadgeDetails extends PureComponent {
                   badge.latestRequest.dispute &&
                   badge.latestRequest.dispute.status !==
                     tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
-                Number(countdown)
-              ) === 0 && (
+                Number(countdown) === 0
+              ) && (
                 <div className="BadgeDetails-timer">
                   Deadline{' '}
                   {countdown instanceof Date

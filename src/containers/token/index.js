@@ -187,7 +187,7 @@ class TokenDetails extends PureComponent {
                   losingSide = true
 
                 if (!losingSide) {
-                  label = 'Pay Appeal Fees'
+                  label = 'Fund Appeal'
                   disabled = false
                   method = () =>
                     this.handleActionClick(
@@ -195,7 +195,7 @@ class TokenDetails extends PureComponent {
                       SIDE
                     )
                 } else if (timestamp < endOfFirstHalf) {
-                  label = 'Pay Appeal Fees'
+                  label = 'Fund Appeal'
                   disabled = false
                   method = () =>
                     this.handleActionClick(

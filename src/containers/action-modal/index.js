@@ -497,7 +497,12 @@ class ActionModal extends PureComponent {
                     fileInfoMessage={fileInfoMessage}
                     handleOnFileDropAccepted={this.handleOnFileDropAccepted}
                     closeActionModal={closeActionModal}
-                    item={token}
+                    item={
+                      openActionModal ===
+                      modalConstants.ACTION_MODAL_ENUM.Submit
+                        ? null
+                        : token
+                    }
                     resubmit={this.handleResubmitTokenClick}
                   />
                 )
