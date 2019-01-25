@@ -25,8 +25,7 @@ const Submit = ({
 }) => (
   <div>
     <div className="Modal-header">
-      {/* <div className="Modal-header-icon"/> */}
-      <span className="Modal-badge" />
+      {badge && <span className="Modal-badge" />}
       <h3 className="Modal-title">{badge ? 'Add Badge' : 'Submit a token'}</h3>
       {badge && (
         <Img

@@ -420,19 +420,23 @@ class TokenDetails extends PureComponent {
                 {(token.badge.status ===
                   tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
                   token.badge.status ===
+                    tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] ||
+                  token.badge.status ===
                     tcrConstants.IN_CONTRACT_STATUS_ENUM[
-                      'ClearingRequested'
-                    ]) && (
-                  <span>
-                    <span
-                      className="TokenDetails-icon-badge TokenDetails-meta--aligned"
-                      style={getBadgeStyle(token.badge, tcrConstants)}
-                    >
-                      1
+                      'RegistrationRequested'
+                    ]) &&
+                  token.status !==
+                    tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                    <span>
+                      <span
+                        className="TokenDetails-icon-badge TokenDetails-meta--aligned"
+                        style={getBadgeStyle(token.badge, tcrConstants)}
+                      >
+                        1
+                      </span>
+                      Badge
                     </span>
-                    Badge
-                  </span>
-                )}
+                  )}
               </div>
             </div>
             <div className="TokenDetails-meta">
@@ -506,9 +510,11 @@ class TokenDetails extends PureComponent {
           </div>
           <div className="TokenDescription-evidence">
             {token.badge.status !==
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-              <BadgeCard token={token} />
-            )}
+              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
+              token.status !==
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                <BadgeCard token={token} />
+              )}
           </div>
         </div>
       </div>

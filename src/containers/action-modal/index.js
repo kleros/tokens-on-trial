@@ -79,6 +79,7 @@ class ActionModal extends PureComponent {
   state = { file: null, fileInfoMessage: null }
 
   handleSubmitTokenClick = async token => {
+    console.info('test')
     const { createToken, arbitrableTokenListData } = this.props
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
@@ -395,7 +396,12 @@ class ActionModal extends PureComponent {
   }
 
   handleSubmitBadgeClick = () => {
-    const { createBadge, arbitrableAddressListData, token } = this.props
+    const {
+      createBadge,
+      arbitrableAddressListData,
+      token,
+      closeActionModal
+    } = this.props
     const {
       arbitrationCost,
       sharedStakeMultiplier,
@@ -415,6 +421,7 @@ class ActionModal extends PureComponent {
 
     this.setState({ file: null, fileInfoMessage: null })
     createBadge({ tokenData: token.data, value })
+    closeActionModal()
   }
 
   componentDidMount() {
@@ -468,6 +475,7 @@ class ActionModal extends PureComponent {
                     tcr={arbitrableTokenListData}
                     form={submitTokenForm}
                     submitItem={this.handleSubmitTokenClick}
+                    submitItemForm={submitTokenForm}
                     file={file}
                     formIsInvalid={tokenFormIsInvalid}
                     fileInfoMessage={fileInfoMessage}
