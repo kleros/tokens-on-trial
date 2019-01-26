@@ -292,9 +292,6 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   )
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 
-  console.info('token', tokenToSubmit)
-  console.info('value', value)
-
   yield call(
     arbitrableTokenList.methods.requestStatusChange(
       tokenToSubmit.name,

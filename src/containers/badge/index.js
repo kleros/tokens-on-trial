@@ -119,6 +119,7 @@ class BadgeDetails extends PureComponent {
 
     if (
       !token ||
+      !token.badge ||
       !arbitrableAddressListData.data ||
       token.creating ||
       token.updating
@@ -303,6 +304,10 @@ class BadgeDetails extends PureComponent {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
+    arbitrableAddressList.events.AddressStatusChange().on('data', event => {
+      const { token } = this.state
+      if (token.addr === event.returnValues._address) fetchToken(tokenID)
+    })
   }
 
   componentDidUpdate() {
@@ -397,6 +402,10 @@ class BadgeDetails extends PureComponent {
 
   componentWillUnmount() {
     clearInterval(this.interval)
+  }
+
+  componentWillReceiveProps(props) {
+    this.setState({ token: props.token })
   }
 
   render() {
@@ -532,7 +541,7 @@ class BadgeDetails extends PureComponent {
         <br />
         {badge.latestRequest.disputed &&
           !badge.latestRequest.resolved &&
-          token.latestRequest.dispute.status !==
+          badge.latestRequest.dispute.status !==
             tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
             <div className="TokenDescription">
               <hr className="TokenDescription-separator" />
