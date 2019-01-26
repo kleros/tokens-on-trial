@@ -87,10 +87,12 @@
     display: flex;
     flex-direction: column;
     font-size: 14px;
+    justify-content: space-around;
     margin: auto 26px auto 0;
     padding: 0;
 
     &--aligned {
+      margin: 5px 0;
       vertical-align: middle;
     }
   }

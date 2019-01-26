@@ -18,7 +18,8 @@ export const getRemainingTime = (
   token,
   arbitrableTokenListData,
   currentTime,
-  tcrConstants
+  tcrConstants,
+  losingSide
 ) => {
   const { latestRequest } = token
   let time
@@ -43,6 +44,8 @@ export const getRemainingTime = (
       Number(latestRequest.latestRound.appealPeriod[1]) * 1000
     time = appealPeriodEnd - currentTime
   }
+
+  time = losingSide ? time / 2 : time
 
   return time > 0 ? time : 0
 }

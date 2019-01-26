@@ -205,7 +205,7 @@ class TokenDetails extends PureComponent {
                 }
               } else label = 'Waiting For Opponent Fees'
             }
-          } else label = 'Wating Parties Appeals'
+          } else if (countdown > 0) label = 'Wating Appeals'
       } else if (
         submitterFees > 0 &&
         challengerFees > 0 &&
@@ -303,7 +303,7 @@ class TokenDetails extends PureComponent {
   }
 
   componentDidUpdate() {
-    const { token, arbitrableTokenListData } = this.props
+    const { token, arbitrableTokenListData, accounts } = this.props
     const { countdown, listeningForEvidence } = this.state
 
     if (
@@ -314,15 +314,16 @@ class TokenDetails extends PureComponent {
       arbitrableTokenListData.data
     ) {
       this.setState({ countdown: 'Loading...' })
+      const { latestRequest } = token
 
-      if (!listeningForEvidence && token.latestRequest.disputed) {
+      if (!listeningForEvidence && latestRequest.disputed) {
         // Listen for evidence events.
         this.setState({ listeningForEvidence: true })
         arbitrableTokenList.events
           .Evidence({
             filter: {
               arbitrator: arbitrator._address,
-              disputeID: [token.latestRequest.disputeID]
+              disputeID: [latestRequest.disputeID]
             },
             fromBlock: 0
           })
@@ -331,10 +332,7 @@ class TokenDetails extends PureComponent {
               await (await fetch(e.returnValues._evidence)).json()
             )
 
-            if (
-              Number(e.returnValues._disputeID) ===
-              token.latestRequest.disputeID
-            ) {
+            if (Number(e.returnValues._disputeID) === latestRequest.disputeID) {
               evidence.icon = getFileIcon(
                 mime.lookup(evidence.fileTypeExtension)
               )
@@ -346,13 +344,35 @@ class TokenDetails extends PureComponent {
           })
       }
 
+      let losingSide
+      const userAccount = accounts.data[0]
+      if (
+        latestRequest.dispute &&
+        Number(latestRequest.dispute.status) ===
+          tcrConstants.DISPUTE_STATUS.Appealable &&
+        !latestRequest.latestRound.appealed
+      )
+        if (
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
+          latestRequest.dispute.ruling ===
+            tcrConstants.RULING_OPTIONS.Refuse.toString()
+        )
+          losingSide = true
+        else if (
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
+          latestRequest.dispute.ruling ===
+            tcrConstants.RULING_OPTIONS.Accept.toString()
+        )
+          losingSide = true
+
       // Set timer once we have data.
       getBlock(null, web3, 'latest', block => {
         const time = getRemainingTime(
           token,
           arbitrableTokenListData,
           block.timestamp * 1000,
-          tcrConstants
+          tcrConstants,
+          losingSide
         )
         this.setState({
           timestamp: block.timestamp,
@@ -432,7 +452,8 @@ class TokenDetails extends PureComponent {
                     'RegistrationRequested'
                   ]) &&
                 token.status !==
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
+                token.badge && (
                   <div>
                     <span>
                       <span
@@ -457,6 +478,33 @@ class TokenDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[token.clientStatus]
                 )}
               </span>
+              {token.latestRequest.dispute &&
+                Number(token.latestRequest.dispute.status) ===
+                  tcrConstants.DISPUTE_STATUS.Appealable &&
+                !token.latestRequest.latestRound.appealed && (
+                  <span
+                    className="BadgeDetails-timer"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      color: '#3d464d'
+                    }}
+                  >
+                    <FontAwesomeIcon
+                      className="TokenDetails-icon"
+                      color={tcrConstants.STATUS_COLOR_ENUM[5]}
+                      icon="balance-scale"
+                      style={{ marginRight: '10px' }}
+                    />
+                    Arbitration Result:{' '}
+                    {
+                      tcrConstants.RULING_OPTIONS[
+                        token.latestRequest.dispute.status
+                      ]
+                    }{' '}
+                    Request
+                  </span>
+                )}
               {!(
                 token.clientStatus <= 1 ||
                 (hasPendingRequest(token.status, token.latestRequest) &&
@@ -465,12 +513,24 @@ class TokenDetails extends PureComponent {
                     tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
                 Number(countdown) === 0
               ) && (
-                <div className="BadgeDetails-timer">
-                  Deadline{' '}
-                  {countdown instanceof Date
-                    ? countdown.toISOString().substr(11, 8)
-                    : '--:--:--'}
-                </div>
+                <span style={{ display: 'flex', alignItems: 'center' }}>
+                  <FontAwesomeIcon
+                    className="TokenDetails-icon"
+                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                    icon="clock"
+                  />
+                  <div className="BadgeDetails-timer">
+                    {token.latestRequest.dispute &&
+                    token.latestRequest.dispute.status ===
+                      tcrConstants.DISPUTE_STATUS.Appealable.toString()
+                      ? 'Appeal '
+                      : 'Challenge '}
+                    Deadline{' '}
+                    {countdown instanceof Date
+                      ? countdown.toISOString().substr(11, 8)
+                      : '--:--:--'}
+                  </div>
+                </span>
               )}
             </div>
             <div className="TokenDetails-action">
@@ -478,28 +538,31 @@ class TokenDetails extends PureComponent {
             </div>
           </div>
         </div>
-        {token.latestRequest.disputed && !token.latestRequest.resolved && (
-          <div className="TokenDescription">
-            <hr className="TokenDescription-separator" />
-            <h3>Evidence</h3>
-            <div className="TokenDescription-evidence">
-              <div className="TokenDescription-evidence--list">
-                {evidences.map(evidence => (
-                  <div
-                    className="TokenDescription-evidence--item"
-                    key={evidence.fileHash}
-                    onClick={this.handleViewEvidenceClick(evidence)}
-                  >
-                    <FontAwesomeIcon icon={evidence.icon} size="2x" />
-                  </div>
-                ))}
+        {token.latestRequest.disputed &&
+          !token.latestRequest.resolved &&
+          token.latestRequest.dispute.status !==
+            tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
+            <div className="TokenDescription">
+              <hr className="TokenDescription-separator" />
+              <h3>Evidence</h3>
+              <div className="TokenDescription-evidence">
+                <div className="TokenDescription-evidence--list">
+                  {evidences.map(evidence => (
+                    <div
+                      className="TokenDescription-evidence--item"
+                      key={evidence.fileHash}
+                      onClick={this.handleViewEvidenceClick(evidence)}
+                    >
+                      <FontAwesomeIcon icon={evidence.icon} size="2x" />
+                    </div>
+                  ))}
+                </div>
+                <Button onClick={this.handleOpenEvidenceModal} type="secondary">
+                  Submit Evidence
+                </Button>
               </div>
-              <Button onClick={this.handleOpenEvidenceModal} type="secondary">
-                Submit Evidence
-              </Button>
             </div>
-          </div>
-        )}
+          )}
         <br />
         <div className="TokenDescription">
           <hr className="TokenDescription-separator" />

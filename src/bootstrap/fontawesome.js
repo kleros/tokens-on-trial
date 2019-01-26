@@ -24,6 +24,7 @@ import faFileAudio from '@fortawesome/fontawesome-free-solid/faFileAudio'
 import faFileVideo from '@fortawesome/fontawesome-free-solid/faFileVideo'
 import faFilePdf from '@fortawesome/fontawesome-free-solid/faFilePdf'
 import faFileWord from '@fortawesome/fontawesome-free-solid/faFileWord'
+import faBalanceScale from '@fortawesome/fontawesome-free-solid/faBalanceScale'
 
 library.add(
   faCaretDown,
@@ -50,5 +51,6 @@ library.add(
   faFileAudio,
   faFileVideo,
   faFilePdf,
-  faFileWord
+  faFileWord,
+  faBalanceScale
 )

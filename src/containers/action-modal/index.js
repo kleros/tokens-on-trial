@@ -370,7 +370,8 @@ class ActionModal extends PureComponent {
       fundBadgeAppeal,
       token,
       arbitrableAddressListData,
-      actionModalParam
+      actionModalParam,
+      closeActionModal
     } = this.props
     const { badge } = token.data
     const { latestRequest } = badge
@@ -409,6 +410,7 @@ class ActionModal extends PureComponent {
     )
 
     fundBadgeAppeal(token.data.addr, SIDE, value)
+    closeActionModal()
   }
 
   handleSubmitBadgeClick = () => {
