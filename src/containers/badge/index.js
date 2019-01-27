@@ -164,7 +164,6 @@ class BadgeDetails extends PureComponent {
             )
             const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
             const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
-            console.info('asdfas')
             if (timestamp < appealPeriodEnd) {
               const SIDE =
                 userAccount ===
@@ -310,11 +309,9 @@ class BadgeDetails extends PureComponent {
     const { tokenID } = match.params
     fetchToken(tokenID)
     arbitrableAddressList.events.AddressStatusChange().on('data', event => {
-      console.info('AddressStatusChange')
       const { token } = this.state
       if (!token) return
 
-      console.info('there is a token')
       if (token.addr === event.returnValues._address) fetchToken(tokenID)
     })
     arbitrator.events.Ruling().on('data', event => {
@@ -330,21 +327,17 @@ class BadgeDetails extends PureComponent {
         fetchToken(tokenID)
     })
     arbitrator.events.AppealPossible().on('data', event => {
-      console.info('appeal possible')
       const { token } = this.state
       if (!token || !token.badge) return
 
       const { latestRequest } = token.badge
-      console.info('there is a token')
       if (
         latestRequest.disputed &&
         (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
           latestRequest.appealDisputeID ===
             Number(event.returnValues._disputeID))
-      ) {
-        console.info('fetch token')
+      )
         fetchToken(tokenID)
-      }
     })
     arbitrableAddressList.events
       .Evidence({ fromBlock: 0 })
@@ -374,11 +367,9 @@ class BadgeDetails extends PureComponent {
     arbitrableAddressList.events
       .Contribution({ fromBlock: 0 })
       .on('data', async e => {
-        console.info('contribution')
         const { token } = this.state
         if (!token || !token.badge) return
 
-        console.info('there is a token')
         if (e.returnValues._address === token.addr) fetchToken(tokenID)
       })
   }
@@ -394,12 +385,8 @@ class BadgeDetails extends PureComponent {
     let { token } = nextProps
     const { arbitrableAddressListData, accounts } = this.props
     const { countdown } = this.state
-    console.info('will receive props')
-    if (!token) {
-      token = this.props
-      console.info('no token from nextProps')
-      console.info('token from this.props', token)
-    } else this.setState({ token })
+    if (!token) token = this.props
+    else this.setState({ token })
 
     if (
       token &&
@@ -409,7 +396,6 @@ class BadgeDetails extends PureComponent {
       arbitrableAddressListData &&
       arbitrableAddressListData.data
     ) {
-      console.info('badge init coundown')
       this.setState({ countdown: 'Loading...', token })
       const { badge } = token
       const { latestRequest } = badge
@@ -444,7 +430,6 @@ class BadgeDetails extends PureComponent {
           tcrConstants,
           losingSide
         )
-        console.info('time', time)
         this.setState({
           timestamp: block.timestamp,
           countdown: new Date(time)
