@@ -16,7 +16,7 @@ import * as filterSelectors from '../../reducers/filter'
 import { filterToContractParam } from '../../utils/filter'
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 10
+const TOKENS_PER_PAGE = 20
 
 class Tokens extends Component {
   static propTypes = {

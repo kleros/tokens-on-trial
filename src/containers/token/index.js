@@ -612,8 +612,10 @@ class TokenDetails extends PureComponent {
           <hr className="TokenDescription-separator" />
           <div className="TokenDescription-badge-header">
             <h3>Badges</h3>
-            {token.badge.status ===
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+            {(token.status ===
+              tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
+              token.status ===
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) && (
               <Button onClick={this.submitBadgeAction} type="secondary">
                 Add Badge
               </Button>
@@ -621,9 +623,7 @@ class TokenDetails extends PureComponent {
             {token.status !==
               tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] &&
               token.status !==
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] &&
-              token.badge.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] && (
                 <span>Token must be registered to add badges.</span>
               )}
           </div>
