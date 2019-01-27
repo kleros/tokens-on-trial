@@ -118,7 +118,7 @@ class TokenDetails extends PureComponent {
       token.updating
     )
       return (
-        <Button disabled={disabled} type="primary">
+        <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
           <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
           {label}
         </Button>
@@ -290,7 +290,12 @@ class TokenDetails extends PureComponent {
     }
 
     return (
-      <Button disabled={disabled} onClick={method} type="primary">
+      <Button
+        disabled={disabled}
+        onClick={method}
+        style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
+        type="primary"
+      >
         <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
         {label}
       </Button>
