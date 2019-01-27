@@ -42,14 +42,20 @@ export const getBlock = (block, web3, hash, callback) => {
   else callback(block)
 }
 
-// Converts token string data to correct js types.
-export const convertFromString = token => {
-  const { latestRequest } = token
+// Converts item string data to correct js types.
+export const convertFromString = item => {
+  const { latestRequest } = item
   latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
   latestRequest.challengerDepositTime =
     Number(latestRequest.challengerDepositTime) * 1000
   latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
-  latestRequest.disputeID = Number(latestRequest.disputeID)
+  latestRequest.disputeID = latestRequest.dispute
+    ? Number(latestRequest.disputeID)
+    : 0
+  latestRequest.appealDisputeID =
+    Number(latestRequest.numberOfRounds) > 1
+      ? Number(latestRequest.appealDisputeID)
+      : 0
 
   const { latestRound } = latestRequest
   latestRound.ruling = Number(latestRound.ruling)
@@ -59,6 +65,6 @@ export const convertFromString = token => {
   latestRound.requiredForSide[0] = Number(latestRound.requiredForSide[0])
   latestRound.requiredForSide[1] = Number(latestRound.requiredForSide[1])
   latestRound.requiredForSide[2] = Number(latestRound.paidFees[2])
-  token.latestRound = latestRound
-  return token
+  item.latestRound = latestRound
+  return item
 }

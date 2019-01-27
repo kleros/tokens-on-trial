@@ -117,6 +117,14 @@ export function* fetchToken({ payload: { ID } }) {
         arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
       )
 
+      // Fetch appeal disputeID, if there was an appeal.
+      if (Number(token.latestRequest.numberOfRounds) > 1)
+        token.latestRequest.appealDisputeID = yield call(
+          arbitrator.methods.getAppealDisputeID(token.latestRequest.disputeID)
+            .call
+        )
+      else token.latestRequest.appealDisputeID = 0
+
       // Fetch appeal period and cost if in appeal period.
       if (
         token.latestRequest.dispute.status ===
@@ -164,6 +172,13 @@ export function* fetchToken({ payload: { ID } }) {
           arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
         )
 
+        // Fetch appeal disputeID, if there was an appeal.
+        if (Number(token.latestRequest.numberOfRounds) > 1)
+          token.latestRequest.appealDisputeID = yield call(
+            arbitrator.methods.getAppealDisputeID(token.latestRequest.disputeID)
+              .call
+          )
+
         // Fetch appeal period and cost if in appeal period.
         if (
           badge.latestRequest.dispute.status ===
@@ -186,6 +201,7 @@ export function* fetchToken({ payload: { ID } }) {
       badge.latestRequest = {
         disputed: false,
         disputeID: 0,
+        appealDisputeID: 0,
         dispute: null,
         submissionTime: 0,
         challengeRewardBalance: 0,

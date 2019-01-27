@@ -8,8 +8,7 @@ import * as mime from 'mime-types'
 import {
   arbitrableAddressList,
   arbitrator,
-  web3,
-  ARBITRABLE_ADDRESS_LIST_ADDRESS
+  web3
 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
@@ -308,11 +307,37 @@ class BadgeDetails extends PureComponent {
       const { token } = this.state
       if (token.addr === event.returnValues._address) fetchToken(tokenID)
     })
+    arbitrator.events.Ruling().on('data', event => {
+      const { token } = this.state
+      const { badge } = token
+      const { latestRequest } = badge
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchToken(tokenID)
+    })
+    arbitrator.events.AppealPossible().on('data', event => {
+      const { token } = this.state
+      if (!token || !token.badge) return
+
+      const { latestRequest } = token.badge
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchToken(tokenID)
+    })
   }
 
-  componentDidUpdate() {
+  initCountDown = () => {
     const { token, arbitrableAddressListData, accounts } = this.props
     const { countdown, listeningForEvidence } = this.state
+    if (token) this.setState({ token })
 
     if (
       token &&
@@ -388,6 +413,7 @@ class BadgeDetails extends PureComponent {
           timestamp: block.timestamp,
           countdown: new Date(time)
         })
+        clearInterval(this.interval)
         this.interval = setInterval(() => {
           const { countdown } = this.state
           if (countdown > 0)
@@ -397,6 +423,10 @@ class BadgeDetails extends PureComponent {
     }
   }
 
+  componentDidUpdate() {
+    this.initCountDown()
+  }
+
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
@@ -404,8 +434,11 @@ class BadgeDetails extends PureComponent {
     clearInterval(this.interval)
   }
 
-  componentWillReceiveProps(props) {
-    this.setState({ token: props.token })
+  componentWillReceiveProps() {
+    const { token } = this.props
+    if (token) this.setState({ token })
+    this.setState({ countdown: null })
+    this.initCountDown()
   }
 
   render() {
@@ -450,13 +483,13 @@ class BadgeDetails extends PureComponent {
                 <span>
                   <a
                     className="BadgeDetails--link"
-                    href={`https://etherscan.io/address/${ARBITRABLE_ADDRESS_LIST_ADDRESS}`}
+                    href={`https://etherscan.io/address/${token.addr}`}
                   >
                     <Img
                       className="BadgeDetails-icon BadgeDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(ARBITRABLE_ADDRESS_LIST_ADDRESS)}
+                    {truncateMiddle(token.addr)}
                   </a>
                 </span>
               </div>

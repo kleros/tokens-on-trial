@@ -300,11 +300,36 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
+    arbitrator.events.Ruling().on('data', event => {
+      const { token } = this.state
+      const { latestRequest } = token
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchToken(tokenID)
+    })
+    arbitrator.events.AppealPossible().on('data', event => {
+      const { token } = this.state
+      if (!token) return
+
+      const { latestRequest } = token
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchToken(tokenID)
+    })
   }
 
-  componentDidUpdate() {
+  initCountDown = () => {
     const { token, arbitrableTokenListData, accounts } = this.props
     const { countdown, listeningForEvidence } = this.state
+    if (token) this.setState({ token })
 
     if (
       token &&
@@ -378,6 +403,7 @@ class TokenDetails extends PureComponent {
           timestamp: block.timestamp,
           countdown: new Date(time)
         })
+        clearInterval(this.interval)
         this.interval = setInterval(() => {
           const { countdown } = this.state
           if (countdown > 0)
@@ -387,11 +413,22 @@ class TokenDetails extends PureComponent {
     }
   }
 
+  componentDidUpdate() {
+    this.initCountDown()
+  }
+
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
   componentWillUnmount() {
     clearInterval(this.interval)
+  }
+
+  componentWillReceiveProps() {
+    const { token } = this.props
+    if (token) this.setState({ token })
+    this.setState({ countdown: null })
+    this.initCountDown()
   }
 
   render() {
