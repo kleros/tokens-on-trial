@@ -497,6 +497,8 @@ class BadgeDetails extends PureComponent {
                   <a
                     className="BadgeDetails--link"
                     href={`https://etherscan.io/address/${token.addr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Img
                       className="BadgeDetails-icon BadgeDetails-meta--aligned"

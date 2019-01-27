@@ -20,7 +20,11 @@ const TokenCard = ({ token }) => (
       <h5>
         {token.name} - {token.ticker}
       </h5>
-      <a href={`https://etherscan.io/token/${token.addr}`}>
+      <a
+        href={`https://etherscan.io/token/${token.addr}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         <Img src={EtherScanLogo} />
       </a>
     </div>

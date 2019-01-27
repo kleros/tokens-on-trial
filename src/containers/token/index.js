@@ -478,6 +478,8 @@ class TokenDetails extends PureComponent {
                   <a
                     className="TokenDetails--link"
                     href={`https://etherscan.io/token/${token.addr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     <Img
                       className="TokenDetails-icon TokenDetails-meta--aligned"
