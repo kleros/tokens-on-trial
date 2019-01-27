@@ -622,11 +622,13 @@ class TokenDetails extends PureComponent {
             {(token.status ===
               tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
               token.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) && (
-              <Button onClick={this.submitBadgeAction} type="secondary">
-                Add Badge
-              </Button>
-            )}
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) &&
+              token.badge.status ===
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                <Button onClick={this.submitBadgeAction} type="secondary">
+                  Add Badge
+                </Button>
+              )}
             {token.status !==
               tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] &&
               token.status !==
