@@ -8,14 +8,17 @@ export const {
 } = form('tokenForm', {
   name: {
     type: 'text',
-    validate: [required]
+    validate: [required],
+    props: { placeholder: 'Name' }
   },
   addr: {
     type: 'text',
-    validate: [required, ETHAddress]
+    validate: [required, ETHAddress],
+    props: { placeholder: 'Adress' }
   },
   ticker: {
     type: 'text',
-    validate: [required]
+    validate: [required],
+    props: { placeholder: 'Ticker' }
   }
 })
