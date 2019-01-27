@@ -75,6 +75,8 @@ export function* fetchArbitrableTokenListData() {
 function* submitTokenEvidence({
   payload: { evidenceData, file, ID, fileData }
 }) {
+  if (!ID) throw new Error('No selected token ID')
+
   let evidenceURL = ''
   let fileTypeExtension = ''
   let multihash = ''

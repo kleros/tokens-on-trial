@@ -90,7 +90,7 @@ class TokenDetails extends PureComponent {
 
   handleOpenEvidenceModal = () => {
     const { openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidence)
   }
 
   handleViewEvidenceClick = evidence => () => {
@@ -204,7 +204,8 @@ class TokenDetails extends PureComponent {
                     )
                 }
               } else label = 'Waiting For Opponent Fees'
-            }
+            } else if (timestamp > appealPeriodEnd)
+              label = 'Waiting Enforcement'
           } else if (countdown > 0) label = 'Wating Appeals'
       } else if (
         submitterFees > 0 &&
@@ -347,7 +348,6 @@ class TokenDetails extends PureComponent {
         arbitrableTokenList.events
           .Evidence({
             filter: {
-              arbitrator: arbitrator._address,
               disputeID: [latestRequest.disputeID]
             },
             fromBlock: 0
@@ -356,14 +356,21 @@ class TokenDetails extends PureComponent {
             const evidence = JSON.parse(
               await (await fetch(e.returnValues._evidence)).json()
             )
-
-            if (Number(e.returnValues._disputeID) === latestRequest.disputeID) {
+            if (
+              Number(e.returnValues._disputeID) === latestRequest.disputeID ||
+              Number(e.returnValues._disputeID) ===
+                latestRequest.appealDisputeID
+            ) {
               evidence.icon = getFileIcon(
                 mime.lookup(evidence.fileTypeExtension)
               )
               const { evidences } = this.state
+              evidence.ID = web3.utils.sha3(JSON.stringify(evidence))
               this.setState({
-                evidences: [...evidences, evidence]
+                evidences: {
+                  ...evidences,
+                  [evidence.ID]: evidence
+                }
               })
             }
           })
@@ -584,13 +591,13 @@ class TokenDetails extends PureComponent {
               <h3>Evidence</h3>
               <div className="TokenDescription-evidence">
                 <div className="TokenDescription-evidence--list">
-                  {evidences.map(evidence => (
+                  {Object.keys(evidences).map(key => (
                     <div
                       className="TokenDescription-evidence--item"
-                      key={evidence.fileHash}
-                      onClick={this.handleViewEvidenceClick(evidence)}
+                      key={key}
+                      onClick={this.handleViewEvidenceClick(evidences[key])}
                     >
-                      <FontAwesomeIcon icon={evidence.icon} size="2x" />
+                      <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
                     </div>
                   ))}
                 </div>
@@ -611,6 +618,14 @@ class TokenDetails extends PureComponent {
                 Add Badge
               </Button>
             )}
+            {token.status !==
+              tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] &&
+              token.status !==
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] &&
+              token.badge.status ===
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+                <span>Token must be registered to add badges.</span>
+              )}
           </div>
           <div className="TokenDescription-evidence">
             {token.badge.status !==

@@ -67,7 +67,6 @@ class BadgeDetails extends PureComponent {
   state = {
     timestamp: null,
     countdown: null,
-    listeningForEvidence: false,
     evidences: []
   }
 
@@ -208,7 +207,8 @@ class BadgeDetails extends PureComponent {
                       modalConstants.ACTION_MODAL_ENUM.FundAppealBadge,
                       SIDE
                     )
-                }
+                } else if (timestamp > appealPeriodEnd)
+                  label = 'Waiting Enforcement'
               } else label = 'Waiting For Opponent Fees'
             }
           } else if (countdown > 0) label = 'Wating Appeals'
@@ -332,11 +332,36 @@ class BadgeDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
+    arbitrableAddressList.events
+      .Evidence({ fromBlock: 0 })
+      .on('data', async e => {
+        const { token } = this.state
+        if (!token || !token.badge) return
+
+        const { latestRequest } = token.badge
+        if (
+          Number(e.returnValues._disputeID) === latestRequest.disputeID ||
+          latestRequest.appealDisputeID === Number(e.returnValues._disputeID)
+        ) {
+          const evidence = JSON.parse(
+            await (await fetch(e.returnValues._evidence)).json()
+          )
+          evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
+          const { evidences } = this.state
+          evidence.ID = web3.utils.sha3(JSON.stringify(evidence))
+          this.setState({
+            evidences: {
+              ...evidences,
+              [evidence.ID]: evidence
+            }
+          })
+        }
+      })
   }
 
   initCountDown = () => {
     const { token, arbitrableAddressListData, accounts } = this.props
-    const { countdown, listeningForEvidence } = this.state
+    const { countdown } = this.state
     if (token) this.setState({ token })
 
     if (
@@ -350,34 +375,6 @@ class BadgeDetails extends PureComponent {
       this.setState({ countdown: 'Loading...' })
       const { badge } = token
       const { latestRequest } = badge
-
-      if (!listeningForEvidence && latestRequest.disputed) {
-        // Listen for evidence events.
-        this.setState({ listeningForEvidence: true })
-        arbitrableAddressList.events
-          .Evidence({
-            filter: {
-              arbitrator: arbitrator._address,
-              disputeID: [latestRequest.disputeID]
-            }, // Using an array means OR: e.g. 20 or 23
-            fromBlock: 0
-          })
-          .on('data', async e => {
-            const evidence = JSON.parse(
-              await (await fetch(e.returnValues._evidence)).json()
-            )
-
-            if (Number(e.returnValues._disputeID) === latestRequest.disputeID) {
-              evidence.icon = getFileIcon(
-                mime.lookup(evidence.fileTypeExtension)
-              )
-              const { evidences } = this.state
-              this.setState({
-                evidences: [...evidences, evidence]
-              })
-            }
-          })
-      }
 
       let losingSide
       const userAccount = accounts.data[0]
@@ -421,10 +418,6 @@ class BadgeDetails extends PureComponent {
         }, 1000)
       })
     }
-  }
-
-  componentDidUpdate() {
-    this.initCountDown()
   }
 
   submitBadgeAction = () =>
@@ -581,13 +574,13 @@ class BadgeDetails extends PureComponent {
               <h3>Evidence</h3>
               <div className="TokenDescription-evidence">
                 <div className="TokenDescription-evidence--list">
-                  {evidences.map(evidence => (
+                  {Object.keys(evidences).map(key => (
                     <div
                       className="TokenDescription-evidence--item"
-                      key={evidence.fileHash}
-                      onClick={this.handleViewEvidenceClick(evidence)}
+                      key={key}
+                      onClick={this.handleViewEvidenceClick(evidences[key])}
                     >
-                      <FontAwesomeIcon icon={evidence.icon} size="2x" />
+                      <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
                     </div>
                   ))}
                 </div>
