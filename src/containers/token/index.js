@@ -632,7 +632,9 @@ class TokenDetails extends PureComponent {
             {token.status !==
               tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] &&
               token.status !==
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] && (
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] &&
+              token.badge.status ===
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
                 <span>Token must be registered to add badges.</span>
               )}
           </div>
