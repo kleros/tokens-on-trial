@@ -436,10 +436,10 @@ class TokenDetails extends PureComponent {
     clearInterval(this.interval)
   }
 
-  componentWillReceiveProps() {
-    const { token } = this.props
-    if (token) this.setState({ token })
-    this.setState({ countdown: null })
+  componentWillReceiveProps(nextProps) {
+    const { token } = nextProps
+    if (!token) return
+    else this.setState({ token })
     this.initCountDown()
   }
 

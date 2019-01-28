@@ -173,9 +173,9 @@ export function* fetchToken({ payload: { ID } }) {
         )
 
         // Fetch appeal disputeID, if there was an appeal.
-        if (Number(token.latestRequest.numberOfRounds) > 1)
-          token.latestRequest.appealDisputeID = yield call(
-            arbitrator.methods.getAppealDisputeID(token.latestRequest.disputeID)
+        if (Number(badge.latestRequest.numberOfRounds) > 1)
+          badge.latestRequest.appealDisputeID = yield call(
+            arbitrator.methods.getAppealDisputeID(badge.latestRequest.disputeID)
               .call
           )
 

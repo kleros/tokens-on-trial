@@ -328,14 +328,11 @@ class BadgeDetails extends PureComponent {
     })
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
-      if (!token || !token.badge) return
-
       const { latestRequest } = token.badge
+
       if (
-        latestRequest.disputed &&
-        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-          latestRequest.appealDisputeID ===
-            Number(event.returnValues._disputeID))
+        latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+        latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
       )
         fetchToken(tokenID)
     })
@@ -382,11 +379,10 @@ class BadgeDetails extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    let { token } = nextProps
+    const { token } = nextProps
     const { arbitrableAddressListData, accounts } = this.props
     const { countdown } = this.state
-    if (!token) token = this.props
-    else this.setState({ token })
+    this.setState({ token })
 
     if (
       token &&
