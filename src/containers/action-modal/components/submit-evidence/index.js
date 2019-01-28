@@ -21,6 +21,7 @@ const SubmitEvidence = ({
     <EvidenceForm className="SubmitEvidence-form" onSubmit={submitEvidence} />
     <FilePicker
       file={file}
+      style={{ width: '92%' }}
       message={
         <span>
           (Max Size: 5MB)

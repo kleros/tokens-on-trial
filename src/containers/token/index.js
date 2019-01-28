@@ -5,7 +5,12 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 import * as mime from 'mime-types'
 
-import { arbitrableTokenList, arbitrator, web3 } from '../../bootstrap/dapp-api'
+import {
+  arbitrableTokenList,
+  arbitrableAddressList,
+  arbitrator,
+  web3
+} from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
@@ -329,6 +334,17 @@ class TokenDetails extends PureComponent {
             Number(event.returnValues._disputeID))
       )
         fetchToken(tokenID)
+    })
+    arbitrableAddressList.events.AddressStatusChange().on('data', event => {
+      const { token } = this.state
+      if (!token) return
+
+      if (token.addr === event.returnValues._address) fetchToken(tokenID)
+    })
+    arbitrableTokenList.events.TokenStatusChange().on('data', event => {
+      const { token } = this.state
+      if (!token) return
+      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
   }
 

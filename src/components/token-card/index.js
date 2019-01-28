@@ -39,6 +39,9 @@ const TokenCard = ({ token }) => (
     </Link>
     <div
       className={`TokenCard-footer${
+        token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] ||
+        token.status ===
+          tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested'] ||
         token.badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent']
           ? ' TokenCard-hidden'
           : ''

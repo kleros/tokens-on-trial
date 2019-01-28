@@ -207,10 +207,9 @@ class BadgeDetails extends PureComponent {
                       modalConstants.ACTION_MODAL_ENUM.FundAppealBadge,
                       SIDE
                     )
-                } else if (timestamp > appealPeriodEnd)
-                  label = 'Waiting Enforcement'
+                }
               } else label = 'Waiting For Opponent Fees'
-            }
+            } else label = 'Waiting Enforcement'
           } else if (countdown > 0) label = 'Wating Appeals'
       } else if (
         submitterFees > 0 &&
@@ -333,8 +332,11 @@ class BadgeDetails extends PureComponent {
       if (
         latestRequest.disputeID === Number(event.returnValues._disputeID) ||
         latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
-      )
+      ) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
         fetchToken(tokenID)
+      }
     })
     arbitrableAddressList.events
       .Evidence({ fromBlock: 0 })

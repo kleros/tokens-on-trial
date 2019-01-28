@@ -15,13 +15,13 @@ export const truncateMiddle = str =>
   `${str.slice(0, 6)}...${str.slice(str.length - 5, str.length - 1)}`
 
 export const getRemainingTime = (
-  token,
+  item,
   arbitrableTokenListData,
   currentTime,
   tcrConstants,
   losingSide
 ) => {
-  const { latestRequest } = token
+  const { latestRequest } = item
   let time
   if (
     !latestRequest.challengerDepositTime ||
@@ -38,7 +38,10 @@ export const getRemainingTime = (
       currentTime
   else if (
     latestRequest.dispute.status ===
-    tcrConstants.DISPUTE_STATUS.Appealable.toString()
+      tcrConstants.DISPUTE_STATUS.Appealable.toString() ||
+    (latestRequest.dispute.numberOfRounds > 1 &&
+      latestRequest.dispute.appealStatus ===
+        tcrConstants.DISPUTE_STATUS.Appealable.toString())
   ) {
     const appealPeriodEnd =
       Number(latestRequest.latestRound.appealPeriod[1]) * 1000
