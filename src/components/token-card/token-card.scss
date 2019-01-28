@@ -11,7 +11,31 @@
   flex-direction: column;
   height: 230px;
   margin: 16px 13px;
+  position: relative;
   width: 248px;
+
+  &-statusOverlay {
+    align-items: center;
+    background: $action;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-evenly;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transition: opacity 0.25s ease-in-out;
+    width: 100%;
+
+    &-icon {
+      height: 59px !important;
+      width: 59px !important;
+    }
+
+    .TokenCard:hover & {
+      opacity: 1;
+    }
+  }
 
   &-header {
     align-items: center;

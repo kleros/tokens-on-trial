@@ -19,7 +19,7 @@ class SettingsModal extends PureComponent {
     settings: walletSelectors.settingsShape.isRequired,
 
     // Handlers
-    openSettingsModal: PropTypes.func.isRequired,
+    // openSettingsModal: PropTypes.func.isRequired,
     closeSettingsModal: PropTypes.func.isRequired
   }
 
@@ -29,9 +29,10 @@ class SettingsModal extends PureComponent {
   }
 
   handleOpenSettingsClick = () => {
-    const { openSettingsModal, isSettingsModalOpen } = this.props
-    if (isSettingsModalOpen) return // This method is triggered when clicking on the overlay so we avoid opening it again.
-    openSettingsModal()
+    // TODO: Enable once implemented.
+    // const { openSettingsModal, isSettingsModalOpen } = this.props
+    // if (isSettingsModalOpen) return // This method is triggered when clicking on the overlay so we avoid opening it again.
+    // openSettingsModal()
   }
 
   handleUpdateSettingsClick = () => {

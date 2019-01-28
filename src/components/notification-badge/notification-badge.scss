@@ -6,6 +6,22 @@
   position: relative;
   width: 40px;
 
+  // TODO: Remove once implemented.
+  &:hover::after {
+    background: $badgeBlue;
+    border-radius: 5px;
+    bottom: -5px;
+    color: $invertedText;
+    content: 'Coming soon.';
+    font-size: 14px;
+    left: 50%;
+    line-height: 16px;
+    padding: 6px 0;
+    position: absolute;
+    transform: translateX(-50%);
+    width: 110px;
+  }
+
   &-badge {
     background: $badgeBlue;
     border: 1px solid black;

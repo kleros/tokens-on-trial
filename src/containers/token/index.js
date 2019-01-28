@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
 import * as mime from 'mime-types'
+import { ClimbingBoxLoader } from 'react-spinners'
 
 import {
   arbitrableTokenList,
@@ -467,8 +468,8 @@ class TokenDetails extends PureComponent {
 
     if (!token)
       return (
-        <div className="Page">
-          <h5>Loading...</h5>
+        <div className="Page Page--loading">
+          <ClimbingBoxLoader color="#3d464d" />
         </div>
       )
 
