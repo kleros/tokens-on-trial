@@ -14,7 +14,7 @@ export const {
   addr: {
     type: 'text',
     validate: [required, ETHAddress],
-    props: { placeholder: 'Adress' }
+    props: { placeholder: 'Address' }
   },
   ticker: {
     type: 'text',
