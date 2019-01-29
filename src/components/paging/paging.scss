@@ -1,0 +1,52 @@
+@import '../../styles/_colors.scss';
+
+/* @define Paging */
+.Paging {
+  display: flex;
+  justify-content: space-between;
+  margin: 50px 0;
+  width: 100%;
+
+  &-numbers {
+    display: flex;
+
+    &-number {
+      background-color: transparent;
+      border: 0;
+      border-radius: 3px;
+      color: $border;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      height: 27px;
+      line-height: 27px;
+      text-align: center;
+      vertical-align: middle;
+      width: 27px;
+
+      &-active {
+        background-color: $darkGrey;
+        color: white;
+        cursor: default;
+      }
+    }
+  }
+
+  &-navigation {
+    display: flex;
+
+    &-button {
+      background-color: transparent;
+      border: 0;
+      color: $border;
+      font-size: 14px;
+      font-weight: bold;
+      margin-left: 24px;
+    }
+
+    &-clickable {
+      color: $darkGrey;
+      cursor: pointer;
+    }
+  }
+}

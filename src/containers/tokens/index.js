@@ -141,7 +141,6 @@ class Tokens extends Component {
         <SortBar numTokens={numTokens} />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
-            {console.info(tokens)}
             {tokens.data && !tokens.loading ? (
               this.mapTokens(tokens.data)
             ) : (

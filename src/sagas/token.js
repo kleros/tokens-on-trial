@@ -34,9 +34,11 @@ function* fetchTokens({
   if (cursor === '')
     cursor =
       '0x0000000000000000000000000000000000000000000000000000000000000000'
-  const totalCount = yield call(arbitrableTokenList.methods.tokenCount().call, {
-    from: yield select(walletSelectors.getAccount)
-  })
+  const totalCount = Number(
+    yield call(arbitrableTokenList.methods.tokenCount().call, {
+      from: yield select(walletSelectors.getAccount)
+    })
+  )
 
   if (requestedPage * count > totalCount) {
     // Page does not exist. Set to closest.
@@ -80,7 +82,7 @@ function* fetchTokens({
     ))
   ]
   tokens.hasMore = data.hasMore
-  tokens.totalCount = Number(totalCount)
+  tokens.totalCount = totalCount
   return tokens
 }
 
