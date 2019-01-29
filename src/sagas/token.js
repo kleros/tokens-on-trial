@@ -119,14 +119,9 @@ export function* fetchToken({ payload: { ID } }) {
 
       // Fetch appeal disputeID, if there was an appeal.
       if (Number(token.latestRequest.numberOfRounds) > 1) {
-        token.latestRequest.appealDisputeID = yield call(
-          arbitrator.methods.getAppealDisputeID(token.latestRequest.disputeID)
-            .call
-        )
-        token.latestRequest.dispute.appealStatus = yield call(
-          arbitrator.methods.disputeStatus(token.latestRequest.appealDisputeID)
-            .call
-        )
+        token.latestRequest.appealDisputeID = token.latestRequest.disputeID
+        token.latestRequest.dispute.appealStatus =
+          token.latestRequest.dispute.status
       } else token.latestRequest.appealDisputeID = 0
 
       // Fetch appeal period and cost if in appeal period.
@@ -178,15 +173,9 @@ export function* fetchToken({ payload: { ID } }) {
 
         // Fetch appeal disputeID, if there was an appeal.
         if (Number(badge.latestRequest.numberOfRounds) > 1) {
-          badge.latestRequest.appealDisputeID = yield call(
-            arbitrator.methods.getAppealDisputeID(badge.latestRequest.disputeID)
-              .call
-          )
-          badge.latestRequest.dispute.appealStatus = yield call(
-            arbitrator.methods.disputeStatus(
-              badge.latestRequest.appealDisputeID
-            ).call
-          )
+          badge.latestRequest.appealDisputeID = badge.latestRequest.disputeID
+          badge.latestRequest.dispute.appealStatus =
+            badge.latestRequest.dispute.status
         } else token.latestRequest.appealDisputeID = 0
 
         // Fetch appeal period and cost if in appeal period.
