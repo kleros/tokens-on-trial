@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import memoizeOne from 'memoize-one'
+import { BeatLoader } from 'react-spinners'
 
 import TokenCard from '../../components/token-card'
 import FilterBar from '../filter-bar'
@@ -14,6 +15,7 @@ import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { filterToContractParam } from '../../utils/filter'
+
 import './tokens.css'
 
 const TOKENS_PER_PAGE = 20
@@ -139,7 +141,14 @@ class Tokens extends Component {
         <SortBar numTokens={numTokens} />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
-            {tokens.data && this.mapTokens(tokens.data)}
+            {console.info(tokens)}
+            {tokens.data && !tokens.loading ? (
+              this.mapTokens(tokens.data)
+            ) : (
+              <div className="TokenGrid-loading">
+                <BeatLoader color="#3d464d" />
+              </div>
+            )}
           </div>
           <div className="TokenGrid-paging">
             <div className="TokenGrid-paging-numbers">

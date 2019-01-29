@@ -13,6 +13,14 @@
     margin: 0 -13px;
   }
 
+  &-loading {
+    align-items: center;
+    display: flex;
+    height: 200px;
+    justify-content: center;
+    width: 100%;
+  }
+
   &-paging {
     display: flex;
     justify-content: space-between;
