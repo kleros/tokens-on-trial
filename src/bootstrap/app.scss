@@ -97,6 +97,17 @@ img {
   height: 100%;
   margin: 0 9%;
   padding: 1em;
+
+  &--loading {
+    align-items: center;
+    display: flex;
+    height: 100%;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    position: fixed;
+    width: 100%;
+  }
 }
 
 /* @define Hidden */

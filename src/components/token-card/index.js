@@ -12,6 +12,17 @@ import './token-card.css'
 
 const TokenCard = ({ token }) => (
   <div className="TokenCard">
+    <div
+      className="TokenCard-statusOverlay"
+      style={{ color: tcrConstants.STATUS_COLOR_ENUM[token.clientStatus] }}
+    >
+      <FontAwesomeIcon
+        className="TokenCard-statusOverlay-icon"
+        color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+        icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
+      />
+      {tcrConstants.STATUS_ENUM[token.clientStatus]}
+    </div>
     <div className="TokenCard-header">
       <FontAwesomeIcon
         color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
