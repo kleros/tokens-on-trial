@@ -15,7 +15,10 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
     <p>Name: {evidence.name}</p>
     <p>Description: {evidence.description}</p>
     <br />
-    <div className="ViewEvidence-actions">
+    <div
+      className="ViewEvidence-actions"
+      style={{ justifyContent: !evidence.fileURI ? 'center' : 'space-between' }}
+    >
       <Button
         className="View-return"
         onClick={closeActionModal}
@@ -23,7 +26,7 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
       >
         Return
       </Button>
-      {!evidence.fileURI && (
+      {evidence.fileURI && (
         <Button
           className="View-request"
           onClick={downloadClick(evidence.fileURI)}
