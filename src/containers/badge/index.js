@@ -24,7 +24,6 @@ import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
-import * as badgeActions from '../../actions/badge'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
@@ -627,7 +626,7 @@ export default connect(
   {
     openActionModal: modalActions.openActionModal,
     fetchToken: tokenActions.fetchToken,
-    badgeTimeout: badgeActions.badgeTimeout,
+    badgeTimeout: tokenActions.badgeTimeout,
     toggleFilter: filterActions.toggleFilter
   }
 )(BadgeDetails)

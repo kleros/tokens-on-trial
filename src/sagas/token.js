@@ -409,6 +409,99 @@ function* feeTimeout({ payload: { token } }) {
   return yield call(fetchToken, { payload: { ID: token.ID } })
 }
 
+/* Badge function generators */
+
+/**
+ * Requests status change.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* requestStatusChangeBadge({ payload: { token, value } }) {
+  if (isInvalid(token.addr))
+    throw new Error('Missing address on token submit', token)
+
+  yield call(
+    arbitrableAddressList.methods.requestStatusChange(token.addr).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value
+    }
+  )
+
+  const { ID } = token
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Challenge request.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* challengeBadgeRequest({ payload: { addr, ID, value } }) {
+  yield call(arbitrableAddressList.methods.challengeRequest(addr).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Fund a side of a dispute.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* fundBadgeDispute({ payload: { addr, ID, side, value } }) {
+  yield call(arbitrableAddressList.methods.fundLatestRound(addr, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Fund a side of a dispute
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* fundBadgeAppeal({ payload: { addr, ID, side, value } }) {
+  yield call(arbitrableAddressList.methods.fundLatestRound(addr, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Execute a request for a token.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* badgeTimeout({ payload: { token } }) {
+  yield call(arbitrableAddressList.methods.timeout(token.addr).send, {
+    from: yield select(walletSelectors.getAccount)
+  })
+
+  const { ID } = token
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
+ * Timeout challenger.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* feeTimeoutBadge({ payload: { token } }) {
+  yield call(arbitrableAddressList.methods.timeout(token.addr).send, {
+    from: yield select(walletSelectors.getAccount)
+  })
+
+  const { ID } = token
+  return yield call(fetchToken, { payload: { ID } })
+}
+
 /**
  * Check if a string is undefined, not a string or empty.
  * @param {string} str input string.
@@ -512,5 +605,70 @@ export default function* tokenSaga() {
     updateTokensCollectionModFlow,
     tokenActions.token,
     challengeRequest
+  )
+
+  // Badges
+  yield takeLatest(
+    tokenActions.token.CREATE_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    requestStatusChangeBadge
+  )
+  yield takeLatest(
+    tokenActions.token.STATUS_CHANGE_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    requestStatusChangeBadge
+  )
+  yield takeLatest(
+    tokenActions.token.RESUBMIT_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    requestStatusChangeBadge
+  )
+  yield takeLatest(
+    tokenActions.token.CLEAR_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    requestStatusChangeBadge
+  )
+  yield takeLatest(
+    tokenActions.token.EXECUTE_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    badgeTimeout
+  )
+  yield takeLatest(
+    tokenActions.token.FUND_DISPUTE_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    fundBadgeDispute
+  )
+  yield takeLatest(
+    tokenActions.token.FEES_TIMEOUT_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    feeTimeoutBadge
+  )
+  yield takeLatest(
+    tokenActions.token.FUND_APPEAL_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    fundBadgeAppeal
+  )
+  yield takeLatest(
+    tokenActions.token.CHALLENGE_REQUEST_BADGE,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    challengeBadgeRequest
   )
 }

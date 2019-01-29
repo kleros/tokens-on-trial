@@ -16,10 +16,19 @@ export const token = {
   STATUS_CHANGE: 'STATUS_CHANGE',
   FUND_APPEAL: 'FUND_APPEAL',
   FEES_TIMEOUT: 'FEES_TIMEOUT',
-  CHALLENGE_REQUEST: 'CHALLENGE_REQUEST'
+  CREATE_BADGE: 'CREATE_BADGE',
+  CHALLENGE_REQUEST: 'CHALLENGE_REQUEST',
+  CLEAR_BADGE: 'CLEAR_BADGE',
+  EXECUTE_BADGE: 'EXECUTE_BADGE',
+  FUND_DISPUTE_BADGE: 'FUND_DISPUTE_BADGE',
+  RESUBMIT_BADGE: 'RESUBMIT_BADGE',
+  STATUS_CHANGE_BADGE: 'STATUS_CHANGE_BADGE',
+  FUND_APPEAL_BADGE: 'FUND_APPEAL_BADGE',
+  FEES_TIMEOUT_BADGE: 'FEES_TIMEOUT_BADGE',
+  CHALLENGE_REQUEST_BADGE: 'CHALLENGE_REQUEST_BADGE'
 }
 
-/* Action Creators */
+/* T²CR Action Creators */
 
 export const createToken = ({ tokenData, file, fileData, value }) => ({
   type: token.CREATE,
@@ -66,4 +75,42 @@ export const feesTimeout = tokenData => ({
 export const resubmitToken = ({ tokenData, value }) => ({
   type: token.RESUBMIT,
   payload: { token: tokenData, value }
+})
+
+/* Badge TCR */
+export const createBadge = ({ tokenData, file, fileData, value }) => ({
+  type: token.CREATE_BADGE,
+  payload: { token: tokenData, file, fileData, value }
+})
+export const clearBadge = ({ tokenData, value }) => ({
+  type: token.CLEAR_BADGE,
+  payload: { token: tokenData, value }
+})
+export const fundBadgeDispute = ({ addr, ID, side, value }) => ({
+  type: token.FUND_DISPUTE_BADGE,
+  payload: { addr, side, ID, value }
+})
+export const challengeBadgeRequest = ({ addr, ID, value }) => ({
+  type: token.CHALLENGE_REQUEST_BADGE,
+  payload: { addr, ID, value }
+})
+export const badgeTimeout = tokenData => ({
+  type: token.EXECUTE_BADGE,
+  payload: { token: tokenData }
+})
+export const fetchBadge = addr => ({
+  type: token.FETCH_BADGE,
+  payload: { addr }
+})
+export const fundBadgeAppeal = (addr, side, value, ID) => ({
+  type: token.FUND_APPEAL_BADGE,
+  payload: { addr, ID, side, value }
+})
+export const feesTimeoutBadge = tokenData => ({
+  type: token.FEES_TIMEOUT_BADGE,
+  payload: { token: tokenData }
+})
+export const resubmitBadge = ({ tokenData }) => ({
+  type: token.RESUBMIT_BADGE,
+  payload: { token: tokenData }
 })

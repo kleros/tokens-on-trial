@@ -23,13 +23,15 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
       >
         Return
       </Button>
-      <Button
-        className="View-request"
-        onClick={downloadClick(evidence.fileURI)}
-        type="primary"
-      >
-        Download Evidence
-      </Button>
+      {!evidence.fileURI && (
+        <Button
+          className="View-request"
+          onClick={downloadClick(evidence.fileURI)}
+          type="primary"
+        >
+          Download Evidence
+        </Button>
+      )}
     </div>
   </div>
 )
