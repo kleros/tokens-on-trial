@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './clear.css'
@@ -116,7 +115,7 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
 
 Clear.propTypes = {
   // State
-  item: tokenSelectors.tokenShape,
+  item: PropTypes.shape({ name: PropTypes.string.isRequired }),
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape

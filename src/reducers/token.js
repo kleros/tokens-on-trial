@@ -22,10 +22,10 @@ export const _tokenShape = PropTypes.shape({
     parties: PropTypes.arrayOf(PropTypes.string).isRequired,
     dispute: PropTypes.shape({
       arbitrated: PropTypes.string.isRequired,
-      choices: PropTypes.string.isRequired,
-      fee: PropTypes.string.isRequired,
-      ruling: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired
+      choices: PropTypes.string,
+      fee: PropTypes.string,
+      ruling: PropTypes.string,
+      status: PropTypes.string
     }),
     latestRound: PropTypes.shape({
       appealed: PropTypes.bool.isRequired,

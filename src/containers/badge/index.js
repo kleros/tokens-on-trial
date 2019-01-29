@@ -82,12 +82,14 @@ class BadgeDetails extends PureComponent {
   }
 
   handleExecuteRequestClick = () => {
-    const { badgeTimeout, token } = this.props
+    const { badgeTimeout, token, openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
     badgeTimeout(token)
   }
 
   handleFeesTimeoutClick = () => {
-    const { badgeTimeout, token } = this.props
+    const { badgeTimeout, token, openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
     badgeTimeout(token)
   }
 

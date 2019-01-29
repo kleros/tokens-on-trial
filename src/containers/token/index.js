@@ -84,13 +84,15 @@ class TokenDetails extends PureComponent {
   }
 
   handleExecuteRequestClick = () => {
-    const { match, timeout } = this.props
+    const { match, timeout, openActionModal } = this.props
     const { tokenID } = match.params
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
     timeout(tokenID)
   }
 
   handleFeesTimeoutClick = () => {
-    const { timeout, token } = this.props
+    const { timeout, token, openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
     timeout(token)
   }
 
