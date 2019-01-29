@@ -6,6 +6,7 @@ import memoizeOne from 'memoize-one'
 import { BeatLoader } from 'react-spinners'
 
 import TokenCard from '../../components/token-card'
+import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
@@ -18,7 +19,7 @@ import { filterToContractParam } from '../../utils/filter'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 20
+const TOKENS_PER_PAGE = 4
 
 class Tokens extends Component {
   static propTypes = {
@@ -118,7 +119,8 @@ class Tokens extends Component {
   }
 
   render() {
-    const { tokens, filter } = this.props
+    const { tokens, filter, match } = this.props
+    const { page } = match.params
     const { filters } = filter
 
     let numTokens = 'Loading...'
@@ -127,9 +129,11 @@ class Tokens extends Component {
     if (tokens && tokens.data) {
       numTokens = tokens.data.length
       numPages =
-        tokens.totalCount % 2 === 0
-          ? tokens.totalCount / TOKENS_PER_PAGE
-          : tokens.totalCount / TOKENS_PER_PAGE + 1
+        tokens.data.totalCount <= TOKENS_PER_PAGE
+          ? 1
+          : tokens.data.totalCount % TOKENS_PER_PAGE === 0
+          ? tokens.data.totalCount / TOKENS_PER_PAGE
+          : Math.floor(tokens.data.totalCount / TOKENS_PER_PAGE) + 1
     }
 
     return (
@@ -149,35 +153,13 @@ class Tokens extends Component {
               </div>
             )}
           </div>
-          <div className="TokenGrid-paging">
-            <div className="TokenGrid-paging-numbers">
-              {numPages > 0 &&
-                [...new Array(numPages).keys()].map(key => (
-                  <button
-                    className="TokenGrid-paging-numbers-number TokenGrid-paging-numbers"
-                    onClick={this.handlePageClicked(key + 1)}
-                  >
-                    {key}
-                  </button>
-                ))}
-            </div>
-            {numPages > 0 && (
-              <div className="TokenGrid-paging-navigation">
-                <button
-                  className="TokenGrid-paging-navigation-button"
-                  onClick={this.handleNextPageClicked}
-                >
-                  Previous
-                </button>
-                <button
-                  className="TokenGrid-paging-navigation-button TokenGrid-paging-navigation-clickable"
-                  onClick={this.handlePreviousPageClicked}
-                >
-                  Next
-                </button>
-              </div>
-            )}
-          </div>
+          <Paging
+            numPages={numPages}
+            onNextPageClick={this.handleNextPageClicked}
+            onPreviousPageClick={this.handlePreviousPageClicked}
+            onPageClick={this.handlePageClicked}
+            page={page}
+          />
         </div>
       </div>
     )
