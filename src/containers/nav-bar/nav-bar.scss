@@ -3,7 +3,7 @@
 /* @define NavBar */
 .NavBar {
   align-items: center;
-  background: $absoluteBlack;
+  background: $klerosPurple;
   display: flex;
   height: 55px;
   justify-content: center;
@@ -41,7 +41,6 @@
 
   &-route {
     align-items: center !important;
-    background-color: $absoluteBlack;
     color: $white;
     display: flex !important;
     flex: 0 1;
