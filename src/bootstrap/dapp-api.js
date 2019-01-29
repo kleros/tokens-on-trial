@@ -3,7 +3,7 @@ import Archon from '@kleros/archon'
 
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list.json'
 import ArbitrableAddressList from '../assets/contracts/arbitrable-address-list.json'
-import Arbitrator from '../assets/contracts/enhanced-appealable-arbitrator.json'
+import Arbitrator from '../assets/contracts/kleros-liquid.json'
 
 const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
 const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]

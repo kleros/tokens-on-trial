@@ -311,9 +311,13 @@ class BadgeDetails extends PureComponent {
       const { token } = this.state
       if (!token) return
 
-      if (token.addr === event.returnValues._address) fetchToken(tokenID)
+      if (token.addr === event.returnValues._address) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
     })
-    arbitrator.events.Ruling().on('data', event => {
+    arbitrableAddressList.events.Ruling().on('data', event => {
       const { token } = this.state
       const { badge } = token
       const { latestRequest } = badge
@@ -322,8 +326,11 @@ class BadgeDetails extends PureComponent {
         (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
           latestRequest.appealDisputeID ===
             Number(event.returnValues._disputeID))
-      )
+      ) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
         fetchToken(tokenID)
+      }
     })
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
@@ -369,7 +376,11 @@ class BadgeDetails extends PureComponent {
         const { token } = this.state
         if (!token || !token.badge) return
 
-        if (e.returnValues._address === token.addr) fetchToken(tokenID)
+        if (e.returnValues._address === token.addr) {
+          clearInterval(this.interval)
+          this.setState({ countdown: null })
+          fetchToken(tokenID)
+        }
       })
   }
 

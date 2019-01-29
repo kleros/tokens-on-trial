@@ -312,7 +312,7 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
-    arbitrator.events.Ruling().on('data', event => {
+    arbitrableTokenList.events.Ruling().on('data', event => {
       const { token } = this.state
       const { latestRequest } = token
       if (
@@ -320,8 +320,11 @@ class TokenDetails extends PureComponent {
         (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
           latestRequest.appealDisputeID ===
             Number(event.returnValues._disputeID))
-      )
+      ) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
         fetchToken(tokenID)
+      }
     })
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
@@ -333,20 +336,44 @@ class TokenDetails extends PureComponent {
         (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
           latestRequest.appealDisputeID ===
             Number(event.returnValues._disputeID))
-      )
+      ) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
         fetchToken(tokenID)
+      }
     })
     arbitrableAddressList.events.AddressStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
-      if (token.addr === event.returnValues._address) fetchToken(tokenID)
+      if (token.addr === event.returnValues._address) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
     })
     arbitrableTokenList.events.TokenStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
-      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
+
+      if (tokenID === event.returnValues._tokenID) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
     })
+    arbitrableTokenList.events
+      .Contribution({ fromBlock: 0 })
+      .on('data', async e => {
+        const { token } = this.state
+        if (!token) return
+
+        if (e.returnValues._tokenID === tokenID) {
+          clearInterval(this.interval)
+          this.setState({ countdown: null })
+          fetchToken(tokenID)
+        }
+      })
   }
 
   initCountDown = () => {
