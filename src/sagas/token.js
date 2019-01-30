@@ -39,6 +39,31 @@ function* fetchTokens({
       from: yield select(walletSelectors.getAccount)
     })
   )
+  let countByStatus = yield call(
+    arbitrableTokenList.methods.countByStatus().call,
+    {
+      from: yield select(walletSelectors.getAccount)
+    }
+  )
+
+  countByStatus = {
+    '0': Number(countByStatus['0']),
+    '1': Number(countByStatus['1']),
+    '2': Number(countByStatus['2']),
+    '3': Number(countByStatus['3']),
+    '4': Number(countByStatus['4']),
+    '5': Number(countByStatus['5']),
+    absent: Number(countByStatus['absent']),
+    challengedClearingRequest: Number(
+      countByStatus['challengedClearingRequest']
+    ),
+    challengedRegistrationRequest: Number(
+      countByStatus['challengedRegistrationRequest']
+    ),
+    clearingRequest: Number(countByStatus['clearingRequest']),
+    registered: Number(countByStatus['registered']),
+    registrationRequest: Number(countByStatus['registrationRequest'])
+  }
 
   if (requestedPage * count > totalCount) {
     // Page does not exist. Set to closest.
@@ -81,8 +106,10 @@ function* fetchTokens({
         .map(ID => call(fetchToken, { payload: { ID } }))
     ))
   ]
+
   tokens.hasMore = data.hasMore
   tokens.totalCount = totalCount
+  tokens.countByStatus = countByStatus
   return tokens
 }
 
