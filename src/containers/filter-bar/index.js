@@ -120,7 +120,7 @@ class FilterBar extends Component {
                   ))}
               </div>
             </div>
-            <hr className="FilterBar-separator-neon" />
+            <hr className="FilterBar-separator-primaryBlue" />
           </div>
         )}
       </div>
