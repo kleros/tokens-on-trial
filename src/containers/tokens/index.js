@@ -6,7 +6,6 @@ import memoizeOne from 'memoize-one'
 import { BeatLoader } from 'react-spinners'
 
 import TokenCard from '../../components/token-card'
-import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
@@ -119,22 +118,12 @@ class Tokens extends Component {
   }
 
   render() {
-    const { tokens, filter, match } = this.props
-    const { page } = match.params
+    const { tokens, filter } = this.props
     const { filters } = filter
 
     let numTokens = 'Loading...'
-    let numPages = 0
 
-    if (tokens && tokens.data) {
-      numTokens = tokens.data.length
-      numPages =
-        tokens.data.totalCount <= TOKENS_PER_PAGE
-          ? 1
-          : tokens.data.totalCount % TOKENS_PER_PAGE === 0
-          ? tokens.data.totalCount / TOKENS_PER_PAGE
-          : Math.floor(tokens.data.totalCount / TOKENS_PER_PAGE) + 1
-    }
+    if (tokens && tokens.data) numTokens = tokens.data.length
 
     return (
       <div className="Page" ref={this.ref}>
@@ -153,13 +142,6 @@ class Tokens extends Component {
               </div>
             )}
           </div>
-          <Paging
-            numPages={numPages}
-            onNextPageClick={this.handleNextPageClicked}
-            onPreviousPageClick={this.handlePreviousPageClicked}
-            onPageClick={this.handlePageClicked}
-            page={page}
-          />
         </div>
       </div>
     )
