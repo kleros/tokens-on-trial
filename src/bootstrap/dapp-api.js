@@ -26,7 +26,7 @@ else {
   onlyInfura = true
 }
 
-const archon = new Archon(ETHEREUM_PROVIDER)
+const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
 
 const network =
   web3.eth &&

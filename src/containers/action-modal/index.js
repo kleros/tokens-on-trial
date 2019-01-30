@@ -182,14 +182,11 @@ class ActionModal extends PureComponent {
   handleSubmitEvidenceClick = async evidence => {
     const { submitTokenEvidence, closeActionModal, token } = this.props
     const { file } = this.state
-    let fileData
-    if (file) fileData = (await asyncReadFile(file))[0]
 
     submitTokenEvidence({
       file,
       evidenceData: evidence,
-      ID: token.data.ID,
-      fileData
+      ID: token.data.ID
     })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
@@ -204,8 +201,7 @@ class ActionModal extends PureComponent {
       }
     } = this.props
     const { file } = this.state
-    const fileData = file ? (await asyncReadFile(file))[0] : null
-    submitBadgeEvidence({ file, evidenceData: evidence, addr, fileData })
+    submitBadgeEvidence({ file, evidenceData: evidence, addr })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
   }

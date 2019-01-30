@@ -12,9 +12,9 @@ export const fetchArbitrableTokenListData = () => ({
 
 // Evidence submission
 export const tokenEvidence = {
-  ...createActions('EVIDENCE', { withCreate: true })
+  ...createActions('TOKEN_EVIDENCE', { withCreate: true })
 }
-export const submitTokenEvidence = ({ file, evidenceData, ID, fileData }) => ({
+export const submitTokenEvidence = ({ file, evidenceData, ID }) => ({
   type: tokenEvidence.CREATE,
-  payload: { file, evidenceData, ID, fileData }
+  payload: { file, evidenceData, ID }
 })

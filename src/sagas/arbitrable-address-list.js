@@ -1,8 +1,7 @@
-import * as mime from 'mime-types'
-
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
+import readFile from '../utils/read-file'
 import {
   arbitrableAddressList,
   arbitrator,
@@ -12,7 +11,7 @@ import * as arbitrableAddressListActions from '../actions/arbitrable-address-lis
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 
-import storeApi from './api/store'
+import ipfsPublish from './api/ipfs-publish'
 
 /**
  * Fetches the arbitrable address list's data.
@@ -76,52 +75,47 @@ export function* fetchArbitrableAddressListData() {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitBadgeEvidence({
-  payload: { evidenceData, file, addr, fileData }
-}) {
-  let evidenceURL = ''
+function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
+  let fileURI = ''
   let fileTypeExtension = ''
-  let multihash = ''
+  const multihash = ''
 
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
-    multihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
     fileTypeExtension = file.name.split('.')[1]
-    const mimeType = mime.lookup(fileTypeExtension)
-    evidenceURL = (yield call(
-      storeApi.postEncodedFile,
-      fileData,
-      multihash,
-      mimeType
-    )).payload.fileURL
+    const data = yield call(readFile, file.preview)
+    const ipfsFileObj = yield call(ipfsPublish, file.name, data)
+    fileURI = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
   }
   /* eslint-enable */
 
   const evidenceJSON = {
     name: evidenceData.name,
     description: evidenceData.description,
-    fileURI: evidenceURL,
+    fileURI,
     fileHash: multihash,
     fileTypeExtension
   }
 
-  const stringified = JSON.stringify(evidenceJSON)
-
   /* eslint-disable unicorn/number-literal-case */
-  const evidenceJSONHash = archon.utils.multihashFile(
-    stringified,
-    0x1b // keccak-256
-  )
+  const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256
   /* eslint-enable */
 
-  const evidenceJSONURL = (yield call(
-    storeApi.postJSONFile,
-    stringified,
-    evidenceJSONHash
-  )).payload.fileURL
+  const enc = new TextEncoder()
+  const ipfsHashEvidenceObj = yield call(
+    ipfsPublish,
+    evidenceJSONMultihash,
+    enc.encode(JSON.stringify(evidenceJSON))
+  )
+
+  const ipfsHashEvidence =
+    ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
   yield call(
-    arbitrableAddressList.methods.submitEvidence(addr, evidenceJSONURL).send,
+    arbitrableAddressList.methods.submitEvidence(
+      addr,
+      `/ipfs/${ipfsHashEvidence}`
+    ).send,
     {
       from: yield select(walletSelectors.getAccount)
     }
@@ -131,7 +125,7 @@ function* submitBadgeEvidence({
 }
 
 /**
- * The root of the arbitrable token list saga.
+ * The root of the arbitrable address list saga.
  */
 export default function* arbitrableAddressListSaga() {
   // Arbitrable Address List Data

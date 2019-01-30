@@ -8,7 +8,8 @@ import * as mime from 'mime-types'
 import {
   arbitrableAddressList,
   arbitrator,
-  web3
+  web3,
+  archon
 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
@@ -348,28 +349,35 @@ class BadgeDetails extends PureComponent {
     })
     arbitrableAddressList.events
       .Evidence({ fromBlock: 0 })
-      .on('data', async e => {
+      .on('data', async () => {
         const { token } = this.state
         if (!token || !token.badge) return
 
         const { latestRequest } = token.badge
-        if (
-          Number(e.returnValues._disputeID) === latestRequest.disputeID ||
-          latestRequest.appealDisputeID === Number(e.returnValues._disputeID)
-        ) {
-          const evidence = JSON.parse(
-            await (await fetch(e.returnValues._evidence)).json()
+        archon.arbitrable
+          .getEvidence(
+            arbitrableAddressList._address,
+            arbitrator._address,
+            latestRequest.disputeID
           )
-          evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
-          const { evidences } = this.state
-          evidence.ID = web3.utils.sha3(JSON.stringify(evidence))
-          this.setState({
-            evidences: {
-              ...evidences,
-              [evidence.ID]: evidence
-            }
-          })
-        }
+          .then(resp =>
+            resp
+              .filter(
+                evidence => evidence.evidenceJSONValid && evidence.fileValid
+              )
+              .forEach(evidence => {
+                const { evidences } = this.state
+                const { evidenceJSON } = evidence
+                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                evidenceJSON.icon = getFileIcon(mimeType)
+                this.setState({
+                  evidences: {
+                    ...evidences,
+                    [evidence.transactionHash]: evidenceJSON
+                  }
+                })
+              })
+          )
       })
     arbitrableAddressList.events
       .Contribution({ fromBlock: 0 })
@@ -409,6 +417,32 @@ class BadgeDetails extends PureComponent {
       this.setState({ countdown: 'Loading...', token })
       const { badge } = token
       const { latestRequest } = badge
+
+      if (latestRequest && latestRequest.disputed)
+        archon.arbitrable
+          .getEvidence(
+            arbitrableAddressList._address,
+            arbitrator._address,
+            latestRequest.disputeID
+          )
+          .then(resp =>
+            resp
+              .filter(
+                evidence => evidence.evidenceJSONValid && evidence.fileValid
+              )
+              .forEach(evidence => {
+                const { evidences } = this.state
+                const { evidenceJSON } = evidence
+                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                evidenceJSON.icon = getFileIcon(mimeType)
+                this.setState({
+                  evidences: {
+                    ...evidences,
+                    [evidence.transactionHash]: evidenceJSON
+                  }
+                })
+              })
+          )
 
       let losingSide
       const userAccount = accounts.data[0]

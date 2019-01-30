@@ -10,7 +10,8 @@ import {
   arbitrableTokenList,
   arbitrableAddressList,
   arbitrator,
-  web3
+  web3,
+  archon
 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
@@ -364,30 +365,37 @@ class TokenDetails extends PureComponent {
         fetchToken(tokenID)
       }
     })
-    arbitrableAddressList.events
+    arbitrableTokenList.events
       .Evidence({ fromBlock: 0 })
-      .on('data', async e => {
+      .on('data', async () => {
         const { token } = this.state
         if (!token) return
 
         const { latestRequest } = token
-        if (
-          Number(e.returnValues._disputeID) === latestRequest.disputeID ||
-          latestRequest.appealDisputeID === Number(e.returnValues._disputeID)
-        ) {
-          const evidence = JSON.parse(
-            await (await fetch(e.returnValues._evidence)).json()
+        archon.arbitrable
+          .getEvidence(
+            arbitrableTokenList._address,
+            arbitrator._address,
+            latestRequest.disputeID
           )
-          evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
-          const { evidences } = this.state
-          evidence.ID = web3.utils.sha3(JSON.stringify(evidence))
-          this.setState({
-            evidences: {
-              ...evidences,
-              [evidence.ID]: evidence
-            }
-          })
-        }
+          .then(resp =>
+            resp
+              .filter(
+                evidence => evidence.evidenceJSONValid && evidence.fileValid
+              )
+              .forEach(evidence => {
+                const { evidences } = this.state
+                const { evidenceJSON } = evidence
+                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                evidenceJSON.icon = getFileIcon(mimeType)
+                this.setState({
+                  evidences: {
+                    ...evidences,
+                    [evidence.transactionHash]: evidenceJSON
+                  }
+                })
+              })
+          )
       })
     arbitrableTokenList.events
       .Contribution({ fromBlock: 0 })
@@ -403,7 +411,7 @@ class TokenDetails extends PureComponent {
       })
   }
 
-  initCountDown = () => {
+  initCountDown = async () => {
     const { token, arbitrableTokenListData, accounts } = this.props
     const { countdown, listeningForEvidence } = this.state
     if (token) this.setState({ token })
@@ -413,7 +421,9 @@ class TokenDetails extends PureComponent {
       hasPendingRequest(token) &&
       countdown === null &&
       arbitrableTokenListData &&
-      arbitrableTokenListData.data
+      arbitrableTokenListData.data &&
+      arbitrator &&
+      arbitrableTokenList
     ) {
       this.setState({ countdown: 'Loading...' })
       const { latestRequest } = token
@@ -421,35 +431,30 @@ class TokenDetails extends PureComponent {
       if (!listeningForEvidence && latestRequest.disputed) {
         // Listen for evidence events.
         this.setState({ listeningForEvidence: true })
-        arbitrableTokenList.events
-          .Evidence({
-            filter: {
-              disputeID: [latestRequest.disputeID]
-            },
-            fromBlock: 0
-          })
-          .on('data', async e => {
-            const evidence = JSON.parse(
-              await (await fetch(e.returnValues._evidence)).json()
-            )
-            if (
-              Number(e.returnValues._disputeID) === latestRequest.disputeID ||
-              Number(e.returnValues._disputeID) ===
-                latestRequest.appealDisputeID
-            ) {
-              evidence.icon = getFileIcon(
-                mime.lookup(evidence.fileTypeExtension)
+        archon.arbitrable
+          .getEvidence(
+            arbitrableTokenList._address,
+            arbitrator._address,
+            latestRequest.disputeID
+          )
+          .then(resp =>
+            resp
+              .filter(
+                evidence => evidence.evidenceJSONValid && evidence.fileValid
               )
-              const { evidences } = this.state
-              evidence.ID = web3.utils.sha3(JSON.stringify(evidence))
-              this.setState({
-                evidences: {
-                  ...evidences,
-                  [evidence.ID]: evidence
-                }
+              .forEach(evidence => {
+                const { evidences } = this.state
+                const { evidenceJSON } = evidence
+                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                evidenceJSON.icon = getFileIcon(mimeType)
+                this.setState({
+                  evidences: {
+                    ...evidences,
+                    [evidence.transactionHash]: evidenceJSON
+                  }
+                })
               })
-            }
-          })
+          )
       }
 
       let losingSide

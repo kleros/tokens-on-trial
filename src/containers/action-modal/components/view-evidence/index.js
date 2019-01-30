@@ -5,7 +5,7 @@ import Button from '../../../../components/button'
 import './view-evidence.css'
 
 const downloadClick = url => async () => {
-  window.open(url)
+  window.open(`https://ipfs.kleros.io${url}`)
 }
 
 const ViewEvidence = ({ closeActionModal, evidence }) => (

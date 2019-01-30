@@ -1,5 +1,3 @@
-import * as mime from 'mime-types'
-
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
@@ -7,8 +5,9 @@ import { arbitrableTokenList, arbitrator, archon } from '../bootstrap/dapp-api'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
+import readFile from '../utils/read-file'
 
-import storeApi from './api/store'
+import ipfsPublish from './api/ipfs-publish'
 
 /**
  * Fetches the arbitrable token list's data.
@@ -72,54 +71,45 @@ export function* fetchArbitrableTokenListData() {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitTokenEvidence({
-  payload: { evidenceData, file, ID, fileData }
-}) {
+function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
   if (!ID) throw new Error('No selected token ID')
 
-  let evidenceURL = ''
+  let fileURI = ''
   let fileTypeExtension = ''
-  let multihash = ''
 
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
-    multihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
     fileTypeExtension = file.name.split('.')[1]
-    const mimeType = mime.lookup(fileTypeExtension)
-    evidenceURL = (yield call(
-      storeApi.postEncodedFile,
-      fileData,
-      multihash,
-      mimeType
-    )).payload.fileURL
+    const data = yield call(readFile, file.preview)
+    const ipfsFileObj = yield call(ipfsPublish, file.name, data)
+    fileURI = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
   }
   /* eslint-enable */
 
   const evidenceJSON = {
     name: evidenceData.name,
     description: evidenceData.description,
-    fileURI: evidenceURL,
-    fileHash: multihash,
+    fileURI,
     fileTypeExtension
   }
 
-  const stringified = JSON.stringify(evidenceJSON)
-
   /* eslint-disable unicorn/number-literal-case */
-  const evidenceJSONHash = archon.utils.multihashFile(
-    stringified,
-    0x1b // keccak-256
-  )
+  const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256
   /* eslint-enable */
 
-  const evidenceJSONURL = (yield call(
-    storeApi.postJSONFile,
-    stringified,
-    evidenceJSONHash
-  )).payload.fileURL
+  const enc = new TextEncoder()
+  const ipfsHashEvidenceObj = yield call(
+    ipfsPublish,
+    evidenceJSONMultihash,
+    enc.encode(JSON.stringify(evidenceJSON))
+  )
+
+  const ipfsHashEvidence =
+    ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
   yield call(
-    arbitrableTokenList.methods.submitEvidence(ID, evidenceJSONURL).send,
+    arbitrableTokenList.methods.submitEvidence(ID, `/ipfs/${ipfsHashEvidence}`)
+      .send,
     {
       from: yield select(walletSelectors.getAccount)
     }
