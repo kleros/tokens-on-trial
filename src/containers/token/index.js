@@ -364,6 +364,31 @@ class TokenDetails extends PureComponent {
         fetchToken(tokenID)
       }
     })
+    arbitrableAddressList.events
+      .Evidence({ fromBlock: 0 })
+      .on('data', async e => {
+        const { token } = this.state
+        if (!token) return
+
+        const { latestRequest } = token
+        if (
+          Number(e.returnValues._disputeID) === latestRequest.disputeID ||
+          latestRequest.appealDisputeID === Number(e.returnValues._disputeID)
+        ) {
+          const evidence = JSON.parse(
+            await (await fetch(e.returnValues._evidence)).json()
+          )
+          evidence.icon = getFileIcon(mime.lookup(evidence.fileTypeExtension))
+          const { evidences } = this.state
+          evidence.ID = web3.utils.sha3(JSON.stringify(evidence))
+          this.setState({
+            evidences: {
+              ...evidences,
+              [evidence.ID]: evidence
+            }
+          })
+        }
+      })
     arbitrableTokenList.events
       .Contribution({ fromBlock: 0 })
       .on('data', async e => {
@@ -671,7 +696,11 @@ class TokenDetails extends PureComponent {
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) &&
               token.badge.status ===
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-                <Button onClick={this.submitBadgeAction} type="secondary">
+                <Button
+                  onClick={this.submitBadgeAction}
+                  type="secondary"
+                  style={{ width: '135px' }}
+                >
                   Add Badge
                 </Button>
               )}
