@@ -34,11 +34,15 @@ class SortBar extends PureComponent {
     const { tokens, filter } = this.props
     const { oldestFirst } = filter
     const tokensData = tokens.data
+
+    let numTokens
+    if (tokensData && tokensData) numTokens = tokensData.countByStatus.total
+
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData && tokensData.length !== undefined
-            ? `${tokensData.length} submissions`
+          {tokensData && numTokens !== undefined
+            ? `${numTokens} submissions`
             : 'Loading submissions...'}
         </div>
         <div className="SortBar-sort">
