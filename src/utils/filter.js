@@ -37,3 +37,32 @@ export const filterToContractParam = filter => {
   if (filter['My Challenges']) filterValues[7] = true
   return filterValues
 }
+
+/**
+ * Returns the number of tokens selected by the filter
+ * @param {object} countByStatus - The number of items with each status.
+ * @param {object} filters - The filter selected
+ * @returns {number} - The total number of tokens.
+ */
+export const totalByStatus = (countByStatus, filters) => {
+  let total = 0
+  const {
+    absent,
+    registered,
+    registrationRequest,
+    clearingRequest,
+    challengedRegistrationRequest,
+    challengedClearingRequest
+  } = countByStatus
+
+  if (filters.Absent) total += absent
+  if (filters['Registered']) total += registered
+  if (filters['Registration Requests']) total += registrationRequest
+  if (filters['Clearing Requests']) total += clearingRequest
+  if (filters['Challenged Registration Requests'])
+    total += challengedRegistrationRequest
+  if (filters['Challenged Clearing Requests'])
+    total += challengedClearingRequest
+
+  return total
+}

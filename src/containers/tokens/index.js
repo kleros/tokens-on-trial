@@ -2,10 +2,10 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
-import memoizeOne from 'memoize-one'
 import { BeatLoader } from 'react-spinners'
 
 import TokenCard from '../../components/token-card'
+import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
@@ -18,7 +18,7 @@ import { filterToContractParam } from '../../utils/filter'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 20
+const TOKENS_PER_PAGE = 50
 
 class Tokens extends Component {
   static propTypes = {
@@ -26,10 +26,8 @@ class Tokens extends Component {
     history: PropTypes.shape({
       push: PropTypes.func.isRequired
     }).isRequired,
-    match: PropTypes.shape({
-      params: PropTypes.shape({
-        page: PropTypes.string.isRequired
-      }).isRequired
+    location: PropTypes.shape({
+      search: PropTypes.string.isRequired
     }).isRequired,
 
     // Redux State
@@ -53,10 +51,10 @@ class Tokens extends Component {
     } = this.props
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
-    this.fetchTokens(true)
+    this.fetchTokens({})
   }
 
-  mapTokens = memoizeOne(tokens => {
+  mapTokens = tokens => {
     const keys = {}
     if (Array.isArray(tokens))
       return tokens
@@ -68,62 +66,71 @@ class Tokens extends Component {
         })
         .map(token => <TokenCard key={token.ID} token={token} />)
     return null
-  })
+  }
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
     toggleFilter(key)
-    this.fetchTokens(true, key)
+    this.fetchTokens({ key })
   }
 
-  handlePageClicked = page => () => {
+  handleFirstPageClicked = () => {
     const { history } = this.props
-    history.push(`/tokens/${page}`)
-  }
-
-  handleNextPageClicked = () => {
-    const { match, history } = this.props
-    const { page } = match.params
-    history.push(`/tokens/${page + 1}`)
+    history.push('/tokens')
+    this.fetchTokens({ page: '' })
   }
 
   handlePreviousPageClicked = () => {
-    const { match, history } = this.props
-    const { page } = match.params
-    history.push(`/tokens/${page - 1}`)
+    const { tokens, history } = this.props
+    const { previousPage } = tokens.data
+    if (previousPage) {
+      history.push({ search: `?p=${previousPage}` })
+      this.fetchTokens({ page: previousPage })
+    } else {
+      history.push({ search: `` })
+      this.fetchTokens({ page: '' })
+    }
   }
 
-  fetchTokens = (clear, key) => {
-    const { tokens, fetchTokens, filter, match } = this.props
-    const { page } = match.params
+  handleNextPageClicked = () => {
+    const { tokens, history } = this.props
+    history.push({ search: `?p=${tokens.data[tokens.data.length - 1].ID}` })
+    this.fetchTokens({ page: tokens.data[tokens.data.length - 1].ID })
+  }
+
+  handleLastPageClicked = () => {
+    const { tokens, history } = this.props
+    history.push({ search: `?p=${tokens.data.lastPage}` })
+    this.fetchTokens({ page: tokens.data.lastPage })
+  }
+
+  fetchTokens = ({ key, page }) => {
+    const { tokens, fetchTokens, filter, location } = this.props
+    const pageFromUrl =
+      typeof page === 'undefined'
+        ? new URLSearchParams(location.search).get('p')
+        : page
 
     const { filters, oldestFirst } = filter
-    const updatedFilters = {
-      ...filters,
-      [key]: !filters[key]
-    }
+    const updatedFilters = { ...filters }
+    if (key) updatedFilters[key] = !filters[key]
 
     const filterValue = filterToContractParam(updatedFilters)
 
     if (!tokens.loading)
       fetchTokens(
-        tokens.data && clear !== true
-          ? tokens.data[tokens.data.length - 1].ID
-          : '',
+        pageFromUrl && pageFromUrl.length === 66 ? pageFromUrl : '',
         TOKENS_PER_PAGE,
         filterValue,
-        oldestFirst,
-        page
+        oldestFirst
       )
   }
 
   render() {
-    const { tokens, filter } = this.props
+    const { tokens, filter, location } = this.props
     const { filters } = filter
 
-    let numTokens = 'Loading...'
-
-    if (tokens && tokens.data) numTokens = tokens.data.length
+    const currentPage = new URLSearchParams(location.search).get('p')
 
     return (
       <div className="Page" ref={this.ref}>
@@ -131,7 +138,7 @@ class Tokens extends Component {
           filter={filters}
           handleFilterChange={this.handleFilterChange}
         />
-        <SortBar numTokens={numTokens} />
+        <SortBar />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
             {tokens.data && !tokens.loading ? (
@@ -143,6 +150,18 @@ class Tokens extends Component {
             )}
           </div>
         </div>
+        {tokens.data && !tokens.loading && (
+          <Paging
+            onFirstPageClick={this.handleFirstPageClicked}
+            onPreviousPageClick={this.handlePreviousPageClicked}
+            onNextPageClick={this.handleNextPageClicked}
+            onLastPageClick={this.handleLastPageClicked}
+            currentPage={currentPage}
+            maxItemsPerPage={TOKENS_PER_PAGE}
+            itemCount={tokens.data.length}
+            lastPage={tokens.data.lastPage}
+          />
+        )}
       </div>
     )
   }

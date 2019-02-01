@@ -16,73 +16,133 @@ import {
   convertFromString
 } from '../utils/tcr'
 import * as tokenActions from '../actions/token'
-import * as tokenSelectors from '../reducers/token'
 import * as walletSelectors from '../reducers/wallet'
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
 
+const ZERO_ID =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
 /**
  * Fetches a paginatable list of tokens.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object[]} - The fetched tokens.
  */
-function* fetchTokens({
-  payload: { cursor, count, filterValue, sortValue, requestedPage }
-}) {
-  if (cursor === '')
-    cursor =
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
+function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
+  // Token count and stats
+  if (cursor === '') cursor = ZERO_ID
+
   const totalCount = Number(
     yield call(arbitrableTokenList.methods.tokenCount().call, {
       from: yield select(walletSelectors.getAccount)
     })
   )
 
-  if (requestedPage * count > totalCount) {
-    // Page does not exist. Set to closest.
-    requestedPage =
-      totalCount % 2 === 0 ? totalCount / count : totalCount / count + 1
-    requestedPage = Math.trunc(requestedPage)
+  let countByStatus = yield call(
+    arbitrableTokenList.methods.countByStatus().call,
+    {
+      from: yield select(walletSelectors.getAccount)
+    }
+  )
+
+  countByStatus = {
+    '0': Number(countByStatus['0']),
+    '1': Number(countByStatus['1']),
+    '2': Number(countByStatus['2']),
+    '3': Number(countByStatus['3']),
+    '4': Number(countByStatus['4']),
+    '5': Number(countByStatus['5']),
+    absent: Number(countByStatus['absent']),
+    challengedClearingRequest: Number(
+      countByStatus['challengedClearingRequest']
+    ),
+    challengedRegistrationRequest: Number(
+      countByStatus['challengedRegistrationRequest']
+    ),
+    clearingRequest: Number(countByStatus['clearingRequest']),
+    registered: Number(countByStatus['registered']),
+    registrationRequest: Number(countByStatus['registrationRequest'])
   }
 
-  if (requestedPage > 1)
-    cursor = yield call(
-      arbitrableTokenList.methods.tokensList(requestedPage - 1).call,
-      {
-        from: yield select(walletSelectors.getAccount)
-      }
-    )
+  // Fetch first and last tokens
+  const firstToken = yield call(
+    arbitrableTokenList.methods.tokensList(0).call,
+    { from: yield select(walletSelectors.getAccount) }
+  )
+  const lastToken = yield call(
+    arbitrableTokenList.methods.tokensList(totalCount - 1).call,
+    { from: yield select(walletSelectors.getAccount) }
+  )
 
+  // Get last page
+  let lastPage
+  /* eslint-disable no-unused-vars */
+  try {
+    const lastTokens = yield call(
+      arbitrableTokenList.methods.queryTokens(
+        lastToken,
+        count,
+        filterValue,
+        false,
+        ZERO_ADDR
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )
+    lastPage = lastTokens.values.filter(ID => ID !== ZERO_ID)[
+      lastTokens.values.length - 1
+    ]
+  } catch (err) {
+    lastPage = '' // No op. There are no previous tokens.
+  }
+  /* eslint-enable */
+
+  // Fetch tokens
   const data = yield call(
     arbitrableTokenList.methods.queryTokens(
-      cursor,
+      cursor === firstToken ? ZERO_ID : cursor,
       count,
       filterValue,
       sortValue,
-      '0x0000000000000000000000000000000000000000'
+      ZERO_ADDR
     ).call,
     { from: yield select(walletSelectors.getAccount) }
   )
 
-  const tokens = [
-    ...(cursor ===
-    '0x0000000000000000000000000000000000000000000000000000000000000000'
-      ? []
-      : (yield select(tokenSelectors.getTokens)) || []),
-    ...(yield all(
-      data.values
-        .filter(
-          ID =>
-            ID !==
-            '0x0000000000000000000000000000000000000000000000000000000000000000'
-        )
-        .map(ID => call(fetchToken, { payload: { ID } }))
-    ))
-  ]
+  const tokenIDs = data.values.filter(ID => ID !== ZERO_ID)
+  const tokens = yield all(
+    tokenIDs.map(ID => call(fetchToken, { payload: { ID } }))
+  )
+
+  // Fetch previous page token ID
+  /* eslint-disable no-unused-vars */
+  let previousPage
+  try {
+    const previousTokens = yield call(
+      arbitrableTokenList.methods.queryTokens(
+        tokenIDs[0],
+        count + 1,
+        filterValue,
+        !sortValue,
+        ZERO_ADDR
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )
+    previousPage = previousTokens.values.filter(ID => ID !== ZERO_ID)[
+      previousTokens.values.length - 1
+    ]
+  } catch (err) {
+    previousPage = '' // No op. There are no previous tokens.
+  }
+  /* eslint-enable */
+
   tokens.hasMore = data.hasMore
   tokens.totalCount = totalCount
+  tokens.countByStatus = countByStatus
+  tokens.previousPage = previousPage
+  tokens.lastPage = lastPage
   return tokens
 }
 

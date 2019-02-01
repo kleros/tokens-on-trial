@@ -8,7 +8,8 @@ import * as filterActions from '../../actions/filter'
 import * as tokenActions from '../../actions/token'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterSelectors from '../../reducers/filter'
-import { filterToContractParam } from '../../utils/filter'
+import { filterToContractParam, totalByStatus } from '../../utils/filter'
+
 import './sort-bar.css'
 
 class SortBar extends PureComponent {
@@ -34,11 +35,16 @@ class SortBar extends PureComponent {
     const { tokens, filter } = this.props
     const { oldestFirst } = filter
     const tokensData = tokens.data
+
+    let numTokens = 0
+    if (tokensData && tokensData && tokensData.countByStatus)
+      numTokens = totalByStatus(tokensData.countByStatus, filter.filters)
+
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData && tokensData.length !== undefined
-            ? `${tokensData.length} submissions`
+          {tokensData && numTokens !== undefined
+            ? `${numTokens} submissions of ${tokensData.totalCount}`
             : 'Loading submissions...'}
         </div>
         <div className="SortBar-sort">

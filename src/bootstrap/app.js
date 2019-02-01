@@ -131,8 +131,8 @@ const App = ({ store, history }) => (
           <Route component={ConnectedNavBar} exact path="*" />
           <div id="scroll-root">
             <Switch>
-              <Redirect exact from="/" to="/tokens/1" />
-              <Route component={Tokens} exact path="/tokens/:page" />
+              <Redirect exact from="/" to="/tokens" />
+              <Route component={Tokens} exact path="/tokens" />
               <Route component={TokenDetails} exact path="/token/:tokenID" />
               <Route
                 component={BadgeDetails}
