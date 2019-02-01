@@ -40,6 +40,12 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
       from: yield select(walletSelectors.getAccount)
     })
   )
+  const totalPages =
+    totalCount <= count
+      ? 1
+      : totalCount % count === 0
+      ? totalCount / count
+      : Math.floor(totalCount / count) + 1
 
   let countByStatus = yield call(
     arbitrableTokenList.methods.countByStatus().call,
@@ -99,6 +105,28 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   }
   /* eslint-enable */
 
+  // Get current page
+  let currentPage = 1
+  if (cursor !== firstToken && cursor !== ZERO_ID) {
+    const itemsBefore = (yield call(
+      arbitrableTokenList.methods.queryTokens(
+        cursor === firstToken ? ZERO_ID : cursor,
+        1000,
+        filterValue,
+        false,
+        ZERO_ADDR
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )).values.filter(ID => ID !== ZERO_ID).length
+
+    currentPage =
+      itemsBefore <= count
+        ? 2
+        : itemsBefore % count === 0
+        ? itemsBefore / count + 1
+        : Math.floor(itemsBefore / count) + 2
+  }
+
   // Fetch tokens
   const data = yield call(
     arbitrableTokenList.methods.queryTokens(
@@ -143,6 +171,8 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   tokens.countByStatus = countByStatus
   tokens.previousPage = previousPage
   tokens.lastPage = lastPage
+  tokens.totalPages = totalPages
+  tokens.currentPage = currentPage
   return tokens
 }
 

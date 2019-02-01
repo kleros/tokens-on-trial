@@ -18,7 +18,7 @@ import { filterToContractParam, totalByStatus } from '../../utils/filter'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 8
+const TOKENS_PER_PAGE = 3
 
 class Tokens extends Component {
   static propTypes = {
@@ -164,6 +164,8 @@ class Tokens extends Component {
             itemCount={tokens.data.length}
             lastPage={tokens.data.lastPage}
             totalByStatus={totalFiltered}
+            currentPageNum={tokens.data.currentPage}
+            totalPages={tokens.data.totalPages}
           />
         )}
       </div>

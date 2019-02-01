@@ -12,9 +12,12 @@ const Paging = ({
   maxItemsPerPage,
   itemCount,
   lastPage,
-  totalByStatus
+  totalByStatus,
+  currentPageNum,
+  totalPages
 }) => (
   <div className="Paging">
+    <span>{`Page ${currentPageNum} of ${totalPages}`}</span>
     <div className="Paging-navigation">
       <button
         className={`Paging-navigation-button ${
@@ -78,6 +81,8 @@ Paging.propTypes = {
   itemCount: PropTypes.number.isRequired,
   lastPage: PropTypes.string,
   totalByStatus: PropTypes.number.isRequired,
+  currentPageNum: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
 
   // Navigation handlers
   onFirstPageClick: PropTypes.func.isRequired,
