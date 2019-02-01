@@ -22,6 +22,10 @@ import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
 
+const ZERO_ID =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
 /**
  * Fetches a paginatable list of tokens.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
@@ -29,9 +33,8 @@ import storeApi from './api/store'
  */
 function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   // Token count and stats
-  if (cursor === '')
-    cursor =
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
+  if (cursor === '') cursor = ZERO_ID
+
   const totalCount = Number(
     yield call(arbitrableTokenList.methods.tokenCount().call, {
       from: yield select(walletSelectors.getAccount)
@@ -80,7 +83,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
     challengedRegistrationRequest +
     challengedClearingRequest
 
-  // Fetch first token
+  // Fetch first and last tokens
   const firstToken = yield call(
     arbitrableTokenList.methods.tokensList(0).call,
     { from: yield select(walletSelectors.getAccount) }
@@ -100,40 +103,31 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
         count,
         filterValue,
         false,
-        '0x0000000000000000000000000000000000000000'
+        ZERO_ADDR
       ).call,
       { from: yield select(walletSelectors.getAccount) }
     )
-    lastPage = lastTokens.values.filter(
-      ID =>
-        ID !==
-        '0x0000000000000000000000000000000000000000000000000000000000000000'
-    )[lastTokens.values.length - 1]
+    lastPage = lastTokens.values.filter(ID => ID !== ZERO_ID)[
+      lastTokens.values.length - 1
+    ]
   } catch (err) {
     lastPage = '' // No op. There are no previous tokens.
-    console.info('No more tokens to query.')
   }
   /* eslint-enable */
 
   // Fetch tokens
   const data = yield call(
     arbitrableTokenList.methods.queryTokens(
-      cursor === firstToken
-        ? '0x0000000000000000000000000000000000000000000000000000000000000000'
-        : cursor,
+      cursor === firstToken ? ZERO_ID : cursor,
       count,
       filterValue,
       sortValue,
-      '0x0000000000000000000000000000000000000000'
+      ZERO_ADDR
     ).call,
     { from: yield select(walletSelectors.getAccount) }
   )
 
-  const tokenIDs = data.values.filter(
-    ID =>
-      ID !==
-      '0x0000000000000000000000000000000000000000000000000000000000000000'
-  )
+  const tokenIDs = data.values.filter(ID => ID !== ZERO_ID)
   const tokens = yield all(
     tokenIDs.map(ID => call(fetchToken, { payload: { ID } }))
   )
@@ -145,21 +139,18 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
     const previousTokens = yield call(
       arbitrableTokenList.methods.queryTokens(
         tokenIDs[0],
-        count,
+        count + 1,
         filterValue,
         !sortValue,
-        '0x0000000000000000000000000000000000000000'
+        ZERO_ADDR
       ).call,
       { from: yield select(walletSelectors.getAccount) }
     )
-    previousPage = previousTokens.values.filter(
-      ID =>
-        ID !==
-        '0x0000000000000000000000000000000000000000000000000000000000000000'
-    )[previousTokens.values.length - 1]
+    previousPage = previousTokens.values.filter(ID => ID !== ZERO_ID)[
+      previousTokens.values.length - 1
+    ]
   } catch (err) {
     previousPage = '' // No op. There are no previous tokens.
-    console.info('No more tokens to query.', err)
   }
   /* eslint-enable */
 

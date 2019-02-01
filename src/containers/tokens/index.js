@@ -82,8 +82,14 @@ class Tokens extends Component {
 
   handlePreviousPageClicked = () => {
     const { tokens, history } = this.props
-    history.push({ search: `?p=${tokens.data.previousPage}` })
-    this.fetchTokens({ page: tokens.data.previousPage })
+    const { previousPage } = tokens.data
+    if (previousPage) {
+      history.push({ search: `?p=${previousPage}` })
+      this.fetchTokens({ page: previousPage })
+    } else {
+      history.push({ search: `` })
+      this.fetchTokens({ page: '' })
+    }
   }
 
   handleNextPageClicked = () => {
@@ -153,6 +159,7 @@ class Tokens extends Component {
             currentPage={currentPage}
             maxItemsPerPage={TOKENS_PER_PAGE}
             itemCount={tokens.data.length}
+            lastPage={tokens.data.lastPage}
           />
         )}
       </div>

@@ -10,7 +10,8 @@ const Paging = ({
   onLastPageClick,
   currentPage,
   maxItemsPerPage,
-  itemCount
+  itemCount,
+  lastPage
 }) => (
   <div className="Paging">
     <div className="Paging-navigation">
@@ -34,19 +35,23 @@ const Paging = ({
       </button>
       <button
         className={`Paging-navigation-button ${
-          itemCount < maxItemsPerPage ? '' : 'Paging-navigation-clickable'
+          itemCount < maxItemsPerPage || currentPage === lastPage
+            ? ''
+            : 'Paging-navigation-clickable'
         }`}
         onClick={onNextPageClick}
-        disabled={itemCount < maxItemsPerPage}
+        disabled={itemCount < maxItemsPerPage || currentPage === lastPage}
       >
         Next
       </button>
       <button
         className={`Paging-navigation-button ${
-          itemCount < maxItemsPerPage ? '' : 'Paging-navigation-clickable'
+          itemCount < maxItemsPerPage || currentPage === lastPage
+            ? ''
+            : 'Paging-navigation-clickable'
         }`}
         onClick={onLastPageClick}
-        disabled={itemCount < maxItemsPerPage}
+        disabled={itemCount < maxItemsPerPage || currentPage === lastPage}
       >
         Last
       </button>
@@ -58,6 +63,7 @@ Paging.propTypes = {
   currentPage: PropTypes.string,
   maxItemsPerPage: PropTypes.number.isRequired,
   itemCount: PropTypes.number.isRequired,
+  lastPage: PropTypes.string.isRequired,
 
   // Navigation handlers
   onFirstPageClick: PropTypes.func.isRequired,
