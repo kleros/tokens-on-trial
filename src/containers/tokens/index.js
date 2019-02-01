@@ -14,11 +14,11 @@ import * as arbitrableAddressListActions from '../../actions/arbitrable-address-
 import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
-import { filterToContractParam } from '../../utils/filter'
+import { filterToContractParam, totalByStatus } from '../../utils/filter'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 50
+const TOKENS_PER_PAGE = 8
 
 class Tokens extends Component {
   static propTypes = {
@@ -131,6 +131,9 @@ class Tokens extends Component {
     const { filters } = filter
 
     const currentPage = new URLSearchParams(location.search).get('p')
+    let totalFiltered = 0
+    if (tokens.data && tokens.data.countByStatus)
+      totalFiltered = totalByStatus(tokens.data.countByStatus, filter.filters)
 
     return (
       <div className="Page" ref={this.ref}>
@@ -160,6 +163,7 @@ class Tokens extends Component {
             maxItemsPerPage={TOKENS_PER_PAGE}
             itemCount={tokens.data.length}
             lastPage={tokens.data.lastPage}
+            totalByStatus={totalFiltered}
           />
         )}
       </div>
