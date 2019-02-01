@@ -63,7 +63,7 @@ Paging.propTypes = {
   currentPage: PropTypes.string,
   maxItemsPerPage: PropTypes.number.isRequired,
   itemCount: PropTypes.number.isRequired,
-  lastPage: PropTypes.string.isRequired,
+  lastPage: PropTypes.string,
 
   // Navigation handlers
   onFirstPageClick: PropTypes.func.isRequired,
@@ -73,7 +73,8 @@ Paging.propTypes = {
 }
 
 Paging.defaultProps = {
-  currentPage: null
+  currentPage: null,
+  lastPage: null
 }
 
 export default Paging

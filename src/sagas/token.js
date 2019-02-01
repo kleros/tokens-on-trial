@@ -66,22 +66,6 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
     registered: Number(countByStatus['registered']),
     registrationRequest: Number(countByStatus['registrationRequest'])
   }
-  const {
-    absent,
-    registered,
-    registrationRequest,
-    clearingRequest,
-    challengedRegistrationRequest,
-    challengedClearingRequest
-  } = countByStatus
-
-  countByStatus.total =
-    absent +
-    registered +
-    registrationRequest +
-    clearingRequest +
-    challengedRegistrationRequest +
-    challengedClearingRequest
 
   // Fetch first and last tokens
   const firstToken = yield call(
