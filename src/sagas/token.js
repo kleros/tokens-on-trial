@@ -202,15 +202,13 @@ export function* fetchToken({ payload: { ID } }) {
 
     if (token.latestRequest.disputed) {
       // Fetch dispute data.
-      token.latestRequest.dispute = yield call(
-        arbitrator.methods.disputes(token.latestRequest.disputeID).call
-      )
+      token.latestRequest.dispute = {}
       token.latestRequest.dispute.status = yield call(
         arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
       )
 
       // Fetch appeal disputeID, if there was an appeal.
-      if (Number(token.latestRequest.numberOfRounds) > 1) {
+      if (Number(token.latestRequest.numberOfRounds) > 2) {
         token.latestRequest.appealDisputeID = token.latestRequest.disputeID
         token.latestRequest.dispute.appealStatus =
           token.latestRequest.dispute.status
@@ -256,15 +254,13 @@ export function* fetchToken({ payload: { ID } }) {
 
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
-        badge.latestRequest.dispute = yield call(
-          arbitrator.methods.disputes(badge.latestRequest.disputeID).call
-        )
+        badge.latestRequest.dispute = {}
         badge.latestRequest.dispute.status = yield call(
           arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
         )
 
         // Fetch appeal disputeID, if there was an appeal.
-        if (Number(badge.latestRequest.numberOfRounds) > 1) {
+        if (Number(badge.latestRequest.numberOfRounds) > 2) {
           badge.latestRequest.appealDisputeID = badge.latestRequest.disputeID
           badge.latestRequest.dispute.appealStatus =
             badge.latestRequest.dispute.status
