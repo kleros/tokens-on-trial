@@ -19,7 +19,7 @@ import { arbitrableTokenList } from '../../bootstrap/dapp-api'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 100
+const TOKENS_PER_PAGE = 20
 
 class Tokens extends Component {
   static propTypes = {
