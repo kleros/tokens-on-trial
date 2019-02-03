@@ -23,12 +23,6 @@ export const getRemainingTime = (
 ) => {
   const { latestRequest } = item
   const { latestRound } = latestRequest
-  if (
-    Number(latestRound.appealPeriod[1]) -
-    Number(latestRound.appealPeriod[0] === 94608000)
-  )
-    return 94608000 // Large value means the arbitrator does not have an appeal period.
-
   let time
   if (
     !latestRequest.challengerDepositTime ||
@@ -46,10 +40,16 @@ export const getRemainingTime = (
   else if (
     latestRequest.dispute.status ===
       tcrConstants.DISPUTE_STATUS.Appealable.toString() ||
-    (latestRequest.dispute.numberOfRounds > 1 &&
+    (latestRequest.dispute.numberOfRounds > 2 &&
       latestRequest.dispute.appealStatus ===
         tcrConstants.DISPUTE_STATUS.Appealable.toString())
   ) {
+    if (
+      Number(latestRound.appealPeriod[1]) -
+      Number(latestRound.appealPeriod[0] === 94608000)
+    )
+      return 94608000 // Large value means the arbitrator does not have an appeal period.
+
     const appealPeriodEnd =
       Number(latestRequest.latestRound.appealPeriod[1]) * 1000
     time = appealPeriodEnd - currentTime
