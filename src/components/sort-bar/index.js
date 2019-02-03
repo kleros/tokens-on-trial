@@ -43,7 +43,9 @@ class SortBar extends PureComponent {
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData && numTokens !== undefined
+          {tokensData &&
+          typeof tokensData.totalCount !== 'undefined' &&
+          typeof numTokens !== 'undefined'
             ? `${numTokens} submissions of ${tokensData.totalCount}`
             : 'Loading submissions...'}
         </div>

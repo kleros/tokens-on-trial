@@ -15,6 +15,7 @@ import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { filterToContractParam, totalByStatus } from '../../utils/filter'
+import { arbitrableTokenList } from '../../bootstrap/dapp-api'
 
 import './tokens.css'
 
@@ -52,6 +53,9 @@ class Tokens extends Component {
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
     this.fetchTokens({})
+    arbitrableTokenList.events.TokenStatusChange().on('data', () => {
+      this.fetchTokens({})
+    })
   }
 
   mapTokens = tokens => {
