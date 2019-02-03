@@ -367,11 +367,16 @@ class TokenDetails extends PureComponent {
     })
     arbitrableTokenList.events
       .Evidence({ fromBlock: 0 })
-      .on('data', async () => {
+      .on('data', async e => {
         const { token } = this.state
         if (!token) return
 
         const { latestRequest } = token
+        console.info()
+        if (
+          Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
+        )
+          return
         archon.arbitrable
           .getEvidence(
             arbitrableTokenList._address,

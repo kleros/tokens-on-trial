@@ -311,10 +311,8 @@ class BadgeDetails extends PureComponent {
     fetchToken(tokenID)
     arbitrableAddressList.events.AddressStatusChange().on('data', event => {
       const { token } = this.state
-      console.info('got address status change, token:', token)
       if (!token) return
 
-      console.info(event.returnValues._address)
       if (token.addr === event.returnValues._address) {
         clearInterval(this.interval)
         this.setState({ countdown: null })
@@ -336,11 +334,15 @@ class BadgeDetails extends PureComponent {
     })
     arbitrableAddressList.events
       .Evidence({ fromBlock: 0 })
-      .on('data', async () => {
+      .on('data', async e => {
         const { token } = this.state
         if (!token || !token.badge) return
-
         const { latestRequest } = token.badge
+        if (
+          Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
+        )
+          return
+
         archon.arbitrable
           .getEvidence(
             arbitrableAddressList._address,
