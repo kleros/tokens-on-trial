@@ -22,6 +22,13 @@ export const getRemainingTime = (
   losingSide
 ) => {
   const { latestRequest } = item
+  const { latestRound } = latestRequest
+  if (
+    Number(latestRound.appealPeriod[1]) -
+    Number(latestRound.appealPeriod[0] === 94608000)
+  )
+    return 94608000 // Large value means the arbitrator does not have an appeal period.
+
   let time
   if (
     !latestRequest.challengerDepositTime ||

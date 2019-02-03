@@ -487,16 +487,19 @@ class TokenDetails extends PureComponent {
           tcrConstants,
           losingSide
         )
-        this.setState({
-          timestamp: block.timestamp,
-          countdown: new Date(time)
-        })
-        clearInterval(this.interval)
-        this.interval = setInterval(() => {
-          const { countdown } = this.state
-          if (countdown > 0)
-            this.setState({ countdown: new Date(countdown - 1000) })
-        }, 1000)
+        if (time < 94608000) {
+          // Very large duration for testing cases where the arbitrator doesn't have an appeal period
+          this.setState({
+            timestamp: block.timestamp,
+            countdown: new Date(time)
+          })
+          clearInterval(this.interval)
+          this.interval = setInterval(() => {
+            const { countdown } = this.state
+            if (countdown > 0)
+              this.setState({ countdown: new Date(countdown - 1000) })
+          }, 1000)
+        }
       })
     }
   }

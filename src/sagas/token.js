@@ -224,10 +224,15 @@ export function* fetchToken({ payload: { ID } }) {
           arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
             .call
         )
-
-        token.latestRequest.latestRound.appealPeriod = yield call(
-          arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
-        )
+        if (typeof arbitrator.methods.appealPeriod === 'function')
+          token.latestRequest.latestRound.appealPeriod = yield call(
+            arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
+          )
+        else
+          token.latestRequest.latestRound.appealPeriod = [
+            1549163380,
+            1643771380
+          ]
       }
     }
 
@@ -276,10 +281,16 @@ export function* fetchToken({ payload: { ID } }) {
             arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
               .call
           )
-
-          badge.latestRequest.latestRound.appealPeriod = yield call(
-            arbitrator.methods.appealPeriod(badge.latestRequest.disputeID).call
-          )
+          if (typeof arbitrator.methods.appealPeriod === 'function')
+            badge.latestRequest.latestRound.appealPeriod = yield call(
+              arbitrator.methods.appealPeriod(badge.latestRequest.disputeID)
+                .call
+            )
+          else
+            badge.latestRequest.latestRound.appealPeriod = [
+              1549163380,
+              1643771380
+            ]
         }
       }
 
