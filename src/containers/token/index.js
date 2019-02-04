@@ -376,7 +376,6 @@ class TokenDetails extends PureComponent {
         if (!token) return
 
         const { latestRequest } = token
-        console.info()
         if (
           Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
         )

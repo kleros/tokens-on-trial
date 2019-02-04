@@ -1,12 +1,10 @@
 import * as tcrConstants from '../constants/tcr'
 
 export const hasPendingRequest = ({ status, clientStatus, latestRequest }) => {
-  console.info(clientStatus)
   if (clientStatus === tcrConstants.STATUS_ENUM.Pending) return true
   if (latestRequest && latestRequest.disputed && !latestRequest.resolved)
     return true
 
-  console.info(status)
   switch (status) {
     case tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']:
     case tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']:

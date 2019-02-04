@@ -327,8 +327,7 @@ class BadgeDetails extends PureComponent {
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
       const { latestRequest } = token.badge
-      console.info('appeal possible', latestRequest)
-      console.info('return values', event.returnValues)
+
       if (
         latestRequest.disputeID === Number(event.returnValues._disputeID) ||
         latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
