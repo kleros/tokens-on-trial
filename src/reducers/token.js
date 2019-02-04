@@ -9,7 +9,6 @@ export const _tokenShape = PropTypes.shape({
   name: PropTypes.string.isRequired,
   ticker: PropTypes.string.isRequired,
   symbolMultihash: PropTypes.string.isRequired,
-  networkID: PropTypes.string.isRequired,
   status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
   latestRequest: PropTypes.shape({
@@ -21,7 +20,6 @@ export const _tokenShape = PropTypes.shape({
     numberOfRounds: PropTypes.number.isRequired,
     parties: PropTypes.arrayOf(PropTypes.string).isRequired,
     dispute: PropTypes.shape({
-      arbitrated: PropTypes.string.isRequired,
       choices: PropTypes.string,
       fee: PropTypes.string,
       ruling: PropTypes.string,

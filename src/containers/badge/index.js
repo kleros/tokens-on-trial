@@ -274,7 +274,8 @@ class BadgeDetails extends PureComponent {
           this.handleActionClick(
             modalConstants.ACTION_MODAL_ENUM.ChallengeBadge
           )
-        if (isRegistrationRequest(token.status)) label = 'Challenge Addition'
+        if (isRegistrationRequest(token.badge.status))
+          label = 'Challenge Addition'
         else label = 'Challenge Removal'
       }
     else {
@@ -322,7 +323,8 @@ class BadgeDetails extends PureComponent {
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
       const { latestRequest } = token.badge
-
+      console.info('appeal possible', latestRequest)
+      console.info('return values', event.returnValues)
       if (
         latestRequest.disputeID === Number(event.returnValues._disputeID) ||
         latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
@@ -370,6 +372,7 @@ class BadgeDetails extends PureComponent {
       })
     arbitrableAddressList.events.Ruling().on('data', event => {
       const { token } = this.state
+      if (!token || !token.badge) return
       const { badge } = token
       const { latestRequest } = badge
       if (
@@ -600,22 +603,22 @@ class BadgeDetails extends PureComponent {
                   className="BadgeDetails-meta--aligned"
                   style={{ display: 'flex', alignItems: 'center' }}
                 >
-                  <FontAwesomeIcon
-                    className="TokenDetails-icon"
-                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                    icon="clock"
-                  />
-                  <div className="BadgeDetails-timer">
-                    {badge.latestRequest.dispute &&
-                    badge.latestRequest.dispute.status ===
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                      ? 'Appeal '
-                      : 'Challenge '}
-                    Deadline{' '}
-                    {countdown instanceof Date
-                      ? countdown.toISOString().substr(11, 8)
-                      : '--:--:--'}
-                  </div>
+                  {!token.latestRequest.dispute && (
+                    <>
+                      <FontAwesomeIcon
+                        className="TokenDetails-icon"
+                        color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                        icon="clock"
+                      />
+                      <div className="BadgeDetails-timer">
+                        {`Challenge Deadline ${
+                          countdown instanceof Date
+                            ? countdown.toISOString().substr(11, 8)
+                            : '--:--:--'
+                        }`}
+                      </div>
+                    </>
+                  )}
                 </span>
               )}
             </div>

@@ -649,22 +649,22 @@ class TokenDetails extends PureComponent {
                 Number(countdown) === 0
               ) && (
                 <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <FontAwesomeIcon
-                    className="TokenDetails-icon"
-                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                    icon="clock"
-                  />
-                  <div className="BadgeDetails-timer">
-                    {token.latestRequest.dispute &&
-                    token.latestRequest.dispute.status ===
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                      ? 'Appeal '
-                      : 'Challenge '}
-                    Deadline{' '}
-                    {countdown instanceof Date
-                      ? countdown.toISOString().substr(11, 8)
-                      : '--:--:--'}
-                  </div>
+                  {!token.latestRequest.dispute && (
+                    <>
+                      <FontAwesomeIcon
+                        className="TokenDetails-icon"
+                        color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                        icon="clock"
+                      />
+                      <div className="BadgeDetails-timer">
+                        {`Challenge Deadline ${
+                          countdown instanceof Date
+                            ? countdown.toISOString().substr(11, 8)
+                            : '--:--:--'
+                        }`}
+                      </div>
+                    </>
+                  )}
                 </span>
               )}
             </div>

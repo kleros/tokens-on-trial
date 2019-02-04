@@ -223,6 +223,9 @@ export function* fetchToken({ payload: { ID } }) {
           tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
         !token.latestRequest.latestRound.appealed
       ) {
+        token.latestRequest.dispute.ruling = yield call(
+          arbitrator.methods.currentRuling(token.latestRequest.disputeID).call
+        )
         token.latestRequest.latestRound.appealCost = yield call(
           arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
             .call
@@ -272,7 +275,7 @@ export function* fetchToken({ payload: { ID } }) {
           badge.latestRequest.appealDisputeID = badge.latestRequest.disputeID
           badge.latestRequest.dispute.appealStatus =
             badge.latestRequest.dispute.status
-        } else token.latestRequest.appealDisputeID = 0
+        } else badge.latestRequest.appealDisputeID = 0
 
         // Fetch appeal period and cost if in appeal period.
         if (
@@ -280,6 +283,9 @@ export function* fetchToken({ payload: { ID } }) {
             tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
           !badge.latestRequest.latestRound.appealed
         ) {
+          badge.latestRequest.dispute.ruling = yield call(
+            arbitrator.methods.currentRuling(badge.latestRequest.disputeID).call
+          )
           badge.latestRequest.latestRound.appealCost = yield call(
             arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
               .call
@@ -380,8 +386,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     name: token.name,
     ticker: token.ticker,
     addr: web3.utils.toChecksumAddress(token.addr),
-    symbolMultihash: token.symbolMultihash,
-    networkID: 'ETH'
+    symbolMultihash: token.symbolMultihash
   }
 
   if (file && fileData) {
@@ -393,18 +398,12 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     tokenToSubmit.symbolMultihash = fileMultihash
   }
 
-  const { name, ticker, addr, symbolMultihash, networkID } = tokenToSubmit
+  const { name, ticker, addr, symbolMultihash } = tokenToSubmit
 
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = web3.utils.soliditySha3(
-    name,
-    ticker,
-    addr,
-    symbolMultihash,
-    networkID
-  )
+  const ID = web3.utils.soliditySha3(name, ticker, addr, symbolMultihash)
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
   if (
@@ -420,8 +419,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
       tokenToSubmit.name,
       tokenToSubmit.ticker,
       tokenToSubmit.addr,
-      tokenToSubmit.symbolMultihash,
-      tokenToSubmit.networkID
+      tokenToSubmit.symbolMultihash
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
