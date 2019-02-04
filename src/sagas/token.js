@@ -355,12 +355,6 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-  if (!token.badge || !token.badge.status)
-    token.badge = {
-      status: 0,
-      latestRequest: { disputed: false }
-    }
-
   return {
     ...token,
     ID,

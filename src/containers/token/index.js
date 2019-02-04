@@ -108,7 +108,7 @@ class TokenDetails extends PureComponent {
   }
 
   toSentenceCase = input => {
-    input = input.toLowerCase()
+    input = input ? input.toLowerCase() : ''
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
@@ -141,8 +141,12 @@ class TokenDetails extends PureComponent {
     )
     const { latestRequest } = token
     const { latestRound, challengerDepositTime } = latestRequest
-    const submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
-    const challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    let submitterFees
+    let challengerFees
+    if (latestRequest && latestRound) {
+      submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
+      challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    }
 
     if (hasPendingRequest(token))
       if (latestRequest.disputed && !latestRequest.resolved) {
