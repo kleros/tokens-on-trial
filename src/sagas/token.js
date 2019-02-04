@@ -74,14 +74,17 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   }
 
   // Fetch first and last tokens
-  const firstToken = yield call(
-    arbitrableTokenList.methods.tokensList(0).call,
-    { from: yield select(walletSelectors.getAccount) }
-  )
-  const lastToken = yield call(
-    arbitrableTokenList.methods.tokensList(totalCount - 1).call,
-    { from: yield select(walletSelectors.getAccount) }
-  )
+  let firstToken = ZERO_ID
+  let lastToken = ZERO_ID
+  if (totalCount > 0) {
+    firstToken = yield call(arbitrableTokenList.methods.tokensList(0).call, {
+      from: yield select(walletSelectors.getAccount)
+    })
+    lastToken = yield call(
+      arbitrableTokenList.methods.tokensList(totalCount - 1).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )
+  }
 
   // Get last page
   let lastPage
