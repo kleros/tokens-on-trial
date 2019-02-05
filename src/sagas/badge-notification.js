@@ -14,12 +14,16 @@ import {
 import * as notificationActions from '../actions/notification'
 import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
-import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tokenActions from '../actions/token'
 import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
-import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
+import {
+  arbitrableAddressList,
+  arbitrableTokenList,
+  web3
+} from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
@@ -30,6 +34,19 @@ const getBlockDate = memoizeOne(blockHash =>
   web3.eth.getBlock(blockHash).then(block => new Date(block.timestamp * 1000))
 )
 
+const zeroSubmissionID =
+  '0x0000000000000000000000000000000000000000000000000000000000000000'
+const filter = [
+  false, // Do not include tokens which are not on the TCR.
+  true, // Include registered tokens.
+  false, // Do not include tokens with pending registration requests.
+  true, // Include tokens with pending clearing requests.
+  false, // Do not include tokens with challenged registration requests.
+  true, // Include tokens with challenged clearing requests.
+  false, // Include token if caller is the author of a pending request.
+  false // Include token if caller is the challenger of a pending request.
+]
+
 const emitNotifications = async (account, timeToChallenge, emitter, events) => {
   const notifiedIDs = {}
   let oldestNonDisputedSubmittedStatusEvent
@@ -37,7 +54,17 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
 
-    if (notifiedIDs[event.returnValues._tokenID]) continue
+    const tokenID = (await arbitrableTokenList.methods
+      .queryTokens(
+        zeroSubmissionID, // A token ID from which to start/end the query from. Set to zero means unused.
+        100, // Number of items to return at once.
+        filter,
+        true, // Return oldest first.
+        event.returnValues._address // The token address for which to return the submissions.
+      )
+      .call({ from: account })).values.filter(ID => ID !== zeroSubmissionID)[0]
+
+    if (notifiedIDs[tokenID]) continue
     const isRequester = account === event.returnValues._requester
     if (!isRequester && account !== event.returnValues._challenger) continue
 
@@ -52,8 +79,8 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         )
           message = `${
             isRequester
-              ? 'Your token request has challenged.'
-              : 'You challenged a token request.'
+              ? 'Your badge request has challenged.'
+              : 'You challenged a badge request.'
           }`
         else if (
           returnValues._disputed === true &&
@@ -62,25 +89,27 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         )
           message = `${
             isRequester
-              ? 'An appeal was raised on your token request.'
+              ? 'An appeal was raised on your badge request.'
               : 'An appeal was raised on a request you challenged.'
           }`
-        else if (returnValues._disputed === false)
+        else if (returnValues._disputed === false) {
           oldestNonDisputedSubmittedStatusEvent = event
+          oldestNonDisputedSubmittedStatusEvent['tokenID'] = tokenID
+        }
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered: {
         if (returnValues._disputed === false)
           message = `${
             isRequester
-              ? 'Your token registration request'
-              : 'A token registration request you challenged'
+              ? 'Your badge registration request'
+              : 'A badge registration request you challenged'
           } has been executed.`
         else
           message = `${
             isRequester
-              ? 'Your challenged token registration request'
-              : 'A token registration request you challenged'
+              ? 'Your challenged badge registration request'
+              : 'A badge registration request you challenged'
           } has been executed.`
         break
       }
@@ -88,14 +117,14 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         if (returnValues._disputed === false)
           message = `${
             isRequester
-              ? 'Your token clearing request'
-              : 'A token clearing request you challenged'
+              ? 'Your badge clearing request'
+              : 'A badge clearing request you challenged'
           } has been executed.`
         else
           message = `${
             isRequester
-              ? 'Your token clearing request'
-              : 'A token clearing request you challenged'
+              ? 'Your badge clearing request'
+              : 'A badge clearing request you challenged'
           } has been refused.`
         break
       }
@@ -113,7 +142,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     )
 
     if (message) {
-      notifiedIDs[returnValues._tokenID] =
+      notifiedIDs[tokenID] =
         returnValues._disputed === true &&
         (returnValues._status ===
           tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
@@ -123,7 +152,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
           : true
 
       emitter({
-        ID: returnValues._tokenID,
+        ID: tokenID,
         date: await getBlockDate(event.blockHash),
         message,
         clientStatus
@@ -133,24 +162,31 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
 
   if (
     oldestNonDisputedSubmittedStatusEvent &&
-    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID] !==
-      'disputed'
+    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.tokenID] !== 'disputed'
   ) {
     const date = await getBlockDate(
       oldestNonDisputedSubmittedStatusEvent.blockHash
     )
+    console.info(
+      'date ',
+      date,
+      ' timeToChallenge ',
+      timeToChallenge,
+      ' Date.now() ',
+      Number(Date.now())
+    )
     if (Date.now() - date > timeToChallenge)
       emitter({
-        ID: oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID,
+        ID: oldestNonDisputedSubmittedStatusEvent.tokenID,
         date,
-        message: 'Token request pending execution.',
+        message: 'Badge request pending execution.',
         clientStatus: oldestNonDisputedSubmittedStatusEvent.returnValues._status
       })
   }
 
   if (events[0])
     localStorage.setItem(
-      `${arbitrableTokenList.options.address}nextEventsBlockNumber`,
+      `${arbitrableAddressList.options.address}nextEventsBlockNumber`,
       events[0].blockNumber + 1
     )
 }
@@ -166,25 +202,25 @@ function* pushNotificationsListener() {
   while (true) {
     const account = yield select(walletSelectors.getAccount) // Cache current account
     const timeToChallenge = yield select(
-      arbitrableTokenListSelectors.getTimeToChallenge
+      arbitrableAddressListSelectors.getTimeToChallenge
     ) // Cache current time to challenge
-    console.info('arbitrableTokenList Time to Challenge', timeToChallenge)
+    console.info('timeToChallenge', timeToChallenge)
 
     // Set up event channel with subscriber
     const channel = eventChannel(emitter => {
-      arbitrableTokenList
-        .getPastEvents('TokenStatusChange', {
+      arbitrableAddressList
+        .getPastEvents('AddressStatusChange', {
           fromBlock:
             localStorage.getItem(
-              `${arbitrableTokenList.options.address}nextEventsBlockNumber`
+              `${arbitrableAddressList.options.address}nextEventsBlockNumber`
             ) || 0
         })
         .then(events => {
           emitNotifications(account, timeToChallenge, emitter, events)
         })
-      arbitrableTokenList.events.TokenStatusChange().on('data', event => {
+      arbitrableAddressList.events.AddressStatusChange().on('data', event => {
         emitNotifications(account, timeToChallenge, emitter, [event])
-        emitter(event.returnValues._tokenID)
+        emitter(event.returnValues._address)
       })
       return () => {} // Unsubscribe function
     })
@@ -193,7 +229,7 @@ function* pushNotificationsListener() {
     while (
       account === (yield select(walletSelectors.getAccount)) &&
       timeToChallenge ===
-        (yield select(arbitrableTokenListSelectors.getTimeToChallenge))
+        (yield select(arbitrableAddressListSelectors.getTimeToChallenge))
     ) {
       const [notification, accounts, arbitrableTokenListData] = yield race([
         take(channel), // New notification

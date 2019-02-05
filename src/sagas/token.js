@@ -336,24 +336,50 @@ export function* fetchToken({ payload: { ID } }) {
 
     token = convertFromString(token)
   } else
-    token.latestRequest = {
-      disputed: false,
-      disputeID: 0,
-      dispute: null,
-      badge: null,
-      submissionTime: 0,
-      challengeRewardBalance: 0,
-      challengerDepositTime: 0,
-      feeRewards: 0,
-      pot: [],
-      resolved: false,
-      parties: [],
-      latestRound: {
-        appealed: false,
-        paidFees: [],
-        requiredForSide: []
+    token = {
+      status: 0,
+      latestRequest: {
+        disputed: false,
+        disputeID: 0,
+        dispute: null,
+        submissionTime: 0,
+        challengeRewardBalance: 0,
+        challengerDepositTime: 0,
+        feeRewards: 0,
+        pot: [],
+        resolved: false,
+        parties: [],
+        latestRound: {
+          appealed: false,
+          paidFees: [],
+          requiredForSide: []
+        }
+      },
+      badge: {
+        status: 0,
+        numberOfRequests: 0,
+        latestRequest: {
+          disputed: false,
+          disputeID: 0,
+          appealDisputeID: 0,
+          dispute: null,
+          submissionTime: 0,
+          challengeRewardBalance: 0,
+          challengerDepositTime: 0,
+          feeRewards: 0,
+          pot: [],
+          resolved: false,
+          parties: [],
+          latestRound: {
+            appealed: false,
+            paidFees: [],
+            requiredForSide: []
+          }
+        }
       }
     }
+
+  console.info(token)
 
   return {
     ...token,

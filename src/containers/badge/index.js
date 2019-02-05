@@ -310,6 +310,100 @@ class BadgeDetails extends PureComponent {
     )
   }
 
+  initCountDown = async () => {
+    const { arbitrableAddressListData, token, accounts } = this.props
+    const { countdown, listeningForEvidence } = this.state
+    this.setState({ token })
+
+    if (
+      token &&
+      token.badge &&
+      hasPendingRequest(token.badge) &&
+      countdown === null &&
+      arbitrableAddressListData &&
+      arbitrableAddressListData.data &&
+      arbitrator &&
+      arbitrableAddressList
+    ) {
+      this.setState({ countdown: 'Loading...', token })
+      const { badge } = token
+      const { latestRequest } = badge
+
+      if (!listeningForEvidence && latestRequest && latestRequest.disputed)
+        // Listen for evidence events.
+        this.setState({ listeningForEvidence: true })
+      archon.arbitrable
+        .getEvidence(
+          arbitrableAddressList._address,
+          arbitrator._address,
+          latestRequest.disputeID
+        )
+        .then(resp =>
+          resp
+            .filter(
+              evidence => evidence.evidenceJSONValid && evidence.fileValid
+            )
+            .forEach(evidence => {
+              const { evidences } = this.state
+              const { evidenceJSON } = evidence
+              const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+              evidenceJSON.icon = getFileIcon(mimeType)
+              this.setState({
+                evidences: {
+                  ...evidences,
+                  [evidence.transactionHash]: evidenceJSON
+                }
+              })
+            })
+        )
+
+      let losingSide
+      const userAccount = accounts.data[0]
+      if (
+        latestRequest.dispute &&
+        Number(latestRequest.dispute.status) ===
+          tcrConstants.DISPUTE_STATUS.Appealable &&
+        !latestRequest.latestRound.appealed
+      )
+        if (
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
+          latestRequest.dispute.ruling ===
+            tcrConstants.RULING_OPTIONS.Refuse.toString()
+        )
+          losingSide = true
+        else if (
+          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
+          latestRequest.dispute.ruling ===
+            tcrConstants.RULING_OPTIONS.Accept.toString()
+        )
+          losingSide = true
+
+      // Set timer once we have data.
+      getBlock(null, web3, 'latest', block => {
+        const time = getRemainingTime(
+          badge,
+          arbitrableAddressListData,
+          block.timestamp * 1000,
+          tcrConstants,
+          losingSide
+        )
+        if (time < 94608000) {
+          // Very large duration for testing cases where the arbitrator doesn't have an appeal period
+          this.setState({
+            timestamp: block.timestamp,
+            countdown: new Date(time)
+          })
+          clearInterval(this.interval)
+          this.interval = setInterval(() => {
+            const { countdown } = this.state
+            if (countdown > 0)
+              this.setState({ countdown: new Date(countdown - 1000) })
+          }, 1000)
+        }
+      })
+    }
+  }
+
   componentDidMount() {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
@@ -412,90 +506,9 @@ class BadgeDetails extends PureComponent {
 
   componentWillReceiveProps(nextProps) {
     const { token } = nextProps
-    const { arbitrableAddressListData, accounts } = this.props
-    const { countdown } = this.state
-    this.setState({ token })
-
-    if (
-      token &&
-      token.badge &&
-      hasPendingRequest(token.badge) &&
-      (countdown === null || countdown === 0) &&
-      arbitrableAddressListData &&
-      arbitrableAddressListData.data
-    ) {
-      this.setState({ countdown: 'Loading...', token })
-      const { badge } = token
-      const { latestRequest } = badge
-
-      if (latestRequest && latestRequest.disputed)
-        archon.arbitrable
-          .getEvidence(
-            arbitrableAddressList._address,
-            arbitrator._address,
-            latestRequest.disputeID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence => evidence.evidenceJSONValid && evidence.fileValid
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
-              })
-          )
-
-      let losingSide
-      const userAccount = accounts.data[0]
-      if (
-        latestRequest.dispute &&
-        Number(latestRequest.dispute.status) ===
-          tcrConstants.DISPUTE_STATUS.Appealable &&
-        !latestRequest.latestRound.appealed
-      )
-        if (
-          userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
-          latestRequest.dispute.ruling ===
-            tcrConstants.RULING_OPTIONS.Refuse.toString()
-        )
-          losingSide = true
-        else if (
-          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-          latestRequest.dispute.ruling ===
-            tcrConstants.RULING_OPTIONS.Accept.toString()
-        )
-          losingSide = true
-
-      // Set timer once we have data.
-      getBlock(null, web3, 'latest', block => {
-        const time = getRemainingTime(
-          badge,
-          arbitrableAddressListData,
-          block.timestamp * 1000,
-          tcrConstants,
-          losingSide
-        )
-        this.setState({
-          timestamp: block.timestamp,
-          countdown: new Date(time)
-        })
-        clearInterval(this.interval)
-        this.interval = setInterval(() => {
-          const { countdown } = this.state
-          if (countdown > 0)
-            this.setState({ countdown: new Date(countdown - 1000) })
-        }, 1000)
-      })
-    }
+    if (!token) return
+    else this.setState({ token })
+    this.initCountDown()
   }
 
   render() {
@@ -606,7 +619,7 @@ class BadgeDetails extends PureComponent {
                   className="BadgeDetails-meta--aligned"
                   style={{ display: 'flex', alignItems: 'center' }}
                 >
-                  {!token.latestRequest.dispute && (
+                  {!token.badge.latestRequest.dispute && (
                     <>
                       <FontAwesomeIcon
                         className="TokenDetails-icon"
