@@ -173,7 +173,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
       ' timeToChallenge ',
       timeToChallenge,
       ' Date.now() ',
-      Number(Date.now())
+      Date.now()
     )
     if (Date.now() - date > timeToChallenge)
       emitter({

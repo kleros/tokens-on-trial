@@ -379,8 +379,6 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-  console.info(token)
-
   return {
     ...token,
     ID,

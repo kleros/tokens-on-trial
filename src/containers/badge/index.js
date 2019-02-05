@@ -404,6 +404,10 @@ class BadgeDetails extends PureComponent {
     }
   }
 
+  componentDidUpdate() {
+    this.initCountDown()
+  }
+
   componentDidMount() {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
