@@ -11,7 +11,7 @@ const SearchItem = ({ onClick, children }) => (
 
 SearchItem.propTypes = {
   onClick: PropTypes.func.isRequired,
-  children: PropTypes.shapeOf({}).isRequired
+  children: PropTypes.shape({}).isRequired
 }
 
 export default SearchItem
