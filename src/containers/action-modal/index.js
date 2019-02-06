@@ -432,6 +432,12 @@ class ActionModal extends PureComponent {
     createBadge({ tokenData: token.data, value })
   }
 
+  handleCloseTokenSubmission = () => {
+    const { closeActionModal } = this.props
+    this.setState({ file: null, fileInfoMessage: null })
+    closeActionModal()
+  }
+
   componentDidMount() {
     const {
       fetchArbitrableTokenListData,
@@ -488,7 +494,7 @@ class ActionModal extends PureComponent {
                     formIsInvalid={tokenFormIsInvalid}
                     fileInfoMessage={fileInfoMessage}
                     handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    closeActionModal={closeActionModal}
+                    closeActionModal={this.handleCloseTokenSubmission}
                     item={
                       openActionModal ===
                       modalConstants.ACTION_MODAL_ENUM.Submit
