@@ -33,14 +33,11 @@ class SearchBar extends PureComponent {
         tokenSubmissions.push({
           value: returnValues._name,
           searchVal: returnValues._name.toLowerCase(),
-          tokenID: returnValues._tokenID
+          tokenID: returnValues._tokenID,
+          name: returnValues._name,
+          ticker: returnValues._ticker,
+          address: returnValues._addr
         })
-        if (returnValues._name !== returnValues._ticker)
-          tokenSubmissions.push({
-            value: returnValues._ticker,
-            searchVal: returnValues._ticker.toLowerCase(),
-            tokenID: returnValues._tokenID
-          })
       }
     )
   }
@@ -68,28 +65,34 @@ class SearchBar extends PureComponent {
           }) => (
             <div className="SearchBar-box">
               <input {...getInputProps()} className="SearchBar-input" />
-              <ul {...getMenuProps()} className="SearchBar-results">
-                {isOpen
-                  ? tokenSubmissions
-                      .filter(
-                        item =>
-                          inputValue &&
-                          inputValue.length > 0 &&
-                          item.searchVal.includes(inputValue.toLowerCase())
-                      )
-                      .map((item, index) => (
-                        <Item
-                          {...getItemProps({
-                            key: index,
-                            index,
-                            item
-                          })}
-                        >
-                          {item.value}
-                        </Item>
-                      ))
-                  : null}
-              </ul>
+              {isOpen && (
+                <ul {...getMenuProps()} className="SearchBar-results">
+                  {isOpen
+                    ? tokenSubmissions
+                        .filter(
+                          item =>
+                            inputValue &&
+                            inputValue.length > 0 &&
+                            (item.name
+                              .toLowerCase()
+                              .includes(inputValue.toLowerCase()) ||
+                              item.ticker
+                                .toLowerCase()
+                                .includes(inputValue.toLowerCase()))
+                        )
+                        .map((item, index) => (
+                          <Item
+                            item={item}
+                            {...getItemProps({
+                              key: index,
+                              index,
+                              item
+                            })}
+                          />
+                        ))
+                    : null}
+                </ul>
+              )}
             </div>
           )}
         </Downshift>

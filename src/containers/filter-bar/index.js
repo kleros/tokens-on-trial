@@ -59,7 +59,7 @@ class FilterBar extends Component {
     const { filterOptionsVisible } = this.state
 
     return (
-      <div>
+      <>
         <div className="FilterBar">
           <SearchBar />
           <div className="FilterBar-filter" onClick={this.toggleFilterOptions}>
@@ -122,7 +122,7 @@ class FilterBar extends Component {
             <hr className="FilterBar-separator-primaryBlue" />
           </div>
         )}
-      </div>
+      </>
     )
   }
 }
