@@ -3,13 +3,33 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as tokenSelectors from '../../../../reducers/token'
+import * as tcrConstants from '../../../../constants/tcr'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './appeal.css'
 
-const Appeal = ({ closeActionModal, fundAppeal, item, losingSide, tcr }) => (
+const isLosingSide = (item, side) => {
+  const { latestRequest } = item
+  let losingSide = false
+  if (
+    Number(side) === tcrConstants.SIDE.Requester &&
+    latestRequest.dispute.ruling ===
+      tcrConstants.RULING_OPTIONS.Refuse.toString()
+  )
+    losingSide = true
+  else if (
+    Number(side) === tcrConstants.SIDE.Challenger &&
+    latestRequest.dispute.ruling ===
+      tcrConstants.RULING_OPTIONS.Accept.toString()
+  )
+    losingSide = true
+
+  return losingSide
+}
+
+const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
   <>
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Appeal-icon" icon="gavel" />
@@ -36,7 +56,7 @@ const Appeal = ({ closeActionModal, fundAppeal, item, losingSide, tcr }) => (
                 .toBN(item.latestRequest.latestRound.appealCost)
                 .mul(
                   web3.utils.toBN(
-                    losingSide
+                    isLosingSide(item, side)
                       ? tcr.data.loserStakeMultiplier
                       : tcr.data.winnerStakeMultiplier
                   )
@@ -58,7 +78,7 @@ const Appeal = ({ closeActionModal, fundAppeal, item, losingSide, tcr }) => (
                   .toBN(item.latestRequest.latestRound.appealCost)
                   .mul(
                     web3.utils.toBN(
-                      losingSide
+                      isLosingSide(item, side)
                         ? tcr.data.loserStakeMultiplier
                         : tcr.data.winnerStakeMultiplier
                     )
@@ -85,18 +105,18 @@ const Appeal = ({ closeActionModal, fundAppeal, item, losingSide, tcr }) => (
   </>
 )
 
-Appeal.propTypes = {
+FundAppeal.propTypes = {
   // State
   item: tokenSelectors.tokenShape.isRequired,
-  losingSide: PropTypes.bool.isRequired,
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
+  side: PropTypes.string.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   fundAppeal: PropTypes.func.isRequired
 }
 
-export default Appeal
+export default FundAppeal

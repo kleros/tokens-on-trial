@@ -13,7 +13,9 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
     <h3 className="Modal-title">Evidence</h3>
     <hr />
     <p>Name: {evidence.name}</p>
-    <p>Description: {evidence.description}</p>
+    <p className="ViewEvidence-description">
+      Description: {evidence.description}
+    </p>
     <br />
     <div
       className="ViewEvidence-actions"

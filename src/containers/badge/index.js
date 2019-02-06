@@ -105,7 +105,7 @@ class BadgeDetails extends PureComponent {
   }
 
   toSentenceCase = input => {
-    input = input.toLowerCase()
+    input = input ? input.toLowerCase() : ''
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
@@ -140,8 +140,12 @@ class BadgeDetails extends PureComponent {
     const { badge } = token
     const { latestRequest } = badge
     const { latestRound, challengerDepositTime } = latestRequest
-    const submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
-    const challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    let submitterFees
+    let challengerFees
+    if (latestRound) {
+      submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
+      challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    }
 
     if (hasPendingRequest(badge))
       if (latestRequest.disputed && !latestRequest.resolved) {
@@ -274,7 +278,8 @@ class BadgeDetails extends PureComponent {
           this.handleActionClick(
             modalConstants.ACTION_MODAL_ENUM.ChallengeBadge
           )
-        if (isRegistrationRequest(token.status)) label = 'Challenge Addition'
+        if (isRegistrationRequest(token.badge.status))
+          label = 'Challenge Addition'
         else label = 'Challenge Removal'
       }
     else {
@@ -305,144 +310,52 @@ class BadgeDetails extends PureComponent {
     )
   }
 
-  componentDidMount() {
-    const { match, fetchToken } = this.props
-    const { tokenID } = match.params
-    fetchToken(tokenID)
-    arbitrableAddressList.events.AddressStatusChange().on('data', event => {
-      const { token } = this.state
-      if (!token) return
-
-      if (token.addr === event.returnValues._address) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
-        fetchToken(tokenID)
-      }
-    })
-    arbitrableAddressList.events.Ruling().on('data', event => {
-      const { token } = this.state
-      const { badge } = token
-      const { latestRequest } = badge
-      if (
-        latestRequest.disputed &&
-        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-          latestRequest.appealDisputeID ===
-            Number(event.returnValues._disputeID))
-      ) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
-        fetchToken(tokenID)
-      }
-    })
-    arbitrator.events.AppealPossible().on('data', event => {
-      const { token } = this.state
-      const { latestRequest } = token.badge
-
-      if (
-        latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-        latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
-      ) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
-        fetchToken(tokenID)
-      }
-    })
-    arbitrableAddressList.events
-      .Evidence({ fromBlock: 0 })
-      .on('data', async () => {
-        const { token } = this.state
-        if (!token || !token.badge) return
-
-        const { latestRequest } = token.badge
-        archon.arbitrable
-          .getEvidence(
-            arbitrableAddressList._address,
-            arbitrator._address,
-            latestRequest.disputeID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence => evidence.evidenceJSONValid && evidence.fileValid
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
-              })
-          )
-      })
-    arbitrableAddressList.events
-      .Contribution({ fromBlock: 0 })
-      .on('data', async e => {
-        const { token } = this.state
-        if (!token || !token.badge) return
-
-        if (e.returnValues._address === token.addr) {
-          clearInterval(this.interval)
-          this.setState({ countdown: null })
-          fetchToken(tokenID)
-        }
-      })
-  }
-
-  submitBadgeAction = () =>
-    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
-
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
-  componentWillReceiveProps(nextProps) {
-    const { token } = nextProps
-    const { arbitrableAddressListData, accounts } = this.props
-    const { countdown } = this.state
+  initCountDown = async () => {
+    const { arbitrableAddressListData, token, accounts } = this.props
+    const { countdown, listeningForEvidence } = this.state
     this.setState({ token })
 
     if (
       token &&
       token.badge &&
       hasPendingRequest(token.badge) &&
-      (countdown === null || countdown === 0) &&
+      countdown === null &&
       arbitrableAddressListData &&
-      arbitrableAddressListData.data
+      arbitrableAddressListData.data &&
+      arbitrator &&
+      arbitrableAddressList
     ) {
       this.setState({ countdown: 'Loading...', token })
       const { badge } = token
       const { latestRequest } = badge
 
-      if (latestRequest && latestRequest.disputed)
-        archon.arbitrable
-          .getEvidence(
-            arbitrableAddressList._address,
-            arbitrator._address,
-            latestRequest.disputeID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence => evidence.evidenceJSONValid && evidence.fileValid
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
+      if (!listeningForEvidence && latestRequest && latestRequest.disputed)
+        // Listen for evidence events.
+        this.setState({ listeningForEvidence: true })
+      archon.arbitrable
+        .getEvidence(
+          arbitrableAddressList._address,
+          arbitrator._address,
+          latestRequest.disputeID
+        )
+        .then(resp =>
+          resp
+            .filter(
+              evidence => evidence.evidenceJSONValid && evidence.fileValid
+            )
+            .forEach(evidence => {
+              const { evidences } = this.state
+              const { evidenceJSON } = evidence
+              const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+              evidenceJSON.icon = getFileIcon(mimeType)
+              this.setState({
+                evidences: {
+                  ...evidences,
+                  [evidence.transactionHash]: evidenceJSON
+                }
               })
-          )
+            })
+        )
 
       let losingSide
       const userAccount = accounts.data[0]
@@ -474,18 +387,132 @@ class BadgeDetails extends PureComponent {
           tcrConstants,
           losingSide
         )
-        this.setState({
-          timestamp: block.timestamp,
-          countdown: new Date(time)
-        })
-        clearInterval(this.interval)
-        this.interval = setInterval(() => {
-          const { countdown } = this.state
-          if (countdown > 0)
-            this.setState({ countdown: new Date(countdown - 1000) })
-        }, 1000)
+        if (time < 94608000) {
+          // Very large duration for testing cases where the arbitrator doesn't have an appeal period
+          this.setState({
+            timestamp: block.timestamp,
+            countdown: new Date(time)
+          })
+          clearInterval(this.interval)
+          this.interval = setInterval(() => {
+            const { countdown } = this.state
+            if (countdown > 0)
+              this.setState({ countdown: new Date(countdown - 1000) })
+          }, 1000)
+        }
       })
     }
+  }
+
+  componentDidUpdate() {
+    this.initCountDown()
+  }
+
+  componentDidMount() {
+    const { match, fetchToken } = this.props
+    const { tokenID } = match.params
+    fetchToken(tokenID)
+    arbitrableAddressList.events.AddressStatusChange().on('data', event => {
+      const { token } = this.state
+      if (!token) return
+
+      if (token.addr === event.returnValues._address) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
+    })
+    arbitrator.events.AppealPossible().on('data', event => {
+      const { token } = this.state
+      const { latestRequest } = token.badge
+
+      if (
+        latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+        latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
+      ) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
+    })
+    arbitrableAddressList.events
+      .Evidence({ fromBlock: 0 })
+      .on('data', async e => {
+        const { token } = this.state
+        if (!token || !token.badge) return
+        const { latestRequest } = token.badge
+        if (
+          Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
+        )
+          return
+
+        archon.arbitrable
+          .getEvidence(
+            arbitrableAddressList._address,
+            arbitrator._address,
+            latestRequest.disputeID
+          )
+          .then(resp =>
+            resp
+              .filter(
+                evidence => evidence.evidenceJSONValid && evidence.fileValid
+              )
+              .forEach(evidence => {
+                const { evidences } = this.state
+                const { evidenceJSON } = evidence
+                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                evidenceJSON.icon = getFileIcon(mimeType)
+                this.setState({
+                  evidences: {
+                    ...evidences,
+                    [evidence.transactionHash]: evidenceJSON
+                  }
+                })
+              })
+          )
+      })
+    arbitrableAddressList.events.Ruling().on('data', event => {
+      const { token } = this.state
+      if (!token || !token.badge) return
+      const { badge } = token
+      const { latestRequest } = badge
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      ) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
+    })
+    arbitrableAddressList.events
+      .Contribution({ fromBlock: 0 })
+      .on('data', async e => {
+        const { token } = this.state
+        if (!token || !token.badge) return
+
+        if (e.returnValues._address === token.addr) {
+          clearInterval(this.interval)
+          this.setState({ countdown: null })
+          fetchToken(tokenID)
+        }
+      })
+  }
+
+  submitBadgeAction = () =>
+    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
+
+  componentWillUnmount() {
+    clearInterval(this.interval)
+  }
+
+  componentWillReceiveProps(nextProps) {
+    const { token } = nextProps
+    if (!token) return
+    else this.setState({ token })
+    this.initCountDown()
   }
 
   render() {
@@ -596,22 +623,22 @@ class BadgeDetails extends PureComponent {
                   className="BadgeDetails-meta--aligned"
                   style={{ display: 'flex', alignItems: 'center' }}
                 >
-                  <FontAwesomeIcon
-                    className="TokenDetails-icon"
-                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                    icon="clock"
-                  />
-                  <div className="BadgeDetails-timer">
-                    {badge.latestRequest.dispute &&
-                    badge.latestRequest.dispute.status ===
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                      ? 'Appeal '
-                      : 'Challenge '}
-                    Deadline{' '}
-                    {countdown instanceof Date
-                      ? countdown.toISOString().substr(11, 8)
-                      : '--:--:--'}
-                  </div>
+                  {!token.badge.latestRequest.dispute && (
+                    <>
+                      <FontAwesomeIcon
+                        className="TokenDetails-icon"
+                        color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                        icon="clock"
+                      />
+                      <div className="BadgeDetails-timer">
+                        {`Challenge Deadline ${
+                          countdown instanceof Date
+                            ? countdown.toISOString().substr(11, 8)
+                            : '--:--:--'
+                        }`}
+                      </div>
+                    </>
+                  )}
                 </span>
               )}
             </div>

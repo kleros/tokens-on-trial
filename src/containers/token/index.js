@@ -108,7 +108,7 @@ class TokenDetails extends PureComponent {
   }
 
   toSentenceCase = input => {
-    input = input.toLowerCase()
+    input = input ? input.toLowerCase() : ''
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
@@ -141,8 +141,12 @@ class TokenDetails extends PureComponent {
     )
     const { latestRequest } = token
     const { latestRound, challengerDepositTime } = latestRequest
-    const submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
-    const challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    let submitterFees
+    let challengerFees
+    if (latestRequest && latestRound) {
+      submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
+      challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    }
 
     if (hasPendingRequest(token))
       if (latestRequest.disputed && !latestRequest.resolved) {
@@ -367,11 +371,15 @@ class TokenDetails extends PureComponent {
     })
     arbitrableTokenList.events
       .Evidence({ fromBlock: 0 })
-      .on('data', async () => {
+      .on('data', async e => {
         const { token } = this.state
         if (!token) return
 
         const { latestRequest } = token
+        if (
+          Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
+        )
+          return
         archon.arbitrable
           .getEvidence(
             arbitrableTokenList._address,
@@ -487,16 +495,19 @@ class TokenDetails extends PureComponent {
           tcrConstants,
           losingSide
         )
-        this.setState({
-          timestamp: block.timestamp,
-          countdown: new Date(time)
-        })
-        clearInterval(this.interval)
-        this.interval = setInterval(() => {
-          const { countdown } = this.state
-          if (countdown > 0)
-            this.setState({ countdown: new Date(countdown - 1000) })
-        }, 1000)
+        if (time < 94608000) {
+          // Very large duration for testing cases where the arbitrator doesn't have an appeal period
+          this.setState({
+            timestamp: block.timestamp,
+            countdown: new Date(time)
+          })
+          clearInterval(this.interval)
+          this.interval = setInterval(() => {
+            const { countdown } = this.state
+            if (countdown > 0)
+              this.setState({ countdown: new Date(countdown - 1000) })
+          }, 1000)
+        }
       })
     }
   }
@@ -641,22 +652,22 @@ class TokenDetails extends PureComponent {
                 Number(countdown) === 0
               ) && (
                 <span style={{ display: 'flex', alignItems: 'center' }}>
-                  <FontAwesomeIcon
-                    className="TokenDetails-icon"
-                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                    icon="clock"
-                  />
-                  <div className="BadgeDetails-timer">
-                    {token.latestRequest.dispute &&
-                    token.latestRequest.dispute.status ===
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                      ? 'Appeal '
-                      : 'Challenge '}
-                    Deadline{' '}
-                    {countdown instanceof Date
-                      ? countdown.toISOString().substr(11, 8)
-                      : '--:--:--'}
-                  </div>
+                  {!token.latestRequest.dispute && (
+                    <>
+                      <FontAwesomeIcon
+                        className="TokenDetails-icon"
+                        color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                        icon="clock"
+                      />
+                      <div className="BadgeDetails-timer">
+                        {`Challenge Deadline ${
+                          countdown instanceof Date
+                            ? countdown.toISOString().substr(11, 8)
+                            : '--:--:--'
+                        }`}
+                      </div>
+                    </>
+                  )}
                 </span>
               )}
             </div>

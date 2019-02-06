@@ -15,6 +15,8 @@ import ActionModal from '../containers/action-modal'
 import Identicon from '../components/identicon'
 import * as modalConstants from '../constants/modal'
 import * as modalActions from '../actions/modal'
+import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
+import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as walletSelectors from '../reducers/wallet'
 import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
@@ -42,7 +44,9 @@ class _ConnectedNavBar extends Component {
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,
     deleteNotification: PropTypes.func.isRequired,
-    closeNotificationsModal: PropTypes.func.isRequired
+    closeNotificationsModal: PropTypes.func.isRequired,
+    fetchArbitrableTokenListData: PropTypes.func.isRequired,
+    fetchArbitrableAddressListData: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
@@ -61,6 +65,15 @@ class _ConnectedNavBar extends Component {
     const { history, closeNotificationsModal } = this.props
     closeNotificationsModal()
     history.push(`/notifications`)
+  }
+
+  componentDidMount() {
+    const {
+      fetchArbitrableAddressListData,
+      fetchArbitrableTokenListData
+    } = this.props
+    fetchArbitrableTokenListData()
+    fetchArbitrableAddressListData()
   }
 
   render() {
@@ -115,7 +128,11 @@ const ConnectedNavBar = withRouter(
     {
       deleteNotification: notificationActions.deleteNotification,
       openActionModal: modalActions.openActionModal,
-      closeNotificationsModal: modalActions.closeNotificationsModal
+      closeNotificationsModal: modalActions.closeNotificationsModal,
+      fetchArbitrableAddressListData:
+        arbitrableAddressListActions.fetchArbitrableAddressListData,
+      fetchArbitrableTokenListData:
+        arbitrableTokenListActions.fetchArbitrableTokenListData
     }
   )(_ConnectedNavBar)
 )

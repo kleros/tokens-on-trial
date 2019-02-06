@@ -340,16 +340,17 @@ class ActionModal extends PureComponent {
     )
       losingSide = true
 
+    const { latestRound } = latestRequest
+    const { appealCost } = latestRound
     const {
-      arbitrationCost,
       loserStakeMultiplier,
       winnerStakeMultiplier,
       MULTIPLIER_PRECISION
     } = arbitrableTokenListData.data
 
-    const value = web3.utils.toBN(arbitrationCost).add(
+    const value = web3.utils.toBN(appealCost).add(
       web3.utils
-        .toBN(arbitrationCost)
+        .toBN(appealCost)
         .mul(
           web3.utils.toBN(
             losingSide ? loserStakeMultiplier : winnerStakeMultiplier
@@ -386,16 +387,17 @@ class ActionModal extends PureComponent {
     )
       losingSide = true
 
+    const { latestRound } = latestRequest
+    const { appealCost } = latestRound
     const {
-      arbitrationCost,
       loserStakeMultiplier,
       winnerStakeMultiplier,
       MULTIPLIER_PRECISION
     } = arbitrableAddressListData.data
 
-    const value = web3.utils.toBN(arbitrationCost).add(
+    const value = web3.utils.toBN(appealCost).add(
       web3.utils
-        .toBN(arbitrationCost)
+        .toBN(appealCost)
         .mul(
           web3.utils.toBN(
             losingSide ? loserStakeMultiplier : winnerStakeMultiplier
@@ -537,6 +539,7 @@ class ActionModal extends PureComponent {
                     item={token.data}
                     closeActionModal={closeActionModal}
                     fundAppeal={this.handleFundAppealClick}
+                    side={actionModalParam}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:
@@ -615,6 +618,7 @@ class ActionModal extends PureComponent {
                     item={token.data.badge}
                     badge
                     fundAppeal={this.handleFundAppealBadgeClick}
+                    side={actionModalParam}
                   />
                 )
               case modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge:

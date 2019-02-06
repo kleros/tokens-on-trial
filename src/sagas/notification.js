@@ -21,13 +21,13 @@ import { lessduxSaga } from '../utils/saga'
 import { action } from '../utils/action'
 import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
-import { contractStatusToClientStatus, getBlock } from '../utils/tcr'
+import { contractStatusToClientStatus } from '../utils/tcr'
 
 import { fetchToken } from './token'
 
 // Helpers
 const getBlockDate = memoizeOne(blockHash =>
-  getBlock(null, web3, blockHash, block => new Date(block.timestamp * 1000))
+  web3.eth.getBlock(blockHash).then(block => new Date(block.timestamp * 1000))
 )
 
 const emitNotifications = async (account, timeToChallenge, emitter, events) => {
@@ -44,30 +44,67 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     let message
     switch (Number(returnValues._status)) {
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
-      case tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested:
-        if (returnValues._disputed === true && isRequester)
-          message = 'Your request has been challenged.'
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested: {
+        if (
+          returnValues._disputed === true &&
+          returnValues._appealed === false &&
+          isRequester
+        )
+          message = `${
+            isRequester
+              ? 'Your token request has challenged.'
+              : 'You challenged a token request.'
+          }`
+        else if (
+          returnValues._disputed === true &&
+          returnValues._appealed === true &&
+          isRequester
+        )
+          message = `${
+            isRequester
+              ? 'An appeal was raised on your token request.'
+              : 'An appeal was raised on a request you challenged.'
+          }`
         else if (returnValues._disputed === false)
           oldestNonDisputedSubmittedStatusEvent = event
         break
-      case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered:
+      }
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered: {
         if (returnValues._disputed === false)
           message = `${
             isRequester
-              ? 'Your registration request'
-              : 'A registration request you challenged'
+              ? 'Your token registration request'
+              : 'A token registration request you challenged'
+          } has been executed.`
+        else
+          message = `${
+            isRequester
+              ? 'Your challenged token registration request'
+              : 'A token registration request you challenged'
           } has been executed.`
         break
-      case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent:
+      }
+      case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent: {
         if (returnValues._disputed === false)
           message = `${
             isRequester
-              ? 'Your clearing request'
-              : 'A clearing request you challenged'
-          } has been rejected.`
+              ? 'Your token clearing request'
+              : 'A token clearing request you challenged'
+          } has been executed.`
+        else
+          message = `${
+            isRequester
+              ? 'Your token clearing request'
+              : 'A token clearing request you challenged'
+          } has been refused.`
         break
-      default:
+      }
+      default: {
+        console.info('Unhandled notification: ', returnValues)
+        console.info('isRequester', isRequester)
+        console.info('account', account)
         break
+      }
     }
 
     const clientStatus = contractStatusToClientStatus(
@@ -78,10 +115,10 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     if (message) {
       notifiedIDs[returnValues._tokenID] =
         returnValues._disputed === true &&
-        returnValues._status ===
-          tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
-        returnValues._status ===
-          tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
+        (returnValues._status ===
+          tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
+          returnValues._status ===
+            tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested)
           ? 'disputed'
           : true
 
@@ -106,7 +143,8 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
       emitter({
         ID: oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID,
         date,
-        message: 'Token pending execution.'
+        message: 'Token request pending execution.',
+        clientStatus: oldestNonDisputedSubmittedStatusEvent.returnValues._status
       })
   }
 
@@ -161,7 +199,6 @@ function* pushNotificationsListener() {
         take(walletActions.accounts.RECEIVE), // Accounts refetch
         take(arbitrableTokenListActions.arbitrableTokenListData.RECEIVE) // Arbitrable token list data refetch
       ])
-
       if (accounts || arbitrableTokenListData) continue // Possible account or time to challenge change
 
       // Put new notification
@@ -171,8 +208,10 @@ function* pushNotificationsListener() {
               collectionMod: {
                 collection: tokenActions.tokens.self,
                 resource: yield call(fetchToken, {
-                  payload: { ID: notification }
-                })
+                  payload: { ID: notification, withDisputeData: true }
+                }),
+                updating: notification,
+                find: d => d.ID === notification
               }
             })
           : action(notificationActions.notification.RECEIVE, {

@@ -15,7 +15,9 @@ import './sort-bar.css'
 class SortBar extends PureComponent {
   static propTypes = {
     // Redux State
-    tokens: tokenSelectors.tokensShape.isRequired,
+    tokens: PropTypes.shape({
+      data: PropTypes.arrayOf(tokenSelectors._tokenShape.isRequired)
+    }).isRequired,
     filter: filterSelectors.filterShape.isRequired,
 
     // Action Dispatchers

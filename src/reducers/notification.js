@@ -7,7 +7,8 @@ import { arbitrableTokenList } from '../bootstrap/dapp-api'
 export const _notificationShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
   date: PropTypes.instanceOf(Date).isRequired,
-  message: PropTypes.string.isRequired
+  message: PropTypes.string.isRequired,
+  clientStatus: PropTypes.string.isRequired
 })
 export const _notificationsShape = PropTypes.arrayOf(
   _notificationShape.isRequired
@@ -26,7 +27,7 @@ export { notificationsShape, notificationShape }
 
 // Reducer
 const cachedNotifications = localStorage.getItem(
-  `${arbitrableTokenList.options.address}notifications`
+  arbitrableTokenList.options.address + 'notifications'
 )
 export default createReducer({
   notifications: {

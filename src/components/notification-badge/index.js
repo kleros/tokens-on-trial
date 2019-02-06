@@ -56,6 +56,7 @@ class NotificationBadge extends PureComponent {
 
     if (!notifications.data) return null
 
+    const acc = {} // Used to remove duplicated notifications.
     const hasNotifications = notifications.data.length > 0
     const useMaxShown = maxShown && notifications.data.length > maxShown
     return (
@@ -80,52 +81,62 @@ class NotificationBadge extends PureComponent {
               {(useMaxShown
                 ? notifications.data.slice(0, maxShown)
                 : notifications.data
-              ).map((n, i) => (
-                <div
-                  className="NotificationBadge-notifications-notification"
-                  id={n.ID}
-                  key={n.ID + i}
-                  onClick={onNotificationClick}
-                >
-                  <FontAwesomeIcon
-                    className="NotificationBadge-notifications-notification-icon"
-                    color={
-                      n.clientStatus
-                        ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                        : tcrConstants.STATUS_COLOR_ENUM[0]
-                    }
-                    icon={
-                      n.clientStatus
-                        ? tcrConstants.STATUS_ICON_ENUM[n.clientStatus]
-                        : 'bell'
-                    }
-                    size="lg"
-                  />
-                  <div className="NotificationBadge-notifications-notification-content">
-                    <div className="NotificationBadge-notifications-notification-content-message">
-                      {n.message}
-                    </div>
-                    <div
-                      className="NotificationBadge-notifications-notification-content-footer"
-                      style={{
-                        color: n.clientStatus
+              )
+                .filter(n => {
+                  // Filter out repeated notifications.
+                  if (!acc[n.ID]) {
+                    acc[n.ID] = true
+                    return true
+                  }
+                  return false
+                })
+                .map((n, i) => (
+                  <div
+                    className="NotificationBadge-notifications-notification"
+                    id={n.ID}
+                    key={n.ID + i}
+                    onClick={onNotificationClick}
+                  >
+                    <FontAwesomeIcon
+                      className="NotificationBadge-notifications-notification-icon"
+                      color={
+                        n.clientStatus
                           ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
                           : tcrConstants.STATUS_COLOR_ENUM[0]
-                      }}
-                    >
-                      <TimeAgo datetime={n.date} />
+                      }
+                      icon={
+                        n.clientStatus
+                          ? tcrConstants.STATUS_ICON_ENUM[n.clientStatus]
+                          : 'bell'
+                      }
+                      size="lg"
+                    />
+                    <div className="NotificationBadge-notifications-notification-content">
+                      <div className="NotificationBadge-notifications-notification-content-message">
+                        {n.message}
+                      </div>
+                      <div
+                        className="NotificationBadge-notifications-notification-content-footer"
+                        style={{
+                          color: n.clientStatus
+                            ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
+                            : tcrConstants.STATUS_COLOR_ENUM[0]
+                        }}
+                      >
+                        <TimeAgo datetime={n.date} />
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              {useMaxShown && (
-                <div
-                  className="NotificationBadge-notifications-showAll"
-                  onClick={onShowAll}
-                >
-                  <div className="NotificationBadge-notifications-showAll-down" />
-                </div>
-              )}
+                ))}
+              {useMaxShown &&
+              false && ( // TODO: remove false flag once notifications view is implemented
+                  <div
+                    className="NotificationBadge-notifications-showAll"
+                    onClick={onShowAll}
+                  >
+                    <div className="NotificationBadge-notifications-showAll-down" />
+                  </div>
+                )}
             </div>
           </div>
         )}

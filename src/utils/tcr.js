@@ -4,6 +4,7 @@ export const hasPendingRequest = ({ status, clientStatus, latestRequest }) => {
   if (clientStatus === tcrConstants.STATUS_ENUM.Pending) return true
   if (latestRequest && latestRequest.disputed && !latestRequest.resolved)
     return true
+
   switch (status) {
     case tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']:
     case tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']:
