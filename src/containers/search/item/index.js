@@ -8,13 +8,11 @@ import './item.css'
 
 const SearchItem = ({ onClick, item }) => (
   <li onClick={onClick} className="SearchItem">
-    {item.imgSrc && (
-      <Img
-        className="SearchItem-symbol"
-        alt="submission-symbol"
-        src={item.imgSrc}
-      />
-    )}
+    <Img
+      className="SearchItem-symbol"
+      alt="submission-symbol"
+      src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${item.imgSrc}`}
+    />
     <div className="SearchItem-text">
       <span className="SearchItem-text-title">
         {item.name} ({item.ticker})

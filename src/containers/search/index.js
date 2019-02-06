@@ -36,7 +36,8 @@ class SearchBar extends PureComponent {
           tokenID: returnValues._tokenID,
           name: returnValues._name,
           ticker: returnValues._ticker,
-          address: returnValues._addr
+          address: returnValues._address,
+          imgSrc: returnValues._symbolMultihash
         })
       }
     )
@@ -65,7 +66,7 @@ class SearchBar extends PureComponent {
           }) => (
             <div className="SearchBar-box">
               <input {...getInputProps()} className="SearchBar-input" />
-              {isOpen && (
+              {isOpen && inputValue.length > 0 && (
                 <ul {...getMenuProps()} className="SearchBar-results">
                   {isOpen
                     ? tokenSubmissions
