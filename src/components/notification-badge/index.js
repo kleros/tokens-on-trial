@@ -57,8 +57,17 @@ class NotificationBadge extends PureComponent {
     if (!notifications.data) return null
 
     const acc = {} // Used to remove duplicated notifications.
-    const hasNotifications = notifications.data.length > 0
-    const useMaxShown = maxShown && notifications.data.length > maxShown
+    const filteredNotif = notifications.data.filter(n => {
+      // Filter out repeated notifications.
+      if (!acc[n.ID]) {
+        acc[n.ID] = true
+        return true
+      }
+      return false
+    })
+
+    const hasNotifications = filteredNotif.length > 0
+    const useMaxShown = maxShown && filteredNotif.length > maxShown
     return (
       <div
         className="NotificationBadge"
@@ -66,9 +75,7 @@ class NotificationBadge extends PureComponent {
       >
         {children}
         {hasNotifications && (
-          <div className="NotificationBadge-badge">
-            {notifications.data.length}
-          </div>
+          <div className="NotificationBadge-badge">{filteredNotif.length}</div>
         )}
         {hasNotifications && isNotificationsModalOpen && (
           <div>
@@ -78,10 +85,7 @@ class NotificationBadge extends PureComponent {
                 Notifications
               </h4>
               <hr style={{ margin: 0, marginBottom: '15px' }} />
-              {(useMaxShown
-                ? notifications.data.slice(0, maxShown)
-                : notifications.data
-              )
+              {(useMaxShown ? filteredNotif.slice(0, maxShown) : filteredNotif)
                 .filter(n => {
                   // Filter out repeated notifications.
                   if (!acc[n.ID]) {
