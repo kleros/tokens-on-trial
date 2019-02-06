@@ -1,0 +1,28 @@
+@import '../../styles/_colors.scss';
+
+/* @define SearchBar */
+.SearchBar {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  margin: 19px 0;
+
+  &-box {
+    display: flex;
+  }
+
+  &-input {
+    border: none;
+    font-size: 0.9em;
+    margin-left: 10px;
+    outline: none;
+  }
+
+  &-results {
+    background-color: white;
+    margin-left: 10px;
+    padding: 0;
+    position: absolute;
+    z-index: 1;
+  }
+}

@@ -168,7 +168,6 @@ function* pushNotificationsListener() {
     const timeToChallenge = yield select(
       arbitrableTokenListSelectors.getTimeToChallenge
     ) // Cache current time to challenge
-    console.info('arbitrableTokenList Time to Challenge', timeToChallenge)
 
     // Set up event channel with subscriber
     const channel = eventChannel(emitter => {

@@ -3,6 +3,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
 import Button from '../../components/button'
+import SearchBar from '../search'
 import * as filterConstants from '../../constants/filter'
 import './filter-bar.css'
 
@@ -59,10 +60,7 @@ class FilterBar extends Component {
     return (
       <div>
         <div className="FilterBar">
-          <div className="FilterBar-search">
-            <FontAwesomeIcon icon="search" />
-            <input className="FilterBar-search-input" placeholder="Search" />
-          </div>
+          <SearchBar />
           <div className="FilterBar-filter" onClick={this.toggleFilterOptions}>
             <div className="FilterBar-filter-label">Filter:</div>
             <div className="FilterBar-filter-choice">All</div>

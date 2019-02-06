@@ -78,7 +78,6 @@ class NotificationBadge extends PureComponent {
                 Notifications
               </h4>
               <hr style={{ margin: 0, marginBottom: '15px' }} />
-              {console.info(notifications.data)}
               {(useMaxShown
                 ? notifications.data.slice(0, maxShown)
                 : notifications.data

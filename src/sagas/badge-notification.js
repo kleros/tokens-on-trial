@@ -167,14 +167,6 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     const date = await getBlockDate(
       oldestNonDisputedSubmittedStatusEvent.blockHash
     )
-    console.info(
-      'date ',
-      date,
-      ' timeToChallenge ',
-      timeToChallenge,
-      ' Date.now() ',
-      Date.now()
-    )
     if (Date.now() - date > timeToChallenge)
       emitter({
         ID: oldestNonDisputedSubmittedStatusEvent.tokenID,
@@ -204,7 +196,6 @@ function* pushNotificationsListener() {
     const timeToChallenge = yield select(
       arbitrableAddressListSelectors.getTimeToChallenge
     ) // Cache current time to challenge
-    console.info('timeToChallenge', timeToChallenge)
 
     // Set up event channel with subscriber
     const channel = eventChannel(emitter => {
