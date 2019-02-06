@@ -166,7 +166,7 @@ class ActionModal extends PureComponent {
     clearBadge({ tokenData: token.data, value })
   }
 
-  handleOnFileDropAccepted = async ([file]) => {
+  handleOnFileDropAccepted = ([file]) => {
     if (file.size > 5e6)
       return this.setState({
         file: null,
@@ -179,7 +179,7 @@ class ActionModal extends PureComponent {
     })
   }
 
-  handleSubmitEvidenceClick = async evidence => {
+  handleSubmitEvidenceClick = evidence => {
     const { submitTokenEvidence, closeActionModal, token } = this.props
     const { file } = this.state
 
@@ -192,7 +192,7 @@ class ActionModal extends PureComponent {
     closeActionModal()
   }
 
-  handleSubmitEvidenceBadgeClick = async evidence => {
+  handleSubmitEvidenceBadgeClick = evidence => {
     const {
       submitBadgeEvidence,
       closeActionModal,
