@@ -1,0 +1,13 @@
+@import '../../../styles/_colors.scss';
+
+/* @define SearchItem */
+.SearchItem {
+  cursor: pointer;
+  list-style-type: none;
+  padding: 10px;
+  width: 250px;
+
+  &:hover {
+    background-color: $darkerGrey;
+  }
+}

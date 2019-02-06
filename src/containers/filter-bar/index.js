@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import Button from '../../components/button'
 import SearchBar from '../search'
 import * as filterConstants from '../../constants/filter'
+
 import './filter-bar.css'
 
 class FilterButton extends PureComponent {

@@ -6,6 +6,8 @@ import PropTypes from 'prop-types'
 
 import { arbitrableTokenList } from '../../bootstrap/dapp-api'
 
+import Item from './item'
+
 import './search-bar.css'
 
 class SearchBar extends PureComponent {
@@ -61,9 +63,7 @@ class SearchBar extends PureComponent {
             getItemProps,
             getMenuProps,
             isOpen,
-            inputValue,
-            highlightedIndex,
-            selectedItem
+            inputValue
           }) => (
             <div className="SearchBar-box">
               <input {...getInputProps()} className="SearchBar-input" />
@@ -77,23 +77,15 @@ class SearchBar extends PureComponent {
                           item.searchVal.includes(inputValue.toLowerCase())
                       )
                       .map((item, index) => (
-                        <li
+                        <Item
                           {...getItemProps({
                             key: index,
                             index,
-                            item,
-                            style: {
-                              backgroundColor:
-                                highlightedIndex === index
-                                  ? 'lightgray'
-                                  : 'white',
-                              fontWeight:
-                                selectedItem === item ? 'bold' : 'normal'
-                            }
+                            item
                           })}
                         >
                           {item.value}
-                        </li>
+                        </Item>
                       ))
                   : null}
               </ul>
