@@ -35,11 +35,12 @@ class SearchBar extends PureComponent {
           searchVal: returnValues._name.toLowerCase(),
           tokenID: returnValues._tokenID
         })
-        tokenSubmissions.push({
-          value: returnValues._ticker,
-          searchVal: returnValues._ticker.toLowerCase(),
-          tokenID: returnValues._tokenID
-        })
+        if (returnValues._name !== returnValues._ticker)
+          tokenSubmissions.push({
+            value: returnValues._ticker,
+            searchVal: returnValues._ticker.toLowerCase(),
+            tokenID: returnValues._tokenID
+          })
       }
     )
   }
