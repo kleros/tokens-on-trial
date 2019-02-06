@@ -71,7 +71,6 @@ class SearchBar extends PureComponent {
                     ? tokenSubmissions
                         .filter(
                           item =>
-                            inputValue &&
                             inputValue.length > 0 &&
                             (item.name
                               .toLowerCase()

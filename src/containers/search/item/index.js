@@ -8,11 +8,13 @@ import './item.css'
 
 const SearchItem = ({ onClick, item }) => (
   <li onClick={onClick} className="SearchItem">
-    <Img
-      className="SearchItem-symbol"
-      alt="submission-symbol"
-      src={item.imgSrc}
-    />
+    {item.imgSrc && (
+      <Img
+        className="SearchItem-symbol"
+        alt="submission-symbol"
+        src={item.imgSrc}
+      />
+    )}
     <div className="SearchItem-text">
       <span className="SearchItem-text-title">
         {item.name} ({item.ticker})
