@@ -144,6 +144,7 @@ class Tokens extends Component {
         <FilterBar
           filter={filters}
           handleFilterChange={this.handleFilterChange}
+          filterVisible
         />
         <SortBar />
         <div className="TokenGrid">

@@ -42,7 +42,12 @@ class FilterBar extends Component {
     filter: PropTypes.shape({}).isRequired,
 
     // Handlers
-    handleFilterChange: PropTypes.func.isRequired
+    handleFilterChange: PropTypes.func.isRequired,
+    filterVisible: PropTypes.bool
+  }
+
+  static defaultProps = {
+    filterVisible: false
   }
 
   state = {
@@ -55,18 +60,23 @@ class FilterBar extends Component {
   }
 
   render() {
-    const { filter, handleFilterChange } = this.props
+    const { filter, handleFilterChange, filterVisible } = this.props
     const { filterOptionsVisible } = this.state
 
     return (
       <>
         <div className="FilterBar">
           <SearchBar />
-          <div className="FilterBar-filter" onClick={this.toggleFilterOptions}>
-            <div className="FilterBar-filter-label">Filter:</div>
-            <div className="FilterBar-filter-choice">All</div>
-            <FontAwesomeIcon icon="filter" size="xs" />
-          </div>
+          {filterVisible && (
+            <div
+              className="FilterBar-filter"
+              onClick={this.toggleFilterOptions}
+            >
+              <div className="FilterBar-filter-label">Filter:</div>
+              <div className="FilterBar-filter-choice">All</div>
+              <FontAwesomeIcon icon="filter" size="xs" />
+            </div>
+          )}
         </div>
         <hr className="FilterBar-separator" />
         {filterOptionsVisible && (
