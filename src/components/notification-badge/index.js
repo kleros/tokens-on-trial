@@ -56,18 +56,8 @@ class NotificationBadge extends PureComponent {
 
     if (!notifications.data) return null
 
-    const acc = {} // Used to remove duplicated notifications.
-    const filteredNotif = notifications.data.filter(n => {
-      // Filter out repeated notifications.
-      if (!acc[n.ID]) {
-        acc[n.ID] = true
-        return true
-      }
-      return false
-    })
-
-    const hasNotifications = filteredNotif.length > 0
-    const useMaxShown = maxShown && filteredNotif.length > maxShown
+    const hasNotifications = notifications.data.length > 0
+    const useMaxShown = false
     return (
       <div
         className="NotificationBadge"
@@ -75,7 +65,9 @@ class NotificationBadge extends PureComponent {
       >
         {children}
         {hasNotifications && (
-          <div className="NotificationBadge-badge">{filteredNotif.length}</div>
+          <div className="NotificationBadge-badge">
+            {notifications.data.length}
+          </div>
         )}
         {hasNotifications && isNotificationsModalOpen && (
           <div>
@@ -85,16 +77,11 @@ class NotificationBadge extends PureComponent {
                 Notifications
               </h4>
               <hr style={{ margin: 0, marginBottom: '15px' }} />
-              {(useMaxShown ? filteredNotif.slice(0, maxShown) : filteredNotif)
-                .filter(n => {
-                  // Filter out repeated notifications.
-                  if (!acc[n.ID]) {
-                    acc[n.ID] = true
-                    return true
-                  }
-                  return false
-                })
-                .map((n, i) => (
+              <div className="NotificationBadge-notifications-box">
+                {(useMaxShown
+                  ? notifications.data.slice(0, maxShown)
+                  : notifications.data
+                ).map((n, i) => (
                   <div
                     className="NotificationBadge-notifications-notification"
                     id={n.ID}
@@ -132,15 +119,16 @@ class NotificationBadge extends PureComponent {
                     </div>
                   </div>
                 ))}
-              {useMaxShown &&
-              false && ( // TODO: remove false flag once notifications view is implemented
-                  <div
-                    className="NotificationBadge-notifications-showAll"
-                    onClick={onShowAll}
-                  >
-                    <div className="NotificationBadge-notifications-showAll-down" />
-                  </div>
-                )}
+                {useMaxShown &&
+                false && ( // TODO: remove false flag once notifications view is implemented
+                    <div
+                      className="NotificationBadge-notifications-showAll"
+                      onClick={onShowAll}
+                    >
+                      <div className="NotificationBadge-notifications-showAll-down" />
+                    </div>
+                  )}
+              </div>
             </div>
           </div>
         )}
