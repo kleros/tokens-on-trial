@@ -26,12 +26,8 @@
   cursor: pointer;
   display: inline-flex;
   max-width: 100%;
-  padding: 0 2em;
+  padding: 0 1em;
   user-select: none;
-
-  @media only screen and (min-width: 800px) {
-    padding: 0 1.5em;
-  }
 
   @include buttonType(
     'primary',
