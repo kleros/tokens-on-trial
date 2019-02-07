@@ -167,7 +167,7 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
     const date = await getBlockDate(
       oldestNonDisputedSubmittedStatusEvent.blockHash
     )
-    if (Date.now() - date > timeToChallenge)
+    if (timeToChallenge && Date.now() - date > timeToChallenge)
       emitter({
         ID: oldestNonDisputedSubmittedStatusEvent.tokenID,
         date,
