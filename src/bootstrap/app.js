@@ -54,11 +54,16 @@ class _ConnectedNavBar extends Component {
     openActionModal(modalConstants.ACTION_MODAL_ENUM.Submit)
   }
 
-  handleNotificationClick = ({ currentTarget: { id } }) => {
+  handleNotificationClick = ({ ID, addr, badgeAddr }) => {
     const { deleteNotification, history, closeNotificationsModal } = this.props
-    deleteNotification(id)
+    if (!badgeAddr) {
+      deleteNotification(ID)
+      history.push(`/token/${ID}`)
+    } else {
+      deleteNotification(addr)
+      history.push(`/badge/${badgeAddr}/${addr}`)
+    }
     closeNotificationsModal()
-    history.push(`/token/${id}`)
   }
 
   handleShowAllClick = () => {
@@ -78,6 +83,7 @@ class _ConnectedNavBar extends Component {
 
   render() {
     const { accounts, notifications } = this.props
+
     return (
       <NavBar
         extras={[
@@ -154,7 +160,7 @@ const App = ({ store, history }) => (
               <Route
                 component={BadgeDetails}
                 exact
-                path="/token/:tokenID/badge/:badgeAddr"
+                path="/badge/:badgeAddr/:tokenAddr"
               />
               <Route component={PageNotFound} exact path="/notifications" />
               <Route component={PageNotFound} />

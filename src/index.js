@@ -4,7 +4,10 @@ import ReactDOM from 'react-dom'
 import configureStore from './bootstrap/configure-store'
 import App from './bootstrap/app'
 import registerServiceWorker from './bootstrap/register-service-worker'
-import { arbitrableTokenList } from './bootstrap/dapp-api'
+import {
+  arbitrableTokenList,
+  arbitrableAddressList
+} from './bootstrap/dapp-api'
 
 const { store, history } = configureStore()
 export default store
@@ -24,7 +27,8 @@ registerServiceWorker()
 
 window.addEventListener('unload', () => {
   localStorage.setItem(
-    `${arbitrableTokenList.options.address}notifications`,
+    `${arbitrableTokenList.options.address +
+      arbitrableAddressList.options.address}notifications`,
     JSON.stringify(store.getState().notification.notifications.data)
   )
   localStorage.setItem(

@@ -44,7 +44,7 @@ const SubmitEvidence = ({
       </Button>
       <Button
         className="Submit-request"
-        disabled={evidenceFormIsInvalid || !file}
+        disabled={evidenceFormIsInvalid}
         onClick={submitEvidenceForm}
         type="primary"
       >

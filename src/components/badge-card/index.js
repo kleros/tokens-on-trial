@@ -45,7 +45,7 @@ const BadgeCard = ({ token }) => (
     </div>
     <Link
       className="BadgeCard-content"
-      to={`/token/${token.ID}/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}`}
+      to={`/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}/${token.addr}`}
     >
       <Img
         alt="Badge List Submission"

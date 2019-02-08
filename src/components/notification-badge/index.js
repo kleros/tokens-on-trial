@@ -54,8 +54,6 @@ class NotificationBadge extends PureComponent {
       isNotificationsModalOpen
     } = this.props
 
-    if (!notifications.data) return null
-
     const hasNotifications = notifications.data.length > 0
     const useMaxShown = false
     return (
@@ -81,13 +79,20 @@ class NotificationBadge extends PureComponent {
                 {(useMaxShown
                   ? notifications.data.slice(0, maxShown)
                   : notifications.data
-                ).map((n, i) => (
+                ).map((n, i /* eslint-disable react/jsx-no-bind */) => (
                   <div
                     className="NotificationBadge-notifications-notification"
-                    id={n.ID}
-                    key={n.ID + i}
-                    onClick={onNotificationClick}
+                    id={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
+                    key={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
+                    onClick={() =>
+                      onNotificationClick({
+                        ID: n.ID,
+                        addr: n.addr,
+                        badgeAddr: n.badgeAddr
+                      })
+                    }
                   >
+                    {/* eslint-enable */}
                     <FontAwesomeIcon
                       className="NotificationBadge-notifications-notification-icon"
                       color={

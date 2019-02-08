@@ -22,25 +22,23 @@ class SearchBar extends PureComponent {
   }
 
   componentDidMount() {
-    arbitrableTokenList.events.TokenSubmitted(
-      { fromBlock: 0 },
-      (err, { returnValues }) => {
-        if (err) {
-          console.error('Error fetching token submission: ', err)
-          return
-        }
-        const { tokenSubmissions } = this.state
-        tokenSubmissions.push({
-          value: returnValues._name,
-          searchVal: returnValues._name.toLowerCase(),
-          tokenID: returnValues._tokenID,
-          name: returnValues._name,
-          ticker: returnValues._ticker,
-          address: returnValues._address,
-          imgSrc: returnValues._symbolMultihash
-        })
+    arbitrableTokenList.events.TokenSubmitted({ fromBlock: 0 }, (err, data) => {
+      if (err) {
+        console.error('Error fetching token submission: ', err)
+        return
       }
-    )
+      const { returnValues } = data
+      const { tokenSubmissions } = this.state
+      tokenSubmissions.push({
+        value: returnValues._name,
+        searchVal: returnValues._name.toLowerCase(),
+        tokenID: returnValues._tokenID,
+        name: returnValues._name,
+        ticker: returnValues._ticker,
+        address: returnValues._address,
+        imgSrc: returnValues._symbolMultihash
+      })
+    })
   }
 
   itemClicked = selection => {

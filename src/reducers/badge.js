@@ -31,21 +31,27 @@ export const _badgeShape = PropTypes.shape({
     })
   }).isRequired
 })
+export const _badgesShape = PropTypes.arrayOf(_badgeShape.isRequired)
 
-// Shape
+// Shapes
+const { shape: badgesShape, initialState: badgesInitialState } = createResource(
+  _badgesShape
+)
 const { shape: badgeShape, initialState: badgeInitialState } = createResource(
   _badgeShape,
   { withCreate: true, withUpdate: true }
 )
-export { badgeShape }
+export { badgesShape, badgeShape }
 
 // Reducer
 export default createReducer({
+  badges: badgesInitialState,
   badge: badgeInitialState
 })
 
 // Selectors
-export const getBadgeDisputeID = state =>
+export const getTokens = state => state.badge.badges.data
+export const getTokenDisputeID = state =>
   state.badge.badge.data && state.badge.badge.data.disputeID
-export const getBadgeAppealCost = state =>
+export const getTokenAppealCost = state =>
   state.badge.badge.data && state.badge.badge.data.appealCost

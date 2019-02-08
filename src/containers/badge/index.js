@@ -24,7 +24,7 @@ import { truncateMiddle, getRemainingTime } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
-import * as tokenActions from '../../actions/token'
+import * as badgeActions from '../../actions/badge'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
@@ -40,12 +40,7 @@ class BadgeDetails extends PureComponent {
     accounts: walletSelectors.accountsShape.isRequired,
     arbitrableAddressListData:
       arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
-    token: PropTypes.shape({
-      name: PropTypes.string,
-      ticker: PropTypes.string,
-      addr: PropTypes.string,
-      URI: PropTypes.string
-    }),
+    badge: PropTypes.shape({}),
     match: PropTypes.shape({
       params: PropTypes.shape({
         tokenID: PropTypes.string
@@ -53,15 +48,15 @@ class BadgeDetails extends PureComponent {
     }),
 
     // Functions
-    badgeTimeout: PropTypes.func.isRequired,
-    fetchToken: PropTypes.func.isRequired,
+    timeout: PropTypes.func.isRequired,
+    fetchBadge: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired
   }
 
   static defaultProps = {
     match: {},
-    token: null
+    badge: null
   }
 
   state = {
@@ -83,15 +78,15 @@ class BadgeDetails extends PureComponent {
   }
 
   handleExecuteRequestClick = () => {
-    const { badgeTimeout, token, openActionModal } = this.props
+    const { timeout, badge, openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
-    badgeTimeout(token)
+    timeout(badge.addr)
   }
 
   handleFeesTimeoutClick = () => {
-    const { badgeTimeout, token, openActionModal } = this.props
+    const { timeout, badge, openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
-    badgeTimeout(token)
+    timeout(badge)
   }
 
   handleOpenEvidenceModal = () => {
@@ -109,7 +104,7 @@ class BadgeDetails extends PureComponent {
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
-  getActionButton = (token, userAccount) => {
+  getActionButton = (item, userAccount) => {
     const { arbitrableAddressListData } = this.props
     const { timestamp, countdown } = this.state
     let method
@@ -118,11 +113,10 @@ class BadgeDetails extends PureComponent {
     let icon = 'spinner'
 
     if (
-      !token ||
-      !token.badge ||
+      !item ||
       !arbitrableAddressListData.data ||
-      token.creating ||
-      token.updating
+      item.creating ||
+      item.updating
     )
       return (
         <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
@@ -137,8 +131,7 @@ class BadgeDetails extends PureComponent {
     const arbitrationFeesWaitingTime = Number(
       arbitrableAddressListData.data.arbitrationFeesWaitingTime
     )
-    const { badge } = token
-    const { latestRequest } = badge
+    const { latestRequest } = item
     const { latestRound, challengerDepositTime } = latestRequest
     let submitterFees
     let challengerFees
@@ -147,7 +140,7 @@ class BadgeDetails extends PureComponent {
       challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
     }
 
-    if (hasPendingRequest(badge))
+    if (hasPendingRequest(item))
       if (latestRequest.disputed && !latestRequest.resolved) {
         icon = 'hourglass-half'
         disabled = true
@@ -278,13 +271,12 @@ class BadgeDetails extends PureComponent {
           this.handleActionClick(
             modalConstants.ACTION_MODAL_ENUM.ChallengeBadge
           )
-        if (isRegistrationRequest(token.badge.status))
-          label = 'Challenge Addition'
+        if (isRegistrationRequest(item.status)) label = 'Challenge Addition'
         else label = 'Challenge Removal'
       }
     else {
       disabled = false
-      if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
+      if (item.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
         method = () =>
           this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.ClearBadge)
         label = 'Remove Badge'
@@ -311,22 +303,20 @@ class BadgeDetails extends PureComponent {
   }
 
   initCountDown = async () => {
-    const { arbitrableAddressListData, token, accounts } = this.props
+    const { arbitrableAddressListData, badge, accounts } = this.props
     const { countdown, listeningForEvidence } = this.state
-    this.setState({ token })
+    this.setState({ badge })
 
     if (
-      token &&
-      token.badge &&
-      hasPendingRequest(token.badge) &&
+      badge &&
+      hasPendingRequest(badge) &&
       countdown === null &&
       arbitrableAddressListData &&
       arbitrableAddressListData.data &&
       arbitrator &&
       arbitrableAddressList
     ) {
-      this.setState({ countdown: 'Loading...', token })
-      const { badge } = token
+      this.setState({ countdown: 'Loading...', badge })
       const { latestRequest } = badge
 
       if (!listeningForEvidence && latestRequest && latestRequest.disputed)
@@ -409,22 +399,21 @@ class BadgeDetails extends PureComponent {
   }
 
   componentDidMount() {
-    const { match, fetchToken } = this.props
-    const { tokenID } = match.params
-    fetchToken(tokenID)
+    const { match, fetchBadge } = this.props
+    const { tokenAddr } = match.params
+    fetchBadge(tokenAddr)
     arbitrableAddressList.events.AddressStatusChange().on('data', event => {
-      const { token } = this.state
-      if (!token) return
-
-      if (token.addr === event.returnValues._address) {
+      const { tokenAddr } = match.params
+      if (tokenAddr === event.returnValues._address) {
         clearInterval(this.interval)
         this.setState({ countdown: null })
-        fetchToken(tokenID)
+        fetchBadge(tokenAddr)
       }
     })
     arbitrator.events.AppealPossible().on('data', event => {
-      const { token } = this.state
-      const { latestRequest } = token.badge
+      const { badge } = this.state
+      if (!badge) return
+      const { latestRequest } = badge
 
       if (
         latestRequest.disputeID === Number(event.returnValues._disputeID) ||
@@ -432,15 +421,16 @@ class BadgeDetails extends PureComponent {
       ) {
         clearInterval(this.interval)
         this.setState({ countdown: null })
-        fetchToken(tokenID)
+        fetchBadge(tokenAddr)
       }
     })
     arbitrableAddressList.events
       .Evidence({ fromBlock: 0 })
       .on('data', async e => {
-        const { token } = this.state
-        if (!token || !token.badge) return
-        const { latestRequest } = token.badge
+        const { badge } = this.state
+        if (!badge) return
+        const { latestRequest } = badge
+
         if (
           Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
         )
@@ -472,9 +462,8 @@ class BadgeDetails extends PureComponent {
           )
       })
     arbitrableAddressList.events.Ruling().on('data', event => {
-      const { token } = this.state
-      if (!token || !token.badge) return
-      const { badge } = token
+      const { badge } = this.state
+      if (!badge) return
       const { latestRequest } = badge
       if (
         latestRequest.disputed &&
@@ -484,19 +473,16 @@ class BadgeDetails extends PureComponent {
       ) {
         clearInterval(this.interval)
         this.setState({ countdown: null })
-        fetchToken(tokenID)
+        fetchBadge(tokenAddr)
       }
     })
     arbitrableAddressList.events
       .Contribution({ fromBlock: 0 })
       .on('data', async e => {
-        const { token } = this.state
-        if (!token || !token.badge) return
-
-        if (e.returnValues._address === token.addr) {
+        if (e.returnValues._address === tokenAddr) {
           clearInterval(this.interval)
           this.setState({ countdown: null })
-          fetchToken(tokenID)
+          fetchBadge(tokenAddr)
         }
       })
   }
@@ -509,28 +495,27 @@ class BadgeDetails extends PureComponent {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { token } = nextProps
-    if (!token) return
-    else this.setState({ token })
+    const { badge } = nextProps
+    if (!badge) return
+    else this.setState({ badge })
     this.initCountDown()
   }
 
   render() {
     const { countdown, evidences } = this.state
-    const { token, accounts, filter, match } = this.props
+    const { badge, accounts, filter, match } = this.props
     const { filters } = filter
-    const { tokenID } = match.params
+    const { tokenAddr } = match.params
 
-    if (!token || !token.badge)
+    if (!badge)
       return (
         <div className="Page">
           <h5>Loading...</h5>
         </div>
       )
 
-    if (token.ID !== tokenID) return window.location.reload()
+    if (badge.addr !== tokenAddr) return window.location.reload()
 
-    const { badge } = token
     return (
       <div className="Page">
         <FilterBar
@@ -538,15 +523,21 @@ class BadgeDetails extends PureComponent {
           handleFilterChange={this.handleFilterChange}
         />
         <div className="BadgeDetails-header">
-          <h3 className="BadgeDetails-header-title">Badge Details</h3>
-          <Img
-            className="BadgeDetails-header-img"
-            src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-              token.symbolMultihash
-            }`}
-          />
-          <h4 className="BadgeDetails-label-name">{token.name}</h4>
-          <h4 className="BadgeDetails-label-ticker">{token.ticker}</h4>
+          {badge.token && (
+            <>
+              <h3 className="BadgeDetails-header-title">Badge Details</h3>
+              <Img
+                className="BadgeDetails-header-img"
+                src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                  badge.token.symbolMultihash
+                }`}
+              />
+              <h4 className="BadgeDetails-label-name">{badge.token.name}</h4>
+              <h4 className="BadgeDetails-label-ticker">
+                {badge.token.ticker}
+              </h4>
+            </>
+          )}
         </div>
         <div className="BadgeDetails">
           <div className="BadgeDetails-card">
@@ -557,7 +548,7 @@ class BadgeDetails extends PureComponent {
                 <span>
                   <a
                     className="BadgeDetails--link"
-                    href={`https://etherscan.io/address/${token.addr}`}
+                    href={`https://etherscan.io/address/${tokenAddr}`}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
@@ -565,7 +556,7 @@ class BadgeDetails extends PureComponent {
                       className="BadgeDetails-icon BadgeDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(token.addr)}
+                    {truncateMiddle(tokenAddr)}
                   </a>
                 </span>
               </div>
@@ -575,13 +566,11 @@ class BadgeDetails extends PureComponent {
               <span className="BadgeDetails-meta--aligned">
                 <FontAwesomeIcon
                   className="BadgeDetails-icon"
-                  color={
-                    tcrConstants.STATUS_COLOR_ENUM[token.badge.clientStatus]
-                  }
-                  icon={tcrConstants.STATUS_ICON_ENUM[token.badge.clientStatus]}
+                  color={tcrConstants.STATUS_COLOR_ENUM[badge.clientStatus]}
+                  icon={tcrConstants.STATUS_ICON_ENUM[badge.clientStatus]}
                 />
                 {this.toSentenceCase(
-                  tcrConstants.STATUS_ENUM[token.badge.clientStatus]
+                  tcrConstants.STATUS_ENUM[badge.clientStatus]
                 )}
               </span>
               {badge.latestRequest.dispute &&
@@ -623,7 +612,7 @@ class BadgeDetails extends PureComponent {
                   className="BadgeDetails-meta--aligned"
                   style={{ display: 'flex', alignItems: 'center' }}
                 >
-                  {!token.badge.latestRequest.dispute && (
+                  {!badge.latestRequest.dispute && (
                     <>
                       <FontAwesomeIcon
                         className="TokenDetails-icon"
@@ -643,7 +632,7 @@ class BadgeDetails extends PureComponent {
               )}
             </div>
             <div className="BadgeDetails-action">
-              {this.getActionButton(token, accounts.data[0])}
+              {this.getActionButton(badge, accounts.data[0])}
             </div>
           </div>
         </div>
@@ -680,7 +669,7 @@ class BadgeDetails extends PureComponent {
 
 export default connect(
   state => ({
-    token: state.token.token.data,
+    badge: state.badge.badge.data,
     accounts: state.wallet.accounts,
     arbitrableAddressListData:
       state.arbitrableAddressList.arbitrableAddressListData,
@@ -688,8 +677,8 @@ export default connect(
   }),
   {
     openActionModal: modalActions.openActionModal,
-    fetchToken: tokenActions.fetchToken,
-    badgeTimeout: tokenActions.badgeTimeout,
+    fetchBadge: badgeActions.fetchBadge,
+    timeout: badgeActions.timeout,
     toggleFilter: filterActions.toggleFilter
   }
 )(BadgeDetails)
