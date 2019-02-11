@@ -48,7 +48,7 @@ class TTCREvidence extends Component {
     const symbolURI = `${FILE_BASE_URL}/${token.symbolMultihash}`
     return (
       <div className="TTCREvidence">
-        <h4>The Token in Question:</h4>
+        <h4 style={{ marginLeft: 0 }}>The Token in Question:</h4>
         <div className="TTCREvidence-data">
           <img className="TTCREvidence-symbol" src={symbolURI} alt="Avatar" />
           <div className="TTCREvidence-data-card">
