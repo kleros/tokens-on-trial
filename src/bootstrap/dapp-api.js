@@ -1,4 +1,5 @@
 import Web3 from 'web3'
+import Eth from 'ethjs'
 import Archon from '@kleros/archon'
 
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list.json'
@@ -25,6 +26,14 @@ else {
   web3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
   onlyInfura = true
 }
+
+let eth
+if (process.env.NODE_ENV === 'test')
+  eth = new Eth(require('ganache-cli').provider())
+else if (window.ethereum) eth = new Eth(window.ethereum)
+else if (window.web3 && window.web3.currentProvider)
+  eth = new Eth(window.web3.currentProvider)
+else eth = new Eth(new Eth.HttpProvider(ETHEREUM_PROVIDER))
 
 const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
 
@@ -64,6 +73,7 @@ const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
   web3,
+  eth,
   onlyInfura,
   network,
   ETHAddressRegExpCaptureGroup,

@@ -23,6 +23,7 @@ import * as notificationActions from '../actions/notification'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
+import TTCREvidence from '../components/iframes/t2cr-evidence'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -154,6 +155,7 @@ const App = ({ store, history }) => (
           <Route component={ConnectedNavBar} exact path="*" />
           <div id="scroll-root">
             <Switch>
+              <Route component={TTCREvidence} exact path="/evidence/t2cr" />
               <Redirect exact from="/" to="/tokens" />
               <Route component={Tokens} exact path="/tokens" />
               <Route component={TokenDetails} exact path="/token/:tokenID" />
