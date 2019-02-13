@@ -217,7 +217,7 @@ function* fundBadgeAppeal({ payload: { addr, side, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* badgeTimeout({ payload: { addr } }) {
-  yield call(arbitrableAddressList.methods.timeout(addr).send, {
+  yield call(arbitrableAddressList.methods.executeRequest(addr).send, {
     from: yield select(walletSelectors.getAccount)
   })
 
@@ -230,7 +230,7 @@ function* badgeTimeout({ payload: { addr } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* feeTimeoutBadge({ payload: { badge } }) {
-  yield call(arbitrableAddressList.methods.timeout(badge.addr).send, {
+  yield call(arbitrableAddressList.methods.executeRequest(badge.addr).send, {
     from: yield select(walletSelectors.getAccount)
   })
 
