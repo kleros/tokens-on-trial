@@ -189,7 +189,7 @@ function* challengeBadgeRequest({ payload: { addr, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* fundBadgeDispute({ payload: { addr, side, value } }) {
-  yield call(arbitrableAddressList.methods.fundLatestRound(addr, side).send, {
+  yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
     from: yield select(walletSelectors.getAccount),
     value
   })
@@ -203,7 +203,7 @@ function* fundBadgeDispute({ payload: { addr, side, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* fundBadgeAppeal({ payload: { addr, side, value } }) {
-  yield call(arbitrableAddressList.methods.fundLatestRound(addr, side).send, {
+  yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
     from: yield select(walletSelectors.getAccount),
     value
   })

@@ -28,7 +28,7 @@ const Submit = ({
   <div>
     <div
       className="Modal-header"
-      style={!badge && item ? { justifyContent: 'center' } : {}}
+      style={!badge ? { justifyContent: 'center' } : {}}
     >
       {badge && <span className="Modal-badge" />}
       <h3 className="Modal-title">
@@ -42,10 +42,7 @@ const Submit = ({
         />
       )}
     </div>
-    <hr />
-    <h5 className="Modal-subtitle">
-      {!badge ? 'Fill the form and stake ETH' : ''}
-    </h5>
+    <br />
     {!badge && !item && (
       <>
         <TokenForm className="Submit-form" onSubmit={submitItem} />
