@@ -114,6 +114,13 @@
     }
   }
 
+  &-token {
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+    margin: 0 14px;
+  }
+
   &-action {
     align-items: center;
     background: $action;

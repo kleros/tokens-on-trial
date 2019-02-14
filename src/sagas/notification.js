@@ -100,9 +100,9 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         break
       }
       default: {
-        console.info('Unhandled notification: ', returnValues)
-        console.info('isRequester', isRequester)
-        console.info('account', account)
+        console.warn('Unhandled notification: ', returnValues)
+        console.warn('isRequester', isRequester)
+        console.warn('account', account)
         break
       }
     }

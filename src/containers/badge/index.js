@@ -141,8 +141,6 @@ class BadgeDetails extends PureComponent {
       challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
     }
 
-    console.info(item)
-
     if (hasPendingRequest(item))
       if (latestRequest.disputed && !latestRequest.resolved) {
         icon = 'hourglass-half'
@@ -537,6 +535,25 @@ class BadgeDetails extends PureComponent {
           <h4>Badge Details</h4>
           {badge.latestRequest.withdrawable > 0 && (
             <>
+              {badge.token && (
+                <>
+                  <div className="TokenDetails-divider" />
+                  <div className="BadgeDetails-token">
+                    <Img
+                      className="BadgeDetails-header-img"
+                      src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                        badge.token.symbolMultihash
+                      }`}
+                    />
+                    <h4 className="BadgeDetails-label-name">
+                      {badge.token.name}
+                    </h4>
+                    <h4 className="BadgeDetails-label-ticker">
+                      {badge.token.ticker}
+                    </h4>
+                  </div>
+                </>
+              )}
               <div className="TokenDetails-divider" />
               <h5
                 className="TokenDetails-withdraw"
@@ -554,22 +571,6 @@ class BadgeDetails extends PureComponent {
           )}
         </div>
         <hr className="TokenDescription-separator" />
-        <div className="BadgeDetails-header">
-          {badge.token && (
-            <>
-              <Img
-                className="BadgeDetails-header-img"
-                src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                  badge.token.symbolMultihash
-                }`}
-              />
-              <h4 className="BadgeDetails-label-name">{badge.token.name}</h4>
-              <h4 className="BadgeDetails-label-ticker">
-                {badge.token.ticker}
-              </h4>
-            </>
-          )}
-        </div>
         <div className="BadgeDetails">
           <div className="BadgeDetails-card">
             <Img className="BadgeDetails-img" src={EthfinexLogo} />

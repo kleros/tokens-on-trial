@@ -30,6 +30,7 @@ const filter = [
  * @returns {object} - The fetched badge.
  */
 export function* fetchBadge({ payload: { addr } }) {
+  const account = yield select(walletSelectors.getAccount)
   let badge = yield call(
     arbitrableAddressList.methods.getAddressInfo(addr).call
   )
@@ -41,6 +42,15 @@ export function* fetchBadge({ payload: { addr } }) {
         Number(badge.numberOfRequests) - 1
       ).call
     )
+
+    if (badge.latestRequest.resolved)
+      badge.latestRequest.withdrawable = yield call(
+        arbitrableAddressList.methods.amountWithdrawable(
+          addr,
+          account,
+          Number(badge.numberOfRequests) - 1
+        ).call
+      )
 
     badge.latestRequest.latestRound = yield call(
       arbitrableAddressList.methods.getRoundInfo(
@@ -111,7 +121,6 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (tokens && tokens.length === 1) badge.token = tokens[0]
 
-    console.info('badge', badge)
     badge = convertFromString(badge)
   } else
     badge = {

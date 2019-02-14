@@ -268,7 +268,7 @@ export function* fetchToken({ payload: { ID } }) {
       if (badge.latestRequest.resolved)
         badge.latestRequest.withdrawable = yield call(
           arbitrableAddressList.methods.amountWithdrawable(
-            ID,
+            token.addr,
             account,
             Number(badge.numberOfRequests) - 1
           ).call
