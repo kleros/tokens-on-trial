@@ -411,6 +411,14 @@ class BadgeDetails extends PureComponent {
     const { match, fetchBadge } = this.props
     const { tokenAddr } = match.params
     fetchBadge(tokenAddr)
+    arbitrableAddressList.events.RewardWithdrawal().on('data', event => {
+      const { tokenAddr } = match.params
+      if (tokenAddr === event.returnValues._address) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchBadge(tokenAddr)
+      }
+    })
     arbitrableAddressList.events.AddressStatusChange().on('data', event => {
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) {
@@ -533,27 +541,25 @@ class BadgeDetails extends PureComponent {
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <h4>Badge Details</h4>
+          {badge.token && (
+            <>
+              <div className="TokenDetails-divider" />
+              <div className="BadgeDetails-token">
+                <Img
+                  className="BadgeDetails-header-img"
+                  src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                    badge.token.symbolMultihash
+                  }`}
+                />
+                <h4 className="BadgeDetails-label-name">{badge.token.name}</h4>
+                <h4 className="BadgeDetails-label-ticker">
+                  {badge.token.ticker}
+                </h4>
+              </div>
+            </>
+          )}
           {badge.latestRequest.withdrawable > 0 && (
             <>
-              {badge.token && (
-                <>
-                  <div className="TokenDetails-divider" />
-                  <div className="BadgeDetails-token">
-                    <Img
-                      className="BadgeDetails-header-img"
-                      src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                        badge.token.symbolMultihash
-                      }`}
-                    />
-                    <h4 className="BadgeDetails-label-name">
-                      {badge.token.name}
-                    </h4>
-                    <h4 className="BadgeDetails-label-ticker">
-                      {badge.token.ticker}
-                    </h4>
-                  </div>
-                </>
-              )}
               <div className="TokenDetails-divider" />
               <h5
                 className="TokenDetails-withdraw"

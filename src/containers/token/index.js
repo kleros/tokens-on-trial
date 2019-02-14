@@ -334,6 +334,16 @@ class TokenDetails extends PureComponent {
         fetchToken(tokenID)
       }
     })
+    arbitrableTokenList.events.TokenStatusChange().on('data', event => {
+      const { token } = this.state
+      if (!token) return
+
+      if (tokenID === event.returnValues._tokenID) {
+        clearInterval(this.interval)
+        this.setState({ countdown: null })
+        fetchToken(tokenID)
+      }
+    })
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
       if (!token) return
