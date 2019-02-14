@@ -186,6 +186,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
  */
 export function* fetchToken({ payload: { ID } }) {
   let token = yield call(arbitrableTokenList.methods.getTokenInfo(ID).call)
+  const account = yield select(walletSelectors.getAccount)
 
   if (Number(token.numberOfRequests > 0)) {
     token.latestRequest = yield call(
@@ -194,6 +195,15 @@ export function* fetchToken({ payload: { ID } }) {
         Number(token.numberOfRequests) - 1
       ).call
     )
+
+    if (token.latestRequest.resolved)
+      token.latestRequest.withdrawable = yield call(
+        arbitrableTokenList.methods.amountWithdrawable(
+          ID,
+          account,
+          Number(token.numberOfRequests) - 1
+        ).call
+      )
 
     token.latestRequest.latestRound = yield call(
       arbitrableTokenList.methods.getRoundInfo(
@@ -254,6 +264,15 @@ export function* fetchToken({ payload: { ID } }) {
           Number(badge.numberOfRequests) - 1
         ).call
       )
+
+      if (badge.latestRequest.resolved)
+        badge.latestRequest.withdrawable = yield call(
+          arbitrableAddressList.methods.amountWithdrawable(
+            ID,
+            account,
+            Number(badge.numberOfRequests) - 1
+          ).call
+        )
 
       badge.latestRequest.latestRound = yield call(
         arbitrableAddressList.methods.getRoundInfo(
@@ -529,7 +548,7 @@ function* executeRequest({ payload: { ID } }) {
 /**
  * Timeout challenger.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
- * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ * @returns {object} - The `lessdux` collection mod object for updating the token.
  */
 function* feeTimeout({ payload: { token } }) {
   yield call(arbitrableTokenList.methods.executeRequest(token.ID).send, {
@@ -537,6 +556,26 @@ function* feeTimeout({ payload: { token } }) {
   })
 
   return yield call(fetchToken, { payload: { ID: token.ID } })
+}
+
+/**
+ * Withdraw funds from token's latest request.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the token object.
+ */
+function* withdrawTokenFunds({ payload: { ID, request } }) {
+  yield call(
+    arbitrableTokenList.methods.batchRoundWithdraw(
+      yield select(walletSelectors.getAccount),
+      ID,
+      request,
+      0,
+      0
+    ).send,
+    { from: yield select(walletSelectors.getAccount) }
+  )
+
+  return yield call(fetchToken, { payload: { ID } })
 }
 
 /**
@@ -642,5 +681,12 @@ export default function* tokenSaga() {
     updateTokensCollectionModFlow,
     tokenActions.token,
     challengeRequest
+  )
+  yield takeLatest(
+    tokenActions.token.WITHDRAW,
+    lessduxSaga,
+    updateTokensCollectionModFlow,
+    tokenActions.token,
+    withdrawTokenFunds
   )
 }

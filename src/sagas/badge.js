@@ -111,6 +111,7 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (tokens && tokens.length === 1) badge.token = tokens[0]
 
+    console.info('badge', badge)
     badge = convertFromString(badge)
   } else
     badge = {
@@ -239,6 +240,26 @@ function* feeTimeoutBadge({ payload: { badge } }) {
 }
 
 /**
+ * Withdraw funds from badge's latest request.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the badge object.
+ */
+function* withdrawBadgeFunds({ payload: { address, request } }) {
+  yield call(
+    arbitrableAddressList.methods.batchRoundWithdraw(
+      yield select(walletSelectors.getAccount),
+      address,
+      request,
+      0,
+      0
+    ).send,
+    { from: yield select(walletSelectors.getAccount) }
+  )
+
+  return yield call(fetchBadge, { payload: { address } })
+}
+
+/**
  * Check if a string is undefined, not a string or empty.
  * @param {string} str input string.
  * @returns {bool} Weather it passes the test.
@@ -332,5 +353,12 @@ export default function* badgeSaga() {
     updateBadgesCollectionModFlow,
     badgeActions.badge,
     challengeBadgeRequest
+  )
+  yield takeLatest(
+    badgeActions.badge.WITHDRAW_FUNDS,
+    lessduxSaga,
+    updateBadgesCollectionModFlow,
+    badgeActions.badge,
+    withdrawBadgeFunds
   )
 }

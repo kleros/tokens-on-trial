@@ -16,7 +16,8 @@ export const badge = {
   STATUS_CHANGE: 'BADGE_STATUS_CHANGE',
   FUND_APPEAL: 'BADGE_FUND_APPEAL',
   FEES_TIMEOUT: 'BADGE_FEES_TIMEOUT',
-  CHALLENGE_REQUEST: 'CHALLENGE_REQUEST'
+  CHALLENGE_REQUEST: 'CHALLENGE_REQUEST',
+  WITHDRAW_FUNDS: 'WITHDRAW_FUNDS'
 }
 
 /* Badge TCR Action Creators */
@@ -65,4 +66,8 @@ export const feesTimeout = badgeData => ({
 export const resubmitBadge = ({ badgeData, value }) => ({
   type: badge.RESUBMIT,
   payload: { badge: badgeData, value }
+})
+export const withdrawBadgeFunds = ({ address, request }) => ({
+  type: badge.WITHDRAW_FUNDS,
+  payload: { address, request }
 })

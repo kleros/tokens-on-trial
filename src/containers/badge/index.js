@@ -51,7 +51,8 @@ class BadgeDetails extends PureComponent {
     timeout: PropTypes.func.isRequired,
     fetchBadge: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
-    toggleFilter: PropTypes.func.isRequired
+    toggleFilter: PropTypes.func.isRequired,
+    withdrawBadgeFunds: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -139,6 +140,8 @@ class BadgeDetails extends PureComponent {
       submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
       challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
     }
+
+    console.info(item)
 
     if (hasPendingRequest(item))
       if (latestRequest.disputed && !latestRequest.resolved) {
@@ -394,6 +397,14 @@ class BadgeDetails extends PureComponent {
     }
   }
 
+  withdrawFunds = async () => {
+    const { withdrawBadgeFunds, badge } = this.props
+    withdrawBadgeFunds({
+      address: badge.addr,
+      request: badge.numberOfRequests - 1
+    })
+  }
+
   componentDidUpdate() {
     this.initCountDown()
   }
@@ -522,10 +533,30 @@ class BadgeDetails extends PureComponent {
           filter={filters}
           handleFilterChange={this.handleFilterChange}
         />
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <h4>Badge Details</h4>
+          {badge.latestRequest.withdrawable > 0 && (
+            <>
+              <div className="TokenDetails-divider" />
+              <h5
+                className="TokenDetails-withdraw"
+                onClick={this.withdrawFunds}
+              >
+                <span className="TokenDetails-withdraw-value">
+                  {web3.utils.fromWei(
+                    badge.latestRequest.withdrawable.toString()
+                  )}{' '}
+                  ETH{' '}
+                </span>
+                Withdraw Funds
+              </h5>
+            </>
+          )}
+        </div>
+        <hr className="TokenDescription-separator" />
         <div className="BadgeDetails-header">
           {badge.token && (
             <>
-              <h3 className="BadgeDetails-header-title">Badge Details</h3>
               <Img
                 className="BadgeDetails-header-img"
                 src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
@@ -679,6 +710,7 @@ export default connect(
     openActionModal: modalActions.openActionModal,
     fetchBadge: badgeActions.fetchBadge,
     timeout: badgeActions.timeout,
+    withdrawBadgeFunds: badgeActions.withdrawBadgeFunds,
     toggleFilter: filterActions.toggleFilter
   }
 )(BadgeDetails)

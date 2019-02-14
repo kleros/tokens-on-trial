@@ -156,29 +156,35 @@ const App = ({ store, history }) => (
           <Switch>
             <Route component={TTCREvidence} exact path="/evidence/t2cr" />
             <Route component={BadgeEvidence} exact path="/evidence/badge" />
-            <div id="router-root">
-              <Route component={ConnectedNavBar} exact path="*" />
-              <div id="scroll-root">
-                <Switch>
-                  <Redirect exact from="/" to="/tokens" />
-                  <Route component={Tokens} exact path="/tokens" />
-                  <Route
-                    component={TokenDetails}
-                    exact
-                    path="/token/:tokenID"
-                  />
-                  <Route
-                    component={BadgeDetails}
-                    exact
-                    path="/badge/:badgeAddr/:tokenAddr"
-                  />
-                  <Route component={PageNotFound} exact path="/notifications" />
-                  <Route component={PageNotFound} />
-                </Switch>
+            <>
+              <div id="router-root">
+                <Route component={ConnectedNavBar} exact path="*" />
+                <div id="scroll-root">
+                  <Switch>
+                    <Redirect exact from="/" to="/tokens" />
+                    <Route component={Tokens} exact path="/tokens" />
+                    <Route
+                      component={TokenDetails}
+                      exact
+                      path="/token/:tokenID"
+                    />
+                    <Route
+                      component={BadgeDetails}
+                      exact
+                      path="/badge/:badgeAddr/:tokenAddr"
+                    />
+                    <Route
+                      component={PageNotFound}
+                      exact
+                      path="/notifications"
+                    />
+                    <Route component={PageNotFound} />
+                  </Switch>
+                </div>
+                <Route component={ActionModal} exact path="*" />
+                <Route component={GlobalComponents} exact path="*" />
               </div>
-              <Route component={ActionModal} exact path="*" />
-              <Route component={GlobalComponents} exact path="*" />
-            </div>
+            </>
           </Switch>
         </>
       </ConnectedRouter>

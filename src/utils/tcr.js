@@ -50,6 +50,7 @@ export const convertFromString = item => {
   latestRequest.challengerDepositTime =
     Number(latestRequest.challengerDepositTime) * 1000
   latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
+  latestRequest.withdrawable = Number(latestRequest.withdrawable)
   latestRequest.disputeID = latestRequest.dispute
     ? Number(latestRequest.disputeID)
     : 0

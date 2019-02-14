@@ -119,6 +119,16 @@
   &-timer {
     color: $orange;
   }
+
+  &-withdraw {
+    color: $primary;
+    cursor: pointer;
+    margin-left: 14px;
+
+    &-value {
+      color: $darkGrey;
+    }
+  }
 }
 
 /* @define TokenDescription */

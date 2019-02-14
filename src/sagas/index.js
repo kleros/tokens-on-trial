@@ -44,7 +44,6 @@ const rootSagas = [
   badgeSaga,
   arbitratorSaga,
   notificationSaga
-  // badgeNotificationSaga
 ].map(makeRestartable)
 
 /**

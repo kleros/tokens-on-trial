@@ -16,6 +16,7 @@ export const token = {
   STATUS_CHANGE: 'STATUS_CHANGE',
   FUND_APPEAL: 'FUND_APPEAL',
   FEES_TIMEOUT: 'FEES_TIMEOUT',
+  WITHDRAW: 'WITHDRAW',
   CREATE_BADGE: 'CREATE_BADGE',
   CHALLENGE_REQUEST: 'CHALLENGE_REQUEST',
   CLEAR_BADGE: 'CLEAR_BADGE',
@@ -75,6 +76,10 @@ export const feesTimeout = tokenData => ({
 export const resubmitToken = ({ tokenData, value }) => ({
   type: token.RESUBMIT,
   payload: { token: tokenData, value }
+})
+export const withdrawTokenFunds = ({ ID, request }) => ({
+  type: token.WITHDRAW,
+  payload: { ID, request }
 })
 
 /* Badge TCR */

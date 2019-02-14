@@ -57,7 +57,8 @@ class TokenDetails extends PureComponent {
     timeout: PropTypes.func.isRequired,
     fetchToken: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
-    toggleFilter: PropTypes.func.isRequired
+    toggleFilter: PropTypes.func.isRequired,
+    withdrawTokenFunds: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -380,6 +381,7 @@ class TokenDetails extends PureComponent {
           Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
         )
           return
+
         archon.arbitrable
           .getEvidence(
             arbitrableTokenList._address,
@@ -405,6 +407,7 @@ class TokenDetails extends PureComponent {
               })
           )
       })
+
     arbitrableTokenList.events
       .Contribution({ fromBlock: 0 })
       .on('data', async e => {
@@ -512,6 +515,11 @@ class TokenDetails extends PureComponent {
     }
   }
 
+  withdrawFunds = async () => {
+    const { withdrawTokenFunds, token } = this.props
+    withdrawTokenFunds({ ID: token.ID, request: token.numberOfRequests - 1 })
+  }
+
   componentDidUpdate() {
     this.initCountDown()
   }
@@ -551,6 +559,27 @@ class TokenDetails extends PureComponent {
           filter={filters}
           handleFilterChange={this.handleFilterChange}
         />
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <h4>Token Details</h4>
+          {token.latestRequest.withdrawable > 0 && (
+            <>
+              <div className="TokenDetails-divider" />
+              <h5
+                className="TokenDetails-withdraw"
+                onClick={this.withdrawFunds}
+              >
+                <span className="TokenDetails-withdraw-value">
+                  {web3.utils.fromWei(
+                    token.latestRequest.withdrawable.toString()
+                  )}{' '}
+                  ETH{' '}
+                </span>
+                Withdraw Funds
+              </h5>
+            </>
+          )}
+        </div>
+        <hr className="TokenDescription-separator" />
         <div className="TokenDetails">
           <Img
             className="TokenDetails-img"
@@ -752,6 +781,7 @@ export default connect(
   }),
   {
     fetchToken: tokenActions.fetchToken,
+    withdrawTokenFunds: tokenActions.withdrawTokenFunds,
     timeout: tokenActions.timeout,
     openActionModal: modalActions.openActionModal,
     feesTimeout: tokenActions.feesTimeout,
