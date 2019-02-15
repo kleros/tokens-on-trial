@@ -43,9 +43,7 @@ class SettingsModal extends PureComponent {
       name: { S: name },
       email: { S: email },
       ...Object.keys(rest).reduce((acc, v) => {
-        acc[
-          `TCR-NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`
-        ] = {
+        acc[`tcrNotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`] = {
           BOOL: rest[v] || false
         }
         return acc
