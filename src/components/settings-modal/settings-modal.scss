@@ -7,22 +7,6 @@
   text-align: center;
   width: 40px;
 
-  // TODO: Remove once implemented.
-  &:hover::after {
-    background: $badgeBlue;
-    border-radius: 5px;
-    bottom: -5px;
-    color: $invertedText;
-    content: 'Coming soon.';
-    font-size: 14px;
-    left: 50%;
-    line-height: 16px;
-    padding: 6px 0;
-    position: absolute;
-    transform: translateX(-50%);
-    width: 110px;
-  }
-
   &-window {
     background: $white;
     border: 1px solid $border;
@@ -37,7 +21,7 @@
     line-height: normal;
     padding: 31px 34px 24px 31px;
     position: absolute;
-    right: calc(100% - 190px);
+    right: calc(100% - 202px);
     top: 62px;
     width: 352px;
     z-index: 1002;
@@ -67,7 +51,7 @@
 
     &-form {
       margin: 0 -40px;
-      margin-top: 30px;
+      margin-top: 10px;
     }
 
     &-submit {

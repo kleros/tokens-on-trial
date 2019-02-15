@@ -7,6 +7,7 @@ import * as walletActions from '../../actions/wallet'
 import * as walletSelectors from '../../reducers/wallet'
 import Button from '../../components/button'
 import NavOverlay from '../../components/nav-overlay'
+import { web3 } from '../../bootstrap/dapp-api'
 
 import { SettingsForm, submitSettingsForm } from './components/settings-form'
 import './settings-modal.css'
@@ -17,10 +18,12 @@ class SettingsModal extends PureComponent {
     children: PropTypes.node.isRequired,
     isSettingsModalOpen: PropTypes.oneOf([true, false]).isRequired,
     settings: walletSelectors.settingsShape.isRequired,
+    accounts: walletSelectors.accountsShape.isRequired,
 
     // Handlers
-    // openSettingsModal: PropTypes.func.isRequired,
-    closeSettingsModal: PropTypes.func.isRequired
+    closeSettingsModal: PropTypes.func.isRequired,
+    openSettingsModal: PropTypes.func.isRequired,
+    submitSettingsForm: PropTypes.func.isRequired
   }
 
   handleOverlayClick = () => {
@@ -29,18 +32,53 @@ class SettingsModal extends PureComponent {
   }
 
   handleOpenSettingsClick = () => {
-    // TODO: Enable once implemented.
-    // const { openSettingsModal, isSettingsModalOpen } = this.props
-    // if (isSettingsModalOpen) return // This method is triggered when clicking on the overlay so we avoid opening it again.
-    // openSettingsModal()
+    const { openSettingsModal, isSettingsModalOpen } = this.props
+    if (isSettingsModalOpen) return // This method is triggered when clicking on the overlay so we avoid opening it again.
+    openSettingsModal()
   }
 
-  handleUpdateSettingsClick = () => {
-    // TODO
+  handleUpdateSettingsClick = async ({ name, email, ...rest }) => {
+    const { accounts } = this.props
+    const settings = {
+      name: { S: name },
+      email: { S: email },
+      ...Object.keys(rest).reduce((acc, v) => {
+        acc[
+          `TCR-NotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`
+        ] = {
+          BOOL: rest[v] || false
+        }
+        return acc
+      }, {})
+    }
+
+    try {
+      await (await fetch(process.env.REACT_APP_PATCH_USER_SETTINGS_URL, {
+        body: JSON.stringify({
+          payload: {
+            address: accounts.data[0],
+            settings,
+            signature: await web3.eth.personal.sign(
+              JSON.stringify(settings),
+              accounts.data[0]
+            )
+          }
+        }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH'
+      })).json()
+    } catch (err) {
+      console.error(err)
+    }
   }
 
   render() {
-    const { children, isSettingsModalOpen, settings } = this.props
+    const {
+      children,
+      isSettingsModalOpen,
+      settings,
+      submitSettingsForm
+    } = this.props
 
     return (
       <div className="SettingsModal" onClick={this.handleOpenSettingsClick}>
@@ -62,7 +100,7 @@ class SettingsModal extends PureComponent {
                   shouldFund: settings.data.shouldFund,
                   rulingGiven: settings.data.rulingGiven
                 }}
-                onSubmit={this.handleOpenSettingsClick}
+                onSubmit={this.handleUpdateSettingsClick}
               />
               <div className="SettingsModal-window-submit">
                 <Button
@@ -82,6 +120,7 @@ class SettingsModal extends PureComponent {
 
 export default connect(
   state => ({
+    accounts: state.wallet.accounts,
     isSettingsModalOpen: state.modal.isSettingsModalOpen,
     settings: state.wallet.settings
   }),
