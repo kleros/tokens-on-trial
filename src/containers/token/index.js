@@ -419,7 +419,7 @@ class TokenDetails extends PureComponent {
       })
 
     arbitrableTokenList.events
-      .Contribution({ fromBlock: 0 })
+      .WaitingOponent({ fromBlock: 0 })
       .on('data', async e => {
         const { token } = this.state
         if (!token) return

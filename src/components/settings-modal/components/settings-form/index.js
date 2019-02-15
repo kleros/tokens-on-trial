@@ -4,7 +4,7 @@ import { email, required } from '../../../../utils/validation'
 export const { Form: SettingsForm, submit: submitSettingsForm } = form(
   'settingsForm',
   {
-    challenged: {
+    dispute: {
       type: 'checkbox',
       props: {
         label: 'Your request was challenged'
@@ -16,10 +16,10 @@ export const { Form: SettingsForm, submit: submitSettingsForm } = form(
         label: 'A ruling was given.'
       }
     },
-    appealFunded: {
+    shouldFund: {
       type: 'checkbox',
       props: {
-        label: 'An adversary funded his side of an appeal.'
+        label: 'It is your turn to fund an appeal.'
       }
     },
     name: { type: 'text', validate: [required] },

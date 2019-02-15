@@ -49,6 +49,7 @@ class SettingsModal extends PureComponent {
         return acc
       }, {})
     }
+    console.info(settings)
 
     try {
       await (await fetch(process.env.REACT_APP_PATCH_USER_SETTINGS_URL, {
@@ -93,10 +94,9 @@ class SettingsModal extends PureComponent {
               <SettingsForm
                 className="SettingsModal-window-form"
                 initialValues={{
-                  executeReady: settings.data.executeReady,
-                  challenged: settings.data.challenged,
-                  shouldFund: settings.data.shouldFund,
-                  rulingGiven: settings.data.rulingGiven
+                  dispute: settings.data.dispute,
+                  rulingGiven: settings.data.rulingGiven,
+                  shouldFund: settings.data.shouldFund
                 }}
                 onSubmit={this.handleUpdateSettingsClick}
               />
