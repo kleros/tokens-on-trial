@@ -28,3 +28,8 @@
   REACT_APP_PROD_FILE_BASE_URL="https://staging-cfs.s3.us-east-2.amazonaws.com"
   REACT_APP_PROD_FILE_UPLOAD_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/staging/cfs"
   REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
