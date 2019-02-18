@@ -494,7 +494,7 @@ class BadgeDetails extends PureComponent {
       }
     })
     arbitrableAddressList.events
-      .WaitingOponent({ fromBlock: 0 })
+      .WaitingOpponent({ fromBlock: 0 })
       .on('data', async e => {
         if (e.returnValues._address === tokenAddr) {
           clearInterval(this.interval)
