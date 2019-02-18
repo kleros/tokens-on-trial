@@ -7,31 +7,21 @@ import { eth, FILE_BASE_URL } from '../../../bootstrap/dapp-api'
 import './t2cr-evidence.css'
 
 class TTCREvidence extends Component {
-  state = {
-    token: null
-  }
+  state = { token: null }
 
-  componentDidMount() {
-    // eslint-disable-next-line unicorn/prefer-add-event-listener
-    window.onmessage = this.receiveEvidence.bind(this)
-  }
-
-  async receiveEvidence(message) {
-    if (
-      !message.data ||
-      message.data.target !== 'evidence' ||
-      !message.data.arbitrableContractAddress ||
-      !message.data.disputeID
+  async componentDidMount() {
+    const message = JSON.parse(
+      window.location.search.substring(1).replace(/%22/g, '"')
     )
+
+    if (!message || !message.arbitrableContractAddress || !message.disputeID)
       return
 
     const arbitrableTokenList = eth
       .contract(ArbitrableTokenList.abi)
-      .at(message.data.arbitrableContractAddress)
+      .at(message.arbitrableContractAddress)
 
-    const ID = await arbitrableTokenList.disputeIDToTokenID(
-      message.data.disputeID
-    )
+    const ID = await arbitrableTokenList.disputeIDToTokenID(message.disputeID)
     const token = await arbitrableTokenList.getTokenInfo(ID[0])
     token.ID = ID[0]
     this.setState({ token })

@@ -12,18 +12,12 @@ class BadgeEvidence extends Component {
     tokenAddress: null
   }
 
-  componentDidMount() {
-    // eslint-disable-next-line unicorn/prefer-add-event-listener
-    window.onmessage = this.receiveEvidence.bind(this)
-  }
-
-  async receiveEvidence(message) {
-    if (
-      !message.data ||
-      message.data.target !== 'evidence' ||
-      !message.data.arbitrableContractAddress ||
-      !message.data.disputeID
+  async componentDidMount() {
+    const message = JSON.parse(
+      window.location.search.substring(1).replace(/%22/g, '"')
     )
+
+    if (!message || !message.arbitrableContractAddress || !message.disputeID)
       return
 
     const arbitrableAddressList = eth
