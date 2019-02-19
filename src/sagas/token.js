@@ -484,7 +484,7 @@ function* challengeRequest({ payload: { ID, value } }) {
   if (!hasPendingRequest(token))
     throw new Error(errorConstants.NO_PENDING_REQUEST)
 
-  yield call(arbitrableTokenList.methods.challengeRequest(ID).send, {
+  yield call(arbitrableTokenList.methods.challengeRequest(ID, '').send, {
     from: yield select(walletSelectors.getAccount),
     value
   })
