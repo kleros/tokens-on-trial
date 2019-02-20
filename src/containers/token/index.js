@@ -385,23 +385,24 @@ class TokenDetails extends PureComponent {
       .on('data', async e => {
         const { token } = this.state
         if (!token) return
-
         const { latestRequest } = token
-        if (
-          Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
-        )
+
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
           return
 
         archon.arbitrable
           .getEvidence(
             arbitrableTokenList._address,
             arbitrator._address,
-            latestRequest.disputeID
+            latestRequest.evidenceGroupID
           )
           .then(resp =>
             resp
               .filter(
-                evidence => evidence.evidenceJSONValid && evidence.fileValid
+                evidence =>
+                  evidence.evidenceJSONValid &&
+                  (evidence.evidenceJSON.fileURI.length === 0 ||
+                    evidence.fileValid)
               )
               .forEach(evidence => {
                 const { evidences } = this.state
@@ -715,31 +716,28 @@ class TokenDetails extends PureComponent {
             </div>
           </div>
         </div>
-        {token.latestRequest.disputed &&
-          !token.latestRequest.resolved &&
-          token.latestRequest.dispute.status !==
-            tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
-            <div className="TokenDescription">
-              <hr className="TokenDescription-separator" />
-              <h3>Evidence</h3>
-              <div className="TokenDescription-evidence">
-                <div className="TokenDescription-evidence--list">
-                  {Object.keys(evidences).map(key => (
-                    <div
-                      className="TokenDescription-evidence--item"
-                      key={key}
-                      onClick={this.handleViewEvidenceClick(evidences[key])}
-                    >
-                      <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
-                    </div>
-                  ))}
-                </div>
-                <Button onClick={this.handleOpenEvidenceModal} type="secondary">
-                  Submit Evidence
-                </Button>
+        {token.latestRequest && !token.latestRequest.resolved && (
+          <div className="TokenDescription">
+            <hr className="TokenDescription-separator" />
+            <h3>Evidence</h3>
+            <div className="TokenDescription-evidence">
+              <div className="TokenDescription-evidence--list">
+                {Object.keys(evidences).map(key => (
+                  <div
+                    className="TokenDescription-evidence--item"
+                    key={key}
+                    onClick={this.handleViewEvidenceClick(evidences[key])}
+                  >
+                    <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
+                  </div>
+                ))}
               </div>
+              <Button onClick={this.handleOpenEvidenceModal} type="secondary">
+                Submit Evidence
+              </Button>
             </div>
-          )}
+          </div>
+        )}
         <br />
         <div className="TokenDescription">
           <hr className="TokenDescription-separator" />

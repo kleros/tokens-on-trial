@@ -4,7 +4,8 @@ import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableAddressList,
   arbitrableTokenList,
-  arbitrator
+  arbitrator,
+  web3
 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus, convertFromString } from '../utils/tcr'
 import * as badgeActions from '../actions/badge'
@@ -42,6 +43,10 @@ export function* fetchBadge({ payload: { addr } }) {
         Number(badge.numberOfRequests) - 1
       ).call
     )
+
+    badge.latestRequest.evidenceGroupID = web3.utils
+      .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
+      .toString()
 
     if (badge.latestRequest.resolved)
       badge.latestRequest.withdrawable = yield call(

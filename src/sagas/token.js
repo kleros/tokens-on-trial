@@ -196,6 +196,10 @@ export function* fetchToken({ payload: { ID } }) {
       ).call
     )
 
+    token.latestRequest.evidenceGroupID = web3.utils
+      .toBN(web3.utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
+      .toString()
+
     if (token.latestRequest.resolved)
       token.latestRequest.withdrawable = yield call(
         arbitrableTokenList.methods.amountWithdrawable(
@@ -264,6 +268,10 @@ export function* fetchToken({ payload: { ID } }) {
           Number(badge.numberOfRequests) - 1
         ).call
       )
+
+      badge.latestRequest.evidenceGroupID = web3.utils
+        .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
+        .toString()
 
       if (badge.latestRequest.resolved)
         badge.latestRequest.withdrawable = yield call(

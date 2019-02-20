@@ -448,21 +448,22 @@ class BadgeDetails extends PureComponent {
         if (!badge) return
         const { latestRequest } = badge
 
-        if (
-          Number(latestRequest.disputeID) !== Number(e.returnValues._disputeID)
-        )
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
           return
 
         archon.arbitrable
           .getEvidence(
             arbitrableAddressList._address,
             arbitrator._address,
-            latestRequest.disputeID
+            latestRequest.evidenceGroupID
           )
           .then(resp =>
             resp
               .filter(
-                evidence => evidence.evidenceJSONValid && evidence.fileValid
+                evidence =>
+                  evidence.evidenceJSONValid &&
+                  (evidence.evidenceJSON.fileURI.length === 0 ||
+                    evidence.fileValid)
               )
               .forEach(evidence => {
                 const { evidences } = this.state
