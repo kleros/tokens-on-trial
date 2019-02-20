@@ -17,13 +17,10 @@ import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
 import FilterBar from '../filter-bar'
-import {
-  hasPendingRequest,
-  isRegistrationRequest,
-  getBlock
-} from '../../utils/tcr'
+import { hasPendingRequest, getBlock } from '../../utils/tcr'
 import { truncateMiddle, getRemainingTime, getBadgeStyle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
+import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
@@ -32,6 +29,7 @@ import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
+
 import './token.css'
 
 class TokenDetails extends PureComponent {
@@ -111,209 +109,6 @@ class TokenDetails extends PureComponent {
   toSentenceCase = input => {
     input = input ? input.toLowerCase() : ''
     return input.charAt(0).toUpperCase() + input.slice(1)
-  }
-
-  getActionButton = (token, userAccount) => {
-    const { arbitrableTokenListData } = this.props
-    const { timestamp, countdown } = this.state
-    let method
-    let disabled = true
-    let label = 'Loading...'
-    let icon = 'spinner'
-
-    if (
-      !token ||
-      !arbitrableTokenListData.data ||
-      token.creating ||
-      token.updating
-    )
-      return (
-        <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
-          <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
-          {label}
-        </Button>
-      )
-
-    const challengePeriodDuration = Number(
-      arbitrableTokenListData.data.challengePeriodDuration
-    )
-    const arbitrationFeesWaitingTime = Number(
-      arbitrableTokenListData.data.arbitrationFeesWaitingTime
-    )
-    const { latestRequest } = token
-    const { latestRound, challengerDepositTime } = latestRequest
-    let submitterFees
-    let challengerFees
-    if (latestRequest && latestRound) {
-      submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
-      challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
-    }
-
-    if (hasPendingRequest(token))
-      if (latestRequest.disputed && !latestRequest.resolved) {
-        icon = 'hourglass-half'
-        disabled = true
-        label = 'Waiting Arbitration'
-        if (
-          Number(latestRequest.dispute.status) ===
-            tcrConstants.DISPUTE_STATUS.Appealable &&
-          !latestRound.appealed
-        )
-          if (
-            userAccount ===
-              token.latestRequest.parties[tcrConstants.SIDE.Requester] ||
-            userAccount ===
-              token.latestRequest.parties[tcrConstants.SIDE.Challenger]
-          ) {
-            const appealPeriodStart = Number(
-              latestRequest.latestRound.appealPeriod[0]
-            )
-            const appealPeriodEnd = Number(
-              latestRequest.latestRound.appealPeriod[1]
-            )
-            const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
-            const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
-            if (timestamp < appealPeriodEnd) {
-              const SIDE =
-                userAccount ===
-                token.latestRequest.parties[tcrConstants.SIDE.Requester]
-                  ? tcrConstants.SIDE.Requester
-                  : tcrConstants.SIDE.Challenger
-
-              if (
-                latestRound.requiredForSide[SIDE] === 0 ||
-                latestRound.paidFees[SIDE] < latestRound.requiredForSide[SIDE]
-              ) {
-                let losingSide
-                if (
-                  userAccount ===
-                    token.latestRequest.parties[tcrConstants.SIDE.Requester] &&
-                  token.latestRequest.dispute.ruling ===
-                    tcrConstants.RULING_OPTIONS.Refuse.toString()
-                )
-                  losingSide = true
-                else if (
-                  userAccount ===
-                    token.latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-                  token.latestRequest.dispute.ruling ===
-                    tcrConstants.RULING_OPTIONS.Accept.toString()
-                )
-                  losingSide = true
-
-                if (!losingSide) {
-                  label = 'Fund Appeal'
-                  disabled = false
-                  method = () =>
-                    this.handleActionClick(
-                      modalConstants.ACTION_MODAL_ENUM.FundAppeal,
-                      SIDE
-                    )
-                } else if (timestamp < endOfFirstHalf) {
-                  label = 'Fund Appeal'
-                  disabled = false
-                  method = () =>
-                    this.handleActionClick(
-                      modalConstants.ACTION_MODAL_ENUM.FundAppeal,
-                      SIDE
-                    )
-                }
-              } else label = 'Waiting For Opponent Fees'
-            } else if (timestamp > appealPeriodEnd)
-              label = 'Waiting Enforcement'
-          } else if (countdown > 0) label = 'Wating Appeals'
-      } else if (
-        submitterFees > 0 &&
-        challengerFees > 0 &&
-        timestamp > challengerDepositTime + arbitrationFeesWaitingTime
-      ) {
-        icon = 'gavel'
-        disabled = false
-        method = this.handleExecuteRequestClick
-        if (submitterFees > challengerFees) label = 'Timeout Challenger'
-        else label = 'Timeout Submitter'
-      } else if (
-        timestamp >= latestRequest.submissionTime + challengePeriodDuration ||
-        (countdown && countdown.getTime && countdown.getTime() === 0)
-      ) {
-        method = this.handleExecuteRequestClick
-        icon = 'check'
-        disabled = false
-        label = 'Execute Request'
-      } else if (
-        challengerDepositTime > 0 &&
-        timestamp - challengerDepositTime < arbitrationFeesWaitingTime &&
-        (userAccount ===
-          token.latestRequest.parties[tcrConstants.SIDE.Requester] ||
-          userAccount ===
-            token.latestRequest.parties[tcrConstants.SIDE.Challenger])
-      ) {
-        icon = 'gavel'
-        label = 'Pay Arbitration Fees'
-        disabled = false
-        if (
-          challengerFees > submitterFees &&
-          userAccount ===
-            token.latestRequest.parties[tcrConstants.SIDE.Requester]
-        )
-          method = () =>
-            this.handleActionClick(
-              modalConstants.ACTION_MODAL_ENUM.FundRequester
-            )
-        else if (
-          submitterFees > challengerFees &&
-          userAccount ===
-            token.latestRequest.parties[tcrConstants.SIDE.Challenger]
-        )
-          method = () =>
-            this.handleActionClick(
-              modalConstants.ACTION_MODAL_ENUM.FundChallenger
-            )
-        else {
-          icon = 'hourglass-half'
-          label = 'Waiting Requester Fees'
-          disabled = true
-        }
-      } else if (
-        userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
-      ) {
-        icon = 'hourglass-half'
-        disabled = true
-        label = 'Waiting Challenges'
-      } else {
-        icon = 'gavel'
-        disabled = false
-        method = () =>
-          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Challenge)
-        if (isRegistrationRequest(token.status))
-          label = 'Challenge Registration'
-        else label = 'Challenge Clearing'
-      }
-    else {
-      disabled = false
-      if (token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
-        method = () =>
-          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Clear)
-        label = 'Submit Clearing Request'
-        icon = 'times-circle'
-      } else {
-        label = 'Resubmit Token'
-        icon = 'plus'
-        method = () =>
-          this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.Resubmit)
-      }
-    }
-
-    return (
-      <Button
-        disabled={disabled}
-        onClick={method}
-        style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
-        type="primary"
-      >
-        <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
-        {label}
-      </Button>
-    )
   }
 
   componentDidMount() {
@@ -550,8 +345,14 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { countdown, evidences } = this.state
-    const { token, accounts, filter, match } = this.props
+    const { countdown, evidences, timestamp } = this.state
+    const {
+      token,
+      accounts,
+      filter,
+      match,
+      arbitrableTokenListData
+    } = this.props
     const { filters } = filter
     const { tokenID } = match.params
 
@@ -718,7 +519,15 @@ class TokenDetails extends PureComponent {
               )}
             </div>
             <div className="TokenDetails-action">
-              {this.getActionButton(token, accounts.data[0])}
+              {getActionButton({
+                item: token,
+                userAccount: accounts.data[0],
+                tcr: arbitrableTokenListData,
+                timestamp,
+                countdown,
+                handleActionClick: this.handleActionClick,
+                handleExecuteRequestClick: this.handleExecuteRequestClick
+              })}
             </div>
           </div>
         </div>
