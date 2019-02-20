@@ -676,31 +676,28 @@ class BadgeDetails extends PureComponent {
           </div>
         </div>
         <br />
-        {badge.latestRequest.disputed &&
-          !badge.latestRequest.resolved &&
-          badge.latestRequest.dispute.status !==
-            tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
-            <div className="TokenDescription">
-              <hr className="TokenDescription-separator" />
-              <h3>Evidence</h3>
-              <div className="TokenDescription-evidence">
-                <div className="TokenDescription-evidence--list">
-                  {Object.keys(evidences).map(key => (
-                    <div
-                      className="TokenDescription-evidence--item"
-                      key={key}
-                      onClick={this.handleViewEvidenceClick(evidences[key])}
-                    >
-                      <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
-                    </div>
-                  ))}
-                </div>
-                <Button onClick={this.handleOpenEvidenceModal} type="secondary">
-                  Submit Evidence
-                </Button>
+        {badge.latestRequest && !badge.latestRequest.resolved && (
+          <div className="TokenDescription">
+            <hr className="TokenDescription-separator" />
+            <h3>Evidence</h3>
+            <div className="TokenDescription-evidence">
+              <div className="TokenDescription-evidence--list">
+                {Object.keys(evidences).map(key => (
+                  <div
+                    className="TokenDescription-evidence--item"
+                    key={key}
+                    onClick={this.handleViewEvidenceClick(evidences[key])}
+                  >
+                    <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
+                  </div>
+                ))}
               </div>
+              <Button onClick={this.handleOpenEvidenceModal} type="secondary">
+                Submit Evidence
+              </Button>
             </div>
-          )}
+          </div>
+        )}
       </div>
     )
   }
