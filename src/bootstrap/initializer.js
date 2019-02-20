@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { RenderIf } from 'lessdux'
-import { ClimbingBoxLoader } from 'react-spinners'
+import { BeatLoader } from 'react-spinners'
 
 import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
@@ -61,7 +61,7 @@ class Initializer extends PureComponent {
         failedLoading={
           <RequiresMetaMaskPage needsUnlock={Boolean(web3.eth)} web3={web3} />
         }
-        loading={<ClimbingBoxLoader color="#3d464d" />}
+        loading={<BeatLoader color="#3d464d" />}
         resource={accounts}
       />
     )
