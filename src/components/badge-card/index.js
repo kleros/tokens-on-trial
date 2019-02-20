@@ -25,7 +25,7 @@ const getBadgeHeaderText = token => {
     return 'Registered'
   if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
     return 'Challenged'
-  return 'Waiting'
+  return 'Pending'
 }
 
 const BadgeCard = ({ token }) => (
@@ -41,7 +41,6 @@ const BadgeCard = ({ token }) => (
         icon="check"
         style={{ visibility: 'hidden' }}
       />{' '}
-      {/* Used for spacing */}
     </div>
     <Link
       className="BadgeCard-content"

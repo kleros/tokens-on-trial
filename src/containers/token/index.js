@@ -700,7 +700,13 @@ class TokenDetails extends PureComponent {
                         icon="clock"
                       />
                       <div className="BadgeDetails-timer">
-                        {`Challenge Deadline ${
+                        {`${
+                          token.latestRequest.dispute &&
+                          token.latestRequest.dispute.status !==
+                            tcrConstants.DISPUTE_STATUS.Appealable.toString()
+                            ? 'Appeal'
+                            : 'Challenge'
+                        } Deadline ${
                           countdown instanceof Date
                             ? countdown.toISOString().substr(11, 8)
                             : '--:--:--'

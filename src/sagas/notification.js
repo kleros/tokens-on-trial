@@ -88,8 +88,8 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         if (returnValues._disputed === false)
           message = `${
             isRequester
-              ? 'Your token clearing request'
-              : 'A token clearing request you challenged'
+              ? 'Your token delisting request'
+              : 'A token delisting request you challenged'
           } has been executed.`
         else
           message = `${
