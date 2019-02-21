@@ -18,6 +18,7 @@ import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
 import FilterBar from '../filter-bar'
+import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
 import { truncateMiddle, getRemainingTime, getBadgeStyle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
@@ -32,27 +33,6 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 
 import './token.css'
-
-const CountdownRenderer = ({ days, hours, minutes, seconds, completed }) => {
-  if (completed) return null
-
-  return (
-    <span>
-      {days > 0 ? `${days} Days` : ''}
-      {hours.toLocaleString(undefined, { minimumIntegerDigits: 2 })}:
-      {minutes.toLocaleString(undefined, { minimumIntegerDigits: 2 })}:
-      {seconds.toLocaleString(undefined, { minimumIntegerDigits: 2 })}
-    </span>
-  )
-}
-
-CountdownRenderer.propTypes = {
-  days: PropTypes.number.isRequired,
-  hours: PropTypes.number.isRequired,
-  minutes: PropTypes.number.isRequired,
-  seconds: PropTypes.number.isRequired,
-  completed: PropTypes.bool.isRequired
-}
 
 class TokenDetails extends PureComponent {
   static propTypes = {
@@ -216,7 +196,6 @@ class TokenDetails extends PureComponent {
             })
         )
     })
-
     arbitrableTokenList.events
       .WaitingOpponent({ fromBlock: 0 })
       .on('data', e => {
@@ -386,10 +365,10 @@ class TokenDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[token.clientStatus]
                 )}
               </span>
-              {token.latestRequest.dispute &&
-                Number(token.latestRequest.dispute.status) ===
+              {latestRequest.dispute &&
+                Number(latestRequest.dispute.status) ===
                   tcrConstants.DISPUTE_STATUS.Appealable &&
-                !token.latestRequest.latestRound.appealed && (
+                !latestRequest.latestRound.appealed && (
                   <span
                     className="BadgeDetails-timer"
                     style={{
@@ -405,25 +384,21 @@ class TokenDetails extends PureComponent {
                       style={{ marginRight: '10px' }}
                     />
                     Arbitration Result:{' '}
-                    {
-                      tcrConstants.RULING_OPTIONS[
-                        token.latestRequest.dispute.status
-                      ]
-                    }{' '}
+                    {tcrConstants.RULING_OPTIONS[latestRequest.dispute.status]}{' '}
                     Request
                   </span>
                 )}
               {!(
                 token.clientStatus <= 1 ||
-                (hasPendingRequest(token.status, token.latestRequest) &&
-                  token.latestRequest.dispute &&
-                  token.latestRequest.dispute.status !==
+                (hasPendingRequest(token.status, latestRequest) &&
+                  latestRequest.dispute &&
+                  latestRequest.dispute.status !==
                     tcrConstants.DISPUTE_STATUS.Appealable.toString())
               ) &&
                 !countdownCompleted &&
                 time > 0 && (
                   <span style={{ display: 'flex', alignItems: 'center' }}>
-                    {!token.latestRequest.dispute && (
+                    {!latestRequest.dispute && (
                       <>
                         <FontAwesomeIcon
                           className="TokenDetails-icon"
@@ -432,8 +407,8 @@ class TokenDetails extends PureComponent {
                         />
                         <div className="BadgeDetails-timer">
                           {`${
-                            token.latestRequest.dispute &&
-                            token.latestRequest.dispute.status !==
+                            latestRequest.dispute &&
+                            latestRequest.dispute.status !==
                               tcrConstants.DISPUTE_STATUS.Appealable.toString()
                               ? 'Appeal'
                               : 'Challenge'
@@ -465,7 +440,7 @@ class TokenDetails extends PureComponent {
             </div>
           </div>
         </div>
-        {token.latestRequest && !token.latestRequest.resolved && (
+        {latestRequest && !latestRequest.resolved && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
             <h3>Evidence</h3>
