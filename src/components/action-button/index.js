@@ -11,8 +11,7 @@ const getActionButton = ({
   item,
   userAccount,
   tcr,
-  timestamp,
-  countdown,
+  countdownCompleted,
   handleActionClick,
   handleExecuteRequestClick
 }) => {
@@ -62,7 +61,7 @@ const getActionButton = ({
           )
           const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
           const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
-          if (timestamp < appealPeriodEnd) {
+          if (Date.now() < appealPeriodEnd) {
             const SIDE =
               userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
                 ? tcrConstants.SIDE.Requester
@@ -96,7 +95,7 @@ const getActionButton = ({
                     modalConstants.ACTION_MODAL_ENUM.FundAppeal,
                     SIDE
                   )
-              } else if (timestamp < endOfFirstHalf) {
+              } else if (Date.now() < endOfFirstHalf) {
                 label = 'Fund Appeal'
                 disabled = false
                 method = () =>
@@ -106,12 +105,12 @@ const getActionButton = ({
                   )
               }
             } else label = 'Waiting For Opponent Fees'
-          } else if (timestamp > appealPeriodEnd) label = 'Waiting Enforcement'
-        } else if (countdown > 0) label = 'Wating Appeals'
+          } else if (Date.now() > appealPeriodEnd) label = 'Waiting Enforcement'
+        } else if (!countdownCompleted) label = 'Waiting Appeals'
     } else if (
       submitterFees > 0 &&
       challengerFees > 0 &&
-      timestamp > challengerDepositTime + arbitrationFeesWaitingTime
+      Date.now() > challengerDepositTime + arbitrationFeesWaitingTime
     ) {
       icon = 'gavel'
       disabled = false
@@ -119,8 +118,8 @@ const getActionButton = ({
       if (submitterFees > challengerFees) label = 'Timeout Challenger'
       else label = 'Timeout Submitter'
     } else if (
-      timestamp >= latestRequest.submissionTime + challengePeriodDuration ||
-      (countdown && countdown.getTime && countdown.getTime() === 0)
+      Date.now() >= latestRequest.submissionTime + challengePeriodDuration ||
+      countdownCompleted
     ) {
       method = handleExecuteRequestClick
       icon = 'check'
@@ -128,7 +127,7 @@ const getActionButton = ({
       label = 'Execute Request'
     } else if (
       challengerDepositTime > 0 &&
-      timestamp - challengerDepositTime < arbitrationFeesWaitingTime &&
+      Date.now() - challengerDepositTime < arbitrationFeesWaitingTime &&
       (userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger])
     ) {

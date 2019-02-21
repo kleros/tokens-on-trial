@@ -17,10 +17,10 @@ export const truncateMiddle = str =>
 export const getRemainingTime = (
   item,
   arbitrableTokenListData,
-  currentTime,
   tcrConstants,
   losingSide
 ) => {
+  const currentTime = Date.now()
   const { latestRequest } = item
   const { latestRound } = latestRequest
   let time

@@ -4,7 +4,8 @@ import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
 import * as mime from 'mime-types'
-import { ClimbingBoxLoader } from 'react-spinners'
+import { BeatLoader } from 'react-spinners'
+import Countdown from 'react-countdown-now'
 
 import {
   arbitrableTokenList,
@@ -17,7 +18,7 @@ import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
 import FilterBar from '../filter-bar'
-import { hasPendingRequest, getBlock } from '../../utils/tcr'
+import { hasPendingRequest } from '../../utils/tcr'
 import { truncateMiddle, getRemainingTime, getBadgeStyle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
@@ -31,6 +32,27 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 
 import './token.css'
+
+const CountdownRenderer = ({ days, hours, minutes, seconds, completed }) => {
+  if (completed) return null
+
+  return (
+    <span>
+      {days > 0 ? `${days} Days` : ''}
+      {hours.toLocaleString(undefined, { minimumIntegerDigits: 2 })}:
+      {minutes.toLocaleString(undefined, { minimumIntegerDigits: 2 })}:
+      {seconds.toLocaleString(undefined, { minimumIntegerDigits: 2 })}
+    </span>
+  )
+}
+
+CountdownRenderer.propTypes = {
+  days: PropTypes.number.isRequired,
+  hours: PropTypes.number.isRequired,
+  minutes: PropTypes.number.isRequired,
+  seconds: PropTypes.number.isRequired,
+  completed: PropTypes.bool.isRequired
+}
 
 class TokenDetails extends PureComponent {
   static propTypes = {
@@ -65,13 +87,9 @@ class TokenDetails extends PureComponent {
   }
 
   state = {
-    timestamp: null,
-    countdown: null,
-    listeningForEvidence: false,
-    evidences: []
+    evidences: [],
+    countdownCompleted: false
   }
-
-  interval = null
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
@@ -112,7 +130,7 @@ class TokenDetails extends PureComponent {
   }
 
   componentDidMount() {
-    const { match, fetchToken } = this.props
+    const { match, fetchToken, accounts } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
     arbitrableTokenList.events.Ruling().on('data', event => {
@@ -123,21 +141,19 @@ class TokenDetails extends PureComponent {
         (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
           latestRequest.appealDisputeID ===
             Number(event.returnValues._disputeID))
-      ) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
+      )
         fetchToken(tokenID)
-      }
+    })
+    arbitrableTokenList.events.RewardWithdrawal().on('data', event => {
+      const { token } = this.state
+      if (!token || event.returnValues._beneficiary !== accounts.data[0]) return
+      fetchToken(event.returnValues._tokenID)
     })
     arbitrableTokenList.events.TokenStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
-      if (tokenID === event.returnValues._tokenID) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
-        fetchToken(tokenID)
-      }
+      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
     arbitrator.events.AppealPossible().on('data', event => {
       const { token } = this.state
@@ -149,203 +165,87 @@ class TokenDetails extends PureComponent {
         (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
           latestRequest.appealDisputeID ===
             Number(event.returnValues._disputeID))
-      ) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
+      )
         fetchToken(tokenID)
-      }
     })
     arbitrableAddressList.events.AddressStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
-      if (token.addr === event.returnValues._address) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
-        fetchToken(tokenID)
-      }
+      if (token.addr === event.returnValues._address) fetchToken(tokenID)
     })
     arbitrableTokenList.events.TokenStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
-      if (tokenID === event.returnValues._tokenID) {
-        clearInterval(this.interval)
-        this.setState({ countdown: null })
-        fetchToken(tokenID)
-      }
+      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitrableTokenList.events
-      .Evidence({ fromBlock: 0 })
-      .on('data', async e => {
-        const { token } = this.state
-        if (!token) return
-        const { latestRequest } = token
+    arbitrableTokenList.events.Evidence({ fromBlock: 0 }).on('data', e => {
+      const { token } = this.state
+      if (!token) return
+      const { latestRequest } = token
 
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
+      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+        return
 
-        archon.arbitrable
-          .getEvidence(
-            arbitrableTokenList._address,
-            arbitrator._address,
-            latestRequest.evidenceGroupID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence =>
-                  evidence.evidenceJSONValid &&
-                  (evidence.evidenceJSON.fileURI.length === 0 ||
-                    evidence.fileValid)
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
+      archon.arbitrable
+        .getEvidence(
+          arbitrableTokenList._address,
+          arbitrator._address,
+          latestRequest.evidenceGroupID
+        )
+        .then(resp =>
+          resp
+            .filter(
+              evidence =>
+                evidence.evidenceJSONValid &&
+                (evidence.evidenceJSON.fileURI.length === 0 ||
+                  evidence.fileValid)
+            )
+            .forEach(evidence => {
+              const { evidences } = this.state
+              const { evidenceJSON } = evidence
+              const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+              evidenceJSON.icon = getFileIcon(mimeType)
+              this.setState({
+                evidences: {
+                  ...evidences,
+                  [evidence.transactionHash]: evidenceJSON
+                }
               })
-          )
-      })
+            })
+        )
+    })
 
     arbitrableTokenList.events
       .WaitingOpponent({ fromBlock: 0 })
-      .on('data', async e => {
+      .on('data', e => {
         const { token } = this.state
         if (!token) return
 
-        if (e.returnValues._tokenID === tokenID) {
-          clearInterval(this.interval)
-          this.setState({ countdown: null })
-          fetchToken(tokenID)
-        }
+        if (e.returnValues._tokenID === tokenID) fetchToken(tokenID)
       })
   }
 
-  initCountDown = async () => {
-    const { token, arbitrableTokenListData, accounts } = this.props
-    const { countdown, listeningForEvidence } = this.state
-    if (token) this.setState({ token })
-
-    if (
-      token &&
-      hasPendingRequest(token) &&
-      countdown === null &&
-      arbitrableTokenListData &&
-      arbitrableTokenListData.data &&
-      arbitrator &&
-      arbitrableTokenList
-    ) {
-      this.setState({ countdown: 'Loading...' })
-      const { latestRequest } = token
-
-      if (!listeningForEvidence && latestRequest.disputed) {
-        // Listen for evidence events.
-        this.setState({ listeningForEvidence: true })
-        archon.arbitrable
-          .getEvidence(
-            arbitrableTokenList._address,
-            arbitrator._address,
-            latestRequest.disputeID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence => evidence.evidenceJSONValid && evidence.fileValid
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
-              })
-          )
-      }
-
-      let losingSide
-      const userAccount = accounts.data[0]
-      if (
-        latestRequest.dispute &&
-        Number(latestRequest.dispute.status) ===
-          tcrConstants.DISPUTE_STATUS.Appealable &&
-        !latestRequest.latestRound.appealed
-      )
-        if (
-          userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
-          latestRequest.dispute.ruling ===
-            tcrConstants.RULING_OPTIONS.Refuse.toString()
-        )
-          losingSide = true
-        else if (
-          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-          latestRequest.dispute.ruling ===
-            tcrConstants.RULING_OPTIONS.Accept.toString()
-        )
-          losingSide = true
-
-      // Set timer once we have data.
-      getBlock(null, web3, 'latest', block => {
-        const time = getRemainingTime(
-          token,
-          arbitrableTokenListData,
-          block.timestamp * 1000,
-          tcrConstants,
-          losingSide
-        )
-        if (time < 94608000) {
-          // Very large duration for testing cases where the arbitrator doesn't have an appeal period
-          this.setState({
-            timestamp: block.timestamp,
-            countdown: new Date(time)
-          })
-          clearInterval(this.interval)
-          this.interval = setInterval(() => {
-            const { countdown } = this.state
-            if (countdown > 0)
-              this.setState({ countdown: new Date(countdown - 1000) })
-          }, 1000)
-        }
-      })
-    }
-  }
-
-  withdrawFunds = async () => {
+  withdrawFunds = () => {
     const { withdrawTokenFunds, token } = this.props
     withdrawTokenFunds({ ID: token.ID, request: token.numberOfRequests - 1 })
   }
 
-  componentDidUpdate() {
-    this.initCountDown()
+  onCountdownComplete = () => {
+    this.setState({ countdownCompleted: true })
   }
 
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
-  componentWillUnmount() {
-    clearInterval(this.interval)
-  }
-
   componentWillReceiveProps(nextProps) {
     const { token } = nextProps
-    if (!token) return
-    else this.setState({ token })
-    this.initCountDown()
+    if (token) this.setState({ token })
   }
 
   render() {
-    const { countdown, evidences, timestamp } = this.state
+    const { evidences, countdownCompleted } = this.state
     const {
       token,
       accounts,
@@ -359,11 +259,40 @@ class TokenDetails extends PureComponent {
     if (!token)
       return (
         <div className="Page Page--loading">
-          <ClimbingBoxLoader color="#3d464d" />
+          <BeatLoader color="#3d464d" />
         </div>
       )
 
     if (token.ID !== tokenID) return window.location.reload()
+
+    let losingSide
+    const userAccount = accounts.data[0]
+    const { latestRequest } = token
+    if (
+      latestRequest.dispute &&
+      Number(latestRequest.dispute.status) ===
+        tcrConstants.DISPUTE_STATUS.Appealable &&
+      !latestRequest.latestRound.appealed
+    )
+      if (
+        userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
+        latestRequest.dispute.ruling ===
+          tcrConstants.RULING_OPTIONS.Refuse.toString()
+      )
+        losingSide = true
+      else if (
+        userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
+        latestRequest.dispute.ruling ===
+          tcrConstants.RULING_OPTIONS.Accept.toString()
+      )
+        losingSide = true
+
+    const time = getRemainingTime(
+      token,
+      arbitrableTokenListData,
+      tcrConstants,
+      losingSide
+    )
 
     return (
       <div className="Page">
@@ -489,42 +418,47 @@ class TokenDetails extends PureComponent {
                 (hasPendingRequest(token.status, token.latestRequest) &&
                   token.latestRequest.dispute &&
                   token.latestRequest.dispute.status !==
-                    tcrConstants.DISPUTE_STATUS.Appealable.toString()) ||
-                Number(countdown) === 0
-              ) && (
-                <span style={{ display: 'flex', alignItems: 'center' }}>
-                  {!token.latestRequest.dispute && (
-                    <>
-                      <FontAwesomeIcon
-                        className="TokenDetails-icon"
-                        color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                        icon="clock"
-                      />
-                      <div className="BadgeDetails-timer">
-                        {`${
-                          token.latestRequest.dispute &&
-                          token.latestRequest.dispute.status !==
-                            tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                            ? 'Appeal'
-                            : 'Challenge'
-                        } Deadline ${
-                          countdown instanceof Date
-                            ? countdown.toISOString().substr(11, 8)
-                            : '--:--:--'
-                        }`}
-                      </div>
-                    </>
-                  )}
-                </span>
-              )}
+                    tcrConstants.DISPUTE_STATUS.Appealable.toString())
+              ) &&
+                !countdownCompleted &&
+                time > 0 && (
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    {!token.latestRequest.dispute && (
+                      <>
+                        <FontAwesomeIcon
+                          className="TokenDetails-icon"
+                          color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                          icon="clock"
+                        />
+                        <div className="BadgeDetails-timer">
+                          {`${
+                            token.latestRequest.dispute &&
+                            token.latestRequest.dispute.status !==
+                              tcrConstants.DISPUTE_STATUS.Appealable.toString()
+                              ? 'Appeal'
+                              : 'Challenge'
+                          } Deadline`}{' '}
+                          {time ? (
+                            <Countdown
+                              date={Date.now() + time}
+                              renderer={CountdownRenderer}
+                              onComplete={this.onCountdownComplete}
+                            />
+                          ) : (
+                            '--:--:--'
+                          )}
+                        </div>
+                      </>
+                    )}
+                  </span>
+                )}
             </div>
             <div className="TokenDetails-action">
               {getActionButton({
                 item: token,
                 userAccount: accounts.data[0],
                 tcr: arbitrableTokenListData,
-                timestamp,
-                countdown,
+                countdownCompleted,
                 handleActionClick: this.handleActionClick,
                 handleExecuteRequestClick: this.handleExecuteRequestClick
               })}
