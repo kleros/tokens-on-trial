@@ -14,7 +14,7 @@
   REACT_APP_DEV_ARBITRATOR_ADDRESS="0xa0ca0d19cab7d2064b620f80a692b275d94f0ed4"
   REACT_APP_DEV_FILE_BASE_URL="https://staging-cfs.s3.us-east-2.amazonaws.com"
   REACT_APP_DEV_FILE_UPLOAD_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/cfs"
-  REACT_APP_DEV_PATCH_USER_SETTINGS_URL="https://8a8aoprv935hoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings"
+  REACT_APP_DEV_PATCH_USER_SETTINGS_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings"
 # Production context: All deploys to the main
 # repository branch will inherit these settings.
 [context.production]

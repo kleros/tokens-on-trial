@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as modalActions from '../../actions/modal'
 import * as walletActions from '../../actions/wallet'
@@ -10,6 +11,7 @@ import NavOverlay from '../../components/nav-overlay'
 import { web3 } from '../../bootstrap/dapp-api'
 
 import { SettingsForm, submitSettingsForm } from './components/settings-form'
+
 import './settings-modal.css'
 
 class SettingsModal extends PureComponent {
@@ -25,6 +27,8 @@ class SettingsModal extends PureComponent {
     openSettingsModal: PropTypes.func.isRequired,
     submitSettingsForm: PropTypes.func.isRequired
   }
+
+  state = { settingsSubmitted: false }
 
   handleOverlayClick = () => {
     const { closeSettingsModal } = this.props
@@ -53,7 +57,7 @@ class SettingsModal extends PureComponent {
     }
 
     try {
-      await (await fetch(process.env.REACT_APP_PATCH_USER_SETTINGS_URL, {
+      await fetch(process.env.REACT_APP_DEV_PATCH_USER_SETTINGS_URL, {
         body: JSON.stringify({
           payload: {
             address: accounts.data[0],
@@ -66,7 +70,8 @@ class SettingsModal extends PureComponent {
         }),
         headers: { 'Content-Type': 'application/json' },
         method: 'PATCH'
-      })).json()
+      })
+      this.setState({ settingsSubmitted: true })
     } catch (err) {
       console.error(err)
     }
@@ -80,37 +85,52 @@ class SettingsModal extends PureComponent {
       submitSettingsForm
     } = this.props
 
+    const { settingsSubmitted } = this.state
+
     return (
       <div className="SettingsModal" onClick={this.handleOpenSettingsClick}>
         {children}
         {isSettingsModalOpen && (
-          <div>
+          <>
             <NavOverlay onClick={this.handleOverlayClick} />
             <div className="SettingsModal-window">
-              <h4 className="SettingsModal-window-title">
-                Register to receive notifications by email
-              </h4>
-              <hr style={{ margin: 0, marginBottom: '15px' }} />
-              <span>You will be informed when:</span>
-              <SettingsForm
-                className="SettingsModal-window-form"
-                initialValues={{
-                  dispute: settings.data.dispute,
-                  rulingGiven: settings.data.rulingGiven,
-                  shouldFund: settings.data.shouldFund
-                }}
-                onSubmit={this.handleUpdateSettingsClick}
-              />
-              <div className="SettingsModal-window-submit">
-                <Button
-                  className="SettingsModal-window-submit-button"
-                  onClick={submitSettingsForm}
-                >
-                  Register
-                </Button>
-              </div>
+              {settingsSubmitted ? (
+                <div className="SettingsModal-statusOverlay">
+                  <FontAwesomeIcon
+                    className="SettingsModal-statusOverlay-icon"
+                    color="#009aff"
+                    icon="check"
+                  />
+                  Done
+                </div>
+              ) : (
+                <>
+                  <h4 className="SettingsModal-window-title">
+                    Register to receive notifications by email
+                  </h4>
+                  <hr style={{ margin: 0, marginBottom: '15px' }} />
+                  <span>You will be informed when:</span>
+                  <SettingsForm
+                    className="SettingsModal-window-form"
+                    initialValues={{
+                      dispute: settings.data.dispute,
+                      rulingGiven: settings.data.rulingGiven,
+                      shouldFund: settings.data.shouldFund
+                    }}
+                    onSubmit={this.handleUpdateSettingsClick}
+                  />
+                  <div className="SettingsModal-window-submit">
+                    <Button
+                      className="SettingsModal-window-submit-button"
+                      onClick={submitSettingsForm}
+                    >
+                      Register
+                    </Button>
+                  </div>
+                </>
+              )}
             </div>
-          </div>
+          </>
         )}
       </div>
     )

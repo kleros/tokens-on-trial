@@ -7,6 +7,20 @@
   text-align: center;
   width: 40px;
 
+  &-statusOverlay {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: 100px;
+    justify-content: space-evenly;
+    pointer-events: none;
+
+    &-icon {
+      height: 59px !important;
+      width: 59px !important;
+    }
+  }
+
   &-window {
     background: $white;
     border: 1px solid $border;
