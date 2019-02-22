@@ -10,19 +10,23 @@ export const getBadgeStyle = (badge, tcrConstants) => {
   return { backgroundImage: `url(${WaitingBadge})`, color: '#656565' }
 }
 
+export const capitalizeFirst = s =>
+  s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : ''
+
 // Truncate with ellipsis in the middle.
 export const truncateMiddle = str =>
   `${str.slice(0, 6)}...${str.slice(str.length - 5, str.length - 1)}`
 
-export const getRemainingTime = (
-  item,
-  arbitrableTokenListData,
-  tcrConstants,
-  losingSide
-) => {
+export const getRemainingTime = (item, tcr, tcrConstants, losingSide) => {
   const currentTime = Date.now()
   const { latestRequest } = item
   const { latestRound } = latestRequest
+
+  if (!tcr.data) {
+    console.warn('No tcr data passed to getRemainingTime.')
+    return 0
+  }
+
   let time
   if (
     !latestRequest.challengerDepositTime ||
@@ -30,12 +34,12 @@ export const getRemainingTime = (
   )
     time =
       latestRequest.submissionTime +
-      arbitrableTokenListData.data.challengePeriodDuration -
+      tcr.data.challengePeriodDuration -
       currentTime
   else if (latestRequest.disputed === false)
     time =
       latestRequest.challengerDepositTime +
-      arbitrableTokenListData.data.arbitrationFeesWaitingTime -
+      tcr.data.arbitrationFeesWaitingTime -
       currentTime
   else if (
     latestRequest.dispute.status ===

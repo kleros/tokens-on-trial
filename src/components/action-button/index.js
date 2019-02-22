@@ -13,7 +13,8 @@ const getActionButton = ({
   tcr,
   countdownCompleted,
   handleActionClick,
-  handleExecuteRequestClick
+  handleExecuteRequestClick,
+  isBadge
 }) => {
   let method
   let disabled = true
@@ -92,7 +93,9 @@ const getActionButton = ({
                 disabled = false
                 method = () =>
                   handleActionClick(
-                    modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                    modalConstants.ACTION_MODAL_ENUM[
+                      `FundAppeal${isBadge ? 'Badge' : ''}`
+                    ],
                     SIDE
                   )
               } else if (Date.now() < endOfFirstHalf) {
@@ -100,7 +103,9 @@ const getActionButton = ({
                 disabled = false
                 method = () =>
                   handleActionClick(
-                    modalConstants.ACTION_MODAL_ENUM.FundAppeal,
+                    modalConstants.ACTION_MODAL_ENUM[
+                      `FundAppeal${isBadge ? 'Badge' : ''}`
+                    ],
                     SIDE
                   )
               }
@@ -139,13 +144,21 @@ const getActionButton = ({
         userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
       )
         method = () =>
-          handleActionClick(modalConstants.ACTION_MODAL_ENUM.FundRequester)
+          handleActionClick(
+            modalConstants.ACTION_MODAL_ENUM[
+              `FundRequester${isBadge ? 'Badge' : ''}`
+            ]
+          )
       else if (
         submitterFees > challengerFees &&
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
       )
         method = () =>
-          handleActionClick(modalConstants.ACTION_MODAL_ENUM.FundChallenger)
+          handleActionClick(
+            modalConstants.ACTION_MODAL_ENUM[
+              `FundChallenger${isBadge ? 'Badge' : ''}`
+            ]
+          )
       else {
         icon = 'hourglass-half'
         label = 'Waiting Requester Fees'
@@ -161,21 +174,28 @@ const getActionButton = ({
       icon = 'gavel'
       disabled = false
       method = () =>
-        handleActionClick(modalConstants.ACTION_MODAL_ENUM.Challenge)
+        handleActionClick(
+          modalConstants.ACTION_MODAL_ENUM[`Challenge${isBadge ? 'Badge' : ''}`]
+        )
       if (isRegistrationRequest(item.status)) label = 'Challenge Registration'
       else label = 'Challenge Clearing'
     }
   else {
     disabled = false
     if (item.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
-      method = () => handleActionClick(modalConstants.ACTION_MODAL_ENUM.Clear)
+      method = () =>
+        handleActionClick(
+          modalConstants.ACTION_MODAL_ENUM[`Clear${isBadge ? 'Badge' : ''}`]
+        )
       label = 'Submit Clearing Request'
       icon = 'times-circle'
     } else {
       label = 'Resubmit Token'
       icon = 'plus'
       method = () =>
-        handleActionClick(modalConstants.ACTION_MODAL_ENUM.Resubmit)
+        handleActionClick(
+          modalConstants.ACTION_MODAL_ENUM[`Resubmit${isBadge ? 'Badge' : ''}`]
+        )
     }
   }
 

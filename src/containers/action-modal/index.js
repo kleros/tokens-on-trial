@@ -481,195 +481,194 @@ class ActionModal extends PureComponent {
 
     const { fileInfoMessage, file } = this.state
 
-    return (
-      <Modal
-        className="ActionModal"
-        isOpen={openActionModal !== null}
-        onRequestClose={closeActionModal}
-      >
-        {!token.creating &&
-        !token.updating &&
-        !badge.creating &&
-        !badge.updating ? (
-          (() => {
-            switch (openActionModal) {
-              case modalConstants.ACTION_MODAL_ENUM.Submit:
-              case modalConstants.ACTION_MODAL_ENUM.Resubmit:
-                return (
-                  <Submit
-                    tcr={arbitrableTokenListData}
-                    form={submitTokenForm}
-                    submitItem={this.handleSubmitTokenClick}
-                    submitItemForm={submitTokenForm}
-                    file={file}
-                    formIsInvalid={tokenFormIsInvalid}
-                    fileInfoMessage={fileInfoMessage}
-                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    closeActionModal={this.handleCloseTokenSubmission}
-                    item={
-                      openActionModal ===
-                      modalConstants.ACTION_MODAL_ENUM.Submit
-                        ? null
-                        : token
-                    }
-                    resubmit={this.handleResubmitTokenClick}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.Clear:
-                return (
-                  <Clear
-                    tcr={arbitrableTokenListData}
-                    item={token.data}
-                    clearItem={this.handleClearTokenClick}
-                    closeActionModal={closeActionModal}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.Challenge:
-                return (
-                  <Challenge
-                    tcr={arbitrableTokenListData}
-                    item={token.data}
-                    closeActionModal={closeActionModal}
-                    fundDispute={this.handleChallengeClick}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.FundRequester:
-                return (
-                  <FundDispute
-                    tcr={arbitrableTokenListData}
-                    closeActionModal={closeActionModal}
-                    fundDispute={this.handleFundRequesterClick}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.FundChallenger:
-                return (
-                  <FundDispute
-                    tcr={arbitrableTokenListData}
-                    closeActionModal={closeActionModal}
-                    fundDispute={this.handleFundChallengerClick}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.FundAppeal:
-                return (
-                  <FundAppeal
-                    tcr={arbitrableTokenListData}
-                    item={token.data}
-                    closeActionModal={closeActionModal}
-                    fundAppeal={this.handleFundAppealClick}
-                    side={actionModalParam}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:
-                return (
-                  <SubmitEvidence
-                    closeActionModal={closeActionModal}
-                    evidenceFormIsInvalid={evidenceFormIsInvalid}
-                    file={file}
-                    fileInfoMessage={fileInfoMessage}
-                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    submitEvidence={this.handleSubmitEvidenceClick}
-                    submitEvidenceForm={submitEvidenceForm}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.ViewEvidence:
-                return (
-                  <ViewEvidence
-                    closeActionModal={closeActionModal}
-                    evidence={actionModalParam}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.SubmitBadge:
-              case modalConstants.ACTION_MODAL_ENUM.ResubmitBadge:
-                return (
-                  <Submit
-                    tcr={arbitrableAddressListData}
-                    submitItem={this.handleSubmitBadgeClick}
-                    closeActionModal={closeActionModal}
-                    badge
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.ClearBadge:
-                return (
-                  <Clear
-                    tcr={arbitrableAddressListData}
-                    closeActionModal={closeActionModal}
-                    clearItem={this.handleClearBadgeClick}
-                    item={badge}
-                    badge
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.ChallengeBadge:
-                return (
-                  <Challenge
-                    tcr={arbitrableAddressListData}
-                    closeActionModal={closeActionModal}
-                    item={badge}
-                    fundDispute={this.handleChallengeBadgeClick}
-                    badge
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.FundRequesterBadge:
-                return (
-                  <FundDispute
-                    tcr={arbitrableAddressListData}
-                    closeActionModal={closeActionModal}
-                    item={badge}
-                    badge
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.FundChallengerBadge:
-                return (
-                  <FundDispute
-                    tcr={arbitrableAddressListData}
-                    closeActionModal={closeActionModal}
-                    fundDispute={this.handleFundChallengerBadgeClick}
-                    item={badge}
-                    badge
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.FundAppealBadge:
-                return (
-                  <FundAppeal
-                    tcr={arbitrableAddressListData}
-                    closeActionModal={closeActionModal}
-                    item={badge}
-                    badge
-                    fundAppeal={this.handleFundAppealBadgeClick}
-                    side={actionModalParam}
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge:
-                return (
-                  <SubmitEvidence
-                    tcr={arbitrableAddressListData}
-                    closeActionModal={closeActionModal}
-                    item={token.data.badge}
-                    evidenceFormIsInvalid={evidenceFormIsInvalid}
-                    file={file}
-                    fileInfoMessage={fileInfoMessage}
-                    handleOnFileDropAccepted={this.handleOnFileDropAccepted}
-                    submitEvidence={this.handleSubmitEvidenceBadgeClick}
-                    submitEvidenceForm={submitEvidenceForm}
-                    badge
-                  />
-                )
-              case modalConstants.ACTION_MODAL_ENUM.Timeout: // Used to display transaction pending indicator
-                return <div />
-              case undefined:
-              case null:
-                break
-              default:
-                throw new Error('Unhandled modal request')
-            }
-          })()
-        ) : (
+    if (token.creating || token.updating || badge.creating || badge.updating)
+      return (
+        <Modal className="ActionModal" isOpen={openActionModal !== null}>
           <div>
             <small>
               <h5>Transaction pending...</h5>
             </small>
             <BeatLoader color="#3d464d" />
           </div>
-        )}
+        </Modal>
+      )
+
+    return (
+      <Modal
+        className="ActionModal"
+        isOpen={openActionModal !== null}
+        onRequestClose={closeActionModal}
+      >
+        {(() => {
+          switch (openActionModal) {
+            case modalConstants.ACTION_MODAL_ENUM.Submit:
+            case modalConstants.ACTION_MODAL_ENUM.Resubmit:
+              return (
+                <Submit
+                  tcr={arbitrableTokenListData}
+                  form={submitTokenForm}
+                  submitItem={this.handleSubmitTokenClick}
+                  submitItemForm={submitTokenForm}
+                  file={file}
+                  formIsInvalid={tokenFormIsInvalid}
+                  fileInfoMessage={fileInfoMessage}
+                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  closeActionModal={this.handleCloseTokenSubmission}
+                  item={
+                    openActionModal === modalConstants.ACTION_MODAL_ENUM.Submit
+                      ? null
+                      : token
+                  }
+                  resubmit={this.handleResubmitTokenClick}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.Clear:
+              return (
+                <Clear
+                  tcr={arbitrableTokenListData}
+                  item={token.data}
+                  clearItem={this.handleClearTokenClick}
+                  closeActionModal={closeActionModal}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.Challenge:
+              return (
+                <Challenge
+                  tcr={arbitrableTokenListData}
+                  item={token.data}
+                  closeActionModal={closeActionModal}
+                  fundDispute={this.handleChallengeClick}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.FundRequester:
+              return (
+                <FundDispute
+                  tcr={arbitrableTokenListData}
+                  closeActionModal={closeActionModal}
+                  fundDispute={this.handleFundRequesterClick}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.FundChallenger:
+              return (
+                <FundDispute
+                  tcr={arbitrableTokenListData}
+                  closeActionModal={closeActionModal}
+                  fundDispute={this.handleFundChallengerClick}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.FundAppeal:
+              return (
+                <FundAppeal
+                  tcr={arbitrableTokenListData}
+                  item={token.data}
+                  closeActionModal={closeActionModal}
+                  fundAppeal={this.handleFundAppealClick}
+                  side={actionModalParam}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.SubmitEvidence:
+              return (
+                <SubmitEvidence
+                  closeActionModal={closeActionModal}
+                  evidenceFormIsInvalid={evidenceFormIsInvalid}
+                  file={file}
+                  fileInfoMessage={fileInfoMessage}
+                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  submitEvidence={this.handleSubmitEvidenceClick}
+                  submitEvidenceForm={submitEvidenceForm}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.ViewEvidence:
+              return (
+                <ViewEvidence
+                  closeActionModal={closeActionModal}
+                  evidence={actionModalParam}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.SubmitBadge:
+            case modalConstants.ACTION_MODAL_ENUM.ResubmitBadge:
+              return (
+                <Submit
+                  tcr={arbitrableAddressListData}
+                  submitItem={this.handleSubmitBadgeClick}
+                  closeActionModal={closeActionModal}
+                  badge
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.ClearBadge:
+              return (
+                <Clear
+                  tcr={arbitrableAddressListData}
+                  closeActionModal={closeActionModal}
+                  clearItem={this.handleClearBadgeClick}
+                  item={badge}
+                  badge
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.ChallengeBadge:
+              return (
+                <Challenge
+                  tcr={arbitrableAddressListData}
+                  closeActionModal={closeActionModal}
+                  item={badge}
+                  fundDispute={this.handleChallengeBadgeClick}
+                  badge
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.FundRequesterBadge:
+              return (
+                <FundDispute
+                  tcr={arbitrableAddressListData}
+                  closeActionModal={closeActionModal}
+                  item={badge}
+                  badge
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.FundChallengerBadge:
+              return (
+                <FundDispute
+                  tcr={arbitrableAddressListData}
+                  closeActionModal={closeActionModal}
+                  fundDispute={this.handleFundChallengerBadgeClick}
+                  item={badge}
+                  badge
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.FundAppealBadge:
+              return (
+                <FundAppeal
+                  tcr={arbitrableAddressListData}
+                  closeActionModal={closeActionModal}
+                  item={badge}
+                  badge
+                  fundAppeal={this.handleFundAppealBadgeClick}
+                  side={actionModalParam}
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge:
+              return (
+                <SubmitEvidence
+                  tcr={arbitrableAddressListData}
+                  closeActionModal={closeActionModal}
+                  item={token.data.badge}
+                  evidenceFormIsInvalid={evidenceFormIsInvalid}
+                  file={file}
+                  fileInfoMessage={fileInfoMessage}
+                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  submitEvidence={this.handleSubmitEvidenceBadgeClick}
+                  submitEvidenceForm={submitEvidenceForm}
+                  badge
+                />
+              )
+            case modalConstants.ACTION_MODAL_ENUM.Timeout: // Used to display transaction pending indicator
+              return <div />
+            case undefined:
+            case null:
+              break
+            default:
+              throw new Error('Unhandled modal request')
+          }
+        })()}
       </Modal>
     )
   }

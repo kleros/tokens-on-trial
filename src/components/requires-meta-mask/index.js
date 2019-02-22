@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import metaMaskLogo from '../../assets/images/meta-mask-logo.png'
 import Button from '../button'
+import { capitalizeFirst } from '../../utils/ui'
 import './requires-meta-mask.css'
 
 const RequiresMetamask = ({
@@ -37,10 +38,11 @@ const RequiresMetamask = ({
           <h1>Wrong Metamask network configuration.</h1>
           <p>
             Please ensure Metamask is set to the{' '}
-            <strong>{requiredNetwork}</strong> ethereum network
+            <strong>{capitalizeFirst(requiredNetwork)}</strong> ethereum network
           </p>
           <small>
-            Metamask is currently set to the {metamaskNetwork} ethereum network
+            Metamask is currently set to the {capitalizeFirst(metamaskNetwork)}{' '}
+            ethereum network
           </small>
         </>
       )}
@@ -50,8 +52,12 @@ const RequiresMetamask = ({
 
 RequiresMetamask.propTypes = {
   requiredNetwork: PropTypes.string.isRequired,
-  metamaskNetwork: PropTypes.string.isRequired,
+  metamaskNetwork: PropTypes.string,
   needsMetamask: PropTypes.bool.isRequired
+}
+
+RequiresMetamask.defaultProps = {
+  metamaskNetwork: ''
 }
 
 export default RequiresMetamask

@@ -9,10 +9,10 @@ import * as walletActions from '../actions/wallet'
 import RequiresMetaMaskPage from '../containers/requires-meta-mask-page'
 
 import {
-  onlyInfura,
   web3,
   network as networkPromise,
-  requiredNetwork
+  requiredNetwork,
+  onlyInfura
 } from './dapp-api'
 
 class Initializer extends PureComponent {
@@ -38,7 +38,7 @@ class Initializer extends PureComponent {
     fetchAccounts()
 
     let prevAddr
-    window.web3.currentProvider.publicConfigStore.on(
+    web3.currentProvider.publicConfigStore.on(
       'update',
       ({ selectedAddress }) => {
         selectedAddress = web3.utils.toChecksumAddress(selectedAddress)
@@ -46,10 +46,6 @@ class Initializer extends PureComponent {
           prevAddr = selectedAddress
           fetchAccounts()
         }
-        // if (!selectedAddress && prevAddr) {
-        //   // Logging out
-        //   fetchAccounts()
-        // }
       }
     )
   }
@@ -57,23 +53,27 @@ class Initializer extends PureComponent {
   render() {
     const { accounts, children } = this.props
     const { metamaskNetwork } = this.state
-    console.info('res', Boolean(web3))
     return (
       <RenderIf
         done={children}
-        extraFailedValues={[!web3, requiredNetwork !== metamaskNetwork]}
-        extraValues={[
-          accounts.data && (accounts.data[0] || onlyInfura || null)
+        extraFailedValues={[
+          typeof metamaskNetwork === 'string' &&
+            requiredNetwork !== metamaskNetwork
         ]}
         failedLoading={
-          <RequiresMetaMaskPage
-            needsUnlock={Boolean(web3.eth.accounts[0])}
-            needsMetamask={Boolean(!web3)}
-            requiredNetwork={requiredNetwork}
-            metamaskNetwork={metamaskNetwork}
-            web3={web3}
-          />
+          <>
+            <RequiresMetaMaskPage
+              needsUnlock={Boolean(web3.eth.accounts[0])}
+              needsMetamask={Boolean(onlyInfura)}
+              requiredNetwork={requiredNetwork}
+              metamaskNetwork={metamaskNetwork}
+            />
+          </>
         }
+        extraLoadingValues={[
+          !accounts.data || accounts.data.length === 0,
+          !metamaskNetwork
+        ]}
         loading={
           <div
             style={{
@@ -82,7 +82,6 @@ class Initializer extends PureComponent {
               flexDirection: 'column'
             }}
           >
-            <p>Waiting Metamask Unlock</p>
             <BeatLoader color="#3d464d" />
           </div>
         }

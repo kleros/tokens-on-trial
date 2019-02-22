@@ -51,7 +51,6 @@ class SettingsModal extends PureComponent {
         return acc
       }, {})
     }
-    console.info(settings)
 
     try {
       await (await fetch(process.env.REACT_APP_PATCH_USER_SETTINGS_URL, {

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
+import { Link } from 'react-router-dom'
 import Countdown from 'react-countdown-now'
 
 import {
@@ -193,8 +194,6 @@ class BadgeDetails extends PureComponent {
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
-  componentWillUnmount() {}
-
   componentWillReceiveProps(nextProps) {
     const { badge } = nextProps
     if (badge) this.setState({ badge })
@@ -261,7 +260,10 @@ class BadgeDetails extends PureComponent {
           {badge.token && (
             <>
               <div className="TokenDetails-divider" />
-              <div className="BadgeDetails-token">
+              <Link
+                to={`/token/${badge.token.addr}`}
+                className="BadgeDetails-token"
+              >
                 <Img
                   className="BadgeDetails-header-img"
                   src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
@@ -272,7 +274,7 @@ class BadgeDetails extends PureComponent {
                 <h4 className="BadgeDetails-label-ticker">
                   {badge.token.ticker}
                 </h4>
-              </div>
+              </Link>
             </>
           )}
           {latestRequest.withdrawable > 0 && (
@@ -399,7 +401,8 @@ class BadgeDetails extends PureComponent {
                 tcr: arbitrableAddressListData,
                 countdownCompleted,
                 handleActionClick: this.handleActionClick,
-                handleExecuteRequestClick: this.handleExecuteRequestClick
+                handleExecuteRequestClick: this.handleExecuteRequestClick,
+                isBadge: true
               })}
             </div>
           </div>
