@@ -5,45 +5,53 @@ import metaMaskLogo from '../../assets/images/meta-mask-logo.png'
 import Button from '../button'
 import './requires-meta-mask.css'
 
-const RequiresMetaMask = ({ needsUnlock }) => (
-  <div className="RequiresMetaMask">
+const RequiresMetamask = ({
+  requiredNetwork,
+  metamaskNetwork,
+  needsMetamask
+}) => (
+  <div className="RequiresMetamask">
     <img
       alt="MetaMask Logo"
-      className="RequiresMetaMask-logo"
+      className="RequiresMetamask-logo"
       src={metaMaskLogo}
     />
-    <div className="RequiresMetaMask-content">
-      <h1>
-        {needsUnlock
-          ? 'You need to unlock your Web3 browser wallet and refresh the page to run this dapp.'
-          : 'You need a Web3 enabled browser to run this dapp.'}
-      </h1>
-      <small>
-        {!needsUnlock &&
-          'We recommend using Chrome with the MetaMask extension. '}
-        This also serves as your login so you won't need to keep track of
-        another account and password.
-      </small>
-      {!needsUnlock && (
-        <div>
-          <br />
-          <Button to="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">
-            Install MetaMask
-          </Button>
-        </div>
+    <div className="RequiresMetamask-content">
+      {needsMetamask ? (
+        <>
+          <h1>You need a Web3 enabled browser to run this dapp.</h1>
+          <small>
+            We recommend using Chrome with the MetaMask extension. This also
+            serves as your login so you won't need to keep track of another
+            account and password.
+          </small>
+          <div>
+            <br />
+            <Button to="https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en">
+              Install MetaMask
+            </Button>
+          </div>
+        </>
+      ) : (
+        <>
+          <h1>Wrong Metamask network configuration.</h1>
+          <p>
+            Please ensure Metamask is set to the{' '}
+            <strong>{requiredNetwork}</strong> ethereum network
+          </p>
+          <small>
+            Metamask is currently set to the {metamaskNetwork} ethereum network
+          </small>
+        </>
       )}
     </div>
   </div>
 )
 
-RequiresMetaMask.propTypes = {
-  // State
-  needsUnlock: PropTypes.bool
+RequiresMetamask.propTypes = {
+  requiredNetwork: PropTypes.string.isRequired,
+  metamaskNetwork: PropTypes.string.isRequired,
+  needsMetamask: PropTypes.bool.isRequired
 }
 
-RequiresMetaMask.defaultProps = {
-  // State
-  needsUnlock: false
-}
-
-export default RequiresMetaMask
+export default RequiresMetamask

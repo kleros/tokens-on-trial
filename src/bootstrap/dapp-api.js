@@ -15,6 +15,7 @@ export const ARBITRABLE_ADDRESS_LIST_ADDRESS =
 const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
 const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
 const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
+const requiredNetwork = env === 'PROD' ? 'main' : 'kovan'
 
 let web3
 let onlyInfura = false
@@ -84,5 +85,6 @@ export {
   arbitrableAddressList,
   FILE_UPLOAD_URL,
   FILE_BASE_URL,
-  archon
+  archon,
+  requiredNetwork
 }

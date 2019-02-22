@@ -8,7 +8,12 @@ import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
 import RequiresMetaMaskPage from '../containers/requires-meta-mask-page'
 
-import { onlyInfura, web3 } from './dapp-api'
+import {
+  onlyInfura,
+  web3,
+  network as networkPromise,
+  requiredNetwork
+} from './dapp-api'
 
 class Initializer extends PureComponent {
   static propTypes = {
@@ -25,43 +30,62 @@ class Initializer extends PureComponent {
     ]).isRequired
   }
 
-  state = { interval: null }
+  state = { metamaskNetwork: null }
 
-  componentDidMount() {
+  async componentDidMount() {
     const { fetchAccounts } = this.props
+    this.setState({ metamaskNetwork: await networkPromise })
     fetchAccounts()
-  }
 
-  static getDerivedStateFromProps({ accounts, fetchAccounts }, prevState) {
-    clearInterval(prevState.interval)
-    return {
-      interval: setInterval(() => {
-        const currAcc = web3.utils.toChecksumAddress(
-          window.web3.eth.defaultAccount
-        )
-        if (accounts.data && currAcc && accounts.data[0] !== currAcc)
+    let prevAddr
+    window.web3.currentProvider.publicConfigStore.on(
+      'update',
+      ({ selectedAddress }) => {
+        selectedAddress = web3.utils.toChecksumAddress(selectedAddress)
+        if (prevAddr !== selectedAddress) {
+          prevAddr = selectedAddress
           fetchAccounts()
-      }, 100)
-    }
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval)
+        }
+        // if (!selectedAddress && prevAddr) {
+        //   // Logging out
+        //   fetchAccounts()
+        // }
+      }
+    )
   }
 
   render() {
     const { accounts, children } = this.props
+    const { metamaskNetwork } = this.state
+    console.info('res', Boolean(web3))
     return (
       <RenderIf
         done={children}
-        extraFailedValues={[!web3.eth]}
+        extraFailedValues={[!web3, requiredNetwork !== metamaskNetwork]}
         extraValues={[
           accounts.data && (accounts.data[0] || onlyInfura || null)
         ]}
         failedLoading={
-          <RequiresMetaMaskPage needsUnlock={Boolean(web3.eth)} web3={web3} />
+          <RequiresMetaMaskPage
+            needsUnlock={Boolean(web3.eth.accounts[0])}
+            needsMetamask={Boolean(!web3)}
+            requiredNetwork={requiredNetwork}
+            metamaskNetwork={metamaskNetwork}
+            web3={web3}
+          />
         }
-        loading={<BeatLoader color="#3d464d" />}
+        loading={
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              flexDirection: 'column'
+            }}
+          >
+            <p>Waiting Metamask Unlock</p>
+            <BeatLoader color="#3d464d" />
+          </div>
+        }
         resource={accounts}
       />
     )

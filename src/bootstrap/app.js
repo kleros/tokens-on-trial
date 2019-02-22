@@ -85,6 +85,7 @@ class _ConnectedNavBar extends Component {
 
   render() {
     const { accounts, notifications } = this.props
+    console.info(accounts.data[0])
 
     return (
       <NavBar

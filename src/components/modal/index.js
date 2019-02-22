@@ -1,6 +1,7 @@
 import React from 'react'
 import ReactModal from 'react-modal'
 import PropTypes from 'prop-types'
+
 import './modal.css'
 
 ReactModal.setAppElement('#root')

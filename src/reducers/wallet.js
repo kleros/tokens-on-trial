@@ -15,7 +15,9 @@ const {
   initialState: settingsInitialState
 } = createResource(
   PropTypes.shape({
-    executeReady: PropTypes.bool.isRequired
+    dispute: PropTypes.bool.isRequired,
+    shouldFund: PropTypes.bool.isRequired,
+    rulingGiven: PropTypes.bool.isRequired
   }),
   {
     withUpdate: true
@@ -31,8 +33,7 @@ export default createReducer({
   settings: {
     ...settingsInitialState,
     data: {
-      executeReady: true,
-      challenged: true,
+      dispute: true,
       shouldFund: true,
       rulingGiven: true,
       name: '',
