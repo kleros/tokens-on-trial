@@ -38,3 +38,8 @@
   for = "/evidence/t2cr"
   [headers.values]
     Access-Control-Allow-Origin = ["*"]
+
+[[headers]]
+  for = "/evidence/badge"
+  [headers.values]
+    Access-Control-Allow-Origin = ["*"]
