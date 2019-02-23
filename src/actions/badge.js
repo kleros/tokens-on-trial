@@ -43,9 +43,9 @@ export const fundDispute = ({ addr, value, side }) => ({
   type: badge.FUND_DISPUTE,
   payload: { addr, value, side }
 })
-export const challengeRequest = ({ addr, value }) => ({
+export const challengeRequest = ({ addr, value, evidence }) => ({
   type: badge.CHALLENGE_REQUEST,
-  payload: { addr, value }
+  payload: { addr, value, evidence }
 })
 export const timeout = addr => ({
   type: badge.EXECUTE,

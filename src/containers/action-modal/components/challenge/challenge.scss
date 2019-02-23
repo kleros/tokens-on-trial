@@ -6,6 +6,15 @@
   display: flex;
   flex-direction: column;
 
+  &-form {
+    margin-top: 12px;
+
+    &-fieldset {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+  }
+
   &-icon {
     margin-left: -25px;
     margin-right: 12px;

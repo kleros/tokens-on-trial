@@ -189,11 +189,14 @@ function* requestStatusChangeBadge({ payload: { badge, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* challengeBadgeRequest({ payload: { addr, value } }) {
-  yield call(arbitrableAddressList.methods.challengeRequest(addr, '').send, {
-    from: yield select(walletSelectors.getAccount),
-    value
-  })
+function* challengeBadgeRequest({ payload: { addr, value, evidence } }) {
+  yield call(
+    arbitrableAddressList.methods.challengeRequest(addr, evidence).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value
+    }
+  )
 
   return yield call(fetchBadge, { payload: { addr } })
 }

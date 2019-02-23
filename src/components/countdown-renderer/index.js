@@ -6,7 +6,7 @@ const CountdownRenderer = ({ days, hours, minutes, seconds, completed }) => {
 
   return (
     <span>
-      {days > 0 ? `${days} Days` : ''}
+      {days > 0 ? `${days} Days, ` : ''}
       {hours.toLocaleString(undefined, { minimumIntegerDigits: 2 })}:
       {minutes.toLocaleString(undefined, { minimumIntegerDigits: 2 })}:
       {seconds.toLocaleString(undefined, { minimumIntegerDigits: 2 })}

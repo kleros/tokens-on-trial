@@ -1,14 +1,28 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { connect } from 'react-redux'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+
+import {
+  ChallengeForm,
+  submitChallengeForm,
+  getChallengeFormIsInvalid
+} from './challenge-form'
+
 import './challenge.css'
 
-const Challenge = ({ tcr, closeActionModal, fundDispute }) => (
+const Challenge = ({
+  tcr,
+  closeActionModal,
+  fundDispute,
+  challengeFormIsInvalid,
+  submitChallengeForm
+}) => (
   <div>
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Challenge-icon" icon="gavel" />
@@ -102,6 +116,13 @@ const Challenge = ({ tcr, closeActionModal, fundDispute }) => (
         </p>
       </div>
     </div>
+    <p style={{ textAlign: 'start', marginTop: '12px', lineHeight: '1.16' }}>
+      <small>
+        Explain why you think this submission should be rejected (this will be
+        seen by jurors).
+      </small>
+    </p>
+    <ChallengeForm className="Challenge-form" onSubmit={fundDispute} />
     <br />
     <div className="Modal-actions">
       <Button
@@ -113,7 +134,8 @@ const Challenge = ({ tcr, closeActionModal, fundDispute }) => (
       </Button>
       <Button
         className="Challenge-request"
-        onClick={fundDispute}
+        onClick={submitChallengeForm}
+        disabled={challengeFormIsInvalid}
         type="primary"
       >
         Challenge
@@ -128,10 +150,19 @@ Challenge.propTypes = {
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
+  challengeFormIsInvalid: PropTypes.bool.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  fundDispute: PropTypes.func.isRequired
+  fundDispute: PropTypes.func.isRequired,
+  submitChallengeForm: PropTypes.func.isRequired
 }
 
-export default Challenge
+export default connect(
+  state => ({
+    challengeFormIsInvalid: getChallengeFormIsInvalid(state)
+  }),
+  {
+    submitChallengeForm
+  }
+)(Challenge)

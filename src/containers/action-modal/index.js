@@ -15,9 +15,10 @@ import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
-import { web3 } from '../../bootstrap/dapp-api'
+import { web3, archon } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 import asyncReadFile from '../../utils/async-file-reader'
+import ipfsPublish from '../../sagas/api/ipfs-publish'
 
 import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
@@ -34,6 +35,7 @@ import {
   getEvidenceFormIsInvalid,
   submitEvidenceForm
 } from './components/submit-evidence/evidence-form'
+
 import './action-modal.css'
 
 class ActionModal extends PureComponent {
@@ -210,7 +212,7 @@ class ActionModal extends PureComponent {
     closeActionModal()
   }
 
-  handleChallengeClick = () => {
+  handleChallengeClick = async ({ reason }) => {
     const { challengeRequest, token, arbitrableTokenListData } = this.props
     const {
       challengeReward,
@@ -218,6 +220,26 @@ class ActionModal extends PureComponent {
       sharedStakeMultiplier,
       MULTIPLIER_PRECISION
     } = arbitrableTokenListData.data
+
+    const evidenceJSON = {
+      name: `${token.ticker} challenge`,
+      description: reason,
+      fileURI: '',
+      fileTypeExtension: ''
+    }
+
+    /* eslint-disable unicorn/number-literal-case */
+    const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256
+    /* eslint-enable */
+
+    const enc = new TextEncoder()
+    const ipfsHashEvidenceObj = await ipfsPublish(
+      evidenceJSONMultihash,
+      enc.encode(JSON.stringify(evidenceJSON))
+    )
+
+    const ipfsHashEvidence =
+      ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
     const value = web3.utils
       .toBN(challengeReward)
@@ -230,11 +252,12 @@ class ActionModal extends PureComponent {
       )
     challengeRequest({
       ID: token.data.ID,
-      value
+      value,
+      evidence: `/ipfs/${ipfsHashEvidence}`
     })
   }
 
-  handleChallengeBadgeClick = () => {
+  handleChallengeBadgeClick = async ({ reason }) => {
     const {
       challengeBadgeRequest,
       badge,
@@ -247,6 +270,26 @@ class ActionModal extends PureComponent {
       MULTIPLIER_PRECISION
     } = arbitrableAddressListData.data
 
+    const evidenceJSON = {
+      name: `Badge challenge`,
+      description: reason,
+      fileURI: '',
+      fileTypeExtension: ''
+    }
+
+    /* eslint-disable unicorn/number-literal-case */
+    const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256
+    /* eslint-enable */
+
+    const enc = new TextEncoder()
+    const ipfsHashEvidenceObj = await ipfsPublish(
+      evidenceJSONMultihash,
+      enc.encode(JSON.stringify(evidenceJSON))
+    )
+
+    const ipfsHashEvidence =
+      ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
+
     const value = web3.utils
       .toBN(challengeReward)
       .add(web3.utils.toBN(arbitrationCost))
@@ -258,6 +301,7 @@ class ActionModal extends PureComponent {
       )
     challengeBadgeRequest({
       addr: badge.data.addr,
+      evidence: `/ipfs/${ipfsHashEvidence}`,
       value
     })
   }

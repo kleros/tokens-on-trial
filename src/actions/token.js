@@ -43,9 +43,9 @@ export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,
   payload: { ID, value, side }
 })
-export const challengeRequest = ({ ID, value }) => ({
+export const challengeRequest = ({ ID, value, evidence }) => ({
   type: token.CHALLENGE_REQUEST,
-  payload: { ID, value }
+  payload: { ID, value, evidence }
 })
 export const fetchTokens = (
   cursor,
@@ -95,9 +95,9 @@ export const fundBadgeDispute = ({ addr, ID, side, value }) => ({
   type: token.FUND_DISPUTE_BADGE,
   payload: { addr, side, ID, value }
 })
-export const challengeBadgeRequest = ({ addr, ID, value }) => ({
+export const challengeBadgeRequest = ({ addr, value, evidence }) => ({
   type: token.CHALLENGE_REQUEST_BADGE,
-  payload: { addr, ID, value }
+  payload: { addr, value, evidence }
 })
 export const badgeTimeout = tokenData => ({
   type: token.EXECUTE_BADGE,

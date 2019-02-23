@@ -486,13 +486,13 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* challengeRequest({ payload: { ID, value } }) {
+function* challengeRequest({ payload: { ID, value, evidence } }) {
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
   if (!hasPendingRequest(token))
     throw new Error(errorConstants.NO_PENDING_REQUEST)
 
-  yield call(arbitrableTokenList.methods.challengeRequest(ID, '').send, {
+  yield call(arbitrableTokenList.methods.challengeRequest(ID, evidence).send, {
     from: yield select(walletSelectors.getAccount),
     value
   })
