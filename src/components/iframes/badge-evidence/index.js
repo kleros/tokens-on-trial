@@ -13,6 +13,7 @@ class BadgeEvidence extends Component {
   }
 
   async componentDidMount() {
+    if (window.location.search[0] !== '?') return
     const message = JSON.parse(
       window.location.search.substring(1).replace(/%22/g, '"')
     )
