@@ -257,7 +257,8 @@ class ActionModal extends PureComponent {
     })
   }
 
-  handleChallengeBadgeClick = async ({ reason }) => {
+  handleChallengeBadgeClick = async () => {
+    const reason = ''
     const {
       challengeBadgeRequest,
       badge,
