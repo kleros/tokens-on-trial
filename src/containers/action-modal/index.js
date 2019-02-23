@@ -222,7 +222,7 @@ class ActionModal extends PureComponent {
     } = arbitrableTokenListData.data
 
     const evidenceJSON = {
-      name: `${token.ticker} challenge`,
+      name: 'Token challenge',
       description: reason,
       fileURI: '',
       fileTypeExtension: ''
