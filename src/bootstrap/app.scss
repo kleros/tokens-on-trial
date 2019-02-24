@@ -52,6 +52,7 @@ body,
   background: $background;
   display: flex;
   flex-direction: column;
+  min-height: 90vh;
   overflow: auto;
   position: relative;
 }
