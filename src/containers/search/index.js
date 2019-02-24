@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
-import { arbitrableTokenList } from '../../bootstrap/dapp-api'
+import { arbitrableTokenList, web3 } from '../../bootstrap/dapp-api'
 
 import Item from './item'
 
@@ -29,14 +29,23 @@ class SearchBar extends PureComponent {
       }
       const { returnValues } = data
       const { tokenSubmissions } = this.state
+      const { _name, _ticker, _symbolMultihash, _address } = returnValues
+
+      const tokenID = web3.utils.soliditySha3(
+        _name,
+        _ticker,
+        _address,
+        _symbolMultihash
+      )
+
       tokenSubmissions.push({
-        value: returnValues._name,
-        searchVal: returnValues._name.toLowerCase(),
-        tokenID: returnValues._tokenID,
-        name: returnValues._name,
-        ticker: returnValues._ticker,
-        address: returnValues._address,
-        imgSrc: returnValues._symbolMultihash
+        value: _name,
+        searchVal: _name.toLowerCase(),
+        tokenID,
+        name: _name,
+        ticker: _ticker,
+        address: _address,
+        imgSrc: _symbolMultihash
       })
     })
   }
