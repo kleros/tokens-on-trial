@@ -38,8 +38,8 @@ export function* fetchArbitrableAddressListData() {
     sharedStakeMultiplier: call(
       arbitrableAddressList.methods.sharedStakeMultiplier().call
     ),
-    MULTIPLIER_PRECISION: call(
-      arbitrableAddressList.methods.MULTIPLIER_PRECISION().call
+    MULTIPLIER_DIVISOR: call(
+      arbitrableAddressList.methods.MULTIPLIER_DIVISOR().call
     ),
     countByStatus: call(arbitrableAddressList.methods.countByStatus().call)
   })
@@ -59,7 +59,7 @@ export function* fetchArbitrableAddressListData() {
     winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
     loserStakeMultiplier: Number(d.loserStakeMultiplier),
     sharedStakeMultiplier: Number(d.sharedStakeMultiplier),
-    MULTIPLIER_PRECISION: Number(d.MULTIPLIER_PRECISION),
+    MULTIPLIER_DIVISOR: Number(d.MULTIPLIER_DIVISOR),
     countByStatus: tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
         acc[value] = Number(d.countByStatus[value.toLowerCase()])

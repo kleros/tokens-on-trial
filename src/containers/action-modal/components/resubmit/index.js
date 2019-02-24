@@ -30,7 +30,7 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
               web3.utils
                 .toBN(tcr.data.arbitrationCost)
                 .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
             )
           )
         )} ETH`}
@@ -57,7 +57,7 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
                   web3.utils
                     .toBN(tcr.data.arbitrationCost)
                     .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
                 )
                 .add(web3.utils.toBN(tcr.data.arbitrationCost))
             )

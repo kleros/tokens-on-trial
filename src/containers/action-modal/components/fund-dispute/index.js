@@ -27,7 +27,7 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
               web3.utils
                 .toBN(tcr.data.arbitrationCost)
                 .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
             )
           )
         )} ETH`}
@@ -53,7 +53,7 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
                   web3.utils
                     .toBN(tcr.data.arbitrationCost)
                     .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
                 )
                 .add(web3.utils.toBN(tcr.data.arbitrationCost))
             )

@@ -61,7 +61,7 @@ const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
                       : tcr.data.winnerStakeMultiplier
                   )
                 )
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
             )
         )} ETH `}
       </strong>
@@ -83,7 +83,7 @@ const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
                         : tcr.data.winnerStakeMultiplier
                     )
                   )
-                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_PRECISION))
+                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
               )
             )
         )} ETH `}
