@@ -54,8 +54,7 @@ export const getRemainingTime = (item, tcr, tcrConstants, losingSide) => {
     )
       return 94608000 // Large value means the arbitrator does not have an appeal period.
 
-    const appealPeriodEnd =
-      Number(latestRequest.latestRound.appealPeriod[1]) * 1000
+    const appealPeriodEnd = Number(latestRequest.latestRound.appealPeriod[1])
     time = appealPeriodEnd - currentTime
   }
 

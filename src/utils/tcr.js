@@ -67,6 +67,16 @@ export const convertFromString = item => {
   latestRound.requiredForSide[0] = Number(latestRound.requiredForSide[0])
   latestRound.requiredForSide[1] = Number(latestRound.requiredForSide[1])
   latestRound.requiredForSide[2] = Number(latestRound.paidFees[2])
+  if (
+    latestRequest.dispute &&
+    latestRequest.dispute.status ===
+      tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
+    !latestRequest.latestRound.appealed
+  ) {
+    latestRound.appealPeriod[0] = Number(latestRound.appealPeriod[0]) * 1000
+    latestRound.appealPeriod[1] = Number(latestRound.appealPeriod[1]) * 1000
+  }
+
   item.latestRound = latestRound
   return item
 }

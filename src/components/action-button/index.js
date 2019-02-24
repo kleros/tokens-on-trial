@@ -54,12 +54,8 @@ const getActionButton = ({
           userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
           userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
         ) {
-          const appealPeriodStart = Number(
-            latestRequest.latestRound.appealPeriod[0]
-          )
-          const appealPeriodEnd = Number(
-            latestRequest.latestRound.appealPeriod[1]
-          )
+          const appealPeriodStart = latestRequest.latestRound.appealPeriod[0]
+          const appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
           const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
           const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
           if (Date.now() < appealPeriodEnd) {
