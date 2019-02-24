@@ -384,7 +384,7 @@ class TokenDetails extends PureComponent {
                       style={{ marginRight: '10px' }}
                     />
                     Arbitration Result:{' '}
-                    {tcrConstants.RULING_OPTIONS[latestRequest.dispute.status]}{' '}
+                    {tcrConstants.RULING_OPTIONS[latestRequest.dispute.ruling]}{' '}
                     Request
                   </span>
                 )}
