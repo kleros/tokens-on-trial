@@ -79,7 +79,9 @@ class Initializer extends PureComponent {
             style={{
               display: 'flex',
               alignItems: 'center',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              justifyContent: 'center',
+              height: '100vh'
             }}
           >
             <BeatLoader color="#3d464d" />

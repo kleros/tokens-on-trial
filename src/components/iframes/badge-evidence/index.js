@@ -15,22 +15,35 @@ class BadgeEvidence extends Component {
   async componentDidMount() {
     if (window.location.search[0] !== '?') return
     const message = JSON.parse(
-      window.location.search.substring(1).replace(/%22/g, '"')
+      window.location.search
+        .substring(1)
+        .replace(/%22/g, '"')
+        .replace(/%7B/g, '{')
+        .replace(/%3A/g, ':')
+        .replace(/%2C/g, ',')
+        .replace(/%7D/g, '}')
     )
 
-    if (!message || !message.arbitrableContractAddress || !message.disputeID)
+    const {
+      disputeID,
+      arbitrableContractAddress,
+      arbitratorContractAddress
+    } = message
+
+    if (!arbitrableContractAddress || !disputeID || !arbitratorContractAddress)
       return
 
     const arbitrableAddressList = eth
       .contract(ArbitrableAddressList.abi)
-      .at(message.data.arbitrableContractAddress)
+      .at(arbitrableContractAddress)
 
-    const tokenAddress = (await arbitrableAddressList.disputeIDToAddress(
-      message.data.disputeID
+    const tokenAddress = (await arbitrableAddressList.arbitratorDisputeIDToTokenID(
+      arbitratorContractAddress,
+      disputeID
     ))[0]
     this.setState({
       tokenAddress,
-      badgeAddress: message.data.arbitrableContractAddress
+      badgeAddress: arbitrableContractAddress
     })
   }
 

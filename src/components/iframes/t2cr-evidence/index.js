@@ -12,17 +12,32 @@ class TTCREvidence extends Component {
   async componentDidMount() {
     if (window.location.search[0] !== '?') return
     const message = JSON.parse(
-      window.location.search.substring(1).replace(/%22/g, '"')
+      window.location.search
+        .substring(1)
+        .replace(/%22/g, '"')
+        .replace(/%7B/g, '{')
+        .replace(/%3A/g, ':')
+        .replace(/%2C/g, ',')
+        .replace(/%7D/g, '}')
     )
 
-    if (!message || !message.arbitrableContractAddress || !message.disputeID)
+    const {
+      disputeID,
+      arbitrableContractAddress,
+      arbitratorContractAddress
+    } = message
+
+    if (!arbitrableContractAddress || !disputeID || !arbitratorContractAddress)
       return
 
     const arbitrableTokenList = eth
       .contract(ArbitrableTokenList.abi)
-      .at(message.arbitrableContractAddress)
+      .at(arbitrableContractAddress)
 
-    const ID = await arbitrableTokenList.disputeIDToTokenID(message.disputeID)
+    const ID = await arbitrableTokenList.arbitratorDisputeIDToTokenID(
+      arbitratorContractAddress,
+      disputeID
+    )
     const token = await arbitrableTokenList.getTokenInfo(ID[0])
     token.ID = ID[0]
     this.setState({ token })
