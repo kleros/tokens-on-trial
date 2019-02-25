@@ -400,10 +400,7 @@ class BadgeDetails extends PureComponent {
                               />
                               {'Appeal Dealine '}
                               <Countdown
-                                date={
-                                  latestRequest.latestRound.appealPeriod[0] +
-                                  time
-                                }
+                                date={Date.now() + time}
                                 renderer={CountdownRenderer}
                                 onComplete={this.onCountdownComplete}
                               />
