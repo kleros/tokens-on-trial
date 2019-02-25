@@ -261,7 +261,7 @@ class BadgeDetails extends PureComponent {
             <>
               <div className="TokenDetails-divider" />
               <Link
-                to={`/token/${badge.token.addr}`}
+                to={`/token/${badge.token.ID}`}
                 className="BadgeDetails-token"
               >
                 <Img
