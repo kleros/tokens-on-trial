@@ -52,8 +52,8 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         )
           message = `${
             isRequester
-              ? 'Your token request has challenged.'
-              : 'You challenged a token request.'
+              ? 'Your token submission was challenged.'
+              : 'You challenged a token.'
           }`
         else if (
           returnValues._disputed === true &&
@@ -62,8 +62,8 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
         )
           message = `${
             isRequester
-              ? 'An appeal was raised on your token request.'
-              : 'An appeal was raised on a request you challenged.'
+              ? 'An appeal was raised on your token.'
+              : 'An appeal was raised on a token you challenged.'
           }`
         else if (returnValues._disputed === false)
           oldestNonDisputedSubmittedStatusEvent = event
@@ -72,16 +72,12 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered: {
         if (returnValues._disputed === false)
           message = `${
-            isRequester
-              ? 'Your token registration request'
-              : 'A token registration request you challenged'
-          } has been executed.`
+            isRequester ? 'Your token' : 'A token you challenged'
+          } was added to the list.`
         else
           message = `${
-            isRequester
-              ? 'Your challenged token registration request'
-              : 'A token registration request you challenged'
-          } has been executed.`
+            isRequester ? 'Your challenged token' : 'A token you challenged'
+          } was added to the list.`
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent: {
@@ -90,13 +86,13 @@ const emitNotifications = async (account, timeToChallenge, emitter, events) => {
             isRequester
               ? 'Your token delisting request'
               : 'A token delisting request you challenged'
-          } has been executed.`
+          } was accepted.`
         else
           message = `${
             isRequester
-              ? 'Your token clearing request'
-              : 'A token clearing request you challenged'
-          } has been refused.`
+              ? 'Your token delisting request'
+              : 'A token delisting request you challenged'
+          } was refused.`
         break
       }
       default: {
