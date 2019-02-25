@@ -255,14 +255,12 @@ class TokenDetails extends PureComponent {
     )
       if (
         userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
-        latestRequest.dispute.ruling ===
-          tcrConstants.RULING_OPTIONS.Refuse.toString()
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
       )
         losingSide = true
       else if (
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-        latestRequest.dispute.ruling ===
-          tcrConstants.RULING_OPTIONS.Accept.toString()
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
       )
         losingSide = true
 
@@ -273,6 +271,9 @@ class TokenDetails extends PureComponent {
       losingSide
     )
 
+    let latestRound
+    if (latestRequest) latestRound = latestRequest.latestRound
+
     return (
       <div className="Page">
         <FilterBar
@@ -280,7 +281,7 @@ class TokenDetails extends PureComponent {
           handleFilterChange={this.handleFilterChange}
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <h4>Token Details</h4>
+          <h4 style={{ marginLeft: 0 }}>Token Details</h4>
           {token.latestRequest.withdrawable > 0 && (
             <>
               <div className="TokenDetails-divider" />
@@ -368,7 +369,7 @@ class TokenDetails extends PureComponent {
               {latestRequest.dispute &&
                 Number(latestRequest.dispute.status) ===
                   tcrConstants.DISPUTE_STATUS.Appealable &&
-                !latestRequest.latestRound.appealed && (
+                !latestRound.appealed && (
                   <span
                     className="BadgeDetails-timer"
                     style={{
@@ -385,7 +386,6 @@ class TokenDetails extends PureComponent {
                     />
                     Arbitration Result:{' '}
                     {tcrConstants.RULING_OPTIONS[latestRequest.dispute.ruling]}{' '}
-                    Request
                   </span>
                 )}
               {!(
@@ -396,36 +396,61 @@ class TokenDetails extends PureComponent {
                     tcrConstants.DISPUTE_STATUS.Appealable.toString())
               ) &&
                 !countdownCompleted &&
-                time > 0 && (
-                  <span style={{ display: 'flex', alignItems: 'center' }}>
-                    {!latestRequest.dispute && (
+                (!latestRequest.dispute ||
+                  (latestRequest.dispute.status ===
+                    tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
+                    time > 0)) && (
+                  <>
+                    {!latestRequest.dispute ? (
                       <>
-                        <FontAwesomeIcon
-                          className="TokenDetails-icon"
-                          color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                          icon="clock"
-                        />
-                        <div className="BadgeDetails-timer">
-                          {`${
-                            latestRequest.dispute &&
-                            latestRequest.dispute.status !==
-                              tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                              ? 'Appeal'
-                              : 'Challenge'
-                          } Deadline`}{' '}
-                          {time ? (
-                            <Countdown
-                              date={Date.now() + time}
-                              renderer={CountdownRenderer}
-                              onComplete={this.onCountdownComplete}
-                            />
-                          ) : (
-                            '--:--:--'
-                          )}
-                        </div>
+                        {time > 0 && (
+                          <span
+                            style={{ display: 'flex', alignItems: 'center' }}
+                          >
+                            <div className="BadgeDetails-timer">
+                              <FontAwesomeIcon
+                                className="TokenDetails-icon"
+                                color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                icon="clock"
+                              />
+                              {'Challenge Deadline '}
+                              <Countdown
+                                date={Date.now() + time}
+                                renderer={CountdownRenderer}
+                                onComplete={this.onCountdownComplete}
+                              />
+                            </div>
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        {latestRequest.dispute.status ===
+                          tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
+                          <span
+                            style={{ display: 'flex', alignItems: 'center' }}
+                          >
+                            <div className="BadgeDetails-timer">
+                              <FontAwesomeIcon
+                                className="TokenDetails-icon"
+                                color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                icon="clock"
+                              />
+                              {'Appeal Dealine '}
+                              <Countdown
+                                date={
+                                  latestRequest.latestRound.appealPeriod[0] +
+                                  time
+                                }
+                                renderer={CountdownRenderer}
+                                onComplete={this.onCountdownComplete}
+                              />
+                            </div>
+                          </span>
+                        )}
                       </>
                     )}
-                  </span>
+                  </>
                 )}
             </div>
             <div className="TokenDetails-action">

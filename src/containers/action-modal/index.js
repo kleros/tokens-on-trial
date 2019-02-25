@@ -376,14 +376,12 @@ class ActionModal extends PureComponent {
     let losingSide = false
     if (
       SIDE === tcrConstants.SIDE.Requester &&
-      latestRequest.dispute.ruling ===
-        tcrConstants.RULING_OPTIONS.Refuse.toString()
+      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
     )
       losingSide = true
     else if (
       SIDE === tcrConstants.SIDE.Challenger &&
-      latestRequest.dispute.ruling ===
-        tcrConstants.RULING_OPTIONS.Accept.toString()
+      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
     )
       losingSide = true
 
@@ -416,20 +414,18 @@ class ActionModal extends PureComponent {
       arbitrableAddressListData,
       actionModalParam
     } = this.props
-    const { latestRequest } = badge
+    const { latestRequest } = badge.data
     const SIDE = actionModalParam
 
     let losingSide = false
     if (
       SIDE === tcrConstants.SIDE.Requester &&
-      latestRequest.dispute.ruling ===
-        tcrConstants.RULING_OPTIONS.Refuse.toString()
+      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
     )
       losingSide = true
     else if (
       SIDE === tcrConstants.SIDE.Challenger &&
-      latestRequest.dispute.ruling ===
-        tcrConstants.RULING_OPTIONS.Accept.toString()
+      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
     )
       losingSide = true
 
@@ -683,7 +679,7 @@ class ActionModal extends PureComponent {
                 <FundAppeal
                   tcr={arbitrableAddressListData}
                   closeActionModal={closeActionModal}
-                  item={badge}
+                  item={badge.data}
                   badge
                   fundAppeal={this.handleFundAppealBadgeClick}
                   side={actionModalParam}

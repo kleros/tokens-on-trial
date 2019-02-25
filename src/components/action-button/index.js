@@ -73,14 +73,14 @@ const getActionButton = ({
                 userAccount ===
                   latestRequest.parties[tcrConstants.SIDE.Requester] &&
                 latestRequest.dispute.ruling ===
-                  tcrConstants.RULING_OPTIONS.Refuse.toString()
+                  tcrConstants.RULING_OPTIONS.Refuse
               )
                 losingSide = true
               else if (
                 userAccount ===
                   latestRequest.parties[tcrConstants.SIDE.Challenger] &&
                 latestRequest.dispute.ruling ===
-                  tcrConstants.RULING_OPTIONS.Accept.toString()
+                  tcrConstants.RULING_OPTIONS.Accept
               )
                 losingSide = true
 
@@ -186,7 +186,7 @@ const getActionButton = ({
       label = 'Submit Clearing Request'
       icon = 'times-circle'
     } else {
-      label = 'Resubmit Token'
+      label = isBadge ? 'Add Badge' : 'Resubmit Token'
       icon = 'plus'
       method = () =>
         handleActionClick(

@@ -15,14 +15,12 @@ const isLosingSide = (item, side) => {
   let losingSide = false
   if (
     Number(side) === tcrConstants.SIDE.Requester &&
-    latestRequest.dispute.ruling ===
-      tcrConstants.RULING_OPTIONS.Refuse.toString()
+    latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
   )
     losingSide = true
   else if (
     Number(side) === tcrConstants.SIDE.Challenger &&
-    latestRequest.dispute.ruling ===
-      tcrConstants.RULING_OPTIONS.Accept.toString()
+    latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
   )
     losingSide = true
 

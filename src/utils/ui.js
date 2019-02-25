@@ -48,13 +48,10 @@ export const getRemainingTime = (item, tcr, tcrConstants, losingSide) => {
       latestRequest.dispute.appealStatus ===
         tcrConstants.DISPUTE_STATUS.Appealable.toString())
   ) {
-    if (
-      Number(latestRound.appealPeriod[1]) -
-      Number(latestRound.appealPeriod[0] === 94608000)
-    )
+    if (latestRound.appealPeriod[1] - latestRound.appealPeriod[0] === 94608000)
       return 94608000 // Large value means the arbitrator does not have an appeal period.
 
-    const appealPeriodEnd = Number(latestRequest.latestRound.appealPeriod[1])
+    const appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
     time = appealPeriodEnd - currentTime
   }
 

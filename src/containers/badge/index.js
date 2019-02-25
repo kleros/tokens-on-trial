@@ -103,6 +103,10 @@ class BadgeDetails extends PureComponent {
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
+  onCountdownComplete = () => {
+    this.setState({ countdownCompleted: true })
+  }
+
   withdrawFunds = async () => {
     const { withdrawBadgeFunds, badge } = this.props
     withdrawBadgeFunds({
@@ -231,14 +235,12 @@ class BadgeDetails extends PureComponent {
     )
       if (
         userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
-        latestRequest.dispute.ruling ===
-          tcrConstants.RULING_OPTIONS.Refuse.toString()
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
       )
         losingSide = true
       else if (
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-        latestRequest.dispute.ruling ===
-          tcrConstants.RULING_OPTIONS.Accept.toString()
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
       )
         losingSide = true
 
@@ -256,7 +258,7 @@ class BadgeDetails extends PureComponent {
           handleFilterChange={this.handleFilterChange}
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <h4>Badge Details</h4>
+          <h4 style={{ marginLeft: 0 }}>Badge Details</h4>
           {badge.token && (
             <>
               <div className="TokenDetails-divider" />
@@ -349,6 +351,7 @@ class BadgeDetails extends PureComponent {
                     Arbitration Result:{' '}
                     {tcrConstants.RULING_OPTIONS[latestRequest.dispute.ruling]}{' '}
                     Request
+                    {console.info()}
                   </span>
                 )}
               {!(
@@ -359,39 +362,57 @@ class BadgeDetails extends PureComponent {
                     tcrConstants.DISPUTE_STATUS.Appealable.toString())
               ) &&
                 !countdownCompleted &&
+                (!latestRequest.dispute ||
+                  latestRequest.dispute.status ===
+                    tcrConstants.DISPUTE_STATUS.Appealable.toString()) &&
                 time > 0 && (
-                  <span
-                    className="BadgeDetails-meta--aligned"
-                    style={{ display: 'flex', alignItems: 'center' }}
-                  >
-                    {!latestRequest.dispute && (
+                  <>
+                    {!latestRequest.dispute ? (
                       <>
-                        <FontAwesomeIcon
-                          className="TokenDetails-icon"
-                          color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                          icon="clock"
-                        />
-                        <div className="BadgeDetails-timer">
-                          {`${
-                            latestRequest.dispute &&
-                            latestRequest.dispute.status !==
-                              tcrConstants.DISPUTE_STATUS.Appealable.toString()
-                              ? 'Appeal'
-                              : 'Challenge'
-                          } Deadline`}{' '}
-                          {time ? (
+                        <span style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className="BadgeDetails-timer">
+                            <FontAwesomeIcon
+                              className="TokenDetails-icon"
+                              color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                              icon="clock"
+                            />
+                            {'Challenge Deadline '}
                             <Countdown
                               date={Date.now() + time}
                               renderer={CountdownRenderer}
                               onComplete={this.onCountdownComplete}
                             />
-                          ) : (
-                            '--:--:--'
-                          )}
-                        </div>
+                          </div>
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        {latestRequest.dispute.status ===
+                          tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
+                          <span
+                            style={{ display: 'flex', alignItems: 'center' }}
+                          >
+                            <div className="BadgeDetails-timer">
+                              <FontAwesomeIcon
+                                className="TokenDetails-icon"
+                                color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                icon="clock"
+                              />
+                              {'Appeal Dealine '}
+                              <Countdown
+                                date={
+                                  latestRequest.latestRound.appealPeriod[0] +
+                                  time
+                                }
+                                renderer={CountdownRenderer}
+                                onComplete={this.onCountdownComplete}
+                              />
+                            </div>
+                          </span>
+                        )}
                       </>
                     )}
-                  </span>
+                  </>
                 )}
             </div>
             <div className="BadgeDetails-action">
