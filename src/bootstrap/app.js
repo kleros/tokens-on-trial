@@ -151,7 +151,7 @@ const App = ({ store, history }) => (
       <ConnectedRouter history={history}>
         <>
           <Helmet>
-            <title>Tokens on Trial</title>
+            <title>Kleros · Tokens on Trial</title>
           </Helmet>
           <Switch>
             <Route component={TTCREvidence} exact path="/evidence/t2cr" />
