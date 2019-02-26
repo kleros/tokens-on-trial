@@ -242,6 +242,20 @@ class TokenDetails extends PureComponent {
         </div>
       )
 
+    if (token.numberOfRequests === 0)
+      return (
+        <div className="PageNotFound">
+          <div className="PageNotFound-message">
+            404.
+            <br />
+            <small>
+              <h3>Token not found.</h3>
+              <p style={{ fontSize: '0.6em' }}>Was it ever submitted?</p>
+            </small>
+          </div>
+        </div>
+      )
+
     if (token.ID !== tokenID) return window.location.reload()
 
     let losingSide
@@ -327,7 +341,7 @@ class TokenDetails extends PureComponent {
                       className="TokenDetails-icon TokenDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(token.addr)}
+                    {token.addr ? truncateMiddle(token.addr) : ''}
                   </a>
                 </span>
               </div>

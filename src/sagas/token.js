@@ -341,6 +341,7 @@ export function* fetchToken({ payload: { ID } }) {
         challengeRewardBalance: 0,
         challengerDepositTime: 0,
         feeRewards: 0,
+        numberOfRequests: 0,
         pot: [],
         resolved: false,
         parties: [],
@@ -403,7 +404,8 @@ export function* fetchToken({ payload: { ID } }) {
             requiredForSide: []
           }
         }
-      }
+      },
+      numberOfRequests: 0
     }
 
   if (!token.badge || !token.badge.status)

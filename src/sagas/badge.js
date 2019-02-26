@@ -138,6 +138,7 @@ export function* fetchBadge({ payload: { addr } }) {
   } else
     badge = {
       status: 0,
+      numberOfRequests: 0,
       latestRequest: {
         disputed: false,
         disputeID: 0,

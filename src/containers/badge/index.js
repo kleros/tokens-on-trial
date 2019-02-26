@@ -224,6 +224,20 @@ class BadgeDetails extends PureComponent {
 
     if (badge.addr !== tokenAddr) return window.location.reload()
 
+    if (badge.numberOfRequests === 0)
+      return (
+        <div className="PageNotFound">
+          <div className="PageNotFound-message">
+            404.
+            <br />
+            <small>
+              <h3>Badge status not found.</h3>
+              <p style={{ fontSize: '0.6em' }}>Was it ever submitted?</p>
+            </small>
+          </div>
+        </div>
+      )
+
     let losingSide
     const userAccount = accounts.data[0]
     const { latestRequest } = badge
@@ -351,7 +365,6 @@ class BadgeDetails extends PureComponent {
                     Arbitration Result:{' '}
                     {tcrConstants.RULING_OPTIONS[latestRequest.dispute.ruling]}{' '}
                     Request
-                    {console.info()}
                   </span>
                 )}
               {!(
