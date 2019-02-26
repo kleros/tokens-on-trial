@@ -87,6 +87,22 @@ const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
         )} ETH `}
       </strong>
     </div>
+    <div
+      style={{
+        textAlign: 'start',
+        fontSize: '12px',
+        marginTop: '10px',
+        display: 'flex'
+      }}
+    >
+      <FontAwesomeIcon icon="info-circle" />
+      <div style={{ marginLeft: '5px' }}>
+        <i>
+          Note: This is not a fee, it is a deposit and will be refunded if you
+          are correct.
+        </i>
+      </div>
+    </div>
     <br />
     <div className="Modal-actions">
       <Button
@@ -94,7 +110,7 @@ const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
         onClick={closeActionModal}
         type="secondary"
       >
-        Return
+        Cancel
       </Button>
       <Button className="Appeal-request" onClick={fundAppeal} type="primary">
         Appeal

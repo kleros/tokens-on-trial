@@ -17,6 +17,7 @@ import {
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
+import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
@@ -68,7 +69,8 @@ class TokenDetails extends PureComponent {
 
   state = {
     evidences: [],
-    countdownCompleted: false
+    countdownCompleted: false,
+    appealModalOpen: true
   }
 
   handleFilterChange = key => {
@@ -211,6 +213,10 @@ class TokenDetails extends PureComponent {
     withdrawTokenFunds({ ID: token.ID, request: token.numberOfRequests - 1 })
   }
 
+  fundAppeal = () => {
+    this.setState({ appealModalOpen: true })
+  }
+
   onCountdownComplete = () => {
     this.setState({ countdownCompleted: true })
   }
@@ -224,7 +230,7 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { evidences, countdownCompleted } = this.state
+    const { evidences, countdownCompleted, appealModalOpen } = this.state
     const {
       token,
       accounts,
@@ -261,6 +267,14 @@ class TokenDetails extends PureComponent {
     let losingSide
     const userAccount = accounts.data[0]
     const { latestRequest } = token
+
+    const SIDE =
+      userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
+        ? tcrConstants.SIDE.Requester
+        : userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
+        ? tcrConstants.SIDE.Challenger
+        : tcrConstants.SIDE.None
+
     if (
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
@@ -465,14 +479,16 @@ class TokenDetails extends PureComponent {
                 )}
             </div>
             <div className="TokenDetails-action">
-              {getActionButton({
-                item: token,
-                userAccount: accounts.data[0],
-                tcr: arbitrableTokenListData,
-                countdownCompleted,
-                handleActionClick: this.handleActionClick,
-                handleExecuteRequestClick: this.handleExecuteRequestClick
-              })}
+              {SIDE !== tcrConstants.SIDE.None
+                ? getActionButton({
+                    item: token,
+                    userAccount: accounts.data[0],
+                    tcr: arbitrableTokenListData,
+                    countdownCompleted,
+                    handleActionClick: this.handleActionClick,
+                    handleExecuteRequestClick: this.handleExecuteRequestClick
+                  })
+                : this.fundAppeal}
             </div>
           </div>
         </div>
@@ -535,6 +551,48 @@ class TokenDetails extends PureComponent {
               )}
           </div>
         </div>
+        {/* eslint-disable react/jsx-no-bind */}
+        <Modal
+          className="ActionModal"
+          isOpen={appealModalOpen}
+          onRequestClose={() => this.setState({ appealModalOpen: false })}
+        >
+          <h3 className="Modal-title">
+            <FontAwesomeIcon className="Appeal-icon" icon="coins" />
+            Fund Appeal
+          </h3>
+          <hr />
+          <br />
+          <h5 className="Modal-subtitle">Which side do you want to fund?</h5>
+          <br />
+          <Button
+            className="Appeal-request"
+            type="primary"
+            style={{ marginRight: '12px' }}
+            onClick={() => {
+              this.setState({ appealModalOpen: false })
+              this.handleActionClick(
+                modalConstants.ACTION_MODAL_ENUM['FundAppeal'],
+                tcrConstants.SIDE.Requester
+              )
+            }}
+          >
+            Fund Requester
+          </Button>
+          <Button
+            className="Appeal-request"
+            type="primary"
+            onClick={() => {
+              this.setState({ appealModalOpen: false })
+              this.handleActionClick(
+                modalConstants.ACTION_MODAL_ENUM['FundAppeal'],
+                tcrConstants.SIDE.Challenger
+              )
+            }}
+          >
+            Fund Challenger
+          </Button>
+        </Modal>
       </div>
     )
   }
