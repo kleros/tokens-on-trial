@@ -41,10 +41,10 @@ class SettingsModal extends PureComponent {
     openSettingsModal()
   }
 
-  handleUpdateSettingsClick = async ({ name, email, ...rest }) => {
+  handleUpdateSettingsClick = async ({ fullName, email, ...rest }) => {
     const { accounts } = this.props
     const settings = {
-      name: { S: name },
+      fullName: { S: fullName },
       email: { S: email },
       ...Object.keys(rest).reduce((acc, v) => {
         acc[

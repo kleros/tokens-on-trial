@@ -22,7 +22,7 @@ export const { Form: SettingsForm, submit: submitSettingsForm } = form(
         label: 'It is your turn to fund an appeal.'
       }
     },
-    name: { type: 'text', validate: [required] },
+    fullName: { type: 'text', validate: [required] },
     email: {
       type: 'text',
       validate: [required, email]
