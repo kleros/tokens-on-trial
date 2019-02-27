@@ -16,12 +16,6 @@ export const { Form: SettingsForm, submit: submitSettingsForm } = form(
         label: 'A ruling was given.'
       }
     },
-    shouldFund: {
-      type: 'checkbox',
-      props: {
-        label: 'It is your turn to fund an appeal.'
-      }
-    },
     fullName: { type: 'text', validate: [required] },
     email: {
       type: 'text',
