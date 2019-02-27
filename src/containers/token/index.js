@@ -698,6 +698,17 @@ class TokenDetails extends PureComponent {
           <hr />
           <br />
           <h5 className="Modal-subtitle">Which side do you want to fund?</h5>
+          {decisiveRuling &&
+            ((requesterIsLoser &&
+              (loserRemainingTime === 0 || loserCountdownCompleted)) ||
+              (challengerIsLoser &&
+                (loserRemainingTime === 0 || loserCountdownCompleted))) && (
+              <small>
+                <h5 className="Modal-subtitle" style={{ marginTop: 0 }}>
+                  Note: The appeal period for the loser has ended.
+                </h5>
+              </small>
+            )}
           <br />
           <div style={{ display: 'flex' }}>
             <Button
