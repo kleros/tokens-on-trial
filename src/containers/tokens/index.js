@@ -71,6 +71,20 @@ class Tokens extends Component {
         .sort((a, b) => {
           if (a.status > 1 && b.status <= 1) return -1
           if (a.status <= 1 && b.status > 1) return 1
+          if (a.badge.status > 1 && b.badge.status <= 1) return -1
+          if (a.badge.status <= 1 && b.badge.status > 1) return 1
+          if (a.badge.status > 1 && b.badge.status > 1) {
+            if (
+              !a.badge.latestRequest.disputed &&
+              b.badge.latestRequest.disputed
+            )
+              return -1
+            if (
+              a.badge.latestRequest.disputed &&
+              !b.badge.latestRequest.disputed
+            )
+              return 1
+          }
           if (a.status > 1 && b.status > 1) {
             if (!a.latestRequest.disputed && b.latestRequest.disputed) return -1
             if (a.latestRequest.disputed && !b.latestRequest.disputed) return 1
