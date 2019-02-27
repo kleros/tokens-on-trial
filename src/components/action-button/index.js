@@ -179,7 +179,7 @@ const getActionButton = ({
           modalConstants.ACTION_MODAL_ENUM[`Challenge${isBadge ? 'Badge' : ''}`]
         )
       if (isRegistrationRequest(item.status)) label = 'Challenge Registration'
-      else label = 'Challenge Clearing'
+      else label = 'Challenge Removal'
     }
   else {
     disabled = false
@@ -188,7 +188,7 @@ const getActionButton = ({
         handleActionClick(
           modalConstants.ACTION_MODAL_ENUM[`Clear${isBadge ? 'Badge' : ''}`]
         )
-      label = 'Submit Clearing Request'
+      label = 'Submit Removal Request'
       icon = 'times-circle'
     } else {
       label = isBadge ? 'Add Badge' : 'Resubmit Token'
