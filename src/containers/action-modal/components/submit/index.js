@@ -62,7 +62,7 @@ const Submit = ({
       </>
     )}
     {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
-    {!badge && (
+    {!badge && !item && (
       <div
         style={{
           textAlign: 'start',

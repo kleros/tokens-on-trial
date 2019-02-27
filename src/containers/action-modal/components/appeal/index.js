@@ -54,25 +54,29 @@ const FundAppeal = ({
     <div className="Appeal-cost">
       <span>Appeal Cost</span>
       {`${item.latestRequest.latestRound.appealCost &&
-        web3.utils.fromWei(item.latestRequest.latestRound.appealCost)} ETH`}
+        String(
+          web3.utils.fromWei(item.latestRequest.latestRound.appealCost)
+        )} ETH`}
     </div>
     <div className="Appeal-cost">
       <span>Arbitration Fee Stake</span>
       {`${String(
         item.latestRequest.latestRound.appealCost &&
           web3.utils.fromWei(
-            web3.utils
-              .toBN(item.latestRequest.latestRound.appealCost)
-              .mul(
-                web3.utils.toBN(
-                  !decisiveRuling(item)
-                    ? tcr.data.sharedStakeMultiplier
-                    : isLosingSide(item, side)
-                    ? tcr.data.loserStakeMultiplier
-                    : tcr.data.winnerStakeMultiplier
+            String(
+              web3.utils
+                .toBN(String(item.latestRequest.latestRound.appealCost))
+                .mul(
+                  web3.utils.toBN(
+                    !decisiveRuling(item)
+                      ? String(tcr.data.sharedStakeMultiplier)
+                      : isLosingSide(item, side)
+                      ? String(tcr.data.loserStakeMultiplier)
+                      : String(tcr.data.winnerStakeMultiplier)
+                  )
                 )
-              )
-              .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
+            )
           )
       )} ETH `}
     </div>
@@ -81,19 +85,23 @@ const FundAppeal = ({
       {`${String(
         item.latestRequest.latestRound.appealCost &&
           web3.utils.fromWei(
-            web3.utils.toBN(item.latestRequest.latestRound.appealCost).add(
+            String(
               web3.utils
-                .toBN(item.latestRequest.latestRound.appealCost)
-                .mul(
-                  web3.utils.toBN(
-                    !decisiveRuling(item)
-                      ? tcr.data.sharedStakeMultiplier
-                      : isLosingSide(item, side)
-                      ? tcr.data.loserStakeMultiplier
-                      : tcr.data.winnerStakeMultiplier
-                  )
+                .toBN(String(item.latestRequest.latestRound.appealCost))
+                .add(
+                  web3.utils
+                    .toBN(String(item.latestRequest.latestRound.appealCost))
+                    .mul(
+                      web3.utils.toBN(
+                        !decisiveRuling(item)
+                          ? String(tcr.data.sharedStakeMultiplier)
+                          : isLosingSide(item, side)
+                          ? String(tcr.data.loserStakeMultiplier)
+                          : String(tcr.data.winnerStakeMultiplier)
+                      )
+                    )
+                    .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
                 )
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
             )
           )
       )} ETH `}
@@ -102,7 +110,11 @@ const FundAppeal = ({
       <span>Amount Paid:</span>
       {`${String(
         web3.utils.fromWei(
-          web3.utils.toBN(item.latestRequest.latestRound.paidFees[side])
+          String(
+            web3.utils.toBN(
+              String(item.latestRequest.latestRound.paidFees[side])
+            )
+          )
         )
       )} ETH `}
     </div>
@@ -113,25 +125,29 @@ const FundAppeal = ({
         {`${String(
           item.latestRequest.latestRound.appealCost &&
             web3.utils.fromWei(
-              web3.utils
-                .toBN(item.latestRequest.latestRound.appealCost)
-                .add(
-                  web3.utils
-                    .toBN(item.latestRequest.latestRound.appealCost)
-                    .mul(
-                      web3.utils.toBN(
-                        !decisiveRuling(item)
-                          ? tcr.data.sharedStakeMultiplier
-                          : isLosingSide(item, side)
-                          ? tcr.data.loserStakeMultiplier
-                          : tcr.data.winnerStakeMultiplier
+              String(
+                web3.utils
+                  .toBN(String(item.latestRequest.latestRound.appealCost))
+                  .add(
+                    web3.utils
+                      .toBN(String(item.latestRequest.latestRound.appealCost))
+                      .mul(
+                        web3.utils.toBN(
+                          !decisiveRuling(item)
+                            ? String(tcr.data.sharedStakeMultiplier)
+                            : isLosingSide(item, side)
+                            ? String(tcr.data.loserStakeMultiplier)
+                            : String(tcr.data.winnerStakeMultiplier)
+                        )
                       )
+                      .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
+                  )
+                  .sub(
+                    web3.utils.toBN(
+                      String(item.latestRequest.latestRound.paidFees[side])
                     )
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                )
-                .sub(
-                  web3.utils.toBN(item.latestRequest.latestRound.paidFees[side])
-                )
+                  )
+              )
             )
         )} ETH `}
       </strong>
@@ -144,27 +160,31 @@ const FundAppeal = ({
           ? 0
           : web3.utils
               .fromWei(
-                web3.utils
-                  .toBN(item.latestRequest.latestRound.appealCost)
-                  .add(
-                    web3.utils
-                      .toBN(item.latestRequest.latestRound.appealCost)
-                      .mul(
-                        web3.utils.toBN(
-                          !decisiveRuling(item)
-                            ? tcr.data.loserStakeMultiplier
-                            : isLosingSide(item, side)
-                            ? tcr.data.loserStakeMultiplier
-                            : tcr.data.winnerStakeMultiplier
+                String(
+                  web3.utils
+                    .toBN(String(item.latestRequest.latestRound.appealCost))
+                    .add(
+                      web3.utils
+                        .toBN(String(item.latestRequest.latestRound.appealCost))
+                        .mul(
+                          web3.utils.toBN(
+                            !decisiveRuling(item)
+                              ? String(tcr.data.loserStakeMultiplier)
+                              : isLosingSide(item, side)
+                              ? String(tcr.data.loserStakeMultiplier)
+                              : String(tcr.data.winnerStakeMultiplier)
+                          )
                         )
-                      )
-                      .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                  )
-                  .sub(
-                    web3.utils.toBN(
-                      item.latestRequest.latestRound.paidFees[side]
+                        .div(
+                          web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR))
+                        )
                     )
-                  )
+                    .sub(
+                      web3.utils.toBN(
+                        String(item.latestRequest.latestRound.paidFees[side])
+                      )
+                    )
+                )
               )
               .toString()
       }}
