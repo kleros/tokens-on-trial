@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 import Button from '../../components/button'
 import SearchBar from '../search'
 import * as filterConstants from '../../constants/filter'
+import { userFriendlyLabel } from '../../utils/ui'
 
 import './filter-bar.css'
 
@@ -30,7 +31,7 @@ class FilterButton extends PureComponent {
         size="small"
         type={type}
       >
-        {filterConstants.FILTER_OPTIONS_ENUM[option]}
+        {userFriendlyLabel[filterConstants.FILTER_OPTIONS_ENUM[option]]}
       </Button>
     )
   }

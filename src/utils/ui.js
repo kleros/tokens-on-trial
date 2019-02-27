@@ -69,3 +69,15 @@ export const getRemainingTime = (
 
   return time > 0 ? time : 0
 }
+
+export const userFriendlyLabel = {
+  // Translate implementation enum into user friendly label.
+  Registered: 'Registered',
+  'Registration Requests': 'Submissions',
+  'Challenged Registration Requests': 'Challenged Submissions',
+  Absent: 'Absent',
+  'Clearing Requests': 'Removal Requests',
+  'Challenged Clearing Requests': 'Challenged Removal Requests',
+  'My Submissions': 'My Requests',
+  'My Challenges': 'My Challenges'
+}
