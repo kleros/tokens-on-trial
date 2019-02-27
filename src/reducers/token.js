@@ -27,8 +27,8 @@ export const _tokenShape = PropTypes.shape({
     }),
     latestRound: PropTypes.shape({
       appealed: PropTypes.bool.isRequired,
-      requiredForSide: PropTypes.arrayOf(PropTypes.number).isRequired,
-      paidFees: PropTypes.arrayOf(PropTypes.number).isRequired
+      requiredForSide: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+      paidFees: PropTypes.arrayOf(PropTypes.shape({})).isRequired
     })
   }).isRequired
 })

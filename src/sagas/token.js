@@ -211,15 +211,6 @@ export function* fetchToken({ payload: { ID } }) {
       .toBN(web3.utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
       .toString()
 
-    if (token.latestRequest.resolved)
-      token.latestRequest.withdrawable = yield call(
-        arbitrableTokenList.methods.amountWithdrawable(
-          ID,
-          account,
-          Number(token.numberOfRequests) - 1
-        ).call
-      )
-
     // Calculate amount withdrawable
     let i
     token.withdrawable = web3.utils.toBN(0)
@@ -299,15 +290,6 @@ export function* fetchToken({ payload: { ID } }) {
         .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
         .toString()
 
-      if (badge.latestRequest.resolved)
-        badge.latestRequest.withdrawable = yield call(
-          arbitrableAddressList.methods.amountWithdrawable(
-            token.addr,
-            account,
-            Number(badge.numberOfRequests) - 1
-          ).call
-        )
-
       badge.latestRequest.latestRound = yield call(
         arbitrableAddressList.methods.getRoundInfo(
           addr,
@@ -372,8 +354,8 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: [],
-          requiredForSide: []
+          paidFees: new Array(3).fill(web3.utils.toBN(0)),
+          requiredForSide: new Array(3).fill(web3.utils.toBN(0))
         }
       }
 
@@ -404,8 +386,8 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: [],
-          requiredForSide: []
+          paidFees: new Array(3).fill(web3.utils.toBN(0)),
+          requiredForSide: new Array(3).fill(web3.utils.toBN(0))
         }
       },
       badge: {
@@ -425,8 +407,8 @@ export function* fetchToken({ payload: { ID } }) {
           parties: [],
           latestRound: {
             appealed: false,
-            paidFees: [],
-            requiredForSide: []
+            paidFees: new Array(3).fill(web3.utils.toBN(0)),
+            requiredForSide: new Array(3).fill(web3.utils.toBN(0))
           }
         }
       },

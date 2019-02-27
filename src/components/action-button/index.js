@@ -5,6 +5,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Button from '../button'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
+import { web3 } from '../../bootstrap/dapp-api'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/tcr'
 
 const getActionButton = ({
@@ -33,11 +34,15 @@ const getActionButton = ({
   const arbitrationFeesWaitingTime = Number(tcr.data.arbitrationFeesWaitingTime)
   const { latestRequest } = item
   const { latestRound, challengerDepositTime } = latestRequest
-  let submitterFees
-  let challengerFees
+  let submitterFees = web3.utils.toBN(0)
+  let challengerFees = web3.utils.toBN(0)
   if (latestRequest && latestRound) {
-    submitterFees = latestRound.paidFees[tcrConstants.SIDE.Requester]
-    challengerFees = latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    submitterFees = web3.utils.toBN(
+      latestRound.paidFees[tcrConstants.SIDE.Requester]
+    )
+    challengerFees = web3.utils.toBN(
+      latestRound.paidFees[tcrConstants.SIDE.Challenger]
+    )
   }
 
   if (hasPendingRequest(item))
@@ -65,8 +70,8 @@ const getActionButton = ({
                 : tcrConstants.SIDE.Challenger
 
             if (
-              latestRound.requiredForSide[SIDE] === 0 ||
-              latestRound.paidFees[SIDE] < latestRound.requiredForSide[SIDE]
+              latestRound.requiredForSide[SIDE].eq(web3.utils.toBN(0)) ||
+              latestRound.paidFees[SIDE].lt(latestRound.requiredForSide[SIDE])
             ) {
               let losingSide
               if (
@@ -109,14 +114,14 @@ const getActionButton = ({
           } else if (Date.now() > appealPeriodEnd) label = 'Waiting Enforcement'
         } else if (!countdownCompleted) label = 'Waiting Appeals'
     } else if (
-      submitterFees > 0 &&
-      challengerFees > 0 &&
+      submitterFees.gt(web3.utils.toBN(0)) &&
+      challengerFees.gt(web3.utils.toBN(0)) > 0 &&
       Date.now() > challengerDepositTime + arbitrationFeesWaitingTime
     ) {
       icon = 'gavel'
       disabled = false
       method = handleExecuteRequestClick
-      if (submitterFees > challengerFees) label = 'Timeout Challenger'
+      if (submitterFees.gt(challengerFees)) label = 'Timeout Challenger'
       else label = 'Timeout Submitter'
     } else if (
       Date.now() >= latestRequest.submissionTime + challengePeriodDuration ||
@@ -136,7 +141,7 @@ const getActionButton = ({
       label = 'Pay Arbitration Fees'
       disabled = false
       if (
-        challengerFees > submitterFees &&
+        challengerFees.gt(submitterFees) &&
         userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
       )
         method = () =>
@@ -146,7 +151,7 @@ const getActionButton = ({
             ]
           )
       else if (
-        submitterFees > challengerFees &&
+        submitterFees.gt(challengerFees) &&
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
       )
         method = () =>

@@ -50,7 +50,6 @@ export const convertFromString = item => {
   latestRequest.challengerDepositTime =
     Number(latestRequest.challengerDepositTime) * 1000
   latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
-  latestRequest.withdrawable = Number(latestRequest.withdrawable)
   latestRequest.disputeID = latestRequest.dispute
     ? Number(latestRequest.disputeID)
     : 0
@@ -63,10 +62,6 @@ export const convertFromString = item => {
     latestRequest.dispute.ruling = Number(latestRequest.dispute.ruling)
 
   const { latestRound } = latestRequest
-  latestRound.paidFees[1] = Number(latestRound.paidFees[1])
-  latestRound.paidFees[2] = Number(latestRound.paidFees[2])
-  latestRound.requiredForSide[1] = Number(latestRound.requiredForSide[1])
-  latestRound.requiredForSide[2] = Number(latestRound.requiredForSide[2])
   if (
     latestRequest.dispute &&
     latestRequest.dispute.status ===

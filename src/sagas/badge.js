@@ -48,15 +48,6 @@ export function* fetchBadge({ payload: { addr } }) {
       .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
       .toString()
 
-    if (badge.latestRequest.resolved)
-      badge.latestRequest.withdrawable = yield call(
-        arbitrableAddressList.methods.amountWithdrawable(
-          addr,
-          account,
-          Number(badge.numberOfRequests) - 1
-        ).call
-      )
-
     // Calculate amount withdrawable
     let i
     badge.withdrawable = web3.utils.toBN(0)
@@ -178,8 +169,8 @@ export function* fetchBadge({ payload: { addr } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: [],
-          requiredForSide: []
+          paidFees: new Array(3).fill(web3.utils.toBN(0)),
+          requiredForSide: new Array(3).fill(web3.utils.toBN(0))
         }
       }
     }
