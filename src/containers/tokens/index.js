@@ -68,7 +68,17 @@ class Tokens extends Component {
             return true
           } else return false
         })
+        .sort((a, b) => {
+          if (a.status > 1 && b.status <= 1) return -1
+          if (a.status <= 1 && b.status > 1) return 1
+          if (a.status > 1 && b.status > 1) {
+            if (!a.latestRequest.disputed && b.latestRequest.disputed) return -1
+            if (a.latestRequest.disputed && !b.latestRequest.disputed) return 1
+          }
+          return 0
+        })
         .map(token => <TokenCard key={token.ID} token={token} />)
+
     return null
   }
 
