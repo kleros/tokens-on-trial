@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
@@ -31,7 +32,7 @@ const Submit = ({
       style={!badge ? { justifyContent: 'center' } : {}}
     >
       {badge && <span className="Modal-badge" />}
-      <h3 className="Modal-title">
+      <h3 className="Modal-title" style={{ marginTop: 0 }}>
         {badge ? 'Add Badge' : item ? 'Resubmit token' : 'Submit a token'}
       </h3>
       {badge && (
@@ -52,7 +53,7 @@ const Submit = ({
             <span>
               (Max Size: 15MB)
               <br />
-              Drag file here or
+              Drag file or click here
             </span>
           }
           multiple={false}
@@ -61,9 +62,23 @@ const Submit = ({
       </>
     )}
     {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
+    <div
+      style={{
+        textAlign: 'start',
+        fontSize: '11.5px',
+        marginTop: '10px',
+        marginBottom: '10px',
+        display: 'flex'
+      }}
+    >
+      <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
+      <div style={{ marginLeft: '5px' }}>
+        <i>Please, upload the logo with a transparent background</i>
+      </div>
+    </div>
     <div className="Challenge-fees">
       <div>
-        <p className="Challenge-fees-line">Challenge Stake</p>
+        <p className="Challenge-fees-line">Challenge Deposit</p>
         <p className="Challenge-fees-line">Arbitration Fee Stake</p>
         <p className="Challenge-fees-line">Arbitration Fees</p>
       </div>

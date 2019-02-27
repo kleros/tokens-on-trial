@@ -26,7 +26,7 @@ const SubmitEvidence = ({
         <span>
           (Max Size: 5MB)
           <br />
-          Drag file here or
+          Drag file or click here
         </span>
       }
       multiple={false}
