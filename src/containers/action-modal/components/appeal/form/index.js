@@ -1,5 +1,5 @@
 import { form } from '../../../../../utils/form-generator'
-import { required, isNumber } from '../../../../../utils/validation'
+import { required, isPositiveNumber } from '../../../../../utils/validation'
 
 export const {
   Form: AppealForm,
@@ -8,6 +8,6 @@ export const {
 } = form('appealForm', {
   amount: {
     type: 'eth',
-    validate: [required, isNumber]
+    validate: [required, isPositiveNumber]
   }
 })

@@ -70,7 +70,9 @@ class TokenDetails extends PureComponent {
   state = {
     evidences: [],
     countdownCompleted: false,
-    appealModalOpen: false
+    appealModalOpen: false,
+    loserCountdownCompleted: false,
+    winnerCountdownCompleted: false
   }
 
   handleFilterChange = key => {
@@ -221,6 +223,14 @@ class TokenDetails extends PureComponent {
     this.setState({ countdownCompleted: true })
   }
 
+  onWinnerCoundownComplete = () => {
+    this.setState({ winnerCountdownCompleted: true })
+  }
+
+  onLoserCoundownComplete = () => {
+    this.setState({ loserCountdownCompleted: true })
+  }
+
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
@@ -230,7 +240,13 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const { evidences, countdownCompleted, appealModalOpen } = this.state
+    const {
+      evidences,
+      countdownCompleted,
+      appealModalOpen,
+      loserCountdownCompleted,
+      winnerCountdownCompleted
+    } = this.state
     const {
       token,
       accounts,
@@ -266,6 +282,8 @@ class TokenDetails extends PureComponent {
 
     let losingSide
     let decisiveRuling
+    let requesterIsLoser
+    let challengerIsLoser
     const userAccount = accounts.data[0]
     const { latestRequest } = token
 
@@ -293,8 +311,13 @@ class TokenDetails extends PureComponent {
       )
         losingSide = true
 
-      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.Other)
+      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.Other) {
         decisiveRuling = true
+        requesterIsLoser =
+          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
+        challengerIsLoser =
+          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
+      }
     }
 
     const time = getRemainingTime(
@@ -445,7 +468,6 @@ class TokenDetails extends PureComponent {
                   latestRequest.dispute.status !==
                     tcrConstants.DISPUTE_STATUS.Appealable.toString())
               ) &&
-                !countdownCompleted &&
                 (!latestRequest.dispute ||
                   (latestRequest.dispute.status ===
                     tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
@@ -453,7 +475,7 @@ class TokenDetails extends PureComponent {
                   <>
                     {!latestRequest.dispute ? (
                       <>
-                        {time > 0 && (
+                        {time > 0 && !countdownCompleted && (
                           <span
                             style={{ display: 'flex', alignItems: 'center' }}
                           >
@@ -478,8 +500,9 @@ class TokenDetails extends PureComponent {
                         {latestRequest.dispute.status ===
                           tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
                           <>
-                            {SIDE !== tcrConstants.SIDE.None ||
-                            !decisiveRuling ? (
+                            {(SIDE !== tcrConstants.SIDE.None ||
+                              !decisiveRuling) &&
+                            !countdownCompleted ? (
                               <span
                                 style={{
                                   display: 'flex',
@@ -502,28 +525,7 @@ class TokenDetails extends PureComponent {
                               </span>
                             ) : (
                               <>
-                                <span
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    margin: '0'
-                                  }}
-                                >
-                                  <div className="BadgeDetails-timer">
-                                    <FontAwesomeIcon
-                                      className="TokenDetails-icon"
-                                      color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                                      icon="clock"
-                                    />
-                                    {'Winner Appeal Deadline '}
-                                    <Countdown
-                                      date={Date.now() + winnerRemainingTime}
-                                      renderer={CountdownRenderer}
-                                      onComplete={this.onCountdownComplete}
-                                    />
-                                  </div>
-                                </span>
-                                {loserRemainingTime > 0 && (
+                                {!winnerCountdownCompleted && (
                                   <span
                                     style={{
                                       display: 'flex',
@@ -539,15 +541,45 @@ class TokenDetails extends PureComponent {
                                         }
                                         icon="clock"
                                       />
-                                      {'Loser Appeal Deadline '}
+                                      {'Winner Appeal Deadline '}
                                       <Countdown
-                                        date={Date.now() + loserRemainingTime}
+                                        date={Date.now() + winnerRemainingTime}
                                         renderer={CountdownRenderer}
-                                        onComplete={this.onCountdownComplete}
+                                        onComplete={
+                                          this.onWinnerCoundownComplete
+                                        }
                                       />
                                     </div>
                                   </span>
                                 )}
+                                {loserRemainingTime > 0 &&
+                                  !loserCountdownCompleted && (
+                                    <span
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        margin: '0'
+                                      }}
+                                    >
+                                      <div className="BadgeDetails-timer">
+                                        <FontAwesomeIcon
+                                          className="TokenDetails-icon"
+                                          color={
+                                            tcrConstants.STATUS_COLOR_ENUM[4]
+                                          }
+                                          icon="clock"
+                                        />
+                                        {'Loser Appeal Deadline '}
+                                        <Countdown
+                                          date={Date.now() + loserRemainingTime}
+                                          renderer={CountdownRenderer}
+                                          onComplete={
+                                            this.onLoserCoundownComplete
+                                          }
+                                        />
+                                      </div>
+                                    </span>
+                                  )}
                               </>
                             )}
                           </>
@@ -564,9 +596,21 @@ class TokenDetails extends PureComponent {
                 tcrConstants.DISPUTE_STATUS.Appealable &&
               latestRequest.numberOfRounds > 1 &&
               SIDE === tcrConstants.SIDE.None ? (
-                <Button type="primary" onClick={this.fundAppeal}>
+                <Button
+                  type="primary"
+                  onClick={this.fundAppeal}
+                  disabled={
+                    decisiveRuling
+                      ? winnerCountdownCompleted && loserCountdownCompleted
+                      : countdownCompleted
+                  }
+                >
                   <FontAwesomeIcon className="TokenDetails-icon" icon="gavel" />
-                  Fund Appeal
+                  {(decisiveRuling
+                  ? !winnerCountdownCompleted || !loserCountdownCompleted
+                  : !countdownCompleted)
+                    ? 'Fund Appeal'
+                    : 'Waiting Enforcement'}
                 </Button>
               ) : (
                 getActionButton({
@@ -658,6 +702,11 @@ class TokenDetails extends PureComponent {
             className="Appeal-request"
             type="primary"
             style={{ marginRight: '12px' }}
+            disabled={
+              decisiveRuling &&
+              requesterIsLoser &&
+              (loserRemainingTime === 0 || loserCountdownCompleted)
+            }
             onClick={() => {
               this.setState({ appealModalOpen: false })
               this.handleActionClick(
@@ -671,6 +720,11 @@ class TokenDetails extends PureComponent {
           <Button
             className="Appeal-request"
             type="primary"
+            disabled={
+              decisiveRuling &&
+              challengerIsLoser &&
+              (loserRemainingTime === 0 || loserCountdownCompleted)
+            }
             onClick={() => {
               this.setState({ appealModalOpen: false })
               this.handleActionClick(
