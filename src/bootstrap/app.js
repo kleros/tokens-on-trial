@@ -23,8 +23,6 @@ import * as notificationActions from '../actions/notification'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
-import TTCREvidence from '../components/iframes/t2cr-evidence'
-import BadgeEvidence from '../components/iframes/badge-evidence'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -154,37 +152,29 @@ const App = ({ store, history }) => (
             <title>Kleros · Tokens on Trial</title>
           </Helmet>
           <Switch>
-            <Route component={TTCREvidence} exact path="/evidence/t2cr" />
-            <Route component={BadgeEvidence} exact path="/evidence/badge" />
-            <>
-              <div id="router-root">
-                <Route component={ConnectedNavBar} exact path="*" />
-                <div id="scroll-root">
-                  <Switch>
-                    <Redirect exact from="/" to="/tokens" />
-                    <Route component={Tokens} exact path="/tokens" />
-                    <Route
-                      component={TokenDetails}
-                      exact
-                      path="/token/:tokenID"
-                    />
-                    <Route
-                      component={BadgeDetails}
-                      exact
-                      path="/badge/:badgeAddr/:tokenAddr"
-                    />
-                    <Route
-                      component={PageNotFound}
-                      exact
-                      path="/notifications"
-                    />
-                    <Route component={PageNotFound} />
-                  </Switch>
-                </div>
-                <Route component={ActionModal} exact path="*" />
-                <Route component={GlobalComponents} exact path="*" />
+            <div id="router-root">
+              <Route component={ConnectedNavBar} exact path="*" />
+              <div id="scroll-root">
+                <Switch>
+                  <Redirect exact from="/" to="/tokens" />
+                  <Route component={Tokens} exact path="/tokens" />
+                  <Route
+                    component={TokenDetails}
+                    exact
+                    path="/token/:tokenID"
+                  />
+                  <Route
+                    component={BadgeDetails}
+                    exact
+                    path="/badge/:badgeAddr/:tokenAddr"
+                  />
+                  <Route component={PageNotFound} exact path="/notifications" />
+                  <Route component={PageNotFound} />
+                </Switch>
               </div>
-            </>
+              <Route component={ActionModal} exact path="*" />
+              <Route component={GlobalComponents} exact path="*" />
+            </div>
           </Switch>
         </>
       </ConnectedRouter>
