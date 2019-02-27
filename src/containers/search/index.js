@@ -30,11 +30,11 @@ class SearchBar extends PureComponent {
       const { returnValues } = data
       const { tokenSubmissions } = this.state
       const { _name, _ticker, _symbolMultihash, _address } = returnValues
-      if (!_name) return
+      if (!_name || !_ticker) return
 
       const tokenID = web3.utils.soliditySha3(
         _name || '',
-        _ticker,
+        _ticker || '',
         _address,
         _symbolMultihash
       )
