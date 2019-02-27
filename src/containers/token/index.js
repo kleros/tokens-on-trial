@@ -213,7 +213,7 @@ class TokenDetails extends PureComponent {
   withdrawFunds = () => {
     const { withdrawTokenFunds, token, openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
-    withdrawTokenFunds({ ID: token.ID, request: token.numberOfRequests - 1 })
+    withdrawTokenFunds({ ID: token.ID, item: token })
   }
 
   fundAppeal = () => {
@@ -356,7 +356,7 @@ class TokenDetails extends PureComponent {
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <h4 style={{ marginLeft: 0 }}>Token Details</h4>
-          {token.latestRequest.withdrawable > 0 && (
+          {token.withdrawable.gt(web3.utils.toBN(0)) && (
             <>
               <div className="TokenDetails-divider" />
               <h5
@@ -365,7 +365,7 @@ class TokenDetails extends PureComponent {
               >
                 <span className="TokenDetails-withdraw-value">
                   {Number(
-                    web3.utils.fromWei(latestRequest.withdrawable.toString())
+                    web3.utils.fromWei(token.withdrawable.toString())
                   ).toFixed(4)}{' '}
                   ETH{' '}
                 </span>

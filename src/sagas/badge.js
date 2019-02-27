@@ -57,6 +57,21 @@ export function* fetchBadge({ payload: { addr } }) {
         ).call
       )
 
+    // Calculate amount withdrawable
+    let i
+    badge.withdrawable = web3.utils.toBN(0)
+    if (badge.latestRequest.resolved) i = badge.numberOfRequests - 1
+    // Start from the last round.
+    else if (badge.numberOfRequests > 1) i = badge.numberOfRequests - 2 // Start from the penultimate round.
+
+    while (i >= 0) {
+      const amount = yield call(
+        arbitrableAddressList.methods.amountWithdrawable(addr, account, i).call
+      )
+      badge.withdrawable = badge.withdrawable.add(web3.utils.toBN(amount))
+      i--
+    }
+
     badge.latestRequest.latestRound = yield call(
       arbitrableAddressList.methods.getRoundInfo(
         addr,
@@ -281,12 +296,16 @@ function* feeTimeoutBadge({ payload: { badge } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the badge object.
  */
-function* withdrawBadgeFunds({ payload: { address, request } }) {
+function* withdrawBadgeFunds({ payload: { address, item } }) {
+  let count = 0
+  if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
+
   yield call(
-    arbitrableAddressList.methods.batchRoundWithdraw(
+    arbitrableAddressList.methods.batchRequestWithdraw(
       yield select(walletSelectors.getAccount),
       address,
-      request,
+      0,
+      count,
       0,
       0
     ).send,

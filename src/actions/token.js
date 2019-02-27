@@ -77,9 +77,9 @@ export const resubmitToken = ({ tokenData, value }) => ({
   type: token.RESUBMIT,
   payload: { token: tokenData, value }
 })
-export const withdrawTokenFunds = ({ ID, request }) => ({
+export const withdrawTokenFunds = ({ ID, item }) => ({
   type: token.WITHDRAW,
-  payload: { ID, request }
+  payload: { ID, item }
 })
 
 /* Badge TCR */

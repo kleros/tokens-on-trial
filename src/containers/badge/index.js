@@ -128,7 +128,7 @@ class BadgeDetails extends PureComponent {
     openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     withdrawBadgeFunds({
       address: badge.addr,
-      request: badge.numberOfRequests - 1
+      item: badge
     })
   }
 
@@ -353,7 +353,7 @@ class BadgeDetails extends PureComponent {
               </Link>
             </>
           )}
-          {latestRequest.withdrawable > 0 && (
+          {badge.withdrawable.gt(web3.utils.toBN(0)) && (
             <>
               <div className="TokenDetails-divider" />
               <h5
@@ -362,7 +362,7 @@ class BadgeDetails extends PureComponent {
               >
                 <span className="TokenDetails-withdraw-value">
                   {Number(
-                    web3.utils.fromWei(latestRequest.withdrawable.toString())
+                    web3.utils.fromWei(badge.withdrawable.toString())
                   ).toFixed(4)}{' '}
                   ETH{' '}
                 </span>

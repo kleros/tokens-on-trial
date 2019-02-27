@@ -67,7 +67,7 @@ export const resubmitBadge = ({ badgeData, value }) => ({
   type: badge.RESUBMIT,
   payload: { badge: badgeData, value }
 })
-export const withdrawBadgeFunds = ({ address, request }) => ({
+export const withdrawBadgeFunds = ({ address, item }) => ({
   type: badge.WITHDRAW_FUNDS,
-  payload: { address, request }
+  payload: { address, item }
 })

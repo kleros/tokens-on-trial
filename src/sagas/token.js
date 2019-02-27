@@ -220,6 +220,21 @@ export function* fetchToken({ payload: { ID } }) {
         ).call
       )
 
+    // Calculate amount withdrawable
+    let i
+    token.withdrawable = web3.utils.toBN(0)
+    if (token.latestRequest.resolved) i = token.numberOfRequests - 1
+    // Start from the last round.
+    else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
+
+    while (i >= 0) {
+      const amount = yield call(
+        arbitrableTokenList.methods.amountWithdrawable(ID, account, i).call
+      )
+      token.withdrawable = token.withdrawable.add(web3.utils.toBN(amount))
+      i--
+    }
+
     token.latestRequest.latestRound = yield call(
       arbitrableTokenList.methods.getRoundInfo(
         ID,
@@ -588,12 +603,16 @@ function* feeTimeout({ payload: { token } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the token object.
  */
-function* withdrawTokenFunds({ payload: { ID, request } }) {
+function* withdrawTokenFunds({ payload: { ID, item } }) {
+  let count = 0
+  if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
+
   yield call(
-    arbitrableTokenList.methods.batchRoundWithdraw(
+    arbitrableTokenList.methods.batchRequestWithdraw(
       yield select(walletSelectors.getAccount),
       ID,
-      request,
+      0,
+      count,
       0,
       0
     ).send,
