@@ -105,7 +105,7 @@ const getActionButton = ({
                     SIDE
                   )
               }
-            } else label = 'Waiting For Opponent Fees'
+            } else label = 'Waiting For Opponent'
           } else if (Date.now() > appealPeriodEnd) label = 'Waiting Enforcement'
         } else if (!countdownCompleted) label = 'Waiting Appeals'
     } else if (

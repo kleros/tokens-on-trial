@@ -362,91 +362,19 @@ class ActionModal extends PureComponent {
     })
   }
 
-  handleFundAppealClick = () => {
-    const {
-      fundAppeal,
-      token,
-      arbitrableTokenListData,
-      actionModalParam
-    } = this.props
+  handleFundAppealClick = ({ amount }) => {
+    const { fundAppeal, token, actionModalParam } = this.props
     const tokenData = token.data
-    const { latestRequest } = tokenData
     const SIDE = actionModalParam
-
-    let losingSide = false
-    if (
-      SIDE === tcrConstants.SIDE.Requester &&
-      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
-    )
-      losingSide = true
-    else if (
-      SIDE === tcrConstants.SIDE.Challenger &&
-      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
-    )
-      losingSide = true
-
-    const { latestRound } = latestRequest
-    const { appealCost } = latestRound
-    const {
-      loserStakeMultiplier,
-      winnerStakeMultiplier,
-      MULTIPLIER_DIVISOR
-    } = arbitrableTokenListData.data
-
-    const value = web3.utils.toBN(appealCost).add(
-      web3.utils
-        .toBN(appealCost)
-        .mul(
-          web3.utils.toBN(
-            losingSide ? loserStakeMultiplier : winnerStakeMultiplier
-          )
-        )
-        .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-    )
+    const value = web3.utils.toWei(amount)
 
     fundAppeal(tokenData.ID, SIDE, value)
   }
 
-  handleFundAppealBadgeClick = () => {
-    const {
-      fundBadgeAppeal,
-      badge,
-      arbitrableAddressListData,
-      actionModalParam
-    } = this.props
-    const { latestRequest } = badge.data
+  handleFundAppealBadgeClick = ({ amount }) => {
+    const { fundBadgeAppeal, badge, actionModalParam } = this.props
     const SIDE = actionModalParam
-
-    let losingSide = false
-    if (
-      SIDE === tcrConstants.SIDE.Requester &&
-      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
-    )
-      losingSide = true
-    else if (
-      SIDE === tcrConstants.SIDE.Challenger &&
-      latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
-    )
-      losingSide = true
-
-    const { latestRound } = latestRequest
-    const { appealCost } = latestRound
-    const {
-      loserStakeMultiplier,
-      winnerStakeMultiplier,
-      MULTIPLIER_DIVISOR
-    } = arbitrableAddressListData.data
-
-    const value = web3.utils.toBN(appealCost).add(
-      web3.utils
-        .toBN(appealCost)
-        .mul(
-          web3.utils.toBN(
-            losingSide ? loserStakeMultiplier : winnerStakeMultiplier
-          )
-        )
-        .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-    )
+    const value = web3.utils.toWei(amount)
 
     fundBadgeAppeal(badge.data.addr, SIDE, value)
   }
@@ -674,7 +602,7 @@ class ActionModal extends PureComponent {
                   badge
                 />
               )
-            case modalConstants.ACTION_MODAL_ENUM.FundAppealBadge:
+            case modalConstants.ACTION_MODAL_ENUM.FundAppealBadge: {
               return (
                 <FundAppeal
                   tcr={arbitrableAddressListData}
@@ -685,6 +613,7 @@ class ActionModal extends PureComponent {
                   side={actionModalParam}
                 />
               )
+            }
             case modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge:
               return (
                 <SubmitEvidence

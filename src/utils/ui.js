@@ -17,7 +17,13 @@ export const capitalizeFirst = s =>
 export const truncateMiddle = str =>
   `${str.slice(0, 6)}...${str.slice(str.length - 5, str.length - 1)}`
 
-export const getRemainingTime = (item, tcr, tcrConstants, losingSide) => {
+export const getRemainingTime = (
+  item,
+  tcr,
+  tcrConstants,
+  losingSide,
+  decisiveRuling
+) => {
   const currentTime = Date.now()
   const { latestRequest } = item
   const { latestRound } = latestRequest
@@ -43,19 +49,23 @@ export const getRemainingTime = (item, tcr, tcrConstants, losingSide) => {
       currentTime
   else if (
     latestRequest.dispute.status ===
-      tcrConstants.DISPUTE_STATUS.Appealable.toString() ||
-    (latestRequest.dispute.numberOfRounds > 2 &&
-      latestRequest.dispute.appealStatus ===
-        tcrConstants.DISPUTE_STATUS.Appealable.toString())
+    tcrConstants.DISPUTE_STATUS.Appealable.toString()
   ) {
     if (latestRound.appealPeriod[1] - latestRound.appealPeriod[0] === 94608000)
       return 94608000 // Large value means the arbitrator does not have an appeal period.
 
-    const appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
+    const appealPeriodStart = latestRequest.latestRound.appealPeriod[0]
+    let appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
+    let appealPeriodDuration = appealPeriodEnd - appealPeriodStart
+    appealPeriodDuration =
+      decisiveRuling && losingSide
+        ? appealPeriodDuration / 2
+        : appealPeriodDuration
+
+    appealPeriodEnd = appealPeriodStart + appealPeriodDuration
+
     time = appealPeriodEnd - currentTime
   }
-
-  time = losingSide ? time / 2 : time
 
   return time > 0 ? time : 0
 }

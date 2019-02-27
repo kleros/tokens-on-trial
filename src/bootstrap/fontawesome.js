@@ -25,6 +25,7 @@ import faFileVideo from '@fortawesome/fontawesome-free-solid/faFileVideo'
 import faFilePdf from '@fortawesome/fontawesome-free-solid/faFilePdf'
 import faFileWord from '@fortawesome/fontawesome-free-solid/faFileWord'
 import faBalanceScale from '@fortawesome/fontawesome-free-solid/faBalanceScale'
+import faCoins from '@fortawesome/fontawesome-free-solid/faCoins'
 
 library.add(
   faCaretDown,
@@ -52,5 +53,6 @@ library.add(
   faFileVideo,
   faFilePdf,
   faFileWord,
-  faBalanceScale
+  faBalanceScale,
+  faCoins
 )

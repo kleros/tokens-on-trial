@@ -11,3 +11,6 @@ export const email = name => v =>
   )
     ? undefined
     : `${name} must be a valid email.`
+
+export const isPositiveNumber = input =>
+  Number(input) >= 0 ? undefined : 'Cannot send negative amounts.'
