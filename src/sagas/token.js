@@ -455,7 +455,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = web3.utils.soliditySha3(name, ticker, addr, symbolMultihash)
+  const ID = web3.utils.soliditySha3(name || '', ticker, addr, symbolMultihash)
   const recentToken = yield call(fetchToken, { payload: { ID } })
 
   if (

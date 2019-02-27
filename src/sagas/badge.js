@@ -127,7 +127,7 @@ export function* fetchBadge({ payload: { addr } }) {
     if (tokens && tokens.length === 1) {
       badge.token = tokens[0]
       badge.token.ID = web3.utils.soliditySha3(
-        badge.token.name,
+        badge.token.name ? badge.token.name : '',
         badge.token.ticker,
         badge.token.addr,
         badge.token.symbolMultihash
