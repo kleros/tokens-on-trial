@@ -188,6 +188,17 @@ export function* fetchToken({ payload: { ID } }) {
   let token = yield call(arbitrableTokenList.methods.getTokenInfo(ID).call)
   const account = yield select(walletSelectors.getAccount)
 
+  // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
+  if (token.name === null || token['0'] === null) {
+    token.name = '0x'
+    token['0'] = '0x'
+  }
+
+  if (token.ticker === null || token['1'] === null) {
+    token.ticker = '0x'
+    token['1'] = '0x'
+  }
+
   if (Number(token.numberOfRequests > 0)) {
     token.latestRequest = yield call(
       arbitrableTokenList.methods.getRequestInfo(

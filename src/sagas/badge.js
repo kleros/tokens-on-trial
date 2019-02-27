@@ -126,6 +126,17 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (tokens && tokens.length === 1) {
       badge.token = tokens[0]
+      // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
+      if (badge.token.name === null || badge.token['0'] === null) {
+        badge.token.name = '0x'
+        badge.token['0'] = '0x'
+      }
+
+      if (badge.token.ticker === null || badge.token['1'] === null) {
+        badge.token.ticker = '0x'
+        badge.token['1'] = '0x'
+      }
+
       badge.token.ID = web3.utils.soliditySha3(
         badge.token.name ? badge.token.name : '',
         badge.token.ticker,
