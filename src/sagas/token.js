@@ -341,7 +341,6 @@ export function* fetchToken({ payload: { ID } }) {
         challengeRewardBalance: 0,
         challengerDepositTime: 0,
         feeRewards: 0,
-        numberOfRequests: 0,
         pot: [],
         resolved: false,
         parties: [],

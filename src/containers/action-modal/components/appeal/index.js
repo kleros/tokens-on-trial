@@ -1,6 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { connect } from 'react-redux'
 
 import * as tokenSelectors from '../../../../reducers/token'
 import * as tcrConstants from '../../../../constants/tcr'
@@ -8,6 +9,8 @@ import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-t
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+
+import { AppealForm, getAppealFormIsInvalid, submitAppealForm } from './form'
 import './appeal.css'
 
 const isLosingSide = (item, side) => {
@@ -27,7 +30,18 @@ const isLosingSide = (item, side) => {
   return losingSide
 }
 
-const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
+const decisiveRuling = item =>
+  item.latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.Other
+
+const FundAppeal = ({
+  closeActionModal,
+  fundAppeal,
+  item,
+  tcr,
+  side,
+  appealFormIsInvalid,
+  submitAppealForm
+}) => (
   <>
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Appeal-icon" icon="gavel" />
@@ -39,54 +53,122 @@ const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
     </h5>
     <div className="Appeal-cost">
       <span>Appeal Cost</span>
-      <strong>
-        {`${item.latestRequest.latestRound.appealCost &&
-          web3.utils.fromWei(item.latestRequest.latestRound.appealCost)} ETH`}
-      </strong>
+      {`${item.latestRequest.latestRound.appealCost &&
+        web3.utils.fromWei(item.latestRequest.latestRound.appealCost)} ETH`}
     </div>
     <div className="Appeal-cost">
       <span>Arbitration Fee Stake</span>
-      <strong>
-        {`${String(
-          item.latestRequest.latestRound.appealCost &&
-            web3.utils.fromWei(
+      {`${String(
+        item.latestRequest.latestRound.appealCost &&
+          web3.utils.fromWei(
+            web3.utils
+              .toBN(item.latestRequest.latestRound.appealCost)
+              .mul(
+                web3.utils.toBN(
+                  !decisiveRuling(item)
+                    ? tcr.data.sharedStakeMultiplier
+                    : isLosingSide(item, side)
+                    ? tcr.data.loserStakeMultiplier
+                    : tcr.data.winnerStakeMultiplier
+                )
+              )
+              .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+          )
+      )} ETH `}
+    </div>
+    <div className="Appeal-cost">
+      <span>Total Required:</span>
+      {`${String(
+        item.latestRequest.latestRound.appealCost &&
+          web3.utils.fromWei(
+            web3.utils.toBN(item.latestRequest.latestRound.appealCost).add(
               web3.utils
                 .toBN(item.latestRequest.latestRound.appealCost)
                 .mul(
                   web3.utils.toBN(
-                    isLosingSide(item, side)
+                    !decisiveRuling(item)
+                      ? tcr.data.sharedStakeMultiplier
+                      : isLosingSide(item, side)
                       ? tcr.data.loserStakeMultiplier
                       : tcr.data.winnerStakeMultiplier
                   )
                 )
                 .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
             )
-        )} ETH `}
-      </strong>
+          )
+      )} ETH `}
+    </div>
+    <div className="Appeal-cost">
+      <span>Amount Paid:</span>
+      {`${String(
+        web3.utils.fromWei(
+          web3.utils.toBN(item.latestRequest.latestRound.paidFees[side])
+        )
+      )} ETH `}
     </div>
     <br />
     <div className="Appeal-cost">
-      <span>Total Due:</span>
+      <span>Amount Still Required:</span>
       <strong className="Appeal-total-value">
         {`${String(
           item.latestRequest.latestRound.appealCost &&
             web3.utils.fromWei(
-              web3.utils.toBN(item.latestRequest.latestRound.appealCost).add(
-                web3.utils
-                  .toBN(item.latestRequest.latestRound.appealCost)
-                  .mul(
-                    web3.utils.toBN(
-                      isLosingSide(item, side)
-                        ? tcr.data.loserStakeMultiplier
-                        : tcr.data.winnerStakeMultiplier
+              web3.utils
+                .toBN(item.latestRequest.latestRound.appealCost)
+                .add(
+                  web3.utils
+                    .toBN(item.latestRequest.latestRound.appealCost)
+                    .mul(
+                      web3.utils.toBN(
+                        !decisiveRuling(item)
+                          ? tcr.data.sharedStakeMultiplier
+                          : isLosingSide(item, side)
+                          ? tcr.data.loserStakeMultiplier
+                          : tcr.data.winnerStakeMultiplier
+                      )
                     )
-                  )
-                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-              )
+                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                )
+                .sub(
+                  web3.utils.toBN(item.latestRequest.latestRound.paidFees[side])
+                )
             )
         )} ETH `}
       </strong>
     </div>
+    <AppealForm
+      className="Challenge-form"
+      onSubmit={fundAppeal}
+      initialValues={{
+        amount: !item.latestRequest.latestRound.appealCost
+          ? 0
+          : web3.utils
+              .fromWei(
+                web3.utils
+                  .toBN(item.latestRequest.latestRound.appealCost)
+                  .add(
+                    web3.utils
+                      .toBN(item.latestRequest.latestRound.appealCost)
+                      .mul(
+                        web3.utils.toBN(
+                          !decisiveRuling(item)
+                            ? tcr.data.loserStakeMultiplier
+                            : isLosingSide(item, side)
+                            ? tcr.data.loserStakeMultiplier
+                            : tcr.data.winnerStakeMultiplier
+                        )
+                      )
+                      .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                  )
+                  .sub(
+                    web3.utils.toBN(
+                      item.latestRequest.latestRound.paidFees[side]
+                    )
+                  )
+              )
+              .toString()
+      }}
+    />
     <div
       style={{
         textAlign: 'start',
@@ -112,8 +194,13 @@ const FundAppeal = ({ closeActionModal, fundAppeal, item, tcr, side }) => (
       >
         Cancel
       </Button>
-      <Button className="Appeal-request" onClick={fundAppeal} type="primary">
-        Appeal
+      <Button
+        className="Appeal-request"
+        onClick={submitAppealForm}
+        disabled={appealFormIsInvalid}
+        type="primary"
+      >
+        Fund Appeal
       </Button>
     </div>
   </>
@@ -127,10 +214,19 @@ FundAppeal.propTypes = {
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
   side: PropTypes.string.isRequired,
+  appealFormIsInvalid: PropTypes.bool.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  fundAppeal: PropTypes.func.isRequired
+  fundAppeal: PropTypes.func.isRequired,
+  submitAppealForm: PropTypes.func.isRequired
 }
 
-export default FundAppeal
+export default connect(
+  state => ({
+    appealFormIsInvalid: getAppealFormIsInvalid(state)
+  }),
+  {
+    submitAppealForm
+  }
+)(FundAppeal)

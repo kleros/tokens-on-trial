@@ -63,12 +63,10 @@ export const convertFromString = item => {
     latestRequest.dispute.ruling = Number(latestRequest.dispute.ruling)
 
   const { latestRound } = latestRequest
-  latestRound.paidFees[0] = Number(latestRound.paidFees[0])
   latestRound.paidFees[1] = Number(latestRound.paidFees[1])
   latestRound.paidFees[2] = Number(latestRound.paidFees[2])
-  latestRound.requiredForSide[0] = Number(latestRound.requiredForSide[0])
   latestRound.requiredForSide[1] = Number(latestRound.requiredForSide[1])
-  latestRound.requiredForSide[2] = Number(latestRound.paidFees[2])
+  latestRound.requiredForSide[2] = Number(latestRound.requiredForSide[2])
   if (
     latestRequest.dispute &&
     latestRequest.dispute.status ===
