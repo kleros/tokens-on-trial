@@ -609,7 +609,7 @@ function* withdrawTokenFunds({ payload: { ID, request } }) {
  * @returns {bool} Weather it passes the test.
  */
 function isInvalid(str) {
-  return !str || typeof str !== 'string' || str.trim().length === 0
+  return str === null || typeof str !== 'string'
 }
 
 // Update collection mod flows
