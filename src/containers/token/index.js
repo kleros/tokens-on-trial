@@ -707,6 +707,13 @@ class TokenDetails extends PureComponent {
               requesterIsLoser &&
               (loserRemainingTime === 0 || loserCountdownCompleted)
             }
+            data-tip={
+              decisiveRuling &&
+              requesterIsLoser &&
+              (loserRemainingTime === 0 || loserCountdownCompleted)
+                ? 'Funding period over.'
+                : ''
+            }
             onClick={() => {
               this.setState({ appealModalOpen: false })
               this.handleActionClick(
@@ -724,6 +731,13 @@ class TokenDetails extends PureComponent {
               decisiveRuling &&
               challengerIsLoser &&
               (loserRemainingTime === 0 || loserCountdownCompleted)
+            }
+            data-tip={
+              decisiveRuling &&
+              requesterIsLoser &&
+              (loserRemainingTime === 0 || loserCountdownCompleted)
+                ? 'Funding period over.'
+                : ''
             }
             onClick={() => {
               this.setState({ appealModalOpen: false })
