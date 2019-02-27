@@ -699,57 +699,46 @@ class TokenDetails extends PureComponent {
           <br />
           <h5 className="Modal-subtitle">Which side do you want to fund?</h5>
           <br />
-          <Button
-            className="Appeal-request"
-            type="primary"
-            style={{ marginRight: '12px' }}
-            disabled={
-              decisiveRuling &&
-              requesterIsLoser &&
-              (loserRemainingTime === 0 || loserCountdownCompleted)
-            }
-            data-tip={
-              decisiveRuling &&
-              requesterIsLoser &&
-              (loserRemainingTime === 0 || loserCountdownCompleted)
-                ? 'Funding period over.'
-                : ''
-            }
-            onClick={() => {
-              this.setState({ appealModalOpen: false })
-              this.handleActionClick(
-                modalConstants.ACTION_MODAL_ENUM['FundAppeal'],
-                tcrConstants.SIDE.Requester
-              )
-            }}
-          >
-            Fund Requester
-          </Button>
-          <Button
-            className="Appeal-request"
-            type="primary"
-            disabled={
-              decisiveRuling &&
-              challengerIsLoser &&
-              (loserRemainingTime === 0 || loserCountdownCompleted)
-            }
-            data-tip={
-              decisiveRuling &&
-              requesterIsLoser &&
-              (loserRemainingTime === 0 || loserCountdownCompleted)
-                ? 'Funding period over.'
-                : ''
-            }
-            onClick={() => {
-              this.setState({ appealModalOpen: false })
-              this.handleActionClick(
-                modalConstants.ACTION_MODAL_ENUM['FundAppeal'],
-                tcrConstants.SIDE.Challenger
-              )
-            }}
-          >
-            Fund Challenger
-          </Button>
+          <div style={{ display: 'flex' }}>
+            <Button
+              className="Appeal-request"
+              type="primary"
+              style={{ marginLeft: 0, marginRight: '6px' }}
+              disabled={
+                decisiveRuling &&
+                requesterIsLoser &&
+                (loserRemainingTime === 0 || loserCountdownCompleted)
+              }
+              onClick={() => {
+                this.setState({ appealModalOpen: false })
+                this.handleActionClick(
+                  modalConstants.ACTION_MODAL_ENUM['FundAppeal'],
+                  tcrConstants.SIDE.Requester
+                )
+              }}
+            >
+              Fund Requester
+            </Button>
+            <Button
+              className="Appeal-request"
+              type="primary"
+              style={{ marginLeft: '6px' }}
+              disabled={
+                decisiveRuling &&
+                challengerIsLoser &&
+                (loserRemainingTime === 0 || loserCountdownCompleted)
+              }
+              onClick={() => {
+                this.setState({ appealModalOpen: false })
+                this.handleActionClick(
+                  modalConstants.ACTION_MODAL_ENUM['FundAppeal'],
+                  tcrConstants.SIDE.Challenger
+                )
+              }}
+            >
+              Fund Challenger
+            </Button>
+          </div>
         </Modal>
       </div>
     )

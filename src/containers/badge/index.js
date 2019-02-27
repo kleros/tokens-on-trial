@@ -632,11 +632,11 @@ class BadgeDetails extends PureComponent {
           <br />
           <h5 className="Modal-subtitle">Which side do you want to fund?</h5>
           <br />
-          <div>
+          <div style={{ display: 'flex' }}>
             <Button
               className="Appeal-request"
               type="primary"
-              style={{ margin: '0 12px 0 0' }}
+              style={{ marginLeft: 0, marginRight: '6px' }}
               disabled={
                 decisiveRuling &&
                 requesterIsLoser &&
@@ -655,7 +655,7 @@ class BadgeDetails extends PureComponent {
             <Button
               className="Appeal-request"
               type="primary"
-              style={{ margin: 0 }}
+              style={{ marginLeft: '6px' }}
               disabled={
                 decisiveRuling &&
                 challengerIsLoser &&
