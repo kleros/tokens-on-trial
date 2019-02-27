@@ -460,6 +460,7 @@ class TokenDetails extends PureComponent {
                     />
                     Arbitration Result:{' '}
                     {tcrConstants.RULING_OPTIONS[latestRequest.dispute.ruling]}{' '}
+                    Request
                   </span>
                 )}
               {!(
