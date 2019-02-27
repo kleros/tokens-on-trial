@@ -20,5 +20,5 @@ export const ACTION_MODAL_ENUM = createEnum([
   'FundAppealBadge',
   'SubmitEvidenceBadge',
   'ViewEvidenceBadge',
-  'Timeout'
+  'TxPending'
 ])

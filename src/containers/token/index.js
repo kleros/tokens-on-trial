@@ -88,13 +88,13 @@ class TokenDetails extends PureComponent {
   handleExecuteRequestClick = () => {
     const { match, timeout, openActionModal } = this.props
     const { tokenID } = match.params
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     timeout(tokenID)
   }
 
   handleFeesTimeoutClick = () => {
     const { timeout, token, openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     timeout(token)
   }
 
@@ -211,7 +211,8 @@ class TokenDetails extends PureComponent {
   }
 
   withdrawFunds = () => {
-    const { withdrawTokenFunds, token } = this.props
+    const { withdrawTokenFunds, token, openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     withdrawTokenFunds({ ID: token.ID, request: token.numberOfRequests - 1 })
   }
 

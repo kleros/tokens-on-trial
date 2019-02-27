@@ -86,13 +86,13 @@ class BadgeDetails extends PureComponent {
 
   handleExecuteRequestClick = () => {
     const { timeout, badge, openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     timeout(badge.addr)
   }
 
   handleFeesTimeoutClick = () => {
     const { timeout, badge, openActionModal } = this.props
-    openActionModal(modalConstants.ACTION_MODAL_ENUM.Timeout)
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     timeout(badge)
   }
 
@@ -124,7 +124,8 @@ class BadgeDetails extends PureComponent {
   }
 
   withdrawFunds = async () => {
-    const { withdrawBadgeFunds, badge } = this.props
+    const { withdrawBadgeFunds, badge, openActionModal } = this.props
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     withdrawBadgeFunds({
       address: badge.addr,
       request: badge.numberOfRequests - 1

@@ -629,7 +629,7 @@ class ActionModal extends PureComponent {
                   badge
                 />
               )
-            case modalConstants.ACTION_MODAL_ENUM.Timeout: // Used to display transaction pending indicator
+            case modalConstants.ACTION_MODAL_ENUM.TxPending: // Used to display transaction pending indicator
               return <div />
             case undefined:
             case null:
