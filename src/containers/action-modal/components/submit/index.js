@@ -62,20 +62,22 @@ const Submit = ({
       </>
     )}
     {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
-    <div
-      style={{
-        textAlign: 'start',
-        fontSize: '11.5px',
-        marginTop: '10px',
-        marginBottom: '10px',
-        display: 'flex'
-      }}
-    >
-      <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
-      <div style={{ marginLeft: '5px' }}>
-        <i>Please, upload the logo with a transparent background</i>
+    {!badge && (
+      <div
+        style={{
+          textAlign: 'start',
+          fontSize: '11.5px',
+          marginTop: '10px',
+          marginBottom: '10px',
+          display: 'flex'
+        }}
+      >
+        <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
+        <div style={{ marginLeft: '5px' }}>
+          <i>Please, upload the logo with a transparent background</i>
+        </div>
       </div>
-    </div>
+    )}
     <div className="Challenge-fees">
       <div>
         <p className="Challenge-fees-line">Challenge Deposit</p>
