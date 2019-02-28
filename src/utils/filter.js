@@ -8,13 +8,11 @@ export const defaultFilter = () => {
   const filter = filterConstants.FILTER_OPTIONS_ENUM.values.reduce(
     (acc, curr) => ({
       ...acc,
-      [curr]: false
+      [curr]: true
     }),
     {}
   )
-  filter['Registered'] = true
-  filter['Registration Requests'] = true
-  filter['Clearing Requests'] = true
+  filter['Absent'] = false
 
   return filter
 }

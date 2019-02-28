@@ -89,13 +89,13 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      challengeReward
+      requesterBaseDeposit
     } = arbitrableTokenListData.data
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
 
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(requesterBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
@@ -114,10 +114,10 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      challengeReward
+      requesterBaseDeposit
     } = arbitrableTokenListData.data
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(requesterBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
@@ -134,11 +134,11 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      challengeReward
+      requesterBaseDeposit
     } = arbitrableTokenListData.data
 
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(requesterBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
@@ -156,11 +156,11 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      challengeReward
+      requesterBaseDeposit
     } = arbitrableAddressListData.data
 
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(requesterBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
@@ -215,7 +215,7 @@ class ActionModal extends PureComponent {
   handleChallengeClick = async ({ reason }) => {
     const { challengeRequest, token, arbitrableTokenListData } = this.props
     const {
-      challengeReward,
+      challengerBaseDeposit,
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR
@@ -242,7 +242,7 @@ class ActionModal extends PureComponent {
       ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(challengerBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
@@ -264,7 +264,7 @@ class ActionModal extends PureComponent {
       arbitrableAddressListData
     } = this.props
     const {
-      challengeReward,
+      challengerBaseDeposit,
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR
@@ -291,7 +291,7 @@ class ActionModal extends PureComponent {
       ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(challengerBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils
@@ -387,12 +387,12 @@ class ActionModal extends PureComponent {
     const {
       arbitrationCost,
       sharedStakeMultiplier,
-      challengeReward,
+      requesterBaseDeposit,
       MULTIPLIER_DIVISOR
     } = arbitrableAddressListData.data
 
     const value = web3.utils
-      .toBN(challengeReward)
+      .toBN(requesterBaseDeposit)
       .add(web3.utils.toBN(arbitrationCost))
       .add(
         web3.utils

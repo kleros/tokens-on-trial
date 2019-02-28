@@ -24,7 +24,7 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
           <strong>
             {`${String(
               web3.utils.fromWei(
-                String(web3.utils.toBN(tcr.data.challengeReward))
+                String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
               )
             )}`}
           </strong>
@@ -77,7 +77,7 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
               web3.utils.fromWei(
                 String(
                   web3.utils
-                    .toBN(tcr.data.challengeReward)
+                    .toBN(tcr.data.requesterBaseDeposit)
                     .add(
                       web3.utils
                         .toBN(tcr.data.arbitrationCost)

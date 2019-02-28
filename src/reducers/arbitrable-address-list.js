@@ -12,7 +12,8 @@ const {
   PropTypes.shape({
     arbitrator: PropTypes.string.isRequired,
     governor: PropTypes.string.isRequired,
-    challengeReward: PropTypes.number.isRequired,
+    requesterBaseDeposit: PropTypes.number.isRequired,
+    challengerBaseDeposit: PropTypes.number.isRequired,
     challengePeriodDuration: PropTypes.number.isRequired,
     arbitrationCost: PropTypes.number.isRequired,
     winnerStakeMultiplier: PropTypes.number.isRequired,
@@ -37,7 +38,8 @@ export default createReducer({
 export const getSubmitCost = state =>
   state.arbitrableAddressList.arbitrableAddressListData.data &&
   web3.utils.toBN(
-    state.arbitrableAddressList.arbitrableAddressListData.data.challengeReward
+    state.arbitrableAddressList.arbitrableAddressListData.data
+      .requesterBaseDeposit
   )
 
 export const getTimeToChallenge = state =>

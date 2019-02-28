@@ -21,7 +21,12 @@ import ipfsPublish from './api/ipfs-publish'
 export function* fetchArbitrableAddressListData() {
   const d = yield all({
     arbitrator: call(arbitrableAddressList.methods.arbitrator().call),
-    challengeReward: call(arbitrableAddressList.methods.challengeReward().call),
+    requesterBaseDeposit: call(
+      arbitrableAddressList.methods.requesterBaseDeposit().call
+    ),
+    challengerBaseDeposit: call(
+      arbitrableAddressList.methods.challengerBaseDeposit().call
+    ),
     challengePeriodDuration: call(
       arbitrableAddressList.methods.challengePeriodDuration().call
     ),
@@ -49,7 +54,8 @@ export function* fetchArbitrableAddressListData() {
   return {
     arbitrator: d.arbitrator,
     governor: d.governor,
-    challengeReward: Number(d.challengeReward),
+    requesterBaseDeposit: Number(d.requesterBaseDeposit),
+    challengerBaseDeposit: Number(d.challengerBaseDeposit),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
     arbitrationCost: Number(arbitrationCost),
     winnerStakeMultiplier: Number(d.winnerStakeMultiplier),

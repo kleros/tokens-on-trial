@@ -17,7 +17,9 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
       <span>Challenge Stake</span>
       <span>
         {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.challengeReward)))
+          web3.utils.fromWei(
+            String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
+          )
         )} ETH`}
       </span>
     </div>
@@ -52,7 +54,7 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
           web3.utils.fromWei(
             String(
               web3.utils
-                .toBN(tcr.data.challengeReward)
+                .toBN(tcr.data.requesterBaseDeposit)
                 .add(
                   web3.utils
                     .toBN(tcr.data.arbitrationCost)

@@ -43,7 +43,7 @@ const Challenge = ({
           <strong>
             {`${String(
               web3.utils.fromWei(
-                String(web3.utils.toBN(tcr.data.challengeReward))
+                String(web3.utils.toBN(tcr.data.challengerBaseDeposit))
               )
             )}`}
           </strong>
@@ -96,7 +96,7 @@ const Challenge = ({
               web3.utils.fromWei(
                 String(
                   web3.utils
-                    .toBN(tcr.data.challengeReward)
+                    .toBN(tcr.data.challengerBaseDeposit)
                     .add(
                       web3.utils
                         .toBN(tcr.data.arbitrationCost)

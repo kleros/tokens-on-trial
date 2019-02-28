@@ -17,7 +17,12 @@ import ipfsPublish from './api/ipfs-publish'
 export function* fetchArbitrableTokenListData() {
   const d = yield all({
     arbitrator: call(arbitrableTokenList.methods.arbitrator().call),
-    challengeReward: call(arbitrableTokenList.methods.challengeReward().call),
+    requesterBaseDeposit: call(
+      arbitrableTokenList.methods.requesterBaseDeposit().call
+    ),
+    challengerBaseDeposit: call(
+      arbitrableTokenList.methods.challengerBaseDeposit().call
+    ),
     challengePeriodDuration: call(
       arbitrableTokenList.methods.challengePeriodDuration().call
     ),
@@ -45,7 +50,8 @@ export function* fetchArbitrableTokenListData() {
   return {
     arbitrator: d.arbitrator,
     governor: d.governor,
-    challengeReward: Number(d.challengeReward),
+    requesterBaseDeposit: Number(d.requesterBaseDeposit),
+    challengerBaseDeposit: Number(d.challengerBaseDeposit),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
     arbitrationCost: Number(arbitrationCost),
     winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
