@@ -24,7 +24,7 @@ const SubmitEvidence = ({
       style={{ width: '92%' }}
       message={
         <span>
-          (Max Size: 5MB)
+          (Max Size: 1MB)
           <br />
           Drag file or click here
         </span>

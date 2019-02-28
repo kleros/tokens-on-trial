@@ -173,10 +173,10 @@ class ActionModal extends PureComponent {
   }
 
   handleOnFileDropAccepted = ([file]) => {
-    if (file.size > 5e6)
+    if (file.size > 1e6)
       return this.setState({
         file: null,
-        fileInfoMessage: 'File is too big. It must be less than 5MB.'
+        fileInfoMessage: 'File is too big. It must be less than 1MB.'
       })
 
     this.setState({

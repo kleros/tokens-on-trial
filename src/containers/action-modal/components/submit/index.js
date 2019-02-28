@@ -51,7 +51,7 @@ const Submit = ({
           file={file}
           message={
             <span>
-              (Max Size: 15MB)
+              (Max Size: 1MB)
               <br />
               Drag file or click here
             </span>
