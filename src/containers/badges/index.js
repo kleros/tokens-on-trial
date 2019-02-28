@@ -153,12 +153,12 @@ class Badges extends Component {
           filterVisible
         />
         <SortBar items={badges} />
-        <div className="TokenGrid">
-          <div className="TokenGrid-container">
+        <div className="BadgeGrid">
+          <div className="BadgeGrid-container">
             {badges.data && !badges.loading ? (
               this.mapBadges(badges.data)
             ) : (
-              <div className="TokenGrid-loading">
+              <div className="BadgeGrid-loading">
                 <BeatLoader color="#3d464d" />
               </div>
             )}
