@@ -29,7 +29,9 @@ const TokenCard = ({ token }) => (
         icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
       />
       <h5>
-        {token.name} - {token.ticker}
+        {`${token.name} ${token.name && token.ticker ? '-' : ''} ${
+          token.ticker
+        }`}
       </h5>
       <a
         href={`https://etherscan.io/token/${token.addr}`}

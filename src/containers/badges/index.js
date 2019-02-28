@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { BeatLoader } from 'react-spinners'
 
-import TokenCard from '../../components/token-card'
+import BadgeCard from '../../components/badge-card'
 import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
@@ -57,35 +57,23 @@ class Badges extends Component {
     if (Array.isArray(tokens))
       return tokens
         .filter(token => {
-          if (!keys[token.ID]) {
-            keys[token.ID] = true
+          if (!keys[token.badge.addr]) {
+            keys[token.badge.addr] = true
             return true
           } else return false
         })
         .sort((a, b) => {
           if (a.status > 1 && b.status <= 1) return -1
           if (a.status <= 1 && b.status > 1) return 1
-          if (a.token.status > 1 && b.token.status <= 1) return -1
-          if (a.token.status <= 1 && b.token.status > 1) return 1
-          if (a.token.status > 1 && b.token.status > 1) {
-            if (
-              !a.token.latestRequest.disputed &&
-              b.token.latestRequest.disputed
-            )
-              return -1
-            if (
-              a.token.latestRequest.disputed &&
-              !b.token.latestRequest.disputed
-            )
-              return 1
-          }
           if (a.status > 1 && b.status > 1) {
             if (!a.latestRequest.disputed && b.latestRequest.disputed) return -1
             if (a.latestRequest.disputed && !b.latestRequest.disputed) return 1
           }
           return 0
         })
-        .map(token => <TokenCard key={token.ID} token={token} />)
+        .map(token => (
+          <BadgeCard key={token.ID} token={token} displayTokenInfo />
+        ))
 
     return null
   }

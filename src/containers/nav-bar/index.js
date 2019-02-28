@@ -33,7 +33,7 @@ export default class NavBar extends PureComponent {
           <Link
             className={`NavBar-route ${r.extraStyle}`}
             style={{ height: '55px', verticalAlign: 'center' }}
-            to="/"
+            to={r.to}
           >
             {r.title}
           </Link>

@@ -175,23 +175,40 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
       return 0
     })
 
-    const submission = {
-      ...submissions[0],
-      status: Number(submissions[0].status)
+    let submission
+    if (submissions.length > 0) {
+      submission = {
+        ...submissions[0],
+        status: Number(submissions[0].status)
+      }
+      submission.latestRequest = yield call(
+        arbitrableTokenList.methods.getRequestInfo(
+          submission.ID,
+          Number(submission.numberOfRequests) - 1
+        ).call
+      )
+      submission.clientStatus = contractStatusToClientStatus(
+        submission.status,
+        submission.latestRequest.disputed
+      )
     }
-    submission.latestRequest = yield call(
-      arbitrableTokenList.methods.getRequestInfo(
-        submission.ID,
-        Number(submission.numberOfRequests) - 1
+
+    const badge = {
+      ...(yield call(arbitrableAddressList.methods.getAddressInfo(addr).call)),
+      addr
+    }
+
+    badge.latestRequest = yield call(
+      arbitrableAddressList.methods.getRequestInfo(
+        addr,
+        Number(badge.numberOfRequests) - 1
       ).call
     )
 
     tokens.push({
       ...submission,
-      clientStatus: contractStatusToClientStatus(
-        submission.status,
-        submission.latestRequest.disputed
-      )
+      badge,
+      addr
     })
   }
 

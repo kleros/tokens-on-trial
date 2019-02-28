@@ -5,6 +5,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
+import UnknownToken from '../../assets/images/unknown.svg'
 import * as tcrConstants from '../../constants/tcr'
 import { ARBITRABLE_ADDRESS_LIST_ADDRESS } from '../../bootstrap/dapp-api'
 
@@ -28,8 +29,8 @@ const getBadgeHeaderText = token => {
   return 'Pending'
 }
 
-const BadgeCard = ({ token }) => (
-  <div className="BadgeCard">
+const BadgeCard = ({ token, displayTokenInfo }) => (
+  <div className="BadgeCard" style={displayTokenInfo ? { margin: '16px' } : {}}>
     <div
       className="BadgeCard-header"
       style={{ backgroundColor: getBadgeColor(token) }}
@@ -46,16 +47,40 @@ const BadgeCard = ({ token }) => (
       className="BadgeCard-content"
       to={`/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}/${token.addr}`}
     >
-      <Img
-        alt="Badge List Submission"
-        className="BadgeCard-image"
-        src={EthfinexLogo}
-      />
+      {displayTokenInfo ? (
+        <Img
+          alt="Token List Submission"
+          className="TokenCard-image"
+          src={
+            token.symbolMultihash
+              ? `https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                  token.symbolMultihash
+                }`
+              : UnknownToken
+          }
+        />
+      ) : (
+        <Img
+          alt="Badge List Submission"
+          className="BadgeCard-image"
+          src={EthfinexLogo}
+        />
+      )}
     </Link>
     <div className="BadgeCard-footer">
-      <h5 className="BadgeCard-footer-text">
-        Compliant with Ethfinex listing criterion
-      </h5>
+      {displayTokenInfo ? (
+        <h5 className="BadgeCard-footer-text">
+          {`${token.ticker ? token.ticker : ''}
+          ${token.name && token.ticker ? '-' : ''}
+          ${token.name ? token.name : ''}
+          ${!token.ticker && !token.name && 'Unknown Token'}
+        `}
+        </h5>
+      ) : (
+        <h5 className="BadgeCard-footer-text">
+          Compliant with Ethfinex listing criterion
+        </h5>
+      )}
     </div>
   </div>
 )
@@ -68,7 +93,12 @@ BadgeCard.propTypes = {
     addr: PropTypes.string.isRequired,
     status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
-  }).isRequired
+  }).isRequired,
+  displayTokenInfo: PropTypes.bool
+}
+
+BadgeCard.defaultProps = {
+  displayTokenInfo: false
 }
 
 export default BadgeCard
