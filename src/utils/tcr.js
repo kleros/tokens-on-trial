@@ -46,6 +46,7 @@ export const getBlock = (block, web3, hash, callback) => {
 // Converts item string data to correct js types.
 export const convertFromString = item => {
   const { latestRequest } = item
+  item.numberOfRequests = Number(item.numberOfRequests)
   latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
   latestRequest.challengerDepositTime =
     Number(latestRequest.challengerDepositTime) * 1000
