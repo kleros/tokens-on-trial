@@ -198,6 +198,8 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
       addr
     }
 
+    badge.status = Number(badge.status)
+
     badge.latestRequest = yield call(
       arbitrableAddressList.methods.getRequestInfo(
         addr,
