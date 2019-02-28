@@ -21,9 +21,6 @@ export function* fetchArbitrableTokenListData() {
     challengePeriodDuration: call(
       arbitrableTokenList.methods.challengePeriodDuration().call
     ),
-    arbitrationFeesWaitingTime: call(
-      arbitrableTokenList.methods.arbitrationFeesWaitingTime().call
-    ),
     governor: call(arbitrableTokenList.methods.governor().call),
     winnerStakeMultiplier: call(
       arbitrableTokenList.methods.winnerStakeMultiplier().call
@@ -50,7 +47,6 @@ export function* fetchArbitrableTokenListData() {
     governor: d.governor,
     challengeReward: Number(d.challengeReward),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
-    arbitrationFeesWaitingTime: Number(d.arbitrationFeesWaitingTime) * 1000,
     arbitrationCost: Number(arbitrationCost),
     winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
     loserStakeMultiplier: Number(d.loserStakeMultiplier),

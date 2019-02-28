@@ -200,14 +200,6 @@ class TokenDetails extends PureComponent {
             })
         )
     })
-    arbitrableTokenList.events
-      .WaitingOpponent({ fromBlock: 0 })
-      .on('data', e => {
-        const { token } = this.state
-        if (!token) return
-
-        if (e.returnValues._tokenID === tokenID) fetchToken(tokenID)
-      })
   }
 
   withdrawFunds = () => {

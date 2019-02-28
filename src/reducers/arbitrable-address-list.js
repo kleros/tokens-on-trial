@@ -14,7 +14,6 @@ const {
     governor: PropTypes.string.isRequired,
     challengeReward: PropTypes.number.isRequired,
     challengePeriodDuration: PropTypes.number.isRequired,
-    arbitrationFeesWaitingTime: PropTypes.number.isRequired,
     arbitrationCost: PropTypes.number.isRequired,
     winnerStakeMultiplier: PropTypes.number.isRequired,
     loserStakeMultiplier: PropTypes.number.isRequired,

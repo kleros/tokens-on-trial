@@ -25,9 +25,6 @@ export function* fetchArbitrableAddressListData() {
     challengePeriodDuration: call(
       arbitrableAddressList.methods.challengePeriodDuration().call
     ),
-    arbitrationFeesWaitingTime: call(
-      arbitrableAddressList.methods.arbitrationFeesWaitingTime().call
-    ),
     governor: call(arbitrableAddressList.methods.governor().call),
     winnerStakeMultiplier: call(
       arbitrableAddressList.methods.winnerStakeMultiplier().call
@@ -54,7 +51,6 @@ export function* fetchArbitrableAddressListData() {
     governor: d.governor,
     challengeReward: Number(d.challengeReward),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
-    arbitrationFeesWaitingTime: Number(d.arbitrationFeesWaitingTime) * 1000,
     arbitrationCost: Number(arbitrationCost),
     winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
     loserStakeMultiplier: Number(d.loserStakeMultiplier),

@@ -31,7 +31,6 @@ const getActionButton = ({
     )
 
   const challengePeriodDuration = Number(tcr.data.challengePeriodDuration)
-  const arbitrationFeesWaitingTime = Number(tcr.data.arbitrationFeesWaitingTime)
   const { latestRequest } = item
   const { latestRound, challengerDepositTime } = latestRequest
   let submitterFees = web3.utils.toBN(0)
@@ -116,7 +115,7 @@ const getActionButton = ({
     } else if (
       submitterFees.gt(web3.utils.toBN(0)) &&
       challengerFees.gt(web3.utils.toBN(0)) > 0 &&
-      Date.now() > challengerDepositTime + arbitrationFeesWaitingTime
+      Date.now() > challengerDepositTime
     ) {
       icon = 'gavel'
       disabled = false
@@ -133,7 +132,6 @@ const getActionButton = ({
       label = 'Execute Request'
     } else if (
       challengerDepositTime > 0 &&
-      Date.now() - challengerDepositTime < arbitrationFeesWaitingTime &&
       (userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger])
     ) {

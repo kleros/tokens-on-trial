@@ -205,11 +205,6 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr)
     })
-    arbitrableAddressList.events
-      .WaitingOpponent({ fromBlock: 0 })
-      .on('data', async e => {
-        if (e.returnValues._address === tokenAddr) fetchBadge(tokenAddr)
-      })
   }
 
   submitBadgeAction = () =>

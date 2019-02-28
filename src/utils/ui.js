@@ -43,10 +43,7 @@ export const getRemainingTime = (
       tcr.data.challengePeriodDuration -
       currentTime
   else if (latestRequest.disputed === false)
-    time =
-      latestRequest.challengerDepositTime +
-      tcr.data.arbitrationFeesWaitingTime -
-      currentTime
+    time = latestRequest.challengerDepositTime + currentTime
   else if (
     latestRequest.dispute.status ===
     tcrConstants.DISPUTE_STATUS.Appealable.toString()
