@@ -115,7 +115,8 @@ class SettingsModal extends PureComponent {
                     initialValues={{
                       dispute: settings.data.dispute,
                       rulingGiven: settings.data.rulingGiven,
-                      shouldFund: settings.data.shouldFund
+                      shouldFund: settings.data.shouldFund,
+                      statusChange: settings.data.statusChange
                     }}
                     onSubmit={this.handleUpdateSettingsClick}
                   />

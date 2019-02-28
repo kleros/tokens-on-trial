@@ -16,6 +16,12 @@ export const { Form: SettingsForm, submit: submitSettingsForm } = form(
         label: 'A ruling was given.'
       }
     },
+    statusChange: {
+      type: 'checkbox',
+      props: {
+        label: 'Someone submitted a new request.'
+      }
+    },
     fullName: { type: 'text', validate: [required] },
     email: {
       type: 'text',
