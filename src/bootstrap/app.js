@@ -7,6 +7,7 @@ import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import Tokens from '../containers/tokens'
+import Badges from '../containers/badges'
 import TokenDetails from '../containers/token'
 import BadgeDetails from '../containers/badge'
 import PageNotFound from '../components/page-not-found'
@@ -163,6 +164,7 @@ const App = ({ store, history }) => (
                     exact
                     path="/token/:tokenID"
                   />
+                  <Route component={Badges} exact path="/badges" />
                   <Route
                     component={BadgeDetails}
                     exact

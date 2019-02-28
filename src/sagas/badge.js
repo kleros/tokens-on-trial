@@ -14,6 +14,7 @@ import * as tcrConstants from '../constants/tcr'
 
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 const filter = [
   false, // Do not include tokens which are not on the TCR.
   true, // Include registered tokens.
@@ -24,6 +25,206 @@ const filter = [
   false, // Include token if caller is the author of a pending request.
   false // Include token if caller is the challenger of a pending request.
 ]
+
+/**
+ * Fetches a paginatable list of tokens with badges.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object[]} - The fetched tokens with badges.
+ */
+function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
+  // Token count and stats
+  if (cursor === '') cursor = ZERO_ADDR
+
+  const totalCount = Number(
+    yield call(arbitrableAddressList.methods.addressCount().call, {
+      from: yield select(walletSelectors.getAccount)
+    })
+  )
+  const totalPages =
+    totalCount <= count
+      ? 1
+      : totalCount % count === 0
+      ? totalCount / count
+      : Math.floor(totalCount / count) + 1
+
+  let countByStatus = yield call(
+    arbitrableAddressList.methods.countByStatus().call,
+    {
+      from: yield select(walletSelectors.getAccount)
+    }
+  )
+
+  countByStatus = {
+    '0': Number(countByStatus['0']),
+    '1': Number(countByStatus['1']),
+    '2': Number(countByStatus['2']),
+    '3': Number(countByStatus['3']),
+    '4': Number(countByStatus['4']),
+    '5': Number(countByStatus['5']),
+    absent: Number(countByStatus['absent']),
+    challengedClearingRequest: Number(
+      countByStatus['challengedClearingRequest']
+    ),
+    challengedRegistrationRequest: Number(
+      countByStatus['challengedRegistrationRequest']
+    ),
+    clearingRequest: Number(countByStatus['clearingRequest']),
+    registered: Number(countByStatus['registered']),
+    registrationRequest: Number(countByStatus['registrationRequest'])
+  }
+
+  // Fetch first and last addresses
+  let firstToken = ZERO_ADDR
+  let lastToken = ZERO_ADDR
+  if (totalCount > 0) {
+    firstToken = yield call(arbitrableAddressList.methods.addressList(0).call, {
+      from: yield select(walletSelectors.getAccount)
+    })
+    lastToken = yield call(
+      arbitrableAddressList.methods.addressList(totalCount - 1).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )
+  }
+
+  // Get last page
+  let lastPage
+  /* eslint-disable no-unused-vars */
+  try {
+    const lastTokens = yield call(
+      arbitrableAddressList.methods.queryAddresses(
+        lastToken,
+        count,
+        filterValue,
+        false
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )
+    lastPage = lastTokens.values.filter(addr => addr !== ZERO_ADDR)[
+      lastTokens.values.length - 1
+    ]
+  } catch (err) {
+    lastPage = '' // No op. There are no further tokens.
+  }
+  /* eslint-enable */
+
+  // Get current page
+  let currentPage = 1
+  if (cursor !== firstToken && cursor !== ZERO_ADDR) {
+    const itemsBefore = (yield call(
+      arbitrableAddressList.methods.queryAddresses(
+        cursor === firstToken ? ZERO_ADDR : cursor,
+        100,
+        filterValue,
+        false
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )).values.filter(ID => ID !== ZERO_ADDR).length
+
+    currentPage =
+      itemsBefore <= count
+        ? 2
+        : itemsBefore % count === 0
+        ? itemsBefore / count + 1
+        : Math.floor(itemsBefore / count) + 2
+  }
+
+  // Fetch tokens
+  const data = yield call(
+    arbitrableAddressList.methods.queryAddresses(
+      cursor === firstToken ? ZERO_ADDR : cursor,
+      count,
+      filterValue,
+      sortValue
+    ).call,
+    { from: yield select(walletSelectors.getAccount) }
+  )
+
+  const tokenAddresses = data.values.filter(addr => addr !== ZERO_ADDR)
+  const tokens = []
+  for (const addr of tokenAddresses) {
+    const submissionIDs = (yield call(
+      arbitrableTokenList.methods.queryTokens(
+        ZERO_ID,
+        count,
+        [true, true, true, true, true, true, true, true],
+        true,
+        addr
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )).values.filter(ID => ID !== ZERO_ID)
+
+    let submissions = []
+    for (const submissionID of submissionIDs)
+      submissions.push({
+        ...(yield call(
+          arbitrableTokenList.methods.getTokenInfo(submissionID).call
+        )),
+        ID: submissionID
+      })
+
+    submissions = submissions.filter(
+      submission => Number(submission.status) !== 0
+    )
+    submissions = submissions.sort((a, b) => {
+      a.status = Number(a.status)
+      b.status = Number(b.status)
+      if (a.status === 1 && b.status !== 1) return -1
+      if (a.status !== 1 && b.status === 1) return 1
+      if (a.status === 3 && b.status === 2) return -1
+      if (a.status === 2 && b.status === 3) return 1
+      return 0
+    })
+
+    const submission = {
+      ...submissions[0],
+      status: Number(submissions[0].status)
+    }
+    submission.latestRequest = yield call(
+      arbitrableTokenList.methods.getRequestInfo(
+        submission.ID,
+        Number(submission.numberOfRequests) - 1
+      ).call
+    )
+
+    tokens.push({
+      ...submission,
+      clientStatus: contractStatusToClientStatus(
+        submission.status,
+        submission.latestRequest.disputed
+      )
+    })
+  }
+
+  // Fetch previous page token ID
+  /* eslint-disable no-unused-vars */
+  let previousPage
+  try {
+    const previousTokens = yield call(
+      arbitrableAddressList.methods.queryAddresses(
+        tokenAddresses[0],
+        count + 1,
+        filterValue,
+        !sortValue
+      ).call,
+      { from: yield select(walletSelectors.getAccount) }
+    )
+    previousPage = previousTokens.values.filter(ID => ID !== ZERO_ID)[
+      previousTokens.values.length - 1
+    ]
+  } catch (err) {
+    previousPage = '' // No op. There are no previous tokens.
+  }
+  /* eslint-enable */
+
+  tokens.hasMore = data.hasMore
+  tokens.totalCount = totalCount
+  tokens.countByStatus = countByStatus
+  tokens.previousPage = previousPage
+  tokens.lastPage = lastPage
+  tokens.totalPages = totalPages
+  tokens.currentPage = currentPage
+  return tokens
+}
 
 /**
  * Fetches a badge from the list.
@@ -327,6 +528,15 @@ const updateBadgesCollectionModFlow = {
  * The root of the badge saga.
  */
 export default function* badgeSaga() {
+  // Tokens
+  yield takeLatest(
+    badgeActions.badges.FETCH,
+    lessduxSaga,
+    'fetch',
+    badgeActions.badges,
+    fetchBadges
+  )
+
   // Badge
   yield takeLatest(
     badgeActions.badge.FETCH,

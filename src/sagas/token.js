@@ -104,7 +104,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
       lastTokens.values.length - 1
     ]
   } catch (err) {
-    lastPage = '' // No op. There are no previous tokens.
+    lastPage = '' // No op. There are no further tokens.
   }
   /* eslint-enable */
 
@@ -114,7 +114,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
     const itemsBefore = (yield call(
       arbitrableTokenList.methods.queryTokens(
         cursor === firstToken ? ZERO_ID : cursor,
-        1000,
+        100,
         filterValue,
         false,
         ZERO_ADDR
@@ -364,8 +364,7 @@ export function* fetchToken({ payload: { ID } }) {
       status: Number(badge.status),
       clientStatus: contractStatusToClientStatus(
         badge.status,
-        badge.latestRequest.disputed,
-        badge.latestRequest.resolved
+        badge.latestRequest.disputed
       )
     }
 

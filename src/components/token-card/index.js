@@ -53,17 +53,20 @@ const TokenCard = ({ token }) => (
         token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] ||
         token.status ===
           tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested'] ||
+        !token.badge ||
         token.badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent']
           ? ' TokenCard-hidden'
           : ''
       }`}
     >
-      <span
-        className="TokenCard-footer-badge"
-        style={getBadgeStyle(token.badge, tcrConstants)}
-      >
-        1
-      </span>
+      {token.badge && (
+        <span
+          className="TokenCard-footer-badge"
+          style={getBadgeStyle(token.badge, tcrConstants)}
+        >
+          1
+        </span>
+      )}
     </div>
   </div>
 )

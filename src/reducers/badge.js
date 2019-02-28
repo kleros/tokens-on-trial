@@ -50,8 +50,8 @@ export default createReducer({
 })
 
 // Selectors
-export const getTokens = state => state.badge.badges.data
-export const getTokenDisputeID = state =>
+export const getBadges = state => state.badge.badges.data
+export const getBadgeDisputeID = state =>
   state.badge.badge.data && state.badge.badge.data.disputeID
-export const getTokenAppealCost = state =>
+export const getBadgeAppealCost = state =>
   state.badge.badge.data && state.badge.badge.data.appealCost

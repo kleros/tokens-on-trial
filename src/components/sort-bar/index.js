@@ -15,7 +15,7 @@ import './sort-bar.css'
 class SortBar extends PureComponent {
   static propTypes = {
     // Redux State
-    tokens: PropTypes.shape({
+    items: PropTypes.shape({
       data: PropTypes.arrayOf(tokenSelectors._tokenShape.isRequired)
     }).isRequired,
     filter: filterSelectors.filterShape.isRequired,
@@ -26,29 +26,29 @@ class SortBar extends PureComponent {
   }
 
   handleSortChange = oldestFirst => {
-    const { setOldestFirst, fetchTokens, tokens, filter } = this.props
+    const { setOldestFirst, fetchTokens, items, filter } = this.props
     const { filters } = filter
     setOldestFirst(oldestFirst)
     const filterValue = filterToContractParam(filters)
-    if (!tokens.loading) fetchTokens('', 10, filterValue, oldestFirst)
+    if (!items.loading) fetchTokens('', 10, filterValue, oldestFirst)
   }
 
   render() {
-    const { tokens, filter } = this.props
+    const { items, filter } = this.props
     const { oldestFirst } = filter
-    const tokensData = tokens.data
+    const itemsData = items.data
 
     let numTokens = 0
-    if (tokensData && tokensData && tokensData.countByStatus)
-      numTokens = totalByStatus(tokensData.countByStatus, filter.filters)
+    if (itemsData && itemsData && itemsData.countByStatus)
+      numTokens = totalByStatus(itemsData.countByStatus, filter.filters)
 
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {tokensData &&
-          typeof tokensData.totalCount !== 'undefined' &&
+          {itemsData &&
+          typeof itemsData.totalCount !== 'undefined' &&
           typeof numTokens !== 'undefined'
-            ? `${tokens.data.length} submissions of ${tokensData.totalCount}`
+            ? `${items.data.length} submissions of ${itemsData.totalCount}`
             : 'Loading submissions...'}
         </div>
         <div className="SortBar-sort">
@@ -69,7 +69,6 @@ class SortBar extends PureComponent {
 
 export default connect(
   state => ({
-    tokens: state.token.tokens,
     filter: state.filter
   }),
   {
