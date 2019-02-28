@@ -237,6 +237,7 @@ export function* fetchToken({ payload: { ID } }) {
     if (token.latestRequest.disputed) {
       // Fetch dispute data.
       token.latestRequest.dispute = {}
+      arbitrator.options.address = token.latestRequest.arbitrator
       token.latestRequest.dispute.status = yield call(
         arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
       )
@@ -300,6 +301,7 @@ export function* fetchToken({ payload: { ID } }) {
 
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
+        arbitrator.options.address = badge.latestRequest.arbitrator
         badge.latestRequest.dispute = {}
         badge.latestRequest.dispute.status = yield call(
           arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
@@ -426,8 +428,7 @@ export function* fetchToken({ payload: { ID } }) {
     status: Number(token.status),
     clientStatus: contractStatusToClientStatus(
       token.status,
-      token.latestRequest.disputed,
-      token.latestRequest.resolved
+      token.latestRequest.disputed
     )
   }
 }

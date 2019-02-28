@@ -73,7 +73,7 @@ const BadgeCard = ({ token, displayTokenInfo }) => (
           {`${token.ticker ? token.ticker : ''}
           ${token.name && token.ticker ? '-' : ''}
           ${token.name ? token.name : ''}
-          ${!token.ticker && !token.name && 'Unknown Token'}
+          ${!token.ticker && !token.name ? 'Unknown Token' : ''}
         `}
         </h5>
       ) : (

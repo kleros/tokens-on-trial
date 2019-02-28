@@ -11,8 +11,6 @@ import { arbitrator } from '../bootstrap/dapp-api'
  */
 export function* fetchArbitratorData() {
   const d = yield all({
-    owner: call(arbitrator.methods.owner().call),
-    timeOut: call(arbitrator.methods.timeOut().call),
     arbitratorExtraData: call(arbitrator.methods.arbitratorExtraData().call)
   })
 

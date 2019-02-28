@@ -18,20 +18,6 @@ export const hasPendingRequest = ({ status, clientStatus, latestRequest }) => {
 export const isRegistrationRequest = tokenStatus =>
   tokenStatus === tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']
 
-export const contractStatusToClientStatus = (status, disputed) => {
-  if (disputed)
-    switch (tcrConstants.IN_CONTRACT_STATUS_ENUM[status]) {
-      case 'RegistrationRequested':
-        return tcrConstants.STATUS_ENUM['Registration Request Challenged']
-      case 'ClearingRequested':
-        return tcrConstants.STATUS_ENUM['Clearing Request Challenged']
-      default:
-        return status
-    }
-
-  return status
-}
-
 export const getBlock = (block, web3, hash, callback) => {
   if (!block || !block.timestamp)
     // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
