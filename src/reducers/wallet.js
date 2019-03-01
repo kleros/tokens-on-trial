@@ -17,7 +17,8 @@ const {
   PropTypes.shape({
     dispute: PropTypes.bool.isRequired,
     shouldFund: PropTypes.bool.isRequired,
-    rulingGiven: PropTypes.bool.isRequired
+    rulingGiven: PropTypes.bool.isRequired,
+    requestSubmitted: PropTypes.bool.isRequired
   }),
   {
     withUpdate: true
@@ -36,6 +37,7 @@ export default createReducer({
       dispute: true,
       shouldFund: true,
       rulingGiven: true,
+      requestSubmitted: true,
       name: '',
       email: ''
     }

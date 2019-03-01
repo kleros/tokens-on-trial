@@ -16,7 +16,7 @@ export const { Form: SettingsForm, submit: submitSettingsForm } = form(
         label: 'A ruling was given.'
       }
     },
-    statusChange: {
+    requestSubmitted: {
       type: 'checkbox',
       props: {
         label: 'Someone submitted a new request.'
