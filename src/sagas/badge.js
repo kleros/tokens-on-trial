@@ -351,8 +351,9 @@ export function* fetchBadge({ payload: { addr } }) {
         token => Number(token.status) === 1 || Number(token.status) === 3
       )
 
-    if (tokens && tokens.length === 1) {
+    if (tokens && tokens.length >= 1) {
       badge.token = tokens[0]
+      badge.token.ID = tokenIDs[0]
       // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
       if (badge.token.name === null || badge.token['0'] === null) {
         badge.token.name = '0x'
@@ -363,13 +364,6 @@ export function* fetchBadge({ payload: { addr } }) {
         badge.token.ticker = '0x'
         badge.token['1'] = '0x'
       }
-
-      badge.token.ID = web3.utils.soliditySha3(
-        badge.token.name ? badge.token.name : '',
-        badge.token.ticker,
-        badge.token.addr,
-        badge.token.symbolMultihash
-      )
     }
 
     badge = convertFromString(badge)

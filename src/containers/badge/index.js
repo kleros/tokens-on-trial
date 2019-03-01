@@ -21,7 +21,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { truncateMiddle, getRemainingTime } from '../../utils/ui'
+import { getRemainingTime } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -384,13 +384,11 @@ class BadgeDetails extends PureComponent {
                       className="BadgeDetails-icon BadgeDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {truncateMiddle(tokenAddr)}
+                    {web3.utils.toChecksumAddress(tokenAddr)}
                   </a>
                 </span>
               </div>
               <div />
-            </div>
-            <div className="BadgeDetails-meta">
               <span className="BadgeDetails-meta--aligned">
                 <FontAwesomeIcon
                   className="BadgeDetails-icon"
@@ -401,6 +399,8 @@ class BadgeDetails extends PureComponent {
                   tcrConstants.STATUS_ENUM[badge.clientStatus]
                 )}
               </span>
+            </div>
+            <div className="BadgeDetails-meta">
               {latestRequest.dispute &&
                 Number(latestRequest.dispute.status) ===
                   tcrConstants.DISPUTE_STATUS.Appealable &&

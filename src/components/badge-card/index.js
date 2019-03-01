@@ -15,6 +15,8 @@ const getBadgeColor = token => {
   const { badge } = token
   if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
     return '#009aff' // blue
+  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'])
+    return '#f60c36' // red
   if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
     return '#ff9900' // orange
   return '#ccc'
@@ -24,13 +26,15 @@ const getBadgeHeaderText = token => {
   const { badge } = token
   if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
     return 'Registered'
+  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'])
+    return 'Absent' // red
   if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
     return 'Challenged'
   return 'Pending'
 }
 
 const BadgeCard = ({ token, displayTokenInfo }) => (
-  <div className="BadgeCard" style={displayTokenInfo ? { margin: '16px' } : {}}>
+  <div className="BadgeCard" style={displayTokenInfo ? { margin: '12px' } : {}}>
     <div
       className="BadgeCard-header"
       style={{ backgroundColor: getBadgeColor(token) }}
