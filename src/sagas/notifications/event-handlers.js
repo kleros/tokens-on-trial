@@ -34,6 +34,18 @@ export const emitTokenNotifications = async (
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
+    const requests = await arbitrableTokenList.getPastEvents(
+      'RequestSubmitted',
+      {
+        filter: { _tokenID: returnValues._tokenID },
+        fromBlock: 0,
+        toBlock: 'latest'
+      }
+    )
+
+    const isRegistrationRequest =
+      requests[requests.length - 1].returnValues._registrationRequest
+
     let message
     switch (Number(returnValues._status)) {
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
@@ -63,33 +75,34 @@ export const emitTokenNotifications = async (
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered: {
-        if (returnValues._disputed === false)
+        if (isRegistrationRequest)
           message = `${
             isRequester
-              ? 'Your token registration request'
-              : 'A token registration request you challenged'
-          } has been executed.`
+              ? 'Your token submission was accepted.'
+              : 'A token submission you challenged was accepted.'
+          }`
         else
           message = `${
             isRequester
-              ? 'Your challenged token registration request'
-              : 'A token registration request you challenged'
-          } has been executed.`
+              ? 'Your token delisting request has been rejected.'
+              : 'A token delisting request you challenged was rejected.'
+          }`
+
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent: {
-        if (returnValues._disputed === false)
+        if (isRegistrationRequest)
           message = `${
             isRequester
-              ? 'Your token clearing request'
-              : 'A token clearing request you challenged'
-          } has been executed.`
+              ? 'Your token submission has been rejected.'
+              : 'A token submission you challenged has been rejected'
+          }`
         else
           message = `${
             isRequester
-              ? 'Your token clearing request'
-              : 'A token clearing request you challenged'
-          } has been refused.`
+              ? 'Your token delisting request has been accepted.'
+              : 'A token delisting you challenged has been accepted.'
+          }`
         break
       }
       default: {
@@ -167,6 +180,18 @@ export const emitBadgeNotifications = async (
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
+    const requests = await arbitrableAddressList.getPastEvents(
+      'RequestSubmitted',
+      {
+        filter: { _tokenID: returnValues._tokenID },
+        fromBlock: 0,
+        toBlock: 'latest'
+      }
+    )
+
+    const isRegistrationRequest =
+      requests[requests.length - 1].returnValues._registrationRequest
+
     let message
     switch (Number(returnValues._status)) {
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
@@ -196,33 +221,33 @@ export const emitBadgeNotifications = async (
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered: {
-        if (returnValues._disputed === false)
+        if (isRegistrationRequest)
           message = `${
             isRequester
-              ? 'Your badge registration request'
-              : 'A badge registration request you challenged'
-          } has been executed.`
+              ? 'Your badge addition request has been accepted'
+              : 'A badge addition request you challenged has been accepted.'
+          }`
         else
           message = `${
             isRequester
-              ? 'Your challenged badge registration request'
-              : 'A badge registration request you challenged'
-          } has been executed.`
+              ? 'Your badge removal request has been rejected.'
+              : 'A badge removal you challenged has been rejected.'
+          }`
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent: {
-        if (returnValues._disputed === false)
+        if (isRegistrationRequest)
           message = `${
             isRequester
-              ? 'Your badge clearing request'
-              : 'A badge clearing request you challenged'
-          } has been executed.`
+              ? 'Your badge addition request has been rejected.'
+              : 'A badge addition request you challenged has been rejected.'
+          }`
         else
           message = `${
             isRequester
-              ? 'Your badge clearing request'
-              : 'A badge clearing request you challenged'
-          } has been refused.`
+              ? 'Your badge removal request has been accepted.'
+              : 'A badge removal request you challenged has been accepted.'
+          }`
         break
       }
       default: {
