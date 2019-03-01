@@ -34,7 +34,7 @@ const getBadgeHeaderText = token => {
 }
 
 const BadgeCard = ({ token, displayTokenInfo }) => (
-  <div className="BadgeCard" style={displayTokenInfo ? { margin: '12px' } : {}}>
+  <div className="BadgeCard">
     <div
       className="BadgeCard-header"
       style={{ backgroundColor: getBadgeColor(token) }}

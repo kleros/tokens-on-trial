@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   height: 230px;
-  margin: 16px 13px;
+  margin: 16px 14px;
   position: relative;
   width: 248px;
 
@@ -78,9 +78,28 @@
   &-image {
     height: 90px;
     object-fit: contain;
+    width: 90px;
   }
 
   &-hidden {
     visibility: hidden;
+  }
+}
+
+@media (min-width: 400px) {
+  .TokenCard {
+    flex: 0 0 calc(45% - 10px);
+  }
+}
+
+@media (min-width: 800px) {
+  .TokenCard {
+    flex: 0 0 calc(30% - 10px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .TokenCard {
+    flex: 0 0 calc(23% - 10px);
   }
 }

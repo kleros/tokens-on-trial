@@ -10,7 +10,7 @@
   display: flex;
   flex-direction: column;
   height: 230px;
-  margin-bottom: 40px;
+  margin: 16px 14px;
   width: 248px;
 
   &-header {
@@ -57,9 +57,28 @@
   &-image {
     height: 90px;
     object-fit: contain;
+    width: 90px;
   }
 
   &-hidden {
     visibility: hidden;
+  }
+}
+
+@media (min-width: 400px) {
+  .BadgeCard {
+    flex: 0 0 calc(45% - 10px);
+  }
+}
+
+@media (min-width: 800px) {
+  .BadgeCard {
+    flex: 0 0 calc(30% - 10px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .BadgeCard {
+    flex: 0 0 calc(23% - 10px);
   }
 }
