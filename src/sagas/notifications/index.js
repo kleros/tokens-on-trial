@@ -13,13 +13,13 @@ import { lessduxSaga } from '../../utils/saga'
 import { action } from '../../utils/action'
 import {
   arbitrableTokenList,
-  arbitrableAddressList
+  arbitrableAddressList,
+  arbitrator
 } from '../../bootstrap/dapp-api'
 
-import {
-  emitTokenNotifications,
-  emitBadgeNotifications
-} from './event-handlers'
+import emitTokenNotifications from './token-events'
+import emitBadgeNotifications from './badge-events'
+import emitArbitratorNotifications from './arbitrator-events'
 
 /**
  * Notification listener.
@@ -83,6 +83,24 @@ function* pushNotificationsListener() {
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
           emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event])
+        }
+      })
+
+      // Arbitator events
+      arbitrator
+        .getPastEvents('AppealPossible', {
+          fromBlock:
+            localStorage.getItem(
+              `${arbitrator.options.address}nextEventsBlockNumber`
+            ) || 0
+        })
+        .then(events => {
+          emitArbitratorNotifications(account, emit, events)
+        })
+      arbitrator.events.AppealPossible().on('data', event => {
+        if (!txHashes[event.transactionHash]) {
+          txHashes[event.transactionHash] = true
+          emitArbitratorNotifications(account, emit, [event])
         }
       })
       return () => {} // Unsubscribe function
