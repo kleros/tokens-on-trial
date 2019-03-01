@@ -20,13 +20,13 @@ const emitTokenNotifications = async (
   emit,
   events
 ) => {
-  const notifiedIDs = {}
+  const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
 
   for (const event of events.reverse()) {
-    const { returnValues } = event
+    const { returnValues, transactionHash } = event
 
-    if (notifiedIDs[returnValues._tokenID]) continue
+    if (notifiedTxs[transactionHash]) continue
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
@@ -115,7 +115,7 @@ const emitTokenNotifications = async (
     )
 
     if (message) {
-      notifiedIDs[returnValues._tokenID] =
+      notifiedTxs[transactionHash] =
         returnValues._disputed === true &&
         (returnValues._status ===
           tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
@@ -135,7 +135,7 @@ const emitTokenNotifications = async (
 
   if (
     oldestNonDisputedSubmittedStatusEvent &&
-    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID] !==
+    notifiedTxs[oldestNonDisputedSubmittedStatusEvent.transactionHash] !==
       'disputed'
   ) {
     const date = await getBlockDate(

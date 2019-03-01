@@ -130,7 +130,12 @@ class TokenDetails extends PureComponent {
     })
     arbitrableTokenList.events.RewardWithdrawal().on('data', event => {
       const { token } = this.state
-      if (!token || event.returnValues._beneficiary !== accounts.data[0]) return
+      if (
+        !token ||
+        event.returnValues._beneficiary !== accounts.data[0] ||
+        token.ID !== event.returnValues._tokenID
+      )
+        return
       fetchToken(event.returnValues._tokenID)
     })
     arbitrableTokenList.events.TokenStatusChange().on('data', event => {
@@ -250,7 +255,7 @@ class TokenDetails extends PureComponent {
     const { filters } = filter
     const { tokenID } = match.params
 
-    if (!token)
+    if (!token || token.ID !== tokenID)
       return (
         <div className="Page Page--loading">
           <BeatLoader color="#3d464d" />
@@ -270,8 +275,6 @@ class TokenDetails extends PureComponent {
           </div>
         </div>
       )
-
-    if (token.ID !== tokenID) return window.location.reload()
 
     let losingSide
     let decisiveRuling

@@ -20,20 +20,20 @@ const emitBadgeNotifications = async (
   emit,
   events
 ) => {
-  const notifiedIDs = {}
+  const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
 
   for (const event of events.reverse()) {
-    const { returnValues } = event
+    const { returnValues, transactionHash } = event
 
-    if (notifiedIDs[returnValues._address]) continue
+    if (notifiedTxs[transactionHash]) continue
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
     const requests = await arbitrableAddressList.getPastEvents(
       'RequestSubmitted',
       {
-        filter: { _tokenID: returnValues._tokenID },
+        filter: { _address: returnValues._address },
         fromBlock: 0,
         toBlock: 'latest'
       }
@@ -114,7 +114,7 @@ const emitBadgeNotifications = async (
     )
 
     if (message) {
-      notifiedIDs[returnValues._address] =
+      notifiedTxs[transactionHash] =
         returnValues._disputed === true &&
         (returnValues._status ===
           tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested ||
@@ -136,7 +136,7 @@ const emitBadgeNotifications = async (
 
   if (
     oldestNonDisputedSubmittedStatusEvent &&
-    notifiedIDs[oldestNonDisputedSubmittedStatusEvent.returnValues._address] !==
+    notifiedTxs[oldestNonDisputedSubmittedStatusEvent.transactionHash] !==
       'disputed'
   ) {
     const date = await getBlockDate(

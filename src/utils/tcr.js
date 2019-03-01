@@ -23,9 +23,9 @@ export const contractStatusToClientStatus = (status, disputed) => {
   if (disputed)
     switch (tcrConstants.IN_CONTRACT_STATUS_ENUM[status]) {
       case 'RegistrationRequested':
-        return tcrConstants.STATUS_ENUM['Registration Request Challenged']
+        return tcrConstants.STATUS_ENUM['Submission Challenged']
       case 'ClearingRequested':
-        return tcrConstants.STATUS_ENUM['Clearing Request Challenged']
+        return tcrConstants.STATUS_ENUM['Delisting Request Challenged']
       default:
         return status
     }

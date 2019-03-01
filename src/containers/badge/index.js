@@ -21,7 +21,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime } from '../../utils/ui'
+import { getRemainingTime, truncateMiddle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -234,14 +234,12 @@ class BadgeDetails extends PureComponent {
     const { filters } = filter
     const { tokenAddr } = match.params
 
-    if (!badge)
+    if (!badge || badge.addr !== tokenAddr)
       return (
         <div className="Page Page--loading">
           <BeatLoader color="#3d464d" />
         </div>
       )
-
-    if (badge.addr !== tokenAddr) return window.location.reload()
 
     if (badge.numberOfRequests === 0)
       return (
@@ -372,22 +370,25 @@ class BadgeDetails extends PureComponent {
             <Img className="BadgeDetails-img" src={EthfinexLogo} />
             <div className="BadgeDetails-divider" />
             <div className="BadgeDetails-meta">
-              <div className="BadgeDetails-meta--aligned">
-                <span>
-                  <a
-                    className="BadgeDetails--link"
-                    href={`https://etherscan.io/address/${tokenAddr}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Img
-                      className="BadgeDetails-icon BadgeDetails-meta--aligned"
-                      src={EtherScanLogo}
-                    />
-                    {web3.utils.toChecksumAddress(tokenAddr)}
-                  </a>
-                </span>
-              </div>
+              <a
+                className="BadgeDetails--link"
+                href={`https://etherscan.io/address/${tokenAddr}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <div
+                  className="BadgeDetails-meta--aligned"
+                  style={{ display: 'flex', alignItems: 'center' }}
+                >
+                  <Img
+                    className="BadgeDetails-icon BadgeDetails-meta--aligned"
+                    src={EtherScanLogo}
+                  />
+                  <div style={{ overflowY: 'auto' }}>
+                    {truncateMiddle(tokenAddr)}
+                  </div>
+                </div>
+              </a>
               <div />
               <span className="BadgeDetails-meta--aligned">
                 <FontAwesomeIcon
@@ -396,7 +397,7 @@ class BadgeDetails extends PureComponent {
                   icon={tcrConstants.STATUS_ICON_ENUM[badge.clientStatus]}
                 />
                 {this.toSentenceCase(
-                  tcrConstants.STATUS_ENUM[badge.clientStatus]
+                  tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
                 )}
               </span>
             </div>

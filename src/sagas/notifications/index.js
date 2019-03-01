@@ -125,6 +125,7 @@ function* pushNotificationsListener() {
         take(arbitrableTokenListActions.arbitrableTokenListData.RECEIVE), // T2CR data refetch
         take(arbitrableAddressListActions.arbitrableAddressListData.RECEIVE) // Badge TCR data refetch
       ])
+
       if (accounts || arbitrableTokenListData || arbitrableAddressListData)
         continue
 

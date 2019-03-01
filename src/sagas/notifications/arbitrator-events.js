@@ -21,16 +21,20 @@ const emitArbitratorNotifications = async (account, emit, events) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
 
-    if (returnValues._arbitrable !== arbitrableTokenList._address) {
-      const tokenID = await arbitrableTokenList.methods.arbitratorDisputeIDToTokenID(
-        arbitrator._address,
-        returnValues._disputeID
-      )
-      const token = await arbitrableTokenList.methods.getTokenInfo(tokenID)
-      const latestRequest = await arbitrableTokenList.methods.getRequestInfo(
-        tokenID,
-        Number(token.numberOfRequests) - 1
-      )
+    if (returnValues._arbitrable === arbitrableTokenList._address) {
+      const tokenID = await arbitrableTokenList.methods
+        .arbitratorDisputeIDToTokenID(
+          arbitrator._address,
+          returnValues._disputeID
+        )
+        .call()
+
+      const token = await arbitrableTokenList.methods
+        .getTokenInfo(tokenID)
+        .call()
+      const latestRequest = await arbitrableTokenList.methods
+        .getRequestInfo(tokenID, Number(token.numberOfRequests) - 1)
+        .call()
       if (
         account !== latestRequest.parties[1] &&
         account !== latestRequest.parties[2]
@@ -45,7 +49,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
         message,
         clientStatus: 4
       })
-    } else if (returnValues._arbitrable !== arbitrableAddressList._address) {
+    } else if (returnValues._arbitrable === arbitrableAddressList._address) {
       const tokenAddress = await arbitrableAddressList.methods.arbitratorDisputeIDToAddress(
         arbitrator._address,
         returnValues._disputeID
