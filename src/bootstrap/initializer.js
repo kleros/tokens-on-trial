@@ -37,17 +37,10 @@ class Initializer extends PureComponent {
     this.setState({ metamaskNetwork: await networkPromise })
     fetchAccounts()
 
-    let prevAddr
-    web3.currentProvider.publicConfigStore.on(
-      'update',
-      ({ selectedAddress }) => {
-        selectedAddress = web3.utils.toChecksumAddress(selectedAddress)
-        if (prevAddr !== selectedAddress) {
-          prevAddr = selectedAddress
-          fetchAccounts()
-        }
-      }
-    )
+    if (window.ethereum)
+      window.ethereum.on('accountsChanged', () => {
+        fetchAccounts()
+      })
   }
 
   render() {
