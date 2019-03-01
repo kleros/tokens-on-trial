@@ -45,7 +45,7 @@ export const emitTokenNotifications = async (
         )
           message = `${
             isRequester
-              ? 'Your token request has challenged.'
+              ? 'Your token request has been challenged.'
               : 'You challenged a token request.'
           }`
         else if (
@@ -154,7 +154,7 @@ export const emitTokenNotifications = async (
 export const emitBadgeNotifications = async (
   account,
   timeToChallenge,
-  emitter,
+  emit,
   events
 ) => {
   const notifiedIDs = {}
@@ -178,7 +178,7 @@ export const emitBadgeNotifications = async (
         )
           message = `${
             isRequester
-              ? 'Your badge request has challenged.'
+              ? 'Your badge request has been challenged.'
               : 'You challenged a badge request.'
           }`
         else if (
@@ -248,7 +248,7 @@ export const emitBadgeNotifications = async (
           ? 'disputed'
           : true
 
-      emitter({
+      emit({
         ID: returnValues._address,
         addr: returnValues._address,
         badgeAddr: arbitrableAddressList._address,
@@ -268,7 +268,7 @@ export const emitBadgeNotifications = async (
       oldestNonDisputedSubmittedStatusEvent.blockHash
     )
     if (timeToChallenge && Date.now() - date > timeToChallenge)
-      emitter({
+      emit({
         ID: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
         addr: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
         date,
