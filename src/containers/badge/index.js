@@ -596,7 +596,10 @@ class BadgeDetails extends PureComponent {
                                             fontSize: '14px'
                                           }}
                                         >
-                                          <div className="BadgeDetails-timer">
+                                          <div
+                                            className="BadgeDetails-timer"
+                                            style={{ display: 'flex' }}
+                                          >
                                             <FontAwesomeIcon
                                               className="BadgeDetails-icon"
                                               color={
@@ -605,16 +608,19 @@ class BadgeDetails extends PureComponent {
                                               }
                                               icon="clock"
                                             />
-                                            {'Loser Deadline '}
-                                            <Countdown
-                                              date={
-                                                Date.now() + loserRemainingTime
-                                              }
-                                              renderer={CountdownRenderer}
-                                              onComplete={
-                                                this.onLoserCoundownComplete
-                                              }
-                                            />
+                                            <div>
+                                              {'Loser Deadline '}
+                                              <Countdown
+                                                date={
+                                                  Date.now() +
+                                                  loserRemainingTime
+                                                }
+                                                renderer={CountdownRenderer}
+                                                onComplete={
+                                                  this.onLoserCoundownComplete
+                                                }
+                                              />
+                                            </div>
                                           </div>
                                         </span>
                                       )}
