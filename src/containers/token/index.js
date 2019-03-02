@@ -468,6 +468,11 @@ class TokenDetails extends PureComponent {
                     />
                     Arbitration Result:{' '}
                     {latestRequest.dispute.ruling.toString() !== '0'
+                      ? tcrConstants.RULING_OPTIONS[
+                          latestRequest.dispute.ruling
+                        ]
+                      : 'Arbitrator did not rule'}{' '}
+                    {latestRequest.dispute.ruling.toString() !== '0'
                       ? 'Request'
                       : ''}
                   </span>

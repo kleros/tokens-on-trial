@@ -462,11 +462,11 @@ class BadgeDetails extends PureComponent {
                           style={{ marginRight: '10px' }}
                         />
                         Arbitration Result:{' '}
-                        {
-                          tcrConstants.RULING_OPTIONS[
-                            latestRequest.dispute.ruling
-                          ]
-                        }{' '}
+                        {latestRequest.dispute.ruling.toString() !== '0'
+                          ? tcrConstants.RULING_OPTIONS[
+                              latestRequest.dispute.ruling
+                            ]
+                          : 'Arbitrator did not rule'}{' '}
                         {latestRequest.dispute.ruling.toString() !== '0'
                           ? 'Request'
                           : ''}
