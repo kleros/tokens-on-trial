@@ -23,12 +23,20 @@
     }
   }
 
+  &-description {
+    align-items: start;
+    display: flex;
+    flex-direction: column;
+    margin: 26px 26px 0 0;
+    width: 100%;
+  }
+
   &-img {
-    height: 115px;
-    margin: 26px 26px 26px 0;
+    height: 132px;
+    margin: 26px;
+    min-width: 212px;
     object-fit: contain;
     padding: 15px;
-    width: 115px;
   }
 
   &-card {
@@ -39,12 +47,17 @@
     box-shadow: 0 3px 6px $shadow;
     box-sizing: border-box;
     display: flex;
-    flex-grow: 2;
+    flex-direction: column;
+    max-width: 100%;
     min-height: 102px;
-    padding-left: 36px;
 
     &-info {
       padding: 17px 0;
+    }
+
+    &-content {
+      display: flex;
+      flex-direction: row;
     }
   }
 
@@ -88,7 +101,7 @@
     flex-direction: column;
     font-size: 14px;
     justify-content: space-around;
-    margin: auto 26px auto 0;
+    overflow-x: auto;
     padding: 0;
 
     &--aligned {
@@ -122,24 +135,12 @@
     text-decoration: none;
   }
 
-  &-action {
+  &-footer {
     align-items: center;
-    background: $action;
+    background-color: $darkWhite;
     display: flex;
-    margin-left: auto;
-    padding-left: 36px;
-    padding-right: 36px;
-    position: relative;
-
-    &::after {
-      border-bottom: 80px solid transparent;
-      border-left: 20px solid $white;
-      border-top: 80px solid transparent;
-      content: "";
-      height: 0;
-      left: 0;
-      position: absolute;
-    }
+    flex-direction: row;
+    height: 58px;
   }
 
   &-timer {
