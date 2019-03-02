@@ -107,7 +107,7 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
         Return
       </Button>
       <Button className="Clear-request" onClick={clearItem} type="primary">
-        Request Clearing
+        Request Removal
       </Button>
     </div>
   </div>

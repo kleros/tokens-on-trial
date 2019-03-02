@@ -5,6 +5,10 @@
   align-items: center;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow-wrap: break-word;
+  width: 100%;
+  word-break: break-word;
 
   &-form {
     margin: 0 -34px;
@@ -13,6 +17,14 @@
   &-actions {
     display: flex;
     flex-direction: row;
+    width: 100%;
+  }
+
+  &-information {
+    align-items: flex-start;
+    display: flex;
+    flex-direction: column;
+    text-align: start;
     width: 100%;
   }
 

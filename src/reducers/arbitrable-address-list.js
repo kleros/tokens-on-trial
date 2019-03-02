@@ -42,6 +42,21 @@ export const getSubmitCost = state =>
       .requesterBaseDeposit
   )
 
+export const getWinnerStakeMultiplier = state =>
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .winnerStakeMultiplier
+
+export const getLoserStakeMultiplier = state =>
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .loserStakeMultiplier
+
+export const getSharedStakeMultiplier = state =>
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .sharedStakeMultiplier
+
 export const getTimeToChallenge = state =>
   state.arbitrableAddressList.arbitrableAddressListData.data &&
   state.arbitrableAddressList.arbitrableAddressListData.data

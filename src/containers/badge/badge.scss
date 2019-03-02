@@ -24,7 +24,7 @@
   }
 
   &-description {
-    align-items: start;
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
     margin: 26px 26px 0 0;
@@ -58,6 +58,7 @@
     &-content {
       display: flex;
       flex-direction: row;
+      overflow-x: auto;
     }
   }
 
@@ -101,7 +102,6 @@
     flex-direction: column;
     font-size: 14px;
     justify-content: space-around;
-    overflow-x: auto;
     padding: 0;
 
     &--aligned {
@@ -111,7 +111,7 @@
   }
 
   &-icon {
-    margin-right: 14px;
+    margin-right: 7px;
 
     &-badge {
       background-image: url('../../assets/images/badge.svg');

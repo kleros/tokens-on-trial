@@ -15,8 +15,6 @@ export const _tokenShape = PropTypes.shape({
     disputed: PropTypes.bool.isRequired,
     disputeID: PropTypes.number.isRequired,
     submissionTime: PropTypes.number.isRequired,
-    challengerDepositTime: PropTypes.number.isRequired,
-    challengeRewardBalance: PropTypes.string.isRequired,
     numberOfRounds: PropTypes.number.isRequired,
     parties: PropTypes.arrayOf(PropTypes.string).isRequired,
     dispute: PropTypes.shape({
@@ -27,7 +25,7 @@ export const _tokenShape = PropTypes.shape({
     }),
     latestRound: PropTypes.shape({
       appealed: PropTypes.bool.isRequired,
-      requiredForSide: PropTypes.arrayOf(PropTypes.shape({})).isRequired,
+      hasPaid: PropTypes.arrayOf(PropTypes.bool).isRequired,
       paidFees: PropTypes.arrayOf(PropTypes.shape({})).isRequired
     })
   }).isRequired

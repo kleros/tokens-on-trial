@@ -8,6 +8,20 @@
   justify-content: center;
   padding: 42px 60px 52px 73px;
 
+  @media (max-width: 400px) {
+    flex-direction: column;
+    padding: 0;
+    padding-top: 40px;
+
+    &-logo {
+      margin: 0 20%;
+    }
+
+    &-content {
+      margin: 0 20%;
+    }
+  }
+
   &-logo {
     height: 105px;
     margin-left: 56px;

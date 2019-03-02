@@ -50,15 +50,18 @@ const emitArbitratorNotifications = async (account, emit, events) => {
         clientStatus: 4
       })
     } else if (returnValues._arbitrable === arbitrableAddressList._address) {
-      const tokenAddress = await arbitrableAddressList.methods.arbitratorDisputeIDToAddress(
-        arbitrator._address,
-        returnValues._disputeID
-      )
+      const tokenAddress = await arbitrableAddressList.methods
+        .arbitratorDisputeIDToAddress(
+          arbitrator._address,
+          returnValues._disputeID
+        )
+        .call()
       const message =
         'The arbitrator gave an appealable ruling on a disputed badge.'
 
       emit({
         ID: tokenAddress,
+        addr: tokenAddress,
         badgeAddr: arbitrableAddressList._address,
         date: await getBlockDate(event.blockHash),
         message,

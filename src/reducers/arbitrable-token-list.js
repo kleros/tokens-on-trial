@@ -34,6 +34,21 @@ export default createReducer({
   arbitrableTokenListData: arbitrableTokenListDataInitialState
 })
 
+export const getWinnerStakeMultiplier = state =>
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .winnerStakeMultiplier
+
+export const getLoserStakeMultiplier = state =>
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .loserStakeMultiplier
+
+export const getSharedStakeMultiplier = state =>
+  state.arbitrableAddressList.arbitrableAddressListData.data &&
+  state.arbitrableAddressList.arbitrableAddressListData.data
+    .sharedStakeMultiplier
+
 // Selectors
 export const getSubmitCost = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&

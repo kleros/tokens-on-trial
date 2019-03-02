@@ -79,51 +79,53 @@ class NotificationBadge extends PureComponent {
                 {(useMaxShown
                   ? notifications.data.slice(0, maxShown)
                   : notifications.data
-                ).map((n, i /* eslint-disable react/jsx-no-bind */) => (
-                  <div
-                    className="NotificationBadge-notifications-notification"
-                    id={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
-                    key={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
-                    onClick={() =>
-                      onNotificationClick({
-                        ID: n.ID,
-                        addr: n.addr,
-                        badgeAddr: n.badgeAddr
-                      })
-                    }
-                  >
-                    {/* eslint-enable */}
-                    <FontAwesomeIcon
-                      className="NotificationBadge-notifications-notification-icon"
-                      color={
-                        n.clientStatus
-                          ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                          : tcrConstants.STATUS_COLOR_ENUM[0]
+                )
+                  .sort((a, b) => b.date - a.date)
+                  .map((n, i /* eslint-disable react/jsx-no-bind */) => (
+                    <div
+                      className="NotificationBadge-notifications-notification"
+                      id={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
+                      key={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
+                      onClick={() =>
+                        onNotificationClick({
+                          ID: n.ID,
+                          addr: n.addr,
+                          badgeAddr: n.badgeAddr
+                        })
                       }
-                      icon={
-                        n.clientStatus
-                          ? tcrConstants.STATUS_ICON_ENUM[n.clientStatus]
-                          : 'bell'
-                      }
-                      size="lg"
-                    />
-                    <div className="NotificationBadge-notifications-notification-content">
-                      <div className="NotificationBadge-notifications-notification-content-message">
-                        {n.message}
-                      </div>
-                      <div
-                        className="NotificationBadge-notifications-notification-content-footer"
-                        style={{
-                          color: n.clientStatus
+                    >
+                      {/* eslint-enable */}
+                      <FontAwesomeIcon
+                        className="NotificationBadge-notifications-notification-icon"
+                        color={
+                          n.clientStatus
                             ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
                             : tcrConstants.STATUS_COLOR_ENUM[0]
-                        }}
-                      >
-                        <TimeAgo datetime={n.date} />
+                        }
+                        icon={
+                          n.clientStatus
+                            ? tcrConstants.STATUS_ICON_ENUM[n.clientStatus]
+                            : 'bell'
+                        }
+                        size="lg"
+                      />
+                      <div className="NotificationBadge-notifications-notification-content">
+                        <div className="NotificationBadge-notifications-notification-content-message">
+                          {n.message}
+                        </div>
+                        <div
+                          className="NotificationBadge-notifications-notification-content-footer"
+                          style={{
+                            color: n.clientStatus
+                              ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
+                              : tcrConstants.STATUS_COLOR_ENUM[0]
+                          }}
+                        >
+                          <TimeAgo datetime={n.date} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
                 {useMaxShown &&
                 false && ( // TODO: remove false flag once notifications view is implemented
                     <div

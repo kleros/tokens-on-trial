@@ -8,6 +8,9 @@ import * as tcrConstants from '../../constants/tcr'
 import { web3 } from '../../bootstrap/dapp-api'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/tcr'
 
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+const { toBN } = web3.utils
+
 const getActionButton = ({
   item,
   userAccount,
@@ -32,16 +35,12 @@ const getActionButton = ({
 
   const challengePeriodDuration = Number(tcr.data.challengePeriodDuration)
   const { latestRequest } = item
-  const { latestRound, challengerDepositTime } = latestRequest
-  let submitterFees = web3.utils.toBN(0)
-  let challengerFees = web3.utils.toBN(0)
+  const { latestRound } = latestRequest
+  let submitterFees = toBN(0)
+  let challengerFees = toBN(0)
   if (latestRequest && latestRound) {
-    submitterFees = web3.utils.toBN(
-      latestRound.paidFees[tcrConstants.SIDE.Requester]
-    )
-    challengerFees = web3.utils.toBN(
-      latestRound.paidFees[tcrConstants.SIDE.Challenger]
-    )
+    submitterFees = toBN(latestRound.paidFees[tcrConstants.SIDE.Requester])
+    challengerFees = toBN(latestRound.paidFees[tcrConstants.SIDE.Challenger])
   }
 
   if (hasPendingRequest(item))
@@ -69,7 +68,7 @@ const getActionButton = ({
                 : tcrConstants.SIDE.Challenger
 
             if (
-              latestRound.requiredForSide[SIDE].eq(web3.utils.toBN(0)) ||
+              latestRound.requiredForSide[SIDE].eq(toBN(0)) ||
               latestRound.paidFees[SIDE].lt(latestRound.requiredForSide[SIDE])
             ) {
               let losingSide
@@ -113,9 +112,9 @@ const getActionButton = ({
           } else if (Date.now() > appealPeriodEnd) label = 'Waiting Enforcement'
         } else if (!countdownCompleted) label = 'Waiting Appeals'
     } else if (
-      submitterFees.gt(web3.utils.toBN(0)) &&
-      challengerFees.gt(web3.utils.toBN(0)) > 0 &&
-      Date.now() > challengerDepositTime
+      submitterFees.gt(toBN(0)) &&
+      challengerFees.gt(toBN(0)) > 0 &&
+      latestRequest.parties[2] !== ZERO_ADDR
     ) {
       icon = 'gavel'
       disabled = false
@@ -131,7 +130,7 @@ const getActionButton = ({
       disabled = false
       label = 'Execute Request'
     } else if (
-      challengerDepositTime > 0 &&
+      latestRequest.parties[2] !== ZERO_ADDR &&
       (userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
         userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger])
     ) {
@@ -176,8 +175,9 @@ const getActionButton = ({
         handleActionClick(
           modalConstants.ACTION_MODAL_ENUM[`Challenge${isBadge ? 'Badge' : ''}`]
         )
-      if (isRegistrationRequest(item.status)) label = 'Challenge Registration'
-      else label = 'Challenge Delisting'
+      if (isRegistrationRequest(item.status))
+        label = isBadge ? 'Challenge Addition' : 'Challenge Registration'
+      else label = isBadge ? 'Challenge Removal' : 'Challenge Delisting'
     }
   else {
     disabled = false

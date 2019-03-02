@@ -12,10 +12,13 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
   <div className="ViewEvidence">
     <h3 className="Modal-title">Evidence</h3>
     <hr />
-    <p>Name: {evidence.name}</p>
-    <p className="ViewEvidence-description">
-      Description: {evidence.description}
-    </p>
+    <div className="ViewEvidence-information">
+      <h4 style={{ margin: 0 }}>Name:</h4>
+      <p>{evidence.name}</p>
+      <br />
+      <h4 style={{ margin: 0 }}>Description:</h4>
+      <p>{evidence.description}</p>
+    </div>
     <br />
     <div
       className="ViewEvidence-actions"

@@ -233,8 +233,26 @@ class TokenDetails extends PureComponent {
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
   componentWillReceiveProps(nextProps) {
-    const { token } = nextProps
-    if (token) this.setState({ token })
+    const { token: nextToken } = nextProps
+    const { match, fetchToken } = this.props
+    const { fetching } = this.state
+    const { tokenID } = match.params
+    if (nextToken && nextToken.ID === tokenID)
+      this.setState({ token: nextToken, fetching: false })
+    else if (!fetching) {
+      this.setState({ fetching: true })
+      fetchToken(tokenID)
+    }
+  }
+
+  componentDidUpdate() {
+    const { match, fetchToken } = this.props
+    const { token, fetching } = this.state
+    const { tokenID } = match.params
+    if (token && token.ID !== tokenID && !fetching) {
+      fetchToken(tokenID)
+      this.setState({ fetching: true })
+    }
   }
 
   render() {
@@ -243,15 +261,10 @@ class TokenDetails extends PureComponent {
       countdownCompleted,
       appealModalOpen,
       loserCountdownCompleted,
-      winnerCountdownCompleted
+      winnerCountdownCompleted,
+      token
     } = this.state
-    const {
-      token,
-      accounts,
-      filter,
-      match,
-      arbitrableTokenListData
-    } = this.props
+    const { accounts, filter, match, arbitrableTokenListData } = this.props
     const { filters } = filter
     const { tokenID } = match.params
 

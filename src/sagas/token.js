@@ -17,10 +17,14 @@ import {
 } from '../utils/tcr'
 import * as tokenActions from '../actions/token'
 import * as walletSelectors from '../reducers/wallet'
+import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 
 import storeApi from './api/store'
+
+const { toBN } = web3.utils
 
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
@@ -234,6 +238,13 @@ export function* fetchToken({ payload: { ID } }) {
       ).call
     )
 
+    token.latestRequest.latestRound.paidFees[1] = toBN(
+      token.latestRequest.latestRound.paidFees[1]
+    )
+    token.latestRequest.latestRound.paidFees[2] = toBN(
+      token.latestRequest.latestRound.paidFees[2]
+    )
+
     if (token.latestRequest.disputed) {
       // Fetch dispute data.
       token.latestRequest.dispute = {}
@@ -262,6 +273,66 @@ export function* fetchToken({ payload: { ID } }) {
           arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
             .call
         )
+
+        const winnerStakeMultiplier = yield select(
+          arbitrableTokenListSelectors.getWinnerStakeMultiplier
+        )
+        const loserStakeMultiplier = yield select(
+          arbitrableTokenListSelectors.getLoserStakeMultiplier
+        )
+        const sharedStakeMultiplier = yield select(
+          arbitrableTokenListSelectors.getSharedStakeMultiplier
+        )
+        token.latestRequest.latestRound.requiredForSide = [0]
+
+        const ruling = Number(token.latestRequest.dispute.ruling)
+        if (ruling === 0) {
+          token.latestRequest.latestRound.requiredForSide.push(
+            toBN(token.latestRequest.latestRound.appealCost).add(
+              toBN(token.latestRequest.latestRound.appealCost).mul(
+                toBN(sharedStakeMultiplier)
+              )
+            )
+          )
+          token.latestRequest.latestRound.requiredForSide.push(
+            toBN(token.latestRequest.latestRound.appealCost).add(
+              toBN(token.latestRequest.latestRound.appealCost).mul(
+                toBN(sharedStakeMultiplier)
+              )
+            )
+          )
+        } else if (ruling === 1) {
+          token.latestRequest.latestRound.requiredForSide.push(
+            toBN(token.latestRequest.latestRound.appealCost).add(
+              toBN(token.latestRequest.latestRound.appealCost).mul(
+                toBN(winnerStakeMultiplier)
+              )
+            )
+          )
+          token.latestRequest.latestRound.requiredForSide.push(
+            toBN(token.latestRequest.latestRound.appealCost).add(
+              toBN(token.latestRequest.latestRound.appealCost).mul(
+                toBN(loserStakeMultiplier)
+              )
+            )
+          )
+        } else {
+          token.latestRequest.latestRound.requiredForSide.push(
+            toBN(token.latestRequest.latestRound.appealCost).add(
+              toBN(token.latestRequest.latestRound.appealCost).mul(
+                toBN(loserStakeMultiplier)
+              )
+            )
+          )
+          token.latestRequest.latestRound.requiredForSide.push(
+            toBN(token.latestRequest.latestRound.appealCost).add(
+              toBN(token.latestRequest.latestRound.appealCost).mul(
+                toBN(winnerStakeMultiplier)
+              )
+            )
+          )
+        }
+
         if (typeof arbitrator.methods.appealPeriod === 'function')
           token.latestRequest.latestRound.appealPeriod = yield call(
             arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
@@ -299,6 +370,13 @@ export function* fetchToken({ payload: { ID } }) {
         ).call
       )
 
+      badge.latestRequest.latestRound.paidFees[1] = toBN(
+        badge.latestRequest.latestRound.paidFees[1]
+      )
+      badge.latestRequest.latestRound.paidFees[2] = toBN(
+        badge.latestRequest.latestRound.paidFees[2]
+      )
+
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
         arbitrator.options.address = badge.latestRequest.arbitrator
@@ -327,6 +405,66 @@ export function* fetchToken({ payload: { ID } }) {
             arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
               .call
           )
+
+          const winnerStakeMultiplier = yield select(
+            arbitrableAddressListSelectors.getWinnerStakeMultiplier
+          )
+          const loserStakeMultiplier = yield select(
+            arbitrableAddressListSelectors.getLoserStakeMultiplier
+          )
+          const sharedStakeMultiplier = yield select(
+            arbitrableAddressListSelectors.getSharedStakeMultiplier
+          )
+          badge.latestRequest.latestRound.requiredForSide = [0]
+
+          const ruling = Number(badge.latestRequest.dispute.ruling)
+          if (ruling === 0) {
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost).mul(
+                  toBN(sharedStakeMultiplier)
+                )
+              )
+            )
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost).mul(
+                  toBN(sharedStakeMultiplier)
+                )
+              )
+            )
+          } else if (ruling === 1) {
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost).mul(
+                  toBN(winnerStakeMultiplier)
+                )
+              )
+            )
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost).mul(
+                  toBN(loserStakeMultiplier)
+                )
+              )
+            )
+          } else {
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost).mul(
+                  toBN(loserStakeMultiplier)
+                )
+              )
+            )
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost).mul(
+                  toBN(winnerStakeMultiplier)
+                )
+              )
+            )
+          }
+
           if (typeof arbitrator.methods.appealPeriod === 'function')
             badge.latestRequest.latestRound.appealPeriod = yield call(
               arbitrator.methods.appealPeriod(badge.latestRequest.disputeID)
@@ -348,8 +486,6 @@ export function* fetchToken({ payload: { ID } }) {
         appealDisputeID: 0,
         dispute: null,
         submissionTime: 0,
-        challengeRewardBalance: 0,
-        challengerDepositTime: 0,
         feeRewards: 0,
         pot: [],
         resolved: false,
@@ -379,8 +515,6 @@ export function* fetchToken({ payload: { ID } }) {
         disputeID: 0,
         dispute: null,
         submissionTime: 0,
-        challengeRewardBalance: 0,
-        challengerDepositTime: 0,
         feeRewards: 0,
         pot: [],
         resolved: false,
@@ -400,8 +534,6 @@ export function* fetchToken({ payload: { ID } }) {
           appealDisputeID: 0,
           dispute: null,
           submissionTime: 0,
-          challengeRewardBalance: 0,
-          challengerDepositTime: 0,
           feeRewards: 0,
           pot: [],
           resolved: false,

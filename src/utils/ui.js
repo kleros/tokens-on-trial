@@ -2,6 +2,8 @@ import RegisteredBadge from '../assets/images/badges/badge-registered.svg'
 import ChallengedBadge from '../assets/images/badges/badge-challenged.svg'
 import WaitingBadge from '../assets/images/badges/badge-waiting.svg'
 
+const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
 export const getBadgeStyle = (badge, tcrConstants) => {
   if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
     return { backgroundImage: `url(${RegisteredBadge})` }
@@ -34,16 +36,11 @@ export const getRemainingTime = (
   }
 
   let time
-  if (
-    !latestRequest.challengerDepositTime ||
-    latestRequest.challengerDepositTime === 0
-  )
+  if (latestRequest.parties[2] === ZERO_ADDR)
     time =
       latestRequest.submissionTime +
       tcr.data.challengePeriodDuration -
       currentTime
-  else if (latestRequest.disputed === false)
-    time = latestRequest.challengerDepositTime + currentTime
   else if (
     latestRequest.dispute.status ===
     tcrConstants.DISPUTE_STATUS.Appealable.toString()

@@ -21,7 +21,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime } from '../../utils/ui'
+import { getRemainingTime, truncateMiddle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -211,8 +211,26 @@ class BadgeDetails extends PureComponent {
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
   componentWillReceiveProps(nextProps) {
-    const { badge } = nextProps
-    if (badge) this.setState({ badge })
+    const { badge: nextBadge } = nextProps
+    const { match, fetchBadge } = this.props
+    const { fetching } = this.state
+    const { tokenAddr } = match.params
+    if (nextBadge && nextBadge.addr === tokenAddr)
+      this.setState({ badge: nextBadge, fetching: false })
+    else if (!fetching) {
+      this.setState({ fetching: true })
+      fetchBadge(tokenAddr)
+    }
+  }
+
+  componentDidUpdate() {
+    const { match, fetchBadge } = this.props
+    const { badge, fetching } = this.state
+    const { tokenAddr } = match.params
+    if (badge && badge.addr !== tokenAddr && !fetching) {
+      fetchBadge(tokenAddr)
+      this.setState({ fetching: true })
+    }
   }
 
   render() {
@@ -221,16 +239,11 @@ class BadgeDetails extends PureComponent {
       countdownCompleted,
       appealModalOpen,
       loserCountdownCompleted,
-      winnerCountdownCompleted
+      winnerCountdownCompleted,
+      badge
     } = this.state
 
-    const {
-      badge,
-      accounts,
-      filter,
-      match,
-      arbitrableAddressListData
-    } = this.props
+    const { accounts, filter, match, arbitrableAddressListData } = this.props
     const { filters } = filter
     const { tokenAddr } = match.params
 
@@ -422,8 +435,8 @@ class BadgeDetails extends PureComponent {
                             className="BadgeDetails-icon BadgeDetails-meta--aligned"
                             src={Etherscan}
                           />
-                          <div style={{ overflowX: 'auto' }}>
-                            {web3.utils.toChecksumAddress(tokenAddr)}
+                          <div style={{ minWidth: '150px' }}>
+                            {truncateMiddle(tokenAddr)}
                           </div>
                         </div>
                       </a>
@@ -438,7 +451,8 @@ class BadgeDetails extends PureComponent {
                         style={{
                           display: 'flex',
                           alignItems: 'center',
-                          color: '#3d464d'
+                          color: '#3d464d',
+                          fontSize: '14px'
                         }}
                       >
                         <FontAwesomeIcon
@@ -453,7 +467,9 @@ class BadgeDetails extends PureComponent {
                             latestRequest.dispute.ruling
                           ]
                         }{' '}
-                        Request
+                        {latestRequest.dispute.ruling.toString() !== '0'
+                          ? 'Request'
+                          : ''}
                       </span>
                     )}
                   {!(
@@ -508,10 +524,14 @@ class BadgeDetails extends PureComponent {
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      marginTop: '5px'
+                                      margin: '5px 0 5px auto',
+                                      fontSize: '14px'
                                     }}
                                   >
-                                    <div className="BadgeDetails-timer">
+                                    <div
+                                      className="BadgeDetails-timer"
+                                      style={{ display: 'flex' }}
+                                    >
                                       <FontAwesomeIcon
                                         className="BadgeDetails-icon"
                                         color={
@@ -519,12 +539,14 @@ class BadgeDetails extends PureComponent {
                                         }
                                         icon="clock"
                                       />
-                                      {'Appeal Deadline '}
-                                      <Countdown
-                                        date={Date.now() + time}
-                                        renderer={CountdownRenderer}
-                                        onComplete={this.onCountdownComplete}
-                                      />
+                                      <div>
+                                        {'Appeal Deadline '}
+                                        <Countdown
+                                          date={Date.now() + time}
+                                          renderer={CountdownRenderer}
+                                          onComplete={this.onCountdownComplete}
+                                        />
+                                      </div>
                                     </div>
                                   </span>
                                 ) : (
@@ -534,10 +556,14 @@ class BadgeDetails extends PureComponent {
                                         style={{
                                           display: 'flex',
                                           alignItems: 'center',
-                                          margin: '5px 0'
+                                          margin: '5px 0 5px auto',
+                                          fontSize: '14px'
                                         }}
                                       >
-                                        <div className="BadgeDetails-timer">
+                                        <div
+                                          className="BadgeDetails-timer"
+                                          style={{ display: 'flex' }}
+                                        >
                                           <FontAwesomeIcon
                                             className="BadgeDetails-icon"
                                             color={
@@ -545,16 +571,18 @@ class BadgeDetails extends PureComponent {
                                             }
                                             icon="clock"
                                           />
-                                          {'Winner Appeal Deadline '}
-                                          <Countdown
-                                            date={
-                                              Date.now() + winnerRemainingTime
-                                            }
-                                            renderer={CountdownRenderer}
-                                            onComplete={
-                                              this.onWinnerCoundownComplete
-                                            }
-                                          />
+                                          <div>
+                                            {'Winner Deadline '}
+                                            <Countdown
+                                              date={
+                                                Date.now() + winnerRemainingTime
+                                              }
+                                              renderer={CountdownRenderer}
+                                              onComplete={
+                                                this.onWinnerCoundownComplete
+                                              }
+                                            />
+                                          </div>
                                         </div>
                                       </span>
                                     )}
@@ -564,7 +592,8 @@ class BadgeDetails extends PureComponent {
                                           style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            margin: '5px 0'
+                                            margin: '5px 0 5px auto',
+                                            fontSize: '14px'
                                           }}
                                         >
                                           <div className="BadgeDetails-timer">
@@ -576,7 +605,7 @@ class BadgeDetails extends PureComponent {
                                               }
                                               icon="clock"
                                             />
-                                            {'Loser Appeal Deadline '}
+                                            {'Loser Deadline '}
                                             <Countdown
                                               date={
                                                 Date.now() + loserRemainingTime
