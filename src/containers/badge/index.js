@@ -466,7 +466,7 @@ class BadgeDetails extends PureComponent {
                           ? tcrConstants.RULING_OPTIONS[
                               latestRequest.dispute.ruling
                             ]
-                          : 'Arbitrator did not rule'}{' '}
+                          : 'Arbitrator Did Not Rule'}{' '}
                         {latestRequest.dispute.ruling.toString() !== '0'
                           ? 'Request'
                           : ''}
