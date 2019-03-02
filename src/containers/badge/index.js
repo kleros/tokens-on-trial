@@ -14,6 +14,7 @@ import {
   web3,
   archon
 } from '../../bootstrap/dapp-api'
+import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import Button from '../../components/button'
@@ -344,21 +345,33 @@ class BadgeDetails extends PureComponent {
           {badge.token && (
             <>
               <div className="TokenDetails-divider" />
-              <Link
-                to={`/token/${badge.token.ID}`}
-                className="BadgeDetails-token"
-              >
-                <Img
-                  className="BadgeDetails-header-img"
-                  src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                    badge.token.symbolMultihash
-                  }`}
-                />
-                <h4 className="BadgeDetails-label-name">{badge.token.name}</h4>
-                <h4 className="BadgeDetails-label-ticker">
-                  {badge.token.ticker}
-                </h4>
-              </Link>
+              {badge.token ? (
+                <Link
+                  to={`/token/${badge.token.ID}`}
+                  className="BadgeDetails-token"
+                >
+                  <Img
+                    className="BadgeDetails-header-img"
+                    src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                      badge.token.symbolMultihash
+                    }`}
+                  />
+                  <h4 className="BadgeDetails-label-name">
+                    {badge.token.name}
+                  </h4>
+                  <h4 className="BadgeDetails-label-ticker">
+                    {badge.token.ticker}
+                  </h4>
+                </Link>
+              ) : (
+                <div
+                  className="BadgeDetails-token"
+                  data-tip="There is no accepted token submission for this address on the T²CR"
+                >
+                  <Img className="BadgeDetails-header-img" src={UnknownToken} />
+                  <h4 className="BadgeDetails-label-name">Unknown Token</h4>
+                </div>
+              )}
             </>
           )}
           {badge.withdrawable.gt(web3.utils.toBN(0)) && (
