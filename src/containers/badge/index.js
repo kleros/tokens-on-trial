@@ -383,6 +383,9 @@ class BadgeDetails extends PureComponent {
                     of criteria defined in the criteria document. Click{' '}
                     <a
                       className="TokenDetails-withdraw"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href="https://ipfs.kleros.io/ipfs/QmTo493TtvRXTH9TyWszgt2rDPRv7L8eczoBDHGscfiU8t/HC-Token-Listing-Criteria-V2.0.pdf"
                       style={{ margin: 0, textDecoration: 'underline' }}
                     >
                       here
@@ -390,7 +393,9 @@ class BadgeDetails extends PureComponent {
                     to to view the requirements.
                   </p>
                 </div>
-                <div style={{ display: 'flex', marginTop: 'auto' }}>
+                <div
+                  style={{ display: 'flex', marginTop: 'auto', width: '100%' }}
+                >
                   <div
                     className="BadgeDetails-meta"
                     style={{ marginRight: 'auto' }}

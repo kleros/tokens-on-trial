@@ -619,7 +619,7 @@ class ActionModal extends PureComponent {
                 <SubmitEvidence
                   tcr={arbitrableAddressListData}
                   closeActionModal={closeActionModal}
-                  item={token.data.badge}
+                  item={badge}
                   evidenceFormIsInvalid={evidenceFormIsInvalid}
                   file={file}
                   fileInfoMessage={fileInfoMessage}
