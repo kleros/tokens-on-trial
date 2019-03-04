@@ -342,37 +342,31 @@ class BadgeDetails extends PureComponent {
           style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto' }}
         >
           <h4 style={{ marginLeft: 0, minWidth: '247px' }}>Badge Details</h4>
-          {badge.token && (
-            <>
-              <div className="TokenDetails-divider" />
-              {badge.token ? (
-                <Link
-                  to={`/token/${badge.token.ID}`}
-                  className="BadgeDetails-token"
-                >
-                  <Img
-                    className="BadgeDetails-header-img"
-                    src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                      badge.token.symbolMultihash
-                    }`}
-                  />
-                  <h4 className="BadgeDetails-label-name">
-                    {badge.token.name}
-                  </h4>
-                  <h4 className="BadgeDetails-label-ticker">
-                    {badge.token.ticker}
-                  </h4>
-                </Link>
-              ) : (
-                <div
-                  className="BadgeDetails-token"
-                  data-tip="There is no accepted token submission for this address on the T²CR"
-                >
-                  <Img className="BadgeDetails-header-img" src={UnknownToken} />
-                  <h4 className="BadgeDetails-label-name">Unknown Token</h4>
-                </div>
-              )}
-            </>
+          <div className="TokenDetails-divider" />
+          {badge.token ? (
+            <Link
+              to={`/token/${badge.token.ID}`}
+              className="BadgeDetails-token"
+            >
+              <Img
+                className="BadgeDetails-header-img"
+                src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                  badge.token.symbolMultihash
+                }`}
+              />
+              <h4 className="BadgeDetails-label-name">{badge.token.name}</h4>
+              <h4 className="BadgeDetails-label-ticker">
+                {badge.token.ticker}
+              </h4>
+            </Link>
+          ) : (
+            <div
+              className="BadgeDetails-token"
+              data-tip="There is no accepted token submission for this address on the T²CR"
+            >
+              <Img className="BadgeDetails-header-img" src={UnknownToken} />
+              <h4 className="BadgeDetails-label-name">Unknown Token</h4>
+            </div>
           )}
           {badge.withdrawable.gt(web3.utils.toBN(0)) && (
             <>
