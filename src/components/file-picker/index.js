@@ -10,7 +10,6 @@ const FilePicker = ({ message, file, ...rest }) => (
   <Dropzone className="FilePicker" {...rest}>
     {!file ? (
       <div className="FilePicker-uploadInfo">
-        <FontAwesomeIcon className="FilePicker-icon" icon="upload" />
         <small>{message}</small>
       </div>
     ) : (

@@ -69,9 +69,9 @@ export const userFriendlyLabel = {
   Registered: 'Registered',
   'Registration Requests': 'Submissions',
   'Challenged Registration Requests': 'Challenged Submissions',
-  Absent: 'Absent',
-  'Clearing Requests': 'Delisting Requests',
-  'Challenged Clearing Requests': 'Challenged Delisting Requests',
+  Absent: 'Removed',
+  'Clearing Requests': 'Removal Requests',
+  'Challenged Clearing Requests': 'Challenged Removal Requests',
   'My Submissions': 'My Requests',
   'My Challenges': 'My Challenges'
 }

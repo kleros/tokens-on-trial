@@ -12,6 +12,7 @@ import {
   arbitrableAddressList,
   arbitrator,
   web3,
+  ETHFINEX_CRITERIA_URL,
   archon
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
@@ -116,11 +117,11 @@ class BadgeDetails extends PureComponent {
     this.setState({ countdownCompleted: true })
   }
 
-  onWinnerCoundownComplete = () => {
+  onWinnerCountdownComplete = () => {
     this.setState({ winnerCountdownCompleted: true })
   }
 
-  onLoserCoundownComplete = () => {
+  onLoserCountdownComplete = () => {
     this.setState({ loserCountdownCompleted: true })
   }
 
@@ -292,7 +293,7 @@ class BadgeDetails extends PureComponent {
       )
         losingSide = true
 
-      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.Other) {
+      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None) {
         decisiveRuling = true
         requesterIsLoser =
           latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
@@ -402,21 +403,18 @@ class BadgeDetails extends PureComponent {
                 <div>
                   <h4 style={{ margin: '0px' }}>Badge Description</h4>
                   <p style={{ lineHeight: '1.5', marginTop: '10px' }}>
-                    Tokens with the Ethfinex badge can participate in the
-                    Ethfinex Community Vote to become traded on the Ethfinex
-                    platform. To be eligible to receive the badge, the project
-                    and it's associated token must comply with the minimum set
-                    of criteria defined in the criteria document. Click{' '}
+                    To be eligible to receive the badge, the project and it's
+                    associated token must comply with listing criterion as
+                    specified{' '}
                     <a
                       className="TokenDetails-withdraw"
                       target="_blank"
                       rel="noopener noreferrer"
-                      href="https://ipfs.kleros.io/ipfs/QmTo493TtvRXTH9TyWszgt2rDPRv7L8eczoBDHGscfiU8t/HC-Token-Listing-Criteria-V2.0.pdf"
+                      href={ETHFINEX_CRITERIA_URL}
                       style={{ margin: 0, textDecoration: 'underline' }}
                     >
-                      here
-                    </a>{' '}
-                    to to view the requirements.
+                      here.
+                    </a>
                   </p>
                 </div>
                 <div
@@ -449,7 +447,9 @@ class BadgeDetails extends PureComponent {
                             src={Etherscan}
                           />
                           <div style={{ minWidth: '150px' }}>
-                            {truncateMiddle(tokenAddr)}
+                            {truncateMiddle(
+                              web3.utils.toChecksumAddress(tokenAddr)
+                            )}
                           </div>
                         </div>
                       </a>
@@ -592,7 +592,7 @@ class BadgeDetails extends PureComponent {
                                               }
                                               renderer={CountdownRenderer}
                                               onComplete={
-                                                this.onWinnerCoundownComplete
+                                                this.onWinnerCountdownComplete
                                               }
                                             />
                                           </div>
@@ -630,7 +630,7 @@ class BadgeDetails extends PureComponent {
                                                 }
                                                 renderer={CountdownRenderer}
                                                 onComplete={
-                                                  this.onLoserCoundownComplete
+                                                  this.onLoserCountdownComplete
                                                 }
                                               />
                                             </div>

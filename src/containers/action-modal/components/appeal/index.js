@@ -31,7 +31,7 @@ const isLosingSide = (item, side) => {
 }
 
 const decisiveRuling = item =>
-  item.latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.Other
+  item.latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None
 
 const FundAppeal = ({
   closeActionModal,

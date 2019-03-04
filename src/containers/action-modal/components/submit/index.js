@@ -5,7 +5,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3 } from '../../../../bootstrap/dapp-api'
+import { web3, ETHFINEX_CRITERIA_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
@@ -43,6 +43,34 @@ const Submit = ({
         />
       )}
     </div>
+    {!badge && !item && (
+      <>
+        <hr />
+        <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
+          Complete the information below and submit.
+        </h5>
+      </>
+    )}
+    {badge && (
+      <>
+        <hr />
+        <h4 className="Modal-subtitle" style={{ margin: 0 }}>
+          <strong>Compliant with Ethfinex Listing Criteria</strong>
+        </h4>
+        <p>
+          See the listing criteria{' '}
+          <a
+            className="TokenDetails-withdraw"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={ETHFINEX_CRITERIA_URL}
+            style={{ margin: 0, textDecoration: 'underline' }}
+          >
+            here.
+          </a>
+        </p>
+      </>
+    )}
     <br />
     {!badge && !item && (
       <>
@@ -177,7 +205,7 @@ const Submit = ({
         onClick={badge ? submitItem : item ? resubmit : submitItemForm}
         type="primary"
       >
-        {!badge ? 'Request Registration' : 'Add Badge'}
+        {!badge ? 'Submit' : 'Add Badge'}
       </Button>
     </div>
   </div>

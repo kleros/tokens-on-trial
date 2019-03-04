@@ -15,6 +15,9 @@ export const ARBITRABLE_ADDRESS_LIST_ADDRESS =
 const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
 const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
 const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
+const ETHFINEX_CRITERIA_URL =
+  process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
+
 // TODO: Use NODE_ENV once there is a mainnet deployment.
 const requiredNetwork = 'kovan'
 // const requiredNetwork = env === 'PROD' ? 'main' : 'kovan'
@@ -88,5 +91,6 @@ export {
   FILE_UPLOAD_URL,
   FILE_BASE_URL,
   archon,
-  requiredNetwork
+  requiredNetwork,
+  ETHFINEX_CRITERIA_URL
 }

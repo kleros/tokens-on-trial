@@ -320,7 +320,7 @@ class TokenDetails extends PureComponent {
       )
         losingSide = true
 
-      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.Other) {
+      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None) {
         decisiveRuling = true
         requesterIsLoser =
           latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
@@ -411,7 +411,9 @@ class TokenDetails extends PureComponent {
                       className="TokenDetails-icon TokenDetails-meta--aligned"
                       src={EtherScanLogo}
                     />
-                    {token.addr ? truncateMiddle(token.addr) : ''}
+                    {token.addr
+                      ? truncateMiddle(web3.utils.toChecksumAddress(token.addr))
+                      : ''}
                   </a>
                 </span>
               </div>

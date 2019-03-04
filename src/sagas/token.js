@@ -564,6 +564,65 @@ export function* fetchToken({ payload: { ID } }) {
 }
 
 /**
+ * Request registration
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
+ */
+function* requestRegistration({ payload: { token, file, fileData, value } }) {
+  const tokenToSubmit = {
+    name: token.name,
+    ticker: token.ticker,
+    addr: web3.utils.toChecksumAddress(token.addr),
+    symbolMultihash: token.symbolMultihash
+  }
+
+  if (file && fileData) {
+    /* eslint-disable unicorn/number-literal-case */
+    const data = yield call(readFile, file.preview)
+    const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
+    try {
+      const ipfsFileObj = yield call(ipfsPublish, fileMultihash, data)
+      tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
+        ipfsFileObj[0].path
+      }`
+    } catch (err) {
+      throw new Error('Failed to upload token image', err)
+    }
+  }
+
+  const { name, ticker, addr, symbolMultihash } = tokenToSubmit
+
+  if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
+    throw new Error('Missing data on token submit', tokenToSubmit)
+
+  const ID = web3.utils.soliditySha3(
+    name || '',
+    ticker || '',
+    addr,
+    symbolMultihash
+  )
+  const recentToken = yield call(fetchToken, { payload: { ID } })
+
+  if (recentToken.status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent)
+    throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
+
+  yield call(
+    arbitrableTokenList.methods.requestStatusChange(
+      tokenToSubmit.name,
+      tokenToSubmit.ticker,
+      tokenToSubmit.addr,
+      tokenToSubmit.symbolMultihash
+    ).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value
+    }
+  )
+
+  return yield call(fetchToken, { payload: { ID } })
+}
+
+/**
  * Requests status change.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
@@ -785,7 +844,7 @@ export default function* tokenSaga() {
       collection: tokenActions.tokens.self
     },
     tokenActions.token,
-    requestStatusChange
+    requestRegistration
   )
   yield takeLatest(
     tokenActions.token.STATUS_CHANGE,
@@ -799,7 +858,7 @@ export default function* tokenSaga() {
     lessduxSaga,
     updateTokensCollectionModFlow,
     tokenActions.token,
-    requestStatusChange
+    requestRegistration
   )
   yield takeLatest(
     tokenActions.token.CLEAR,
