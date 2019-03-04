@@ -45,9 +45,11 @@ const TokenCard = ({ token }) => (
       <Img
         alt="Token List Submission"
         className="TokenCard-image"
-        src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-          token.symbolMultihash
-        }`}
+        src={`${
+          token.symbolMultihash[0] === '/'
+            ? `https://ipfs.kleros.io/`
+            : `https://staging-cfs.s3.us-east-2.amazonaws.com/`
+        }${token.symbolMultihash}`}
       />
     </Link>
     <div

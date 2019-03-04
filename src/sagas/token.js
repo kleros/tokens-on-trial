@@ -1,7 +1,6 @@
-import * as mime from 'mime-types'
-
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
+import readFile from '../utils/read-file'
 import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableTokenList,
@@ -22,10 +21,9 @@ import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 
-import storeApi from './api/store'
+import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3.utils
-
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
@@ -583,11 +581,16 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
 
   if (file && fileData) {
     /* eslint-disable unicorn/number-literal-case */
+    const data = yield call(readFile, file.preview)
     const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
-    const fileTypeExtension = file.name.split('.')[1]
-    const mimeType = mime.lookup(fileTypeExtension)
-    yield call(storeApi.postEncodedFile, fileData, fileMultihash, mimeType)
-    tokenToSubmit.symbolMultihash = fileMultihash
+    try {
+      const ipfsFileObj = yield call(ipfsPublish, fileMultihash, data)
+      tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
+        ipfsFileObj[0].path
+      }`
+    } catch (err) {
+      throw new Error('Failed to upload token image', err)
+    }
   }
 
   const { name, ticker, addr, symbolMultihash } = tokenToSubmit
