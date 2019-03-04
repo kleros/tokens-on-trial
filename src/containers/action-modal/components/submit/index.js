@@ -177,7 +177,7 @@ const Submit = ({
         onClick={badge ? submitItem : item ? resubmit : submitItemForm}
         type="primary"
       >
-        {!badge ? 'Request Registration' : 'Request Badge Addition'}
+        {!badge ? 'Request Registration' : 'Add Badge'}
       </Button>
     </div>
   </div>

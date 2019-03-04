@@ -57,9 +57,11 @@ const BadgeCard = ({ token, displayTokenInfo }) => (
           className="TokenCard-image"
           src={
             token.symbolMultihash
-              ? `https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                  token.symbolMultihash
-                }`
+              ? token.symbolMultihash[0] === '/'
+                ? `https://ipfs.kleros.io/${token.symbolMultihash}`
+                : `https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                    token.symbolMultihash
+                  }`
               : UnknownToken
           }
         />

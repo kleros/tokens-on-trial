@@ -386,9 +386,11 @@ class TokenDetails extends PureComponent {
         <div className="TokenDetails">
           <Img
             className="TokenDetails-img"
-            src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-              token.symbolMultihash
-            }`}
+            src={`${
+              token.symbolMultihash && token.symbolMultihash[0] === '/'
+                ? `https://ipfs.kleros.io/`
+                : `https://staging-cfs.s3.us-east-2.amazonaws.com/`
+            }${token.symbolMultihash}`}
           />
           <div className="TokenDetails-card">
             <div className="TokenDetails-label">

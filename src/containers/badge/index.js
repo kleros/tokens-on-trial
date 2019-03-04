@@ -350,8 +350,14 @@ class BadgeDetails extends PureComponent {
             >
               <Img
                 className="BadgeDetails-header-img"
-                src={`https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                  badge.token.symbolMultihash
+                src={`${
+                  badge.token
+                    ? badge.token.symbolMultihash[0] === '/'
+                      ? `https://ipfs.kleros.io/${badge.token.symbolMultihash}`
+                      : `https://staging-cfs.s3.us-east-2.amazonaws.com/${
+                          badge.token.symbolMultihash
+                        }`
+                    : UnknownToken
                 }`}
               />
               <h4 className="BadgeDetails-label-name">{badge.token.name}</h4>
