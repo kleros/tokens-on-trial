@@ -46,7 +46,7 @@ class SearchBar extends PureComponent {
         name: _name,
         ticker: _ticker,
         address: _address,
-        imgSrc: _symbolMultihash
+        symbolMultihash: _symbolMultihash
       })
     })
   }

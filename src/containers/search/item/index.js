@@ -12,11 +12,13 @@ const SearchItem = ({ onClick, item }) => (
     <Img
       className="SearchItem-symbol"
       alt="submission-symbol"
-      src={`${
+      src={
         item.symbolMultihash && item.symbolMultihash[0] === '/'
-          ? `https://ipfs.kleros.io/`
-          : `https://staging-cfs.s3.us-east-2.amazonaws.com/`
-      }${item.symbolMultihash}`}
+          ? `https://ipfs.kleros.io${item.symbolMultihash}`
+          : `https://staging-cfs.s3.us-east-2.amazonaws.com/${
+              item.symbolMultihash
+            }`
+      }
     />
     <div className="SearchItem-text">
       <span className="SearchItem-text-title">
