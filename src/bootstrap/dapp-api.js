@@ -90,5 +90,6 @@ export {
   FILE_BASE_URL,
   archon,
   requiredNetwork,
-  ETHFINEX_CRITERIA_URL
+  ETHFINEX_CRITERIA_URL,
+  ARBITRATOR_ADDRESS
 }

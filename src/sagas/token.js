@@ -7,6 +7,7 @@ import {
   arbitrableAddressList,
   arbitrator,
   archon,
+  ARBITRATOR_ADDRESS,
   web3
 } from '../bootstrap/dapp-api'
 import {
@@ -552,6 +553,8 @@ export function* fetchToken({ payload: { ID } }) {
       latestRequest: { disputed: false }
     }
 
+  arbitrator.options.address = ARBITRATOR_ADDRESS
+
   return {
     ...token,
     ID,
@@ -615,7 +618,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value
+      value: value.toString()
     }
   )
 

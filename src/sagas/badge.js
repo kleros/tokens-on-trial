@@ -5,6 +5,7 @@ import {
   arbitrableAddressList,
   arbitrableTokenList,
   arbitrator,
+  ARBITRATOR_ADDRESS,
   web3
 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus, convertFromString } from '../utils/tcr'
@@ -456,6 +457,8 @@ export function* fetchBadge({ payload: { addr } }) {
         }
       }
     }
+
+  arbitrator.options.address = ARBITRATOR_ADDRESS
 
   return {
     ...badge,
