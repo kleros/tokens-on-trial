@@ -18,9 +18,7 @@ const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
 const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
 
-// TODO: Use NODE_ENV once there is a mainnet deployment.
-const requiredNetwork = 'kovan'
-// const requiredNetwork = env === 'PROD' ? 'main' : 'kovan'
+const requiredNetwork = env === 'PROD' ? 'main' : 'kovan'
 
 let web3
 let onlyInfura = false
