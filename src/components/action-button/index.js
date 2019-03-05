@@ -47,7 +47,7 @@ const getActionButton = ({
     if (latestRequest.disputed && !latestRequest.resolved) {
       icon = 'hourglass-half'
       disabled = true
-      label = 'Waiting Arbitration'
+      label = 'Awaiting Arbitration'
       if (
         Number(latestRequest.dispute.status) ===
           tcrConstants.DISPUTE_STATUS.Appealable &&

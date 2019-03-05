@@ -13,42 +13,9 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
   <div>
     <h3 className="Modal-title">Resubmit {item.name}</h3>
     <hr />
-    <div className="Resubmit-stake">
-      <span>Challenge Stake</span>
-      <span>
-        {`${String(
-          web3.utils.fromWei(
-            String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
-          )
-        )} ETH`}
-      </span>
-    </div>
-    <div className="Challenge-cost">
-      <span>Arbitration Fee Stake</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.arbitrationCost)
-                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-            )
-          )
-        )} ETH`}
-      </strong>
-    </div>
-    <div className="Challenge-cost">
-      <span>Required Arbitration Fee</span>
-      <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
-        )} ETH`}
-      </strong>
-    </div>
     <br />
     <div className="Challenge-cost">
-      <span>Total Due:</span>
+      <span>Total Deposit:</span>
       <strong className="Challenge-total-value">
         {`${String(
           web3.utils.fromWei(

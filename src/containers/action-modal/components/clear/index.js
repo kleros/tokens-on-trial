@@ -13,62 +13,10 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
       {!badge ? `Clear ${item.name}` : 'Remove badge'}
     </h3>
     <hr />
-    <div className="Challenge-fees">
-      <div>
-        <p className="Challenge-fees-line">Challenge Stake</p>
-        <p className="Challenge-fees-line">Arbitration Fee Stake</p>
-        <p className="Challenge-fees-line">Arbitration Fees</p>
-      </div>
-      <div>
-        <p className="Challenge-fees-line">
-          <strong>
-            {`${String(
-              web3.utils.fromWei(
-                String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
-              )
-            )}`}
-          </strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>
-            {String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(tcr.data.arbitrationCost)
-                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                )
-              )
-            )}
-          </strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>
-            {String(
-              web3.utils.fromWei(
-                String(web3.utils.toBN(tcr.data.arbitrationCost))
-              )
-            )}
-          </strong>
-        </p>
-      </div>
-      <div className="Challenge-fees-symbols">
-        <p className="Challenge-fees-line">
-          <strong>ETH</strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>ETH</strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>ETH</strong>
-        </p>
-      </div>
-    </div>
     <br />
     <div className="Challenge-fees">
       <div>
-        <p className="Challenge-fees-line">Total Due:</p>
+        <p className="Challenge-fees-line">Total Deposit:</p>
       </div>
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>

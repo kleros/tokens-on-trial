@@ -15,7 +15,7 @@ export const SIDE = createEnum(['None', 'Requester', 'Challenger'])
 export const STATUS_ENUM = createEnum([
   'Absent',
   'Registered',
-  'Registration Requested',
+  'Submission Pending',
   'Clearing Requested',
   'Registration Request Challenged',
   'Clearing Request Challenged'
