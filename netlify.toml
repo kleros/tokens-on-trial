@@ -4,8 +4,8 @@
 
   # Develop Branch Deploy context: All deploys that are not in
   # an active Deploy Preview will inherit these settings.
-[context.develop]
-  [context.develop.environment]
+[context.development]
+  [context.development.environment]
   NODE_VERSION='9.10.0'
   YARN_FLAGS='--pure-lockfile'
   REACT_APP_PROD_ETHEREUM_PROVIDER="https://kovan.infura.io/v3/9c26dd38fd2e44e6bcff6a133eb67930"
