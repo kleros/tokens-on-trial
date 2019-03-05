@@ -7,6 +7,7 @@ import ArbitrableAddressList from '../assets/contracts/arbitrable-address-list.j
 import Arbitrator from '../assets/contracts/arbitrator.json'
 
 const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
+const requiredNetwork = process.env[`REACT_APP_${env}_NETWORK`]
 const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
@@ -17,8 +18,6 @@ const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
 const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
 const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
-
-const requiredNetwork = env === 'PROD' ? 'main' : 'kovan'
 
 let web3
 let onlyInfura = false
