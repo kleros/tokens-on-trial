@@ -1,5 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
@@ -13,62 +14,10 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
       {!badge ? `Clear ${item.name}` : 'Remove badge'}
     </h3>
     <hr />
-    <div className="Challenge-fees">
-      <div>
-        <p className="Challenge-fees-line">Challenge Stake</p>
-        <p className="Challenge-fees-line">Arbitration Fee Stake</p>
-        <p className="Challenge-fees-line">Arbitration Fees</p>
-      </div>
-      <div>
-        <p className="Challenge-fees-line">
-          <strong>
-            {`${String(
-              web3.utils.fromWei(
-                String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
-              )
-            )}`}
-          </strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>
-            {String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(tcr.data.arbitrationCost)
-                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                )
-              )
-            )}
-          </strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>
-            {String(
-              web3.utils.fromWei(
-                String(web3.utils.toBN(tcr.data.arbitrationCost))
-              )
-            )}
-          </strong>
-        </p>
-      </div>
-      <div className="Challenge-fees-symbols">
-        <p className="Challenge-fees-line">
-          <strong>ETH</strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>ETH</strong>
-        </p>
-        <p className="Challenge-fees-line">
-          <strong>ETH</strong>
-        </p>
-      </div>
-    </div>
     <br />
     <div className="Challenge-fees">
       <div>
-        <p className="Challenge-fees-line">Total Due:</p>
+        <p className="Challenge-fees-line">Amount Required:</p>
       </div>
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
@@ -95,6 +44,22 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
         <p className="Challenge-fees-line">
           <strong>ETH</strong>
         </p>
+      </div>
+    </div>
+    <div
+      style={{
+        textAlign: 'start',
+        fontSize: '12px',
+        marginTop: '10px',
+        display: 'flex'
+      }}
+    >
+      <FontAwesomeIcon icon="info-circle" />
+      <div style={{ marginLeft: '5px' }}>
+        <i>
+          Note: This is not a fee, it is a deposit and will be refunded if you
+          are correct.
+        </i>
       </div>
     </div>
     <br />
