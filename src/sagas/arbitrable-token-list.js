@@ -39,12 +39,15 @@ export function* fetchArbitrableTokenListData() {
     MULTIPLIER_DIVISOR: call(
       arbitrableTokenList.methods.MULTIPLIER_DIVISOR().call
     ),
+    arbitratorExtraData: call(
+      arbitrableTokenList.methods.arbitratorExtraData().call
+    ),
     countByStatus: call(arbitrableTokenList.methods.countByStatus().call)
   })
 
   arbitrator.options.address = d.arbitrator
   const arbitrationCost = yield call(
-    arbitrator.methods.arbitrationCost('0x00').call
+    arbitrator.methods.arbitrationCost(d.arbitratorExtraData).call
   )
 
   return {
