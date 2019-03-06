@@ -68,9 +68,7 @@ const TokenCard = ({ token }) => (
         <span
           className="TokenCard-footer-badge"
           style={getBadgeStyle(token.badge, tcrConstants)}
-        >
-          1
-        </span>
+        />
       )}
     </div>
   </div>

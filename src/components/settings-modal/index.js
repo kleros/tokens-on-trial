@@ -106,10 +106,10 @@ class SettingsModal extends PureComponent {
               ) : (
                 <>
                   <h4 className="SettingsModal-window-title">
-                    Register to receive notifications by email
+                    Register for email notifications
                   </h4>
                   <hr style={{ margin: 0, marginBottom: '15px' }} />
-                  <span>You will be informed when:</span>
+                  <span>Inform me when:</span>
                   <SettingsForm
                     className="SettingsModal-window-form"
                     initialValues={{

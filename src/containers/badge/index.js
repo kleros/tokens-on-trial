@@ -529,7 +529,7 @@ class BadgeDetails extends PureComponent {
                         tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
                         !countdownCompleted)) && (
                       <>
-                        {!latestRequest.dispute ? (
+                        {!latestRequest.disputed && !latestRequest.dispute ? (
                           <>
                             {!countdownCompleted && (
                               <span

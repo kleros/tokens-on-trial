@@ -488,7 +488,7 @@ class TokenDetails extends PureComponent {
                     latestRequest.dispute.status ===
                       tcrConstants.DISPUTE_STATUS.Appealable.toString()) && (
                     <>
-                      {!latestRequest.dispute ? (
+                      {!latestRequest.disputed && !latestRequest.dispute ? (
                         <>
                           {!countdownCompleted && (
                             <span

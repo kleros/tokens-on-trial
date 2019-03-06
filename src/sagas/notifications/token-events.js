@@ -39,66 +39,87 @@ const emitTokenNotifications = async (
       }
     )
 
+    const token = await arbitrableTokenList.methods
+      .getTokenInfo(returnValues._tokenID)
+      .call()
+
     const isRegistrationRequest =
       requests[requests.length - 1].returnValues._registrationRequest
 
     let message
+    let successMessage // Whether the user receiving a notification was won/succeded in a dispute/request.
     switch (Number(returnValues._status)) {
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested:
+        if (
+          returnValues._disputed === true &&
+          returnValues._appealed === false &&
+          isRequester
+        )
+          message = `${token.ticker} token submission challenged.`
+        else if (
+          returnValues._disputed === true &&
+          returnValues._appealed === true &&
+          isRequester
+        )
+          message = `Appeal raised on ${token.ticker} token submission.`
+        else if (returnValues._disputed === false)
+          oldestNonDisputedSubmittedStatusEvent = event
+        break
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested: {
         if (
           returnValues._disputed === true &&
           returnValues._appealed === false &&
           isRequester
         )
-          message = `${
-            isRequester
-              ? 'Your token request has been challenged.'
-              : 'You challenged a token request.'
-          }`
+          message = `${token.ticker} token delisting challenged.`
         else if (
           returnValues._disputed === true &&
           returnValues._appealed === true &&
           isRequester
         )
-          message = `${
-            isRequester
-              ? 'An appeal was raised on your token request.'
-              : 'An appeal was raised on a request you challenged.'
-          }`
+          message = `${token.ticker} token delisting appealed.`
         else if (returnValues._disputed === false)
           oldestNonDisputedSubmittedStatusEvent = event
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Registered: {
-        if (isRegistrationRequest)
+        if (isRegistrationRequest) {
           message = `${
             isRequester
-              ? 'Your token submission was accepted.'
-              : 'A token submission you challenged was accepted.'
+              ? `${token.ticker} token submission successful.`
+              : `The arbitrator ruled against you on ${token.ticker} token.`
           }`
-        else
+          successMessage = !!isRequester
+        } else {
           message = `${
             isRequester
-              ? 'Your token delisting request has been rejected.'
-              : 'A token delisting request you challenged was rejected.'
+              ? `The arbitrator ruled against you on the ${token.ticker} token.`
+              : `The arbitrator ruled in your favor on the ${
+                  token.ticker
+                } token.`
           }`
-
+          successMessage = !isRequester
+        }
         break
       }
       case tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent: {
-        if (isRegistrationRequest)
+        if (isRegistrationRequest) {
           message = `${
             isRequester
-              ? 'Your token submission has been rejected.'
-              : 'A token submission you challenged has been rejected'
+              ? `The arbitrator ruled against you on the ${token.ticker} token.`
+              : `The arbitrator ruled in your favor on the ${
+                  token.ticker
+                } token.`
           }`
-        else
+          successMessage = !isRequester
+        } else {
           message = `${
             isRequester
-              ? 'Your token delisting request has been accepted.'
-              : 'A token delisting you challenged has been accepted.'
+              ? `${token.ticker} token delisting successful.`
+              : `The arbitrator ruled against you on the ${token.ticker} token.`
           }`
+          successMessage = !!isRequester
+        }
         break
       }
       default: {
@@ -128,7 +149,8 @@ const emitTokenNotifications = async (
         ID: returnValues._tokenID,
         date: await getBlockDate(event.blockHash),
         message,
-        clientStatus
+        clientStatus,
+        successMessage
       })
     }
   }
