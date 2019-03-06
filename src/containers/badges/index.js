@@ -64,12 +64,14 @@ class Badges extends Component {
         })
         .sort((a, b) => {
           if (
-            Number(a.latestRequest.submissionTime) >
+            a.status > 1 &&
+            Number(a.latestRequest.submissionTime) > a.status > 1 &&
             Number(b.latestRequest.submissionTime)
           )
             return -1
           if (
-            Number(a.latestRequest.submissionTime) <
+            a.status > 1 &&
+            Number(a.latestRequest.submissionTime) < a.status > 1 &&
             Number(b.latestRequest.submissionTime)
           )
             return 1
