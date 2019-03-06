@@ -628,7 +628,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value: value.toString()
+      value
     }
   )
 
