@@ -6,6 +6,7 @@ import Img from 'react-image'
 import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
 import Countdown from 'react-countdown-now'
+import Progress from 'react-progressbar'
 
 import {
   arbitrableTokenList,
@@ -22,7 +23,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { truncateMiddle, getRemainingTime, getBadgeStyle } from '../../utils/ui'
+import { getRemainingTime, getBadgeStyle } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -35,6 +36,8 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 
 import './token.css'
+
+const { toBN } = web3.utils
 
 class TokenDetails extends PureComponent {
   static propTypes = {
@@ -219,17 +222,17 @@ class TokenDetails extends PureComponent {
   }
 
   onCountdownComplete = time => {
-    if (time && time > 0) return
+    if (typeof time === 'number' && time > 0) return
     this.setState({ countdownCompleted: true })
   }
 
   onWinnerCountdownComplete = time => {
-    if (time && time > 0) return
+    if (typeof time === 'number' && time > 0) return
     this.setState({ winnerCountdownCompleted: true })
   }
 
   onLoserCountdownComplete = time => {
-    if (time && time > 0) return
+    if (typeof time === 'number' && time > 0) return
     this.setState({ loserCountdownCompleted: true })
   }
 
@@ -358,7 +361,26 @@ class TokenDetails extends PureComponent {
     )
 
     let latestRound
+    let requesterFeesPercent = 0
+    let challengerFeesPercent = 0
     if (latestRequest) latestRound = latestRequest.latestRound
+    if (
+      latestRequest.dispute &&
+      Number(latestRequest.dispute.status) ===
+        tcrConstants.DISPUTE_STATUS.Appealable &&
+      !latestRequest.latestRound.appealed &&
+      latestRound.requiredForSide[1].gt(toBN(0)) &&
+      latestRound.requiredForSide[2].gt(toBN(0))
+    ) {
+      requesterFeesPercent =
+        (Number(latestRound.paidFees[1]) /
+          Number(latestRound.requiredForSide[1])) *
+        100
+      challengerFeesPercent =
+        (Number(latestRound.paidFees[2]) /
+          Number(latestRound.requiredForSide[2])) *
+        100
+    }
 
     /* eslint-disable react/jsx-no-bind */
     return (
@@ -398,168 +420,135 @@ class TokenDetails extends PureComponent {
             }${token.symbolMultihash}`}
           />
           <div className="TokenDetails-card">
-            <div className="TokenDetails-label">
-              <span className="TokenDetails-label-name">{token.name}</span>
-              <span className="TokenDetails-label-ticker">{token.ticker}</span>
-            </div>
-            <div className="TokenDetails-divider" />
-            <div className="TokenDetails-meta">
-              <div className="TokenDetails-meta--aligned">
-                <span>
-                  <a
-                    className="TokenDetails--link"
-                    href={`https://etherscan.io/token/${token.addr}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Img
-                      className="TokenDetails-icon TokenDetails-meta--aligned"
-                      src={EtherScanLogo}
-                    />
-                    {token.addr
-                      ? truncateMiddle(web3.utils.toChecksumAddress(token.addr))
-                      : ''}
-                  </a>
-                </span>
-              </div>
-              {(token.badge.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
-                token.badge.status ===
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] ||
-                token.badge.status ===
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM[
-                    'RegistrationRequested'
-                  ]) &&
-                token.status !==
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
-                token.badge && (
-                  <div>
-                    <span>
-                      <span
-                        className="TokenDetails-icon-badge TokenDetails-meta--aligned"
-                        style={getBadgeStyle(token.badge, tcrConstants)}
-                      >
-                        1
-                      </span>
-                      Badge
-                    </span>
-                  </div>
-                )}
-            </div>
-            <div className="TokenDetails-meta">
-              <span className="TokenDetails-meta--aligned">
-                <FontAwesomeIcon
-                  className="TokenDetails-icon"
-                  color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
-                  icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
-                />
-                {this.toSentenceCase(
-                  tcrConstants.STATUS_ENUM[token.clientStatus]
-                )}
-              </span>
-              {latestRequest.dispute &&
-                Number(latestRequest.dispute.status) ===
-                  tcrConstants.DISPUTE_STATUS.Appealable &&
-                !latestRound.appealed && (
-                  <span
-                    className="BadgeDetails-timer"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      color: '#3d464d'
-                    }}
-                  >
-                    <FontAwesomeIcon
-                      className="TokenDetails-icon"
-                      color={tcrConstants.STATUS_COLOR_ENUM[5]}
-                      icon="balance-scale"
-                      style={{ marginRight: '10px' }}
-                    />
-                    Arbitration Result:{' '}
-                    {latestRequest.dispute.ruling.toString() !== '0'
-                      ? tcrConstants.RULING_OPTIONS[
-                          latestRequest.dispute.ruling
-                        ]
-                      : 'Arbitrator Did Not Rule'}{' '}
-                    {latestRequest.dispute.ruling.toString() !== '0'
-                      ? 'Request'
-                      : ''}
+            <div className="TokenDetails-card-content">
+              <div className="TokenDetails-label">
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    marginLeft: '38px',
+                    alignSelf: 'flex-start'
+                  }}
+                >
+                  <span className="TokenDetails-label-name">{token.name}</span>
+                  <span className="TokenDetails-label-ticker">
+                    {token.ticker}
                   </span>
-                )}
-              {!(
-                token.clientStatus <= 1 ||
-                (hasPendingRequest(token.status, latestRequest) &&
-                  latestRequest.dispute &&
-                  latestRequest.dispute.status !==
-                    tcrConstants.DISPUTE_STATUS.Appealable.toString())
-              ) &&
-                (!latestRequest.dispute ||
-                  (latestRequest.dispute.status ===
-                    tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
-                    !countdownCompleted)) && (
-                  <>
-                    {!latestRequest.dispute ? (
-                      <>
-                        {!countdownCompleted && (
-                          <span
-                            style={{ display: 'flex', alignItems: 'center' }}
-                          >
-                            <div className="BadgeDetails-timer">
-                              <FontAwesomeIcon
-                                className="TokenDetails-icon"
-                                color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                                icon="clock"
-                              />
-                              {'Challenge Deadline '}
-                              <Countdown
-                                date={Date.now() + time}
-                                renderer={CountdownRenderer}
-                                onComplete={this.onCountdownComplete}
-                                onStart={() => this.onCountdownComplete(time)}
-                              />
-                            </div>
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        {latestRequest.dispute.status ===
-                          tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
-                          <>
-                            {(SIDE !== tcrConstants.SIDE.None ||
-                              !decisiveRuling) &&
-                            !countdownCompleted ? (
-                              <span
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center'
-                                }}
-                              >
-                                <div className="BadgeDetails-timer">
-                                  <FontAwesomeIcon
-                                    className="TokenDetails-icon"
-                                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
-                                    icon="clock"
-                                  />
-                                  {'Appeal Deadline '}
-                                  <Countdown
-                                    date={Date.now() + time}
-                                    renderer={CountdownRenderer}
-                                    onComplete={this.onCountdownComplete}
-                                    onStart={() =>
-                                      this.onCountdownComplete(time)
-                                    }
-                                  />
-                                </div>
-                              </span>
-                            ) : (
-                              <>
-                                {!winnerCountdownCompleted && (
+                </div>
+              </div>
+              <div className="TokenDetails-divider" />
+              <div className="TokenDetails-meta">
+                <span className="TokenDetails-meta-item">
+                  <FontAwesomeIcon
+                    className="TokenDetails-icon"
+                    color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+                    icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
+                  />
+                  {this.toSentenceCase(
+                    tcrConstants.STATUS_ENUM[token.clientStatus]
+                  )}
+                </span>
+                {latestRequest.dispute &&
+                  Number(latestRequest.dispute.status) ===
+                    tcrConstants.DISPUTE_STATUS.Appealable &&
+                  !latestRound.appealed && (
+                    <span
+                      className="BadgeDetails-timer TokenDetails-meta-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: '#3d464d'
+                      }}
+                    >
+                      <FontAwesomeIcon
+                        className="TokenDetails-icon"
+                        color={tcrConstants.STATUS_COLOR_ENUM[5]}
+                        icon="balance-scale"
+                        style={{ marginRight: '10px' }}
+                      />
+                      Arbitration Result:{' '}
+                      {latestRequest.dispute.ruling.toString() !== '0'
+                        ? tcrConstants.RULING_OPTIONS[
+                            latestRequest.dispute.ruling
+                          ]
+                        : 'Arbitrator Did Not Rule'}{' '}
+                      {latestRequest.dispute.ruling.toString() !== '0'
+                        ? 'Request'
+                        : ''}
+                    </span>
+                  )}
+                {!(
+                  token.clientStatus <= 1 ||
+                  (hasPendingRequest(token.status, latestRequest) &&
+                    latestRequest.dispute &&
+                    latestRequest.dispute.status !==
+                      tcrConstants.DISPUTE_STATUS.Appealable.toString())
+                ) &&
+                  (!latestRequest.dispute ||
+                    latestRequest.dispute.status ===
+                      tcrConstants.DISPUTE_STATUS.Appealable.toString()) && (
+                    <>
+                      {!latestRequest.dispute ? (
+                        <>
+                          {!countdownCompleted && (
+                            <span
+                              className="TokenDetails-meta-item"
+                              style={{ display: 'flex', alignItems: 'center' }}
+                            >
+                              <div className="BadgeDetails-timer">
+                                <FontAwesomeIcon
+                                  className="TokenDetails-icon"
+                                  color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                  icon="clock"
+                                />
+                                {'Challenge Deadline '}
+                                <Countdown
+                                  date={Date.now() + time}
+                                  renderer={CountdownRenderer}
+                                  onComplete={this.onCountdownComplete}
+                                  onStart={() => this.onCountdownComplete(time)}
+                                />
+                              </div>
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          {latestRequest.dispute.status ===
+                            tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
+                            <>
+                              {!decisiveRuling && !countdownCompleted ? (
+                                <span
+                                  className="TokenDetails-meta-item"
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center'
+                                  }}
+                                >
+                                  <div className="BadgeDetails-timer">
+                                    <FontAwesomeIcon
+                                      className="TokenDetails-icon"
+                                      color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                      icon="clock"
+                                    />
+                                    {'Appeal Deadline '}
+                                    <Countdown
+                                      date={Date.now() + time}
+                                      renderer={CountdownRenderer}
+                                      onComplete={this.onCountdownComplete}
+                                      onStart={() =>
+                                        this.onCountdownComplete(time)
+                                      }
+                                    />
+                                  </div>
+                                </span>
+                              ) : (
+                                <>
                                   <span
+                                    className="TokenDetails-meta-item"
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center',
-                                      margin: '0'
+                                      alignItems: 'center'
                                     }}
                                   >
                                     <div className="BadgeDetails-timer">
@@ -585,13 +574,11 @@ class TokenDetails extends PureComponent {
                                       />
                                     </div>
                                   </span>
-                                )}
-                                {!loserCountdownCompleted && (
                                   <span
+                                    className="TokenDetails-meta-item"
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center',
-                                      margin: '0'
+                                      alignItems: 'center'
                                     }}
                                   >
                                     <div className="BadgeDetails-timer">
@@ -607,59 +594,148 @@ class TokenDetails extends PureComponent {
                                         date={Date.now() + loserRemainingTime}
                                         renderer={CountdownRenderer}
                                         onComplete={
-                                          this.onLoserCountdownComplete
+                                          this.onLoserCoundownComplete
                                         }
-                                        onStart={() =>
+                                        onStart={() => {
                                           this.onLoserCountdownComplete(
                                             loserRemainingTime
                                           )
-                                        }
+                                        }}
                                       />
                                     </div>
                                   </span>
-                                )}
-                              </>
-                            )}
-                          </>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-            </div>
-            <div className="TokenDetails-action">
+                                </>
+                              )}
+                            </>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+              </div>
               {Number(token.status) > 1 &&
-              latestRequest.dispute &&
-              Number(latestRequest.dispute.status) ===
-                tcrConstants.DISPUTE_STATUS.Appealable &&
-              latestRequest.numberOfRounds > 1 &&
-              SIDE === tcrConstants.SIDE.None ? (
-                <Button
-                  type="primary"
-                  onClick={this.fundAppeal}
-                  disabled={
-                    decisiveRuling
-                      ? winnerCountdownCompleted && loserCountdownCompleted
-                      : countdownCompleted
-                  }
-                >
-                  <FontAwesomeIcon className="TokenDetails-icon" icon="coins" />
-                  {(decisiveRuling
-                  ? !winnerCountdownCompleted || !loserCountdownCompleted
-                  : !countdownCompleted)
-                    ? 'Contribute Fees'
-                    : 'Waiting Enforcement'}
-                </Button>
-              ) : (
-                getActionButton({
-                  item: token,
-                  userAccount,
-                  tcr: arbitrableTokenListData,
-                  countdownCompleted,
-                  handleActionClick: this.handleActionClick,
-                  handleExecuteRequestClick: this.handleExecuteRequestClick
-                })
-              )}
+                latestRequest.dispute &&
+                Number(latestRequest.dispute.status) ===
+                  tcrConstants.DISPUTE_STATUS.Appealable &&
+                latestRequest.numberOfRounds > 1 && (
+                  <div className="TokenDetails-meta">
+                    <span style={{ color: '#009aff', marginBottom: '7px' }}>
+                      <FontAwesomeIcon
+                        color="#009aff"
+                        icon="coins"
+                        style={{ marginRight: '14px' }}
+                      />
+                      <strong>Fee Crowdfunding:</strong>
+                    </span>
+                    <span>Requester</span>
+                    <Progress
+                      className="TokenDetails-meta-item"
+                      completed={requesterFeesPercent}
+                      height="5px"
+                      color={
+                        requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+                      }
+                      style={{
+                        width: '200px',
+                        border: '1px solid #009aff',
+                        borderColor:
+                          requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
+                        borderRadius: '3px',
+                        marginLeft: 0
+                      }}
+                    />
+                    <span>Challenger</span>
+                    <Progress
+                      className="TokenDetails-meta-item"
+                      completed={challengerFeesPercent}
+                      height="5px"
+                      color={
+                        challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+                      }
+                      style={{
+                        width: '200px',
+                        border: '1px solid #009aff',
+                        borderColor:
+                          challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
+                        borderRadius: '3px',
+                        marginLeft: 0
+                      }}
+                    />
+                  </div>
+                )}
+              <div className="TokenDetails-action">
+                {Number(token.status) > 1 &&
+                latestRequest.dispute &&
+                Number(latestRequest.dispute.status) ===
+                  tcrConstants.DISPUTE_STATUS.Appealable &&
+                latestRequest.numberOfRounds > 1 &&
+                SIDE === tcrConstants.SIDE.None ? (
+                  <Button
+                    type="primary"
+                    onClick={this.fundAppeal}
+                    disabled={
+                      decisiveRuling
+                        ? winnerCountdownCompleted && loserCountdownCompleted
+                        : countdownCompleted
+                    }
+                  >
+                    <FontAwesomeIcon
+                      className="TokenDetails-icon"
+                      icon="coins"
+                    />
+                    {(decisiveRuling
+                    ? !winnerCountdownCompleted || !loserCountdownCompleted
+                    : !countdownCompleted)
+                      ? 'Fund Appeal'
+                      : 'Waiting Enforcement'}
+                  </Button>
+                ) : (
+                  getActionButton({
+                    item: token,
+                    userAccount,
+                    tcr: arbitrableTokenListData,
+                    countdownCompleted,
+                    handleActionClick: this.handleActionClick,
+                    handleExecuteRequestClick: this.handleExecuteRequestClick
+                  })
+                )}
+              </div>
+            </div>
+            <div className="TokenDetails-footer">
+              <a
+                className="TokenDetails--link"
+                style={{ marginRight: '14px' }}
+                href={`https://etherscan.io/token/${token.addr}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Img
+                  className="TokenDetails-icon TokenDetails-meta--aligned"
+                  src={EtherScanLogo}
+                />
+                {token.addr ? web3.utils.toChecksumAddress(token.addr) : ''}
+              </a>
+              {(token.badge.status ===
+                tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
+                token.badge.status ===
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] ||
+                token.badge.status ===
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM[
+                    'RegistrationRequested'
+                  ]) &&
+                token.status !==
+                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
+                token.badge && (
+                  <span>
+                    <span
+                      className="TokenDetails-icon-badge TokenDetails-meta--aligned"
+                      style={getBadgeStyle(token.badge, tcrConstants)}
+                    >
+                      1
+                    </span>
+                    Badge
+                  </span>
+                )}
             </div>
           </div>
         </div>

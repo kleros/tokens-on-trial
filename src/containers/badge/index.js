@@ -7,6 +7,7 @@ import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
 import { Link } from 'react-router-dom'
 import Countdown from 'react-countdown-now'
+import Progress from 'react-progressbar'
 
 import {
   arbitrableAddressList,
@@ -37,6 +38,8 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 
 import './badge.css'
+
+const { toBN } = web3.utils
 
 class BadgeDetails extends PureComponent {
   static propTypes = {
@@ -115,17 +118,17 @@ class BadgeDetails extends PureComponent {
   }
 
   onCountdownComplete = time => {
-    if (time && time > 0) return
+    if (typeof time === 'number' && time > 0) return
     this.setState({ countdownCompleted: true })
   }
 
   onWinnerCountdownComplete = time => {
-    if (time && time > 0) return
+    if (typeof time === 'number' && time > 0) return
     this.setState({ winnerCountdownCompleted: true })
   }
 
   onLoserCountdownComplete = time => {
-    if (time && time > 0) return
+    if (typeof time === 'number' && time > 0) return
     this.setState({ loserCountdownCompleted: true })
   }
 
@@ -337,7 +340,31 @@ class BadgeDetails extends PureComponent {
       decisiveRuling
     )
 
+    let latestRound
+    let requesterFeesPercent = 0
+    let challengerFeesPercent = 0
+    if (latestRequest) latestRound = latestRequest.latestRound
+    if (
+      latestRequest.dispute &&
+      Number(latestRequest.dispute.status) ===
+        tcrConstants.DISPUTE_STATUS.Appealable &&
+      !latestRequest.latestRound.appealed &&
+      latestRound.requiredForSide[1].gt(toBN(0)) &&
+      latestRound.requiredForSide[2].gt(toBN(0))
+    ) {
+      requesterFeesPercent =
+        (Number(latestRound.paidFees[1]) /
+          Number(latestRound.requiredForSide[1])) *
+        100
+
+      challengerFeesPercent =
+        (Number(latestRound.paidFees[2]) /
+          Number(latestRound.requiredForSide[2])) *
+        100
+    }
+
     /* eslint-disable react/jsx-no-bind */
+
     return (
       <div className="Page">
         <FilterBar
@@ -347,7 +374,9 @@ class BadgeDetails extends PureComponent {
         <div
           style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto' }}
         >
-          <h4 style={{ marginLeft: 0, minWidth: '247px' }}>Badge Details</h4>
+          <h4 style={{ marginLeft: 0, marginRight: 0, minWidth: '247px' }}>
+            Badge Details
+          </h4>
           <div className="TokenDetails-divider" />
           {badge.token ? (
             <Link
@@ -449,7 +478,7 @@ class BadgeDetails extends PureComponent {
                             className="BadgeDetails-icon BadgeDetails-meta--aligned"
                             src={Etherscan}
                           />
-                          <div style={{ minWidth: '150px' }}>
+                          <div style={{ marginRight: '14px' }}>
                             {truncateMiddle(
                               web3.utils.toChecksumAddress(tokenAddr)
                             )}
@@ -536,8 +565,7 @@ class BadgeDetails extends PureComponent {
                             {latestRequest.dispute.status ===
                               tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
                               <>
-                                {!decisiveRuling ||
-                                SIDE === tcrConstants.SIDE.None ? (
+                                {!decisiveRuling ? (
                                   <span
                                     style={{
                                       display: 'flex',
@@ -572,86 +600,82 @@ class BadgeDetails extends PureComponent {
                                   </span>
                                 ) : (
                                   <>
-                                    {!winnerCountdownCompleted && (
-                                      <span
-                                        style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          margin: '5px 0 5px auto',
-                                          fontSize: '14px'
-                                        }}
+                                    <span
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        margin: '5px 0 5px auto',
+                                        fontSize: '14px'
+                                      }}
+                                    >
+                                      <div
+                                        className="BadgeDetails-timer"
+                                        style={{ display: 'flex' }}
                                       >
-                                        <div
-                                          className="BadgeDetails-timer"
-                                          style={{ display: 'flex' }}
-                                        >
-                                          <FontAwesomeIcon
-                                            className="BadgeDetails-icon"
-                                            color={
-                                              tcrConstants.STATUS_COLOR_ENUM[4]
+                                        <FontAwesomeIcon
+                                          className="BadgeDetails-icon"
+                                          color={
+                                            tcrConstants.STATUS_COLOR_ENUM[4]
+                                          }
+                                          icon="clock"
+                                        />
+                                        <div>
+                                          {'Winner Deadline '}
+                                          <Countdown
+                                            date={
+                                              Date.now() + winnerRemainingTime
                                             }
-                                            icon="clock"
+                                            renderer={CountdownRenderer}
+                                            onStart={() => {
+                                              this.onWinnerCountdownComplete(
+                                                winnerRemainingTime
+                                              )
+                                            }}
+                                            onComplete={
+                                              this.onWinnerCountdownComplete
+                                            }
                                           />
-                                          <div>
-                                            {'Winner Deadline '}
-                                            <Countdown
-                                              date={
-                                                Date.now() + winnerRemainingTime
-                                              }
-                                              renderer={CountdownRenderer}
-                                              onStart={() =>
-                                                this.onCountdownComplete(
-                                                  winnerRemainingTime
-                                                )
-                                              }
-                                              onComplete={
-                                                this.onWinnerCountdownComplete
-                                              }
-                                            />
-                                          </div>
                                         </div>
-                                      </span>
-                                    )}
-                                    {!loserCountdownCompleted && (
-                                      <span
-                                        style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          margin: '5px 0 5px auto',
-                                          fontSize: '14px'
-                                        }}
+                                      </div>
+                                    </span>
+                                    <span
+                                      style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        margin: '5px 0 5px auto',
+                                        fontSize: '14px'
+                                      }}
+                                    >
+                                      <div
+                                        className="BadgeDetails-timer"
+                                        style={{ display: 'flex' }}
                                       >
-                                        <div
-                                          className="BadgeDetails-timer"
-                                          style={{ display: 'flex' }}
-                                        >
-                                          <FontAwesomeIcon
-                                            className="BadgeDetails-icon"
-                                            color={
-                                              tcrConstants.STATUS_COLOR_ENUM[4]
+                                        <FontAwesomeIcon
+                                          className="BadgeDetails-icon"
+                                          color={
+                                            tcrConstants.STATUS_COLOR_ENUM[4]
+                                          }
+                                          icon="clock"
+                                        />
+                                        <div>
+                                          {'Loser Deadline '}
+                                          <Countdown
+                                            date={
+                                              Date.now() + loserRemainingTime
                                             }
-                                            icon="clock"
+                                            renderer={CountdownRenderer}
+                                            onComplete={
+                                              this.onLoserCountdownComplete
+                                            }
+                                            onStart={() => {
+                                              this.onLoserCountdownComplete(
+                                                loserRemainingTime
+                                              )
+                                            }}
                                           />
-                                          <div>
-                                            {'Loser Deadline '}
-                                            <Countdown
-                                              date={
-                                                Date.now() + loserRemainingTime
-                                              }
-                                              renderer={CountdownRenderer}
-                                              onComplete={
-                                                this.onLoserCountdownComplete
-                                              }
-                                              onStart={() =>
-                                                this.onCountdownComplete(
-                                                  loserRemainingTime
-                                                )
-                                              }
-                                            />
-                                          </div>
                                         </div>
-                                      </span>
-                                    )}
+                                      </div>
+                                    </span>
                                   </>
                                 )}
                               </>
@@ -662,6 +686,59 @@ class BadgeDetails extends PureComponent {
                     )}
                 </div>
               </div>
+              {Number(badge.status) > 1 &&
+                latestRequest.dispute &&
+                Number(latestRequest.dispute.status) ===
+                  tcrConstants.DISPUTE_STATUS.Appealable &&
+                latestRequest.numberOfRounds > 1 && (
+                  <div
+                    className="TokenDetails-meta"
+                    style={{ margin: 0, marginRight: '26px' }}
+                  >
+                    <span style={{ color: '#009aff', marginBottom: '7px' }}>
+                      <FontAwesomeIcon
+                        color="#009aff"
+                        icon="coins"
+                        style={{ marginRight: '14px' }}
+                      />
+                      <strong>Fee Crowdfunding:</strong>
+                    </span>
+                    <span>Requester</span>
+                    <Progress
+                      className="TokenDetails-meta-item"
+                      completed={requesterFeesPercent}
+                      height="5px"
+                      color={
+                        challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+                      }
+                      style={{
+                        width: '170px',
+                        border: '1px solid #009aff',
+                        borderColor:
+                          challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
+                        borderRadius: '3px',
+                        marginLeft: 0
+                      }}
+                    />
+                    <span>Challenger</span>
+                    <Progress
+                      className="TokenDetails-meta-item"
+                      completed={challengerFeesPercent}
+                      height="5px"
+                      color={
+                        challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+                      }
+                      style={{
+                        width: '170px',
+                        border: '1px solid #009aff',
+                        borderColor:
+                          challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
+                        borderRadius: '3px',
+                        marginLeft: 0
+                      }}
+                    />
+                  </div>
+                )}
             </div>
             <div className="BadgeDetails-footer">
               <div

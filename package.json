@@ -79,6 +79,7 @@
     "react-helmet": "^5.2.0",
     "react-image": "^1.3.1",
     "react-modal": "^3.4.5",
+    "react-progressbar": "^15.4.1",
     "react-redux": "^5.0.6",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",

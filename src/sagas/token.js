@@ -274,6 +274,9 @@ export function* fetchToken({ payload: { ID } }) {
             token.latestRequest.arbitratorExtraData
           ).call
         )
+        const MULTIPLIER_DIVISOR = yield call(
+          arbitrableTokenList.methods.MULTIPLIER_DIVISOR().call
+        )
 
         const winnerStakeMultiplier = yield select(
           arbitrableTokenListSelectors.getWinnerStakeMultiplier
@@ -290,46 +293,46 @@ export function* fetchToken({ payload: { ID } }) {
         if (ruling === 0) {
           token.latestRequest.latestRound.requiredForSide.push(
             toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost).mul(
-                toBN(sharedStakeMultiplier)
-              )
+              toBN(token.latestRequest.latestRound.appealCost)
+                .mul(toBN(sharedStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
           token.latestRequest.latestRound.requiredForSide.push(
             toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost).mul(
-                toBN(sharedStakeMultiplier)
-              )
+              toBN(token.latestRequest.latestRound.appealCost)
+                .mul(toBN(sharedStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
         } else if (ruling === 1) {
           token.latestRequest.latestRound.requiredForSide.push(
             toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost).mul(
-                toBN(winnerStakeMultiplier)
-              )
+              toBN(token.latestRequest.latestRound.appealCost)
+                .mul(toBN(winnerStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
           token.latestRequest.latestRound.requiredForSide.push(
             toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost).mul(
-                toBN(loserStakeMultiplier)
-              )
+              toBN(token.latestRequest.latestRound.appealCost)
+                .mul(toBN(loserStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
         } else {
           token.latestRequest.latestRound.requiredForSide.push(
             toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost).mul(
-                toBN(loserStakeMultiplier)
-              )
+              toBN(token.latestRequest.latestRound.appealCost)
+                .mul(toBN(loserStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
           token.latestRequest.latestRound.requiredForSide.push(
             toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost).mul(
-                toBN(winnerStakeMultiplier)
-              )
+              toBN(token.latestRequest.latestRound.appealCost)
+                .mul(toBN(winnerStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
         }
@@ -418,52 +421,55 @@ export function* fetchToken({ payload: { ID } }) {
           const sharedStakeMultiplier = yield select(
             arbitrableAddressListSelectors.getSharedStakeMultiplier
           )
+          const MULTIPLIER_DIVISOR = yield call(
+            arbitrableAddressList.methods.MULTIPLIER_DIVISOR().call
+          )
           badge.latestRequest.latestRound.requiredForSide = [0]
 
           const ruling = Number(badge.latestRequest.dispute.ruling)
           if (ruling === 0) {
             badge.latestRequest.latestRound.requiredForSide.push(
               toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost).mul(
-                  toBN(sharedStakeMultiplier)
-                )
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(sharedStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
               )
             )
             badge.latestRequest.latestRound.requiredForSide.push(
               toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost).mul(
-                  toBN(sharedStakeMultiplier)
-                )
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(sharedStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
               )
             )
           } else if (ruling === 1) {
             badge.latestRequest.latestRound.requiredForSide.push(
               toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost).mul(
-                  toBN(winnerStakeMultiplier)
-                )
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(winnerStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
               )
             )
             badge.latestRequest.latestRound.requiredForSide.push(
               toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost).mul(
-                  toBN(loserStakeMultiplier)
-                )
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(loserStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
               )
             )
           } else {
             badge.latestRequest.latestRound.requiredForSide.push(
               toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost).mul(
-                  toBN(loserStakeMultiplier)
-                )
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(loserStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
               )
             )
             badge.latestRequest.latestRound.requiredForSide.push(
               toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost).mul(
-                  toBN(winnerStakeMultiplier)
-                )
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(winnerStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
               )
             )
           }

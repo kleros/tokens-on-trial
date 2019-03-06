@@ -8,8 +8,9 @@
   padding: 15px 0;
 
   &-img {
+    align-self: start;
     height: 98px;
-    margin: 26px 26px 26px 0;
+    margin: 0 26px 26px 0;
     object-fit: contain;
     width: 98px;
   }
@@ -20,24 +21,40 @@
     border: 1px solid $border;
     border-radius: 3px;
     box-shadow: 0 3px 6px $shadow;
-    box-sizing: border-box;
     display: flex;
+    flex-direction: column;
     flex-grow: 2;
     justify-content: space-between;
-    min-height: 102px;
-    padding-left: 36px;
 
     &-info {
       padding: 17px 0;
     }
+
+    &-content {
+      display: flex;
+      flex-direction: row;
+      min-height: 102px;
+      overflow-x: auto;
+    }
+  }
+
+  &-footer {
+    align-items: center;
+    background-color: $action;
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    height: 48px;
+    padding-left: 36px;
   }
 
   &-label {
-    align-items: flex-start;
+    align-items: center;
     display: flex;
     flex-direction: column;
     font-size: 21px;
     justify-content: center;
+    min-width: 150px;
 
     &-name {
       color: $darkGrey;
@@ -52,7 +69,7 @@
 
   &-divider {
     border-left: 1px solid $border;
-    margin: 17px 0;
+    margin: 17px;
   }
 
   &--link {
@@ -66,16 +83,24 @@
   }
 
   &-meta {
-    align-content: center;
+    align-items: flex-start;
+    align-self: center;
     display: flex;
     flex-direction: column;
     font-size: 14px;
-    justify-content: space-evenly;
+    height: 100%;
     margin: 17px 0;
+    margin-right: 17px;
     vertical-align: middle;
 
     &--aligned {
       display: inline-block;
+      vertical-align: middle;
+    }
+
+    &-item {
+      display: inline-block;
+      margin: 7px;
       vertical-align: middle;
     }
   }
@@ -101,6 +126,7 @@
     align-items: center;
     background: $action;
     display: flex;
+    margin-left: auto;
     padding-left: 36px;
     padding-right: 36px;
     position: relative;
