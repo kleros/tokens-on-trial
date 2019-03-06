@@ -51,6 +51,7 @@
 
   &-content {
     align-items: center;
+    background: aliceblue;
     display: flex;
     flex-grow: 1;
     justify-content: center;
@@ -83,7 +84,7 @@
   }
 
   &-hidden {
-    visibility: hidden;
+    display: none;
   }
 }
 

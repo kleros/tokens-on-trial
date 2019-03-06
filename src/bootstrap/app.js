@@ -24,6 +24,7 @@ import * as notificationActions from '../actions/notification'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
+import TelegramButton from '../components/telegram-button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -183,6 +184,7 @@ const App = ({ store, history }) => (
               <Route component={GlobalComponents} exact path="*" />
             </div>
           </Switch>
+          <TelegramButton />
         </>
       </ConnectedRouter>
     </Initializer>
