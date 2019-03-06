@@ -628,7 +628,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value
+      value: value.add(web3.utils.toBN('4100000000000000'))
     }
   )
 
@@ -695,7 +695,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value
+      value: value.add(web3.utils.toBN('4100000000000000'))
     }
   )
 
