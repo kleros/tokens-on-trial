@@ -326,8 +326,10 @@ export function* fetchBadge({ payload: { addr } }) {
           arbitrator.methods.currentRuling(badge.latestRequest.disputeID).call
         )
         badge.latestRequest.latestRound.appealCost = yield call(
-          arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
-            .call
+          arbitrator.methods.appealCost(
+            badge.latestRequest.disputeID,
+            badge.latestRequest.arbitratorExtraData
+          ).call
         )
 
         const winnerStakeMultiplier = yield select(

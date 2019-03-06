@@ -269,8 +269,10 @@ export function* fetchToken({ payload: { ID } }) {
           arbitrator.methods.currentRuling(token.latestRequest.disputeID).call
         )
         token.latestRequest.latestRound.appealCost = yield call(
-          arbitrator.methods.appealCost(token.latestRequest.disputeID, '0x0')
-            .call
+          arbitrator.methods.appealCost(
+            token.latestRequest.disputeID,
+            token.latestRequest.arbitratorExtraData
+          ).call
         )
 
         const winnerStakeMultiplier = yield select(
@@ -401,8 +403,10 @@ export function* fetchToken({ payload: { ID } }) {
             arbitrator.methods.currentRuling(badge.latestRequest.disputeID).call
           )
           badge.latestRequest.latestRound.appealCost = yield call(
-            arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
-              .call
+            arbitrator.methods.appealCost(
+              badge.latestRequest.disputeID,
+              badge.latestRequest.arbitratorExtraData
+            ).call
           )
 
           const winnerStakeMultiplier = yield select(
