@@ -709,13 +709,13 @@ class BadgeDetails extends PureComponent {
                       completed={requesterFeesPercent}
                       height="5px"
                       color={
-                        challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+                        requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff'
                       }
                       style={{
                         width: '170px',
                         border: '1px solid #009aff',
                         borderColor:
-                          challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
+                          requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
                         borderRadius: '3px',
                         marginLeft: 0
                       }}
