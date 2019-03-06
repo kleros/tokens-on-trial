@@ -78,5 +78,5 @@ export const userFriendlyLabel = {
 
 export const truncateETHValue = str => {
   if (str.indexOf('.') === -1) return str
-  return str.substring(0, str.indexOf('.') + 4)
+  return str.substring(0, str.indexOf('.') + 5)
 }

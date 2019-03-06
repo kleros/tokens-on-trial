@@ -6,6 +6,7 @@ import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable
 import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { truncateETHValue } from '../../../../utils/ui'
 
 import './resubmit.css'
 
@@ -16,9 +17,11 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
     <div className="Resubmit-stake">
       <span>Challenge Stake</span>
       <span>
-        {`${String(
-          web3.utils.fromWei(
-            String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(web3.utils.toBN(tcr.data.requesterBaseDeposit))
+            )
           )
         )} ETH`}
       </span>
@@ -26,13 +29,15 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
     <div className="Challenge-cost">
       <span>Arbitration Fee Stake</span>
       <strong>
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.arbitrationCost)
-                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(
+                web3.utils
+                  .toBN(tcr.data.arbitrationCost)
+                  .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+              )
             )
           )
         )} ETH`}
@@ -41,8 +46,12 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
     <div className="Challenge-cost">
       <span>Required Arbitration Fee</span>
       <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(web3.utils.toBN(tcr.data.arbitrationCost))
+            )
+          )
         )} ETH`}
       </strong>
     </div>
@@ -50,18 +59,20 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
     <div className="Challenge-cost">
       <span>Total Due:</span>
       <strong className="Challenge-total-value">
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.requesterBaseDeposit)
-                .add(
-                  web3.utils
-                    .toBN(tcr.data.arbitrationCost)
-                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                )
-                .add(web3.utils.toBN(tcr.data.arbitrationCost))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(
+                web3.utils
+                  .toBN(tcr.data.requesterBaseDeposit)
+                  .add(
+                    web3.utils
+                      .toBN(tcr.data.arbitrationCost)
+                      .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                      .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                  )
+                  .add(web3.utils.toBN(tcr.data.arbitrationCost))
+              )
             )
           )
         )} ETH`}

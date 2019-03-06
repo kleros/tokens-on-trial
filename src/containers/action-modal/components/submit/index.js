@@ -10,6 +10,7 @@ import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
 import EthfinexLogo from '../../../../assets/images/ethfinex.svg'
+import { truncateETHValue } from '../../../../utils/ui'
 
 import './submit.css'
 
@@ -115,18 +116,20 @@ const Submit = ({
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
           <strong>
-            {String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(tcr.data.requesterBaseDeposit)
-                    .add(
-                      web3.utils
-                        .toBN(tcr.data.arbitrationCost)
-                        .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                        .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                    )
-                    .add(web3.utils.toBN(tcr.data.arbitrationCost))
+            {truncateETHValue(
+              String(
+                web3.utils.fromWei(
+                  String(
+                    web3.utils
+                      .toBN(tcr.data.requesterBaseDeposit)
+                      .add(
+                        web3.utils
+                          .toBN(tcr.data.arbitrationCost)
+                          .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                          .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                      )
+                      .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                  )
                 )
               )
             )}
