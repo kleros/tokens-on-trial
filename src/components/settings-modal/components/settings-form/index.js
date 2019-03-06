@@ -13,7 +13,7 @@ export const { Form: SettingsForm, submit: submitSettingsForm } = form(
     rulingGiven: {
       type: 'checkbox',
       props: {
-        label: 'The arbitrator gives a ruling in my dispute'
+        label: 'Jurors give a ruling in my dispute'
       }
     },
     fullName: { type: 'text', validate: [required] },

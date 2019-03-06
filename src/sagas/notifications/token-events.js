@@ -87,16 +87,14 @@ const emitTokenNotifications = async (
           message = `${
             isRequester
               ? `${token.ticker} token submission successful.`
-              : `The arbitrator ruled against you on ${token.ticker} token.`
+              : `Jurors ruled against you on ${token.ticker} token.`
           }`
           successMessage = !!isRequester
         } else {
           message = `${
             isRequester
-              ? `The arbitrator ruled against you on the ${token.ticker} token.`
-              : `The arbitrator ruled in your favor on the ${
-                  token.ticker
-                } token.`
+              ? `Jurors ruled against you on the ${token.ticker} token.`
+              : `Jurors ruled in your favor on the ${token.ticker} token.`
           }`
           successMessage = !isRequester
         }
@@ -106,17 +104,15 @@ const emitTokenNotifications = async (
         if (isRegistrationRequest) {
           message = `${
             isRequester
-              ? `The arbitrator ruled against you on the ${token.ticker} token.`
-              : `The arbitrator ruled in your favor on the ${
-                  token.ticker
-                } token.`
+              ? `Jurors ruled against you on the ${token.ticker} token.`
+              : `Jurors ruled in your favor on the ${token.ticker} token.`
           }`
           successMessage = !isRequester
         } else {
           message = `${
             isRequester
               ? `${token.ticker} token delisting successful.`
-              : `The arbitrator ruled against you on the ${token.ticker} token.`
+              : `Jurors ruled against you on the ${token.ticker} token.`
           }`
           successMessage = !!isRequester
         }

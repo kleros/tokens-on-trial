@@ -25,7 +25,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, truncateMiddle } from '../../utils/ui'
+import { getRemainingTime, truncateMiddle, rulingMessage } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -508,10 +508,15 @@ class BadgeDetails extends PureComponent {
                         />
                         Arbitration Result:{' '}
                         {latestRequest.dispute.ruling.toString() !== '0'
-                          ? tcrConstants.RULING_OPTIONS[
-                              latestRequest.dispute.ruling
-                            ]
-                          : 'Arbitrator Did Not Rule'}{' '}
+                          ? rulingMessage(
+                              decisiveRuling,
+                              SIDE !== tcrConstants.SIDE.None,
+                              losingSide,
+                              tcrConstants.RULING_OPTIONS[
+                                latestRequest.dispute.ruling
+                              ]
+                            )
+                          : 'Jurors did not rule.'}{' '}
                         {latestRequest.dispute.ruling.toString() !== '0'
                           ? 'Request'
                           : ''}
@@ -540,11 +545,11 @@ class BadgeDetails extends PureComponent {
                               >
                                 <div
                                   className="BadgeDetails-timer"
-                                  style={{ fontSize: '14px' }}
+                                  style={{ fontSize: '14px', color: '#f60c36' }}
                                 >
                                   <FontAwesomeIcon
                                     className="BadgeDetails-icon"
-                                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                    color="#f60c36"
                                     icon="clock"
                                   />
                                   {'Challenge Deadline '}
@@ -576,13 +581,14 @@ class BadgeDetails extends PureComponent {
                                   >
                                     <div
                                       className="BadgeDetails-timer"
-                                      style={{ display: 'flex' }}
+                                      style={{
+                                        display: 'flex',
+                                        color: '#f60c36'
+                                      }}
                                     >
                                       <FontAwesomeIcon
                                         className="BadgeDetails-icon"
-                                        color={
-                                          tcrConstants.STATUS_COLOR_ENUM[4]
-                                        }
+                                        color="#f60c36"
                                         icon="clock"
                                       />
                                       <div>
@@ -610,13 +616,14 @@ class BadgeDetails extends PureComponent {
                                     >
                                       <div
                                         className="BadgeDetails-timer"
-                                        style={{ display: 'flex' }}
+                                        style={{
+                                          display: 'flex',
+                                          color: '#f60c36'
+                                        }}
                                       >
                                         <FontAwesomeIcon
                                           className="BadgeDetails-icon"
-                                          color={
-                                            tcrConstants.STATUS_COLOR_ENUM[4]
-                                          }
+                                          color="#f60c36"
                                           icon="clock"
                                         />
                                         <div>
@@ -648,13 +655,14 @@ class BadgeDetails extends PureComponent {
                                     >
                                       <div
                                         className="BadgeDetails-timer"
-                                        style={{ display: 'flex' }}
+                                        style={{
+                                          display: 'flex',
+                                          color: '#f60c36'
+                                        }}
                                       >
                                         <FontAwesomeIcon
                                           className="BadgeDetails-icon"
-                                          color={
-                                            tcrConstants.STATUS_COLOR_ENUM[4]
-                                          }
+                                          color="#f60c36"
                                           icon="clock"
                                         />
                                         <div>

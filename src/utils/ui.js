@@ -76,6 +76,18 @@ export const userFriendlyLabel = {
   'My Challenges': 'My Challenges'
 }
 
+export const rulingMessage = (
+  decisiveRuling,
+  requesterOrChallenger,
+  isLoser,
+  defaultMessage
+) => {
+  if (!decisiveRuling) return 'Jurors did not rule.'
+  if (!requesterOrChallenger) return defaultMessage
+  if (isLoser) return 'Jurors ruled against you'
+  else return 'Jurors ruled in your favor'
+}
+
 export const truncateETHValue = str => {
   if (str.indexOf('.') === -1) return str
   return str.substring(0, str.indexOf('.') + 5)

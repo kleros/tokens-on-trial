@@ -125,7 +125,7 @@ const emitBadgeNotifications = async (
           message = `${
             isRequester
               ? `${token ? `${token.ticker} b` : 'B'}adge addition successful.`
-              : `The arbitrator ruled against you on ${
+              : `Jurors ruled against you on ${
                   token ? `${token.ticker}` : 'the'
                 } badge challenge.`
           }`
@@ -133,10 +133,10 @@ const emitBadgeNotifications = async (
         } else {
           message = `${
             isRequester
-              ? `The arbitrator ruled against you on ${
+              ? `Jurors ruled against you on ${
                   token ? `${token.ticker}` : 'the'
                 } badge removal.`
-              : `The arbitrator ruled in your favor on ${
+              : `Jurors ruled in your favor on ${
                   token ? `${token.ticker}` : 'the'
                 } badge challenge.`
           }`
@@ -148,10 +148,10 @@ const emitBadgeNotifications = async (
         if (isRegistrationRequest) {
           message = `${
             isRequester
-              ? `The arbitrator ruled against you on ${
+              ? `Jurors ruled against you on ${
                   token ? `${token.ticker}` : 'the'
                 } badge addition.`
-              : `The arbitrator ruled in your favor on ${
+              : `Jurors ruled in your favor on ${
                   token ? `${token.ticker}` : 'the'
                 } badge challenge.`
           }`
@@ -160,7 +160,7 @@ const emitBadgeNotifications = async (
           message = `${
             isRequester
               ? `${token ? `${token.ticker} b` : 'B'}adge removal successful.`
-              : `The arbitrator ruled against you on ${
+              : `Jurors ruled against you on ${
                   token ? `${token.ticker}` : 'the'
                 } badge challenge.`
           }`

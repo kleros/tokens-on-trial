@@ -41,8 +41,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
       )
         continue
 
-      const message =
-        'The arbitrator gave an appealable ruling on a disputed token.'
+      const message = 'Jurors gave an appealable ruling on a disputed token.'
       emit({
         ID: tokenID,
         date: await getBlockDate(event.blockHash),
@@ -56,8 +55,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
           returnValues._disputeID
         )
         .call()
-      const message =
-        'The arbitrator gave an appealable ruling on a disputed badge.'
+      const message = 'Jurors gave an appealable ruling on a disputed badge.'
 
       emit({
         ID: tokenAddress,

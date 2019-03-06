@@ -23,7 +23,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, getBadgeStyle } from '../../utils/ui'
+import { getRemainingTime, getBadgeStyle, rulingMessage } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -468,10 +468,15 @@ class TokenDetails extends PureComponent {
                       />
                       Arbitration Result:{' '}
                       {latestRequest.dispute.ruling.toString() !== '0'
-                        ? tcrConstants.RULING_OPTIONS[
-                            latestRequest.dispute.ruling
-                          ]
-                        : 'Arbitrator Did Not Rule'}{' '}
+                        ? rulingMessage(
+                            decisiveRuling,
+                            SIDE !== tcrConstants.SIDE.None,
+                            losingSide,
+                            tcrConstants.RULING_OPTIONS[
+                              latestRequest.dispute.ruling
+                            ]
+                          )
+                        : 'Jurors did not rule.'}{' '}
                       {latestRequest.dispute.ruling.toString() !== '0'
                         ? 'Request'
                         : ''}
@@ -493,12 +498,16 @@ class TokenDetails extends PureComponent {
                           {!countdownCompleted && (
                             <span
                               className="TokenDetails-meta-item"
-                              style={{ display: 'flex', alignItems: 'center' }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                color: '#f60c36'
+                              }}
                             >
                               <div className="BadgeDetails-timer">
                                 <FontAwesomeIcon
                                   className="TokenDetails-icon"
-                                  color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                  color="#f60c36"
                                   icon="clock"
                                 />
                                 {'Challenge Deadline '}
@@ -522,13 +531,14 @@ class TokenDetails extends PureComponent {
                                   className="TokenDetails-meta-item"
                                   style={{
                                     display: 'flex',
-                                    alignItems: 'center'
+                                    alignItems: 'center',
+                                    color: '#f60c36'
                                   }}
                                 >
                                   <div className="BadgeDetails-timer">
                                     <FontAwesomeIcon
                                       className="TokenDetails-icon"
-                                      color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                      color="#f60c36"
                                       icon="clock"
                                     />
                                     {'Appeal Deadline '}
@@ -548,15 +558,14 @@ class TokenDetails extends PureComponent {
                                     className="TokenDetails-meta-item"
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center'
+                                      alignItems: 'center',
+                                      color: '#f60c36'
                                     }}
                                   >
                                     <div className="BadgeDetails-timer">
                                       <FontAwesomeIcon
                                         className="TokenDetails-icon"
-                                        color={
-                                          tcrConstants.STATUS_COLOR_ENUM[4]
-                                        }
+                                        color="#f60c36"
                                         icon="clock"
                                       />
                                       {'Winner Deadline '}
@@ -578,15 +587,14 @@ class TokenDetails extends PureComponent {
                                     className="TokenDetails-meta-item"
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center'
+                                      alignItems: 'center',
+                                      color: '#f60c36'
                                     }}
                                   >
                                     <div className="BadgeDetails-timer">
                                       <FontAwesomeIcon
                                         className="TokenDetails-icon"
-                                        color={
-                                          tcrConstants.STATUS_COLOR_ENUM[4]
-                                        }
+                                        color="#f60c36"
                                         icon="clock"
                                       />
                                       {'Loser Deadline '}
