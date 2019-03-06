@@ -218,15 +218,18 @@ class TokenDetails extends PureComponent {
     this.setState({ appealModalOpen: true })
   }
 
-  onCountdownComplete = () => {
+  onCountdownComplete = time => {
+    if (time && time > 0) return
     this.setState({ countdownCompleted: true })
   }
 
-  onWinnerCoundownComplete = () => {
+  onWinnerCountdownComplete = time => {
+    if (time && time > 0) return
     this.setState({ winnerCountdownCompleted: true })
   }
 
-  onLoserCoundownComplete = () => {
+  onLoserCountdownComplete = time => {
+    if (time && time > 0) return
     this.setState({ loserCountdownCompleted: true })
   }
 
@@ -357,6 +360,7 @@ class TokenDetails extends PureComponent {
     let latestRound
     if (latestRequest) latestRound = latestRequest.latestRound
 
+    /* eslint-disable react/jsx-no-bind */
     return (
       <div className="Page">
         <FilterBar
@@ -492,11 +496,11 @@ class TokenDetails extends PureComponent {
                 (!latestRequest.dispute ||
                   (latestRequest.dispute.status ===
                     tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
-                    time > 0)) && (
+                    !countdownCompleted)) && (
                   <>
                     {!latestRequest.dispute ? (
                       <>
-                        {time > 0 && !countdownCompleted && (
+                        {!countdownCompleted && (
                           <span
                             style={{ display: 'flex', alignItems: 'center' }}
                           >
@@ -511,6 +515,7 @@ class TokenDetails extends PureComponent {
                                 date={Date.now() + time}
                                 renderer={CountdownRenderer}
                                 onComplete={this.onCountdownComplete}
+                                onStart={() => this.onCountdownComplete(time)}
                               />
                             </div>
                           </span>
@@ -541,6 +546,9 @@ class TokenDetails extends PureComponent {
                                     date={Date.now() + time}
                                     renderer={CountdownRenderer}
                                     onComplete={this.onCountdownComplete}
+                                    onStart={() =>
+                                      this.onCountdownComplete(time)
+                                    }
                                   />
                                 </div>
                               </span>
@@ -562,45 +570,54 @@ class TokenDetails extends PureComponent {
                                         }
                                         icon="clock"
                                       />
-                                      {'Winner Appeal Deadline '}
+                                      {'Winner Deadline '}
                                       <Countdown
                                         date={Date.now() + winnerRemainingTime}
                                         renderer={CountdownRenderer}
                                         onComplete={
-                                          this.onWinnerCoundownComplete
+                                          this.onWinnerCountdownComplete
+                                        }
+                                        onStart={() =>
+                                          this.onWinnerCountdownComplete(
+                                            winnerRemainingTime
+                                          )
                                         }
                                       />
                                     </div>
                                   </span>
                                 )}
-                                {loserRemainingTime > 0 &&
-                                  !loserCountdownCompleted && (
-                                    <span
-                                      style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        margin: '0'
-                                      }}
-                                    >
-                                      <div className="BadgeDetails-timer">
-                                        <FontAwesomeIcon
-                                          className="TokenDetails-icon"
-                                          color={
-                                            tcrConstants.STATUS_COLOR_ENUM[4]
-                                          }
-                                          icon="clock"
-                                        />
-                                        {'Loser Appeal Deadline '}
-                                        <Countdown
-                                          date={Date.now() + loserRemainingTime}
-                                          renderer={CountdownRenderer}
-                                          onComplete={
-                                            this.onLoserCoundownComplete
-                                          }
-                                        />
-                                      </div>
-                                    </span>
-                                  )}
+                                {!loserCountdownCompleted && (
+                                  <span
+                                    style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      margin: '0'
+                                    }}
+                                  >
+                                    <div className="BadgeDetails-timer">
+                                      <FontAwesomeIcon
+                                        className="TokenDetails-icon"
+                                        color={
+                                          tcrConstants.STATUS_COLOR_ENUM[4]
+                                        }
+                                        icon="clock"
+                                      />
+                                      {'Loser Deadline '}
+                                      <Countdown
+                                        date={Date.now() + loserRemainingTime}
+                                        renderer={CountdownRenderer}
+                                        onComplete={
+                                          this.onLoserCountdownComplete
+                                        }
+                                        onStart={() =>
+                                          this.onLoserCountdownComplete(
+                                            loserRemainingTime
+                                          )
+                                        }
+                                      />
+                                    </div>
+                                  </span>
+                                )}
                               </>
                             )}
                           </>
@@ -629,7 +646,7 @@ class TokenDetails extends PureComponent {
                   <FontAwesomeIcon className="TokenDetails-icon" icon="coins" />
                   {(decisiveRuling
                   ? !winnerCountdownCompleted || !loserCountdownCompleted
-                  : !countdownCompleted && time > 0)
+                  : !countdownCompleted)
                     ? 'Contribute Fees'
                     : 'Waiting Enforcement'}
                 </Button>

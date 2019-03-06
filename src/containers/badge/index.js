@@ -114,15 +114,18 @@ class BadgeDetails extends PureComponent {
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
-  onCountdownComplete = () => {
+  onCountdownComplete = time => {
+    if (time && time > 0) return
     this.setState({ countdownCompleted: true })
   }
 
-  onWinnerCountdownComplete = () => {
+  onWinnerCountdownComplete = time => {
+    if (time && time > 0) return
     this.setState({ winnerCountdownCompleted: true })
   }
 
-  onLoserCountdownComplete = () => {
+  onLoserCountdownComplete = time => {
+    if (time && time > 0) return
     this.setState({ loserCountdownCompleted: true })
   }
 
@@ -334,6 +337,7 @@ class BadgeDetails extends PureComponent {
       decisiveRuling
     )
 
+    /* eslint-disable react/jsx-no-bind */
     return (
       <div className="Page">
         <FilterBar
@@ -494,11 +498,11 @@ class BadgeDetails extends PureComponent {
                     (!latestRequest.dispute ||
                       (latestRequest.dispute.status ===
                         tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
-                        time > 0)) && (
+                        !countdownCompleted)) && (
                       <>
                         {!latestRequest.dispute ? (
                           <>
-                            {time > 0 && !countdownCompleted && (
+                            {!countdownCompleted && (
                               <span
                                 style={{
                                   display: 'flex',
@@ -516,6 +520,9 @@ class BadgeDetails extends PureComponent {
                                   />
                                   {'Challenge Deadline '}
                                   <Countdown
+                                    onStart={() =>
+                                      this.onCountdownComplete(time)
+                                    }
                                     date={Date.now() + time}
                                     renderer={CountdownRenderer}
                                     onComplete={this.onCountdownComplete}
@@ -529,9 +536,7 @@ class BadgeDetails extends PureComponent {
                             {latestRequest.dispute.status ===
                               tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
                               <>
-                                {(SIDE !== tcrConstants.SIDE.None ||
-                                  !decisiveRuling) &&
-                                !countdownCompleted ? (
+                                {!decisiveRuling && !countdownCompleted ? (
                                   <span
                                     style={{
                                       display: 'flex',
@@ -556,6 +561,9 @@ class BadgeDetails extends PureComponent {
                                         <Countdown
                                           date={Date.now() + time}
                                           renderer={CountdownRenderer}
+                                          onStart={() =>
+                                            this.onCountdownComplete(time)
+                                          }
                                           onComplete={this.onCountdownComplete}
                                         />
                                       </div>
@@ -590,6 +598,11 @@ class BadgeDetails extends PureComponent {
                                                 Date.now() + winnerRemainingTime
                                               }
                                               renderer={CountdownRenderer}
+                                              onStart={() =>
+                                                this.onCountdownComplete(
+                                                  winnerRemainingTime
+                                                )
+                                              }
                                               onComplete={
                                                 this.onWinnerCountdownComplete
                                               }
@@ -598,44 +611,46 @@ class BadgeDetails extends PureComponent {
                                         </div>
                                       </span>
                                     )}
-                                    {loserRemainingTime > 0 &&
-                                      !loserCountdownCompleted && (
-                                        <span
-                                          style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            margin: '5px 0 5px auto',
-                                            fontSize: '14px'
-                                          }}
+                                    {!loserCountdownCompleted && (
+                                      <span
+                                        style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          margin: '5px 0 5px auto',
+                                          fontSize: '14px'
+                                        }}
+                                      >
+                                        <div
+                                          className="BadgeDetails-timer"
+                                          style={{ display: 'flex' }}
                                         >
-                                          <div
-                                            className="BadgeDetails-timer"
-                                            style={{ display: 'flex' }}
-                                          >
-                                            <FontAwesomeIcon
-                                              className="BadgeDetails-icon"
-                                              color={
-                                                tcrConstants
-                                                  .STATUS_COLOR_ENUM[4]
+                                          <FontAwesomeIcon
+                                            className="BadgeDetails-icon"
+                                            color={
+                                              tcrConstants.STATUS_COLOR_ENUM[4]
+                                            }
+                                            icon="clock"
+                                          />
+                                          <div>
+                                            {'Loser Deadline '}
+                                            <Countdown
+                                              date={
+                                                Date.now() + loserRemainingTime
                                               }
-                                              icon="clock"
-                                            />
-                                            <div>
-                                              {'Loser Deadline '}
-                                              <Countdown
-                                                date={
-                                                  Date.now() +
+                                              renderer={CountdownRenderer}
+                                              onComplete={
+                                                this.onLoserCountdownComplete
+                                              }
+                                              onStart={() =>
+                                                this.onCountdownComplete(
                                                   loserRemainingTime
-                                                }
-                                                renderer={CountdownRenderer}
-                                                onComplete={
-                                                  this.onLoserCountdownComplete
-                                                }
-                                              />
-                                            </div>
+                                                )
+                                              }
+                                            />
                                           </div>
-                                        </span>
-                                      )}
+                                        </div>
+                                      </span>
+                                    )}
                                   </>
                                 )}
                               </>
@@ -690,12 +705,12 @@ class BadgeDetails extends PureComponent {
                   >
                     <FontAwesomeIcon
                       className="BadgeDetails-icon"
-                      icon="gavel"
+                      icon="coins"
                     />
                     {(decisiveRuling
                     ? !winnerCountdownCompleted || !loserCountdownCompleted
                     : !countdownCompleted)
-                      ? 'Fund Appeal'
+                      ? 'Contribute Fees'
                       : 'Waiting Enforcement'}
                   </Button>
                 ) : (
