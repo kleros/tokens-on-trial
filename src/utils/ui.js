@@ -75,3 +75,8 @@ export const userFriendlyLabel = {
   'My Submissions': 'My Requests',
   'My Challenges': 'My Challenges'
 }
+
+export const truncateETHValue = str => {
+  if (str.indexOf('.') === -1) return str
+  return str.substring(0, str.indexOf('.') + 4)
+}

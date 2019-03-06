@@ -12,7 +12,8 @@ import {
   arbitrableAddressList,
   arbitrator,
   web3,
-  archon
+  archon,
+  FILE_BASE_URL
 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
@@ -389,7 +390,7 @@ class TokenDetails extends PureComponent {
             src={`${
               token.symbolMultihash && token.symbolMultihash[0] === '/'
                 ? `https://ipfs.kleros.io/`
-                : `https://staging-cfs.s3.us-east-2.amazonaws.com/`
+                : `${FILE_BASE_URL}/`
             }${token.symbolMultihash}`}
           />
           <div className="TokenDetails-card">

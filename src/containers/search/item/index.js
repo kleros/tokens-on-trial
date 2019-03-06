@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 
 import { truncateMiddle } from '../../../utils/ui'
-import { web3 } from '../../../bootstrap/dapp-api'
+import { web3, FILE_BASE_URL } from '../../../bootstrap/dapp-api'
 
 import './item.css'
 
@@ -15,9 +15,7 @@ const SearchItem = ({ onClick, item }) => (
       src={
         item.symbolMultihash && item.symbolMultihash[0] === '/'
           ? `https://ipfs.kleros.io${item.symbolMultihash}`
-          : `https://staging-cfs.s3.us-east-2.amazonaws.com/${
-              item.symbolMultihash
-            }`
+          : `${FILE_BASE_URL}/${item.symbolMultihash}`
       }
     />
     <div className="SearchItem-text">

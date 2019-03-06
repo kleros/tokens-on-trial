@@ -13,7 +13,8 @@ import {
   arbitrator,
   web3,
   ETHFINEX_CRITERIA_URL,
-  archon
+  archon,
+  FILE_BASE_URL
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
@@ -355,9 +356,7 @@ class BadgeDetails extends PureComponent {
                   badge.token
                     ? badge.token.symbolMultihash[0] === '/'
                       ? `https://ipfs.kleros.io/${badge.token.symbolMultihash}`
-                      : `https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                          badge.token.symbolMultihash
-                        }`
+                      : `${FILE_BASE_URL}/${badge.token.symbolMultihash}`
                     : UnknownToken
                 }`}
               />
