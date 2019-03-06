@@ -183,7 +183,7 @@ const FundAppeal = ({
                           .mul(
                             web3.utils.toBN(
                               !decisiveRuling(item)
-                                ? String(tcr.data.loserStakeMultiplier)
+                                ? String(tcr.data.sharedStakeMultiplier)
                                 : isLosingSide(item, side)
                                 ? String(tcr.data.loserStakeMultiplier)
                                 : String(tcr.data.winnerStakeMultiplier)
