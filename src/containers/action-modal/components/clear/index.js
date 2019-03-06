@@ -12,7 +12,7 @@ import './clear.css'
 const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
   <div>
     <h3 className="Modal-title">
-      {!badge ? `Clear ${item.name}` : 'Remove Badge'}
+      {!badge ? `Remove ${item.name}` : 'Remove Badge'}
     </h3>
     <hr />
     <br />

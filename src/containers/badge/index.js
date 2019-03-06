@@ -536,7 +536,8 @@ class BadgeDetails extends PureComponent {
                             {latestRequest.dispute.status ===
                               tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
                               <>
-                                {!decisiveRuling && !countdownCompleted ? (
+                                {!decisiveRuling ||
+                                SIDE === tcrConstants.SIDE.None ? (
                                   <span
                                     style={{
                                       display: 'flex',
