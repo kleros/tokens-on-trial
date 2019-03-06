@@ -5,13 +5,16 @@ import readFile from '../utils/read-file'
 import {
   arbitrableAddressList,
   arbitrator,
-  archon
+  archon,
+  web3
 } from '../bootstrap/dapp-api'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 
 import ipfsPublish from './api/ipfs-publish'
+
+const { toBN } = web3.utils
 
 /**
  * Fetches the arbitrable address list's data.
@@ -57,14 +60,14 @@ export function* fetchArbitrableAddressListData() {
   return {
     arbitrator: d.arbitrator,
     governor: d.governor,
-    requesterBaseDeposit: Number(d.requesterBaseDeposit),
-    challengerBaseDeposit: Number(d.challengerBaseDeposit),
+    requesterBaseDeposit: toBN(d.requesterBaseDeposit),
+    challengerBaseDeposit: toBN(d.challengerBaseDeposit),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
-    arbitrationCost: Number(arbitrationCost),
-    winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
-    loserStakeMultiplier: Number(d.loserStakeMultiplier),
-    sharedStakeMultiplier: Number(d.sharedStakeMultiplier),
-    MULTIPLIER_DIVISOR: Number(d.MULTIPLIER_DIVISOR),
+    arbitrationCost: toBN(arbitrationCost),
+    winnerStakeMultiplier: toBN(d.winnerStakeMultiplier),
+    loserStakeMultiplier: toBN(d.loserStakeMultiplier),
+    sharedStakeMultiplier: toBN(d.sharedStakeMultiplier),
+    MULTIPLIER_DIVISOR: toBN(d.MULTIPLIER_DIVISOR),
     countByStatus: tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
         acc[value] = Number(d.countByStatus[value.toLowerCase()])
