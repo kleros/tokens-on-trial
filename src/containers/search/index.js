@@ -86,7 +86,9 @@ class SearchBar extends PureComponent {
                               .includes(inputValue.toLowerCase()) ||
                               item.ticker
                                 .toLowerCase()
-                                .includes(inputValue.toLowerCase()))
+                                .includes(inputValue.toLowerCase()) ||
+                              item.address.toLowerCase() ===
+                                inputValue.toLowerCase())
                         )
                         .map((item, index) => (
                           <Item
