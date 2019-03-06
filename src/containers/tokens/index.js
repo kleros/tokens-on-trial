@@ -69,6 +69,16 @@ class Tokens extends Component {
           } else return false
         })
         .sort((a, b) => {
+          if (
+            Number(a.latestRequest.submissionTime) >
+            Number(b.latestRequest.submissionTime)
+          )
+            return -1
+          if (
+            Number(a.latestRequest.submissionTime) <
+            Number(b.latestRequest.submissionTime)
+          )
+            return 1
           if (a.status > 1 && b.status <= 1) return -1
           if (a.status <= 1 && b.status > 1) return 1
           if (a.badge.status > 1 && b.badge.status <= 1) return -1
