@@ -626,11 +626,11 @@ class TokenDetails extends PureComponent {
                       : countdownCompleted
                   }
                 >
-                  <FontAwesomeIcon className="TokenDetails-icon" icon="gavel" />
+                  <FontAwesomeIcon className="TokenDetails-icon" icon="coins" />
                   {(decisiveRuling
                   ? !winnerCountdownCompleted || !loserCountdownCompleted
-                  : !countdownCompleted)
-                    ? 'Fund Appeal'
+                  : !countdownCompleted && time > 0)
+                    ? 'Contribute Fees'
                     : 'Waiting Enforcement'}
                 </Button>
               ) : (
