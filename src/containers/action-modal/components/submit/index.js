@@ -104,7 +104,8 @@ const Submit = ({
         <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
         <div style={{ marginLeft: '5px' }}>
           <i>
-            Please ensure the logo is a transparent <strong>PNG</strong>.
+            Please ensure the logo is a transparent high resolution{' '}
+            <strong>PNG</strong>.
           </i>
         </div>
         <br />
