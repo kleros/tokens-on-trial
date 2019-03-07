@@ -105,14 +105,7 @@ class NotificationBadge extends PureComponent {
                         <div className="NotificationBadge-notifications-notification-content-message">
                           {n.message}
                         </div>
-                        <div
-                          className="NotificationBadge-notifications-notification-content-footer"
-                          style={{
-                            color: n.clientStatus
-                              ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                              : tcrConstants.STATUS_COLOR_ENUM[0]
-                          }}
-                        >
+                        <div className="NotificationBadge-notifications-notification-content-footer">
                           <TimeAgo datetime={n.date} />
                         </div>
                       </div>

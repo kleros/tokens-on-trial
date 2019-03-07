@@ -23,7 +23,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, getBadgeStyle } from '../../utils/ui'
+import { getRemainingTime, getBadgeStyle, rulingMessage } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -36,8 +36,6 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 
 import './token.css'
-
-const { toBN } = web3.utils
 
 class TokenDetails extends PureComponent {
   static propTypes = {
@@ -76,7 +74,8 @@ class TokenDetails extends PureComponent {
     countdownCompleted: false,
     appealModalOpen: false,
     loserCountdownCompleted: false,
-    winnerCountdownCompleted: false
+    winnerCountdownCompleted: false,
+    evidenceListenerSet: false
   }
 
   handleFilterChange = key => {
@@ -173,42 +172,6 @@ class TokenDetails extends PureComponent {
 
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitrableTokenList.events.Evidence({ fromBlock: 0 }).on('data', e => {
-      const { token } = this.state
-      if (!token) return
-      const { latestRequest } = token
-
-      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-        return
-
-      archon.arbitrable
-        .getEvidence(
-          arbitrableTokenList._address,
-          arbitrator._address,
-          latestRequest.evidenceGroupID
-        )
-        .then(resp =>
-          resp
-            .filter(
-              evidence =>
-                evidence.evidenceJSONValid &&
-                (evidence.evidenceJSON.fileURI.length === 0 ||
-                  evidence.fileValid)
-            )
-            .forEach(evidence => {
-              const { evidences } = this.state
-              const { evidenceJSON } = evidence
-              const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-              evidenceJSON.icon = getFileIcon(mimeType)
-              this.setState({
-                evidences: {
-                  ...evidences,
-                  [evidence.transactionHash]: evidenceJSON
-                }
-              })
-            })
-        )
-    })
   }
 
   withdrawFunds = () => {
@@ -254,11 +217,58 @@ class TokenDetails extends PureComponent {
 
   componentDidUpdate() {
     const { match, fetchToken } = this.props
-    const { token, fetching } = this.state
+    const { token, fetching, evidenceListenerSet } = this.state
     const { tokenID } = match.params
     if (token && token.ID !== tokenID && !fetching) {
       fetchToken(tokenID)
       this.setState({ fetching: true })
+    }
+
+    if (token && !evidenceListenerSet && token.ID === tokenID) {
+      arbitrableTokenList.events
+        .Evidence({
+          fromBlock: 0,
+          filter: {
+            _evidenceGroupID: token.latestRequest.evidenceGroupID
+          }
+        })
+        .on('data', e => {
+          const { token } = this.state
+          if (!token) return
+          const { latestRequest } = token
+
+          if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+            return
+
+          archon.arbitrable
+            .getEvidence(
+              arbitrableTokenList._address,
+              arbitrator._address,
+              latestRequest.evidenceGroupID
+            )
+            .then(resp =>
+              resp
+                .filter(
+                  evidence =>
+                    evidence.evidenceJSONValid &&
+                    (evidence.evidenceJSON.fileURI.length === 0 ||
+                      evidence.fileValid)
+                )
+                .forEach(evidence => {
+                  const { evidences } = this.state
+                  const { evidenceJSON } = evidence
+                  const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                  evidenceJSON.icon = getFileIcon(mimeType)
+                  this.setState({
+                    evidences: {
+                      ...evidences,
+                      [evidence.transactionHash]: evidenceJSON
+                    }
+                  })
+                })
+            )
+        })
+      this.setState({ evidenceListenerSet: true })
     }
   }
 
@@ -271,6 +281,7 @@ class TokenDetails extends PureComponent {
       winnerCountdownCompleted,
       token
     } = this.state
+
     const { accounts, filter, match, arbitrableTokenListData } = this.props
     const { filters } = filter
     const { tokenID } = match.params
@@ -368,18 +379,21 @@ class TokenDetails extends PureComponent {
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
-      !latestRequest.latestRound.appealed &&
-      latestRound.requiredForSide[1].gt(toBN(0)) &&
-      latestRound.requiredForSide[2].gt(toBN(0))
+      !latestRequest.latestRound.appealed
     ) {
-      requesterFeesPercent =
-        (Number(latestRound.paidFees[1]) /
-          Number(latestRound.requiredForSide[1])) *
-        100
-      challengerFeesPercent =
-        (Number(latestRound.paidFees[2]) /
-          Number(latestRound.requiredForSide[2])) *
-        100
+      if (!latestRound.hasPaid[1])
+        requesterFeesPercent =
+          (Number(latestRound.paidFees[1]) /
+            Number(latestRound.requiredForSide[1])) *
+          100
+      else requesterFeesPercent = 100
+
+      if (!latestRound.hasPaid[2])
+        challengerFeesPercent =
+          (Number(latestRound.paidFees[2]) /
+            Number(latestRound.requiredForSide[2])) *
+          100
+      else challengerFeesPercent = 100
     }
 
     /* eslint-disable react/jsx-no-bind */
@@ -459,6 +473,15 @@ class TokenDetails extends PureComponent {
                         alignItems: 'center',
                         color: '#3d464d'
                       }}
+                      data-tip={
+                        latestRequest.dispute.ruling.toString() !== '0'
+                          ? ''
+                          : `If the requester does not fully fund, the token will ${
+                              token.status.toString() === '2'
+                                ? 'not be added'
+                                : 'not be removed'
+                            } and parties will be reimbursed.`
+                      }
                     >
                       <FontAwesomeIcon
                         className="TokenDetails-icon"
@@ -466,15 +489,14 @@ class TokenDetails extends PureComponent {
                         icon="balance-scale"
                         style={{ marginRight: '10px' }}
                       />
-                      Arbitration Result:{' '}
                       {latestRequest.dispute.ruling.toString() !== '0'
-                        ? tcrConstants.RULING_OPTIONS[
-                            latestRequest.dispute.ruling
-                          ]
-                        : 'Arbitrator Did Not Rule'}{' '}
-                      {latestRequest.dispute.ruling.toString() !== '0'
-                        ? 'Request'
-                        : ''}
+                        ? rulingMessage(
+                            decisiveRuling,
+                            SIDE !== tcrConstants.SIDE.None,
+                            losingSide,
+                            latestRequest.dispute.ruling.toString()
+                          )
+                        : 'Jurors did not rule.'}
                     </span>
                   )}
                 {!(
@@ -488,17 +510,21 @@ class TokenDetails extends PureComponent {
                     latestRequest.dispute.status ===
                       tcrConstants.DISPUTE_STATUS.Appealable.toString()) && (
                     <>
-                      {!latestRequest.dispute ? (
+                      {!latestRequest.disputed && !latestRequest.dispute ? (
                         <>
                           {!countdownCompleted && (
                             <span
                               className="TokenDetails-meta-item"
-                              style={{ display: 'flex', alignItems: 'center' }}
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                color: '#f60c36'
+                              }}
                             >
                               <div className="BadgeDetails-timer">
                                 <FontAwesomeIcon
                                   className="TokenDetails-icon"
-                                  color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                  color="#f60c36"
                                   icon="clock"
                                 />
                                 {'Challenge Deadline '}
@@ -522,13 +548,14 @@ class TokenDetails extends PureComponent {
                                   className="TokenDetails-meta-item"
                                   style={{
                                     display: 'flex',
-                                    alignItems: 'center'
+                                    alignItems: 'center',
+                                    color: '#f60c36'
                                   }}
                                 >
                                   <div className="BadgeDetails-timer">
                                     <FontAwesomeIcon
                                       className="TokenDetails-icon"
-                                      color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                      color="#f60c36"
                                       icon="clock"
                                     />
                                     {'Appeal Deadline '}
@@ -548,15 +575,14 @@ class TokenDetails extends PureComponent {
                                     className="TokenDetails-meta-item"
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center'
+                                      alignItems: 'center',
+                                      color: '#f60c36'
                                     }}
                                   >
                                     <div className="BadgeDetails-timer">
                                       <FontAwesomeIcon
                                         className="TokenDetails-icon"
-                                        color={
-                                          tcrConstants.STATUS_COLOR_ENUM[4]
-                                        }
+                                        color="#f60c36"
                                         icon="clock"
                                       />
                                       {'Winner Deadline '}
@@ -578,15 +604,14 @@ class TokenDetails extends PureComponent {
                                     className="TokenDetails-meta-item"
                                     style={{
                                       display: 'flex',
-                                      alignItems: 'center'
+                                      alignItems: 'center',
+                                      color: '#f60c36'
                                     }}
                                   >
                                     <div className="BadgeDetails-timer">
                                       <FontAwesomeIcon
                                         className="TokenDetails-icon"
-                                        color={
-                                          tcrConstants.STATUS_COLOR_ENUM[4]
-                                        }
+                                        color="#f60c36"
                                         icon="clock"
                                       />
                                       {'Loser Deadline '}
@@ -618,7 +643,10 @@ class TokenDetails extends PureComponent {
                 Number(latestRequest.dispute.status) ===
                   tcrConstants.DISPUTE_STATUS.Appealable &&
                 latestRequest.numberOfRounds > 1 && (
-                  <div className="TokenDetails-meta">
+                  <div
+                    className="TokenDetails-meta"
+                    data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
+                  >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
                         color="#009aff"

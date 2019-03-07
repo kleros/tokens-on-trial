@@ -25,7 +25,7 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, truncateMiddle } from '../../utils/ui'
+import { getRemainingTime, truncateMiddle, rulingMessage } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -38,8 +38,6 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 
 import './badge.css'
-
-const { toBN } = web3.utils
 
 class BadgeDetails extends PureComponent {
   static propTypes = {
@@ -73,7 +71,8 @@ class BadgeDetails extends PureComponent {
     evidences: [],
     appealModalOpen: false,
     loserCountdownCompleted: false,
-    winnerCountdownCompleted: false
+    winnerCountdownCompleted: false,
+    evidenceListenerSet: false
   }
 
   handleFilterChange = key => {
@@ -164,44 +163,6 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr)
     })
-    arbitrableAddressList.events
-      .Evidence({ fromBlock: 0 })
-      .on('data', async e => {
-        const { badge } = this.state
-        if (!badge) return
-        const { latestRequest } = badge
-
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-
-        archon.arbitrable
-          .getEvidence(
-            arbitrableAddressList._address,
-            arbitrator._address,
-            latestRequest.evidenceGroupID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence =>
-                  evidence.evidenceJSONValid &&
-                  (evidence.evidenceJSON.fileURI.length === 0 ||
-                    evidence.fileValid)
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
-              })
-          )
-      })
     arbitrableAddressList.events.Ruling().on('data', event => {
       const { badge } = this.state
       if (!badge) return
@@ -234,11 +195,58 @@ class BadgeDetails extends PureComponent {
 
   componentDidUpdate() {
     const { match, fetchBadge } = this.props
-    const { badge, fetching } = this.state
+    const { badge, fetching, evidenceListenerSet } = this.state
     const { tokenAddr } = match.params
     if (badge && badge.addr !== tokenAddr && !fetching) {
       fetchBadge(tokenAddr)
       this.setState({ fetching: true })
+    }
+
+    if (badge && !evidenceListenerSet && badge.addr === tokenAddr) {
+      arbitrableAddressList.events
+        .Evidence({
+          fromBlock: 0,
+          filter: {
+            _evidenceGroupID: badge.latestRequest.evidenceGroupID
+          }
+        })
+        .on('data', e => {
+          const { badge } = this.state
+          if (!badge) return
+          const { latestRequest } = badge
+
+          if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+            return
+
+          archon.arbitrable
+            .getEvidence(
+              arbitrableAddressList._address,
+              arbitrator._address,
+              latestRequest.evidenceGroupID
+            )
+            .then(resp =>
+              resp
+                .filter(
+                  evidence =>
+                    evidence.evidenceJSONValid &&
+                    (evidence.evidenceJSON.fileURI.length === 0 ||
+                      evidence.fileValid)
+                )
+                .forEach(evidence => {
+                  const { evidences } = this.state
+                  const { evidenceJSON } = evidence
+                  const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                  evidenceJSON.icon = getFileIcon(mimeType)
+                  this.setState({
+                    evidences: {
+                      ...evidences,
+                      [evidence.transactionHash]: evidenceJSON
+                    }
+                  })
+                })
+            )
+        })
+      this.setState({ evidenceListenerSet: true })
     }
   }
 
@@ -348,19 +356,21 @@ class BadgeDetails extends PureComponent {
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
-      !latestRequest.latestRound.appealed &&
-      latestRound.requiredForSide[1].gt(toBN(0)) &&
-      latestRound.requiredForSide[2].gt(toBN(0))
+      !latestRequest.latestRound.appealed
     ) {
-      requesterFeesPercent =
-        (Number(latestRound.paidFees[1]) /
-          Number(latestRound.requiredForSide[1])) *
-        100
+      if (!latestRound.hasPaid[1])
+        requesterFeesPercent =
+          (Number(latestRound.paidFees[1]) /
+            Number(latestRound.requiredForSide[1])) *
+          100
+      else requesterFeesPercent = 100
 
-      challengerFeesPercent =
-        (Number(latestRound.paidFees[2]) /
-          Number(latestRound.requiredForSide[2])) *
-        100
+      if (!latestRound.hasPaid[2])
+        challengerFeesPercent =
+          (Number(latestRound.paidFees[2]) /
+            Number(latestRound.requiredForSide[2])) *
+          100
+      else challengerFeesPercent = 100
     }
 
     /* eslint-disable react/jsx-no-bind */
@@ -450,43 +460,13 @@ class BadgeDetails extends PureComponent {
                   </p>
                 </div>
                 <div
-                  style={{ display: 'flex', marginTop: 'auto', width: '100%' }}
+                  style={{
+                    display: 'flex',
+                    marginTop: 'auto',
+                    width: '100%',
+                    alignItems: 'flex-start'
+                  }}
                 >
-                  <div
-                    className="BadgeDetails-meta"
-                    style={{ marginRight: 'auto' }}
-                  >
-                    <span
-                      className="BadgeDetails-meta--aligned BadgeDetails-timer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#3d464d'
-                      }}
-                    >
-                      <a
-                        className="BadgeDetails--link"
-                        href={`https://etherscan.io/address/${tokenAddr}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <div
-                          className="BadgeDetails-meta--aligned"
-                          style={{ display: 'flex', alignItems: 'center' }}
-                        >
-                          <Img
-                            className="BadgeDetails-icon BadgeDetails-meta--aligned"
-                            src={Etherscan}
-                          />
-                          <div style={{ marginRight: '14px' }}>
-                            {truncateMiddle(
-                              web3.utils.toChecksumAddress(tokenAddr)
-                            )}
-                          </div>
-                        </div>
-                      </a>
-                    </span>
-                  </div>
                   {latestRequest.dispute &&
                     Number(latestRequest.dispute.status) ===
                       tcrConstants.DISPUTE_STATUS.Appealable &&
@@ -497,8 +477,18 @@ class BadgeDetails extends PureComponent {
                           display: 'flex',
                           alignItems: 'center',
                           color: '#3d464d',
-                          fontSize: '14px'
+                          fontSize: '14px',
+                          marginRight: '14px'
                         }}
+                        data-tip={
+                          latestRequest.dispute.ruling.toString() !== '0'
+                            ? ''
+                            : `If the requester does not fully fund, the badge will ${
+                                badge.status.toString() === '2'
+                                  ? 'not be added'
+                                  : 'not be removed'
+                              } and parties will be reimbursed.`
+                        }
                       >
                         <FontAwesomeIcon
                           className="BadgeDetails-icon"
@@ -506,15 +496,14 @@ class BadgeDetails extends PureComponent {
                           icon="balance-scale"
                           style={{ marginRight: '10px' }}
                         />
-                        Arbitration Result:{' '}
                         {latestRequest.dispute.ruling.toString() !== '0'
-                          ? tcrConstants.RULING_OPTIONS[
-                              latestRequest.dispute.ruling
-                            ]
-                          : 'Arbitrator Did Not Rule'}{' '}
-                        {latestRequest.dispute.ruling.toString() !== '0'
-                          ? 'Request'
-                          : ''}
+                          ? rulingMessage(
+                              decisiveRuling,
+                              SIDE !== tcrConstants.SIDE.None,
+                              losingSide,
+                              latestRequest.dispute.ruling.toString()
+                            )
+                          : 'Jurors did not rule.'}
                       </span>
                     )}
                   {!(
@@ -529,7 +518,7 @@ class BadgeDetails extends PureComponent {
                         tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
                         !countdownCompleted)) && (
                       <>
-                        {!latestRequest.dispute ? (
+                        {!latestRequest.disputed && !latestRequest.dispute ? (
                           <>
                             {!countdownCompleted && (
                               <span
@@ -540,11 +529,11 @@ class BadgeDetails extends PureComponent {
                               >
                                 <div
                                   className="BadgeDetails-timer"
-                                  style={{ fontSize: '14px' }}
+                                  style={{ fontSize: '14px', color: '#f60c36' }}
                                 >
                                   <FontAwesomeIcon
                                     className="BadgeDetails-icon"
-                                    color={tcrConstants.STATUS_COLOR_ENUM[4]}
+                                    color="#f60c36"
                                     icon="clock"
                                   />
                                   {'Challenge Deadline '}
@@ -576,13 +565,14 @@ class BadgeDetails extends PureComponent {
                                   >
                                     <div
                                       className="BadgeDetails-timer"
-                                      style={{ display: 'flex' }}
+                                      style={{
+                                        display: 'flex',
+                                        color: '#f60c36'
+                                      }}
                                     >
                                       <FontAwesomeIcon
                                         className="BadgeDetails-icon"
-                                        color={
-                                          tcrConstants.STATUS_COLOR_ENUM[4]
-                                        }
+                                        color="#f60c36"
                                         icon="clock"
                                       />
                                       <div>
@@ -610,13 +600,14 @@ class BadgeDetails extends PureComponent {
                                     >
                                       <div
                                         className="BadgeDetails-timer"
-                                        style={{ display: 'flex' }}
+                                        style={{
+                                          display: 'flex',
+                                          color: '#f60c36'
+                                        }}
                                       >
                                         <FontAwesomeIcon
                                           className="BadgeDetails-icon"
-                                          color={
-                                            tcrConstants.STATUS_COLOR_ENUM[4]
-                                          }
+                                          color="#f60c36"
                                           icon="clock"
                                         />
                                         <div>
@@ -648,13 +639,14 @@ class BadgeDetails extends PureComponent {
                                     >
                                       <div
                                         className="BadgeDetails-timer"
-                                        style={{ display: 'flex' }}
+                                        style={{
+                                          display: 'flex',
+                                          color: '#f60c36'
+                                        }}
                                       >
                                         <FontAwesomeIcon
                                           className="BadgeDetails-icon"
-                                          color={
-                                            tcrConstants.STATUS_COLOR_ENUM[4]
-                                          }
+                                          color="#f60c36"
                                           icon="clock"
                                         />
                                         <div>
@@ -694,6 +686,7 @@ class BadgeDetails extends PureComponent {
                   <div
                     className="TokenDetails-meta"
                     style={{ margin: 0, marginRight: '26px' }}
+                    data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
@@ -765,6 +758,38 @@ class BadgeDetails extends PureComponent {
                   tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
                 )}
               </span>
+              <div className="BadgeDetails-meta" style={{ marginLeft: '14px' }}>
+                <span
+                  className="BadgeDetails-meta--aligned BadgeDetails-timer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#3d464d'
+                  }}
+                >
+                  <a
+                    className="BadgeDetails--link"
+                    href={`https://etherscan.io/address/${tokenAddr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div
+                      className="BadgeDetails-meta--aligned"
+                      style={{ display: 'flex', alignItems: 'center' }}
+                    >
+                      <Img
+                        className="BadgeDetails-icon BadgeDetails-meta--aligned"
+                        src={Etherscan}
+                      />
+                      <div style={{ marginRight: '14px' }}>
+                        {truncateMiddle(
+                          web3.utils.toChecksumAddress(tokenAddr)
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                </span>
+              </div>
               <div style={{ marginLeft: 'auto', marginRight: '26px' }}>
                 {Number(badge.status) > 1 &&
                 latestRequest.dispute &&

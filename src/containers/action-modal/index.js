@@ -161,6 +161,25 @@ class ActionModal extends PureComponent {
     })
   }
 
+  handleOnImageDropAccepted = ([file]) => {
+    if (file.type !== 'image/png')
+      return this.setState({
+        file: null,
+        fileInfoMessage: 'File should be a PNG with a transparent background.'
+      })
+
+    if (file.size > 1e6)
+      return this.setState({
+        file: null,
+        fileInfoMessage: 'File is too big. It must be less than 1MB.'
+      })
+
+    this.setState({
+      file,
+      fileInfoMessage: null
+    })
+  }
+
   handleSubmitEvidenceClick = evidence => {
     const { submitTokenEvidence, closeActionModal, token } = this.props
     const { file } = this.state
@@ -364,6 +383,12 @@ class ActionModal extends PureComponent {
     closeActionModal()
   }
 
+  handleRequestClose = () => {
+    const { closeActionModal } = this.props
+    this.setState({ file: null, fileInfoMessage: null })
+    closeActionModal()
+  }
+
   componentDidMount() {
     const {
       fetchArbitrableTokenListData,
@@ -418,7 +443,7 @@ class ActionModal extends PureComponent {
       <Modal
         className="ActionModal"
         isOpen={openActionModal !== null}
-        onRequestClose={closeActionModal}
+        onRequestClose={this.handleRequestClose}
       >
         {(() => {
           switch (openActionModal) {
@@ -433,7 +458,7 @@ class ActionModal extends PureComponent {
                   file={file}
                   formIsInvalid={tokenFormIsInvalid}
                   fileInfoMessage={fileInfoMessage}
-                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  handleOnFileDropAccepted={this.handleOnImageDropAccepted}
                   closeActionModal={this.handleCloseTokenSubmission}
                   item={
                     openActionModal === modalConstants.ACTION_MODAL_ENUM.Submit
