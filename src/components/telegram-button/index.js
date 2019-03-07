@@ -13,10 +13,10 @@ export default class TelegramButton extends PureComponent {
     const { show } = this.state
     return (
       show && (
-        <div class="TelegramButton">
+        <div className="TelegramButton">
           <button
             onClick={this.onCloseButtonClick}
-            class="TelegramButton-closeButton"
+            className="TelegramButton-closeButton"
           >
             x
           </button>
@@ -26,12 +26,12 @@ export default class TelegramButton extends PureComponent {
             rel="noopener noreferrer"
           >
             <img
-              class="TelegramButton-image"
+              className="TelegramButton-image"
               src={telegramButton}
               alt="Telegram Button"
             />
           </a>
-          <div class="TelegramButton-help">Help</div>
+          <div className="TelegramButton-help">Help</div>
         </div>
       )
     )
