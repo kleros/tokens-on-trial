@@ -42,7 +42,6 @@ const emitBadgeNotifications = async (
   for (const event of events.reverse()) {
     const { returnValues, transactionHash } = event
 
-    console.info('1', returnValues)
     if (notifiedTxs[transactionHash]) continue
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
@@ -56,8 +55,6 @@ const emitBadgeNotifications = async (
       }
     )
 
-    console.info('2')
-
     const tokenIDs = (await arbitrableTokenList.methods
       .queryTokens(
         ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
@@ -67,8 +64,6 @@ const emitBadgeNotifications = async (
         returnValues._address // The token address for which to return the submissions.
       )
       .call()).values.filter(ID => ID !== ZERO_ID)
-
-    console.info('4')
 
     let token
     if (tokenIDs && tokenIDs.length > 0)
@@ -175,7 +170,6 @@ const emitBadgeNotifications = async (
         break
       }
     }
-    console.info('5')
 
     const clientStatus = contractStatusToClientStatus(
       returnValues._status,
