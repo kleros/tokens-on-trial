@@ -520,7 +520,7 @@ class BadgeDetails extends PureComponent {
                                 latestRequest.dispute.ruling
                               ]
                             )
-                          : 'Jurors did not rule.'}{' '}
+                          : 'Jurors did not rule.'}
                       </span>
                     )}
                   {!(

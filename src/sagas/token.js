@@ -209,6 +209,8 @@ export function* fetchToken({ payload: { ID } }) {
         Number(token.numberOfRequests) - 1
       ).call
     )
+    if (token.latestRequest.arbitratorExtraData === null)
+      token.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
     token.latestRequest.evidenceGroupID = web3.utils
       .toBN(web3.utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
@@ -361,6 +363,8 @@ export function* fetchToken({ payload: { ID } }) {
           Number(badge.numberOfRequests) - 1
         ).call
       )
+      if (badge.latestRequest.arbitratorExtraData === null)
+        badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
       badge.latestRequest.evidenceGroupID = web3.utils
         .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))

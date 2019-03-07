@@ -1,6 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+
+import { getFileIcon } from '../../utils/evidence'
 
 import './file-picker.css'
 
@@ -10,15 +13,19 @@ const FilePicker = ({ message, file, imageFilePreviewURL, ...rest }) => (
       <div className="FilePicker-uploadInfo">
         <small>{message}</small>
       </div>
+    ) : imageFilePreviewURL ? (
+      <div
+        className="FilePicker-filePreview"
+        style={{ backgroundImage: `url(${imageFilePreviewURL})` }}
+      />
     ) : (
-      <>
-        {imageFilePreviewURL && (
-          <div
-            className="FilePicker-filePreview"
-            style={{ backgroundImage: `url(${imageFilePreviewURL})` }}
-          />
-        )}
-      </>
+      <div>
+        <FontAwesomeIcon
+          className="FilePicker-icon"
+          icon={getFileIcon(file.type)}
+        />{' '}
+        {file.name}
+      </div>
     )}
   </Dropzone>
 )

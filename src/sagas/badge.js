@@ -191,6 +191,9 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
           Number(submission.numberOfRequests) - 1
         ).call
       )
+      if (submission.latestRequest.arbitratorExtraData === null)
+        submission.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
+
       submission.clientStatus = contractStatusToClientStatus(
         submission.status,
         submission.latestRequest.disputed
@@ -210,6 +213,8 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
         Number(badge.numberOfRequests) - 1
       ).call
     )
+    if (badge.latestRequest.arbitratorExtraData === null)
+      badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
     tokens.push({
       ...submission,
@@ -267,6 +272,8 @@ export function* fetchBadge({ payload: { addr } }) {
         Number(badge.numberOfRequests) - 1
       ).call
     )
+    if (badge.latestRequest.arbitratorExtraData === null)
+      badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
     badge.latestRequest.evidenceGroupID = web3.utils
       .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))

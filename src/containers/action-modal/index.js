@@ -383,6 +383,12 @@ class ActionModal extends PureComponent {
     closeActionModal()
   }
 
+  handleRequestClose = () => {
+    const { closeActionModal } = this.props
+    this.setState({ file: null, fileInfoMessage: null })
+    closeActionModal()
+  }
+
   componentDidMount() {
     const {
       fetchArbitrableTokenListData,
@@ -437,7 +443,7 @@ class ActionModal extends PureComponent {
       <Modal
         className="ActionModal"
         isOpen={openActionModal !== null}
-        onRequestClose={closeActionModal}
+        onRequestClose={this.handleRequestClose}
       >
         {(() => {
           switch (openActionModal) {
