@@ -476,7 +476,11 @@ class TokenDetails extends PureComponent {
                       data-tip={
                         latestRequest.dispute.ruling.toString() !== '0'
                           ? ''
-                          : `If the requester doesn't receive appeal fee contributions, the request will fail and parties will be reimbursed.`
+                          : `If the requester does not fully fund, the token will ${
+                              token.status.toString() === '2'
+                                ? 'not be added'
+                                : 'not be removed'
+                            } and parties will be reimbursed.`
                       }
                     >
                       <FontAwesomeIcon
@@ -641,7 +645,7 @@ class TokenDetails extends PureComponent {
                 latestRequest.numberOfRounds > 1 && (
                   <div
                     className="TokenDetails-meta"
-                    data-tip="If the party that lost the last juror vote is fully funded but the winner is not, the loser will win the dispute."
+                    data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon

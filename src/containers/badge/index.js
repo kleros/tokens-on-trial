@@ -483,7 +483,11 @@ class BadgeDetails extends PureComponent {
                         data-tip={
                           latestRequest.dispute.ruling.toString() !== '0'
                             ? ''
-                            : `If the the party that lost is fully funded funds but the winner is not, the loser will win the dispute.`
+                            : `If the requester does not fully fund, the badge will ${
+                                badge.status.toString() === '2'
+                                  ? 'not be added'
+                                  : 'not be removed'
+                              } and parties will be reimbursed.`
                         }
                       >
                         <FontAwesomeIcon
@@ -682,7 +686,7 @@ class BadgeDetails extends PureComponent {
                   <div
                     className="TokenDetails-meta"
                     style={{ margin: 0, marginRight: '26px' }}
-                    data-tip="If the party that lost the last juror vote is fully funded but the winner is not, the loser will win the dispute."
+                    data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
