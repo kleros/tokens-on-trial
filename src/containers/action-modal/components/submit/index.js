@@ -80,9 +80,9 @@ const Submit = ({
           file={file}
           message={
             <span>
-              (Max Size: 1MB)
+              (Max Size: 1 MB)
               <br />
-              Drag file or click here
+              Drag your transparent PNG or click here.
             </span>
           }
           multiple={false}
@@ -103,7 +103,9 @@ const Submit = ({
       >
         <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
         <div style={{ marginLeft: '5px' }}>
-          <i>Please, upload the logo with a transparent background</i>
+          <i>
+            Please ensure the logo is a transparent <strong>PNG</strong>.
+          </i>
         </div>
         <br />
         <br />
