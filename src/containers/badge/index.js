@@ -706,7 +706,7 @@ class BadgeDetails extends PureComponent {
                   <div
                     className="TokenDetails-meta"
                     style={{ margin: 0, marginRight: '26px' }}
-                    data-tip="If there are appeal fee contributions, the party that received the most, wins."
+                    data-tip="If there are appeal fee contributions, but not enough to raise an appeal, the party that received the most, wins."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon

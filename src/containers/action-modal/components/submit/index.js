@@ -103,7 +103,7 @@ const Submit = ({
       >
         <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
         <div style={{ marginLeft: '5px' }}>
-          <i>Please, upload the logo with a transparent background</i>
+          <i>Please, upload the logo as a PNG with a transparent background</i>
         </div>
         <br />
         <br />
