@@ -521,9 +521,6 @@ class BadgeDetails extends PureComponent {
                               ]
                             )
                           : 'Jurors did not rule.'}{' '}
-                        {latestRequest.dispute.ruling.toString() !== '0'
-                          ? 'Request'
-                          : ''}
                       </span>
                     )}
                   {!(

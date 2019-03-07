@@ -84,8 +84,8 @@ export const rulingMessage = (
 ) => {
   if (!decisiveRuling) return 'Jurors did not rule.'
   if (!requesterOrChallenger) return defaultMessage
-  if (isLoser) return 'Jurors ruled against you'
-  else return 'Jurors ruled in your favor'
+  if (isLoser) return 'Jurors ruled against you.'
+  else return 'Jurors ruled in your favor.'
 }
 
 export const truncateETHValue = str => {
