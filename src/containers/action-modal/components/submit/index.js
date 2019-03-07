@@ -87,6 +87,7 @@ const Submit = ({
           }
           multiple={false}
           onDropAccepted={handleOnFileDropAccepted}
+          imageFilePreviewURL={file ? file.preview : null}
         />
       </>
     )}
