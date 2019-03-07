@@ -641,7 +641,7 @@ class TokenDetails extends PureComponent {
                 latestRequest.numberOfRounds > 1 && (
                   <div
                     className="TokenDetails-meta"
-                    data-tip="If a side receives fee contributions, but not enough are raised to appeal, the party that received the most wins."
+                    data-tip="If the party that lost is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon

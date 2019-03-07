@@ -483,7 +483,7 @@ class BadgeDetails extends PureComponent {
                         data-tip={
                           latestRequest.dispute.ruling.toString() !== '0'
                             ? ''
-                            : `If the requester doesn't receive appeal fee contributions, the request will fail and parties will be reimbursed.`
+                            : `If the the party that lost is fully funded funds but the winner is not, the loser will win the dispute.`
                         }
                       >
                         <FontAwesomeIcon
@@ -682,7 +682,7 @@ class BadgeDetails extends PureComponent {
                   <div
                     className="TokenDetails-meta"
                     style={{ margin: 0, marginRight: '26px' }}
-                    data-tip="If a side receives fee contributions, but not enough are raised to appeal, the party that received the most wins."
+                    data-tip="If the party that lost is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
