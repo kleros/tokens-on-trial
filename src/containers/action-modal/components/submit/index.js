@@ -90,7 +90,11 @@ const Submit = ({
         />
       </>
     )}
-    {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
+    {!badge && fileInfoMessage && (
+      <div style={{ color: '#f66e0c', fontSize: '12px', textAlign: 'start' }}>
+        {fileInfoMessage}
+      </div>
+    )}
     {!badge && !item && (
       <div
         style={{
