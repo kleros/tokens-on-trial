@@ -459,6 +459,11 @@ class TokenDetails extends PureComponent {
                         alignItems: 'center',
                         color: '#3d464d'
                       }}
+                      data-tip={
+                        latestRequest.dispute.ruling.toString() !== '0'
+                          ? ''
+                          : `If no sides receives appeal fees contributions, the token will revert to it's previous state.`
+                      }
                     >
                       <FontAwesomeIcon
                         className="TokenDetails-icon"
@@ -466,7 +471,6 @@ class TokenDetails extends PureComponent {
                         icon="balance-scale"
                         style={{ marginRight: '10px' }}
                       />
-                      Arbitration Result:{' '}
                       {latestRequest.dispute.ruling.toString() !== '0'
                         ? rulingMessage(
                             decisiveRuling,
@@ -626,7 +630,10 @@ class TokenDetails extends PureComponent {
                 Number(latestRequest.dispute.status) ===
                   tcrConstants.DISPUTE_STATUS.Appealable &&
                 latestRequest.numberOfRounds > 1 && (
-                  <div className="TokenDetails-meta">
+                  <div
+                    className="TokenDetails-meta"
+                    data-tip="If no one receives a contribution for appeals, current ruling will be enforced after the appeal period. If fees are contributed but not enough are raised for a new appeal, the party that received the most contributions will win."
+                  >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
                         color="#009aff"

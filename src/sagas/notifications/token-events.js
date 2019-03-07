@@ -89,7 +89,7 @@ const emitTokenNotifications = async (
               ? `${token.ticker} token submission successful.`
               : `Jurors ruled against you on ${token.ticker} token.`
           }`
-          successMessage = !!isRequester
+          successMessage = isRequester
         } else {
           message = `${
             isRequester
@@ -114,7 +114,7 @@ const emitTokenNotifications = async (
               ? `${token.ticker} token delisting successful.`
               : `Jurors ruled against you on the ${token.ticker} token.`
           }`
-          successMessage = !!isRequester
+          successMessage = isRequester
         }
         break
       }

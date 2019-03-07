@@ -129,7 +129,7 @@ const emitBadgeNotifications = async (
                   token ? `${token.ticker}` : 'the'
                 } badge challenge.`
           }`
-          successMessage = !!isRequester
+          successMessage = isRequester
         } else {
           message = `${
             isRequester
@@ -164,7 +164,7 @@ const emitBadgeNotifications = async (
                   token ? `${token.ticker}` : 'the'
                 } badge challenge.`
           }`
-          successMessage = !!isRequester
+          successMessage = isRequester
         }
         break
       }

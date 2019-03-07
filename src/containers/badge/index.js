@@ -499,6 +499,11 @@ class BadgeDetails extends PureComponent {
                           color: '#3d464d',
                           fontSize: '14px'
                         }}
+                        data-tip={
+                          latestRequest.dispute.ruling.toString() !== '0'
+                            ? ''
+                            : `If no sides receives appeal fees contributions, the token will revert to it's previous state.`
+                        }
                       >
                         <FontAwesomeIcon
                           className="BadgeDetails-icon"
@@ -506,7 +511,6 @@ class BadgeDetails extends PureComponent {
                           icon="balance-scale"
                           style={{ marginRight: '10px' }}
                         />
-                        Arbitration Result:{' '}
                         {latestRequest.dispute.ruling.toString() !== '0'
                           ? rulingMessage(
                               decisiveRuling,
@@ -702,6 +706,7 @@ class BadgeDetails extends PureComponent {
                   <div
                     className="TokenDetails-meta"
                     style={{ margin: 0, marginRight: '26px' }}
+                    data-tip="If no one receives a fee contribution for appeals, the current ruling will be enforced after the appeal period. If fees are contributed but not enough are raised for a new appeal, the party that received the most contributions will win."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
