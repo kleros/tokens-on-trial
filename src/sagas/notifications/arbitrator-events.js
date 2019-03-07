@@ -76,7 +76,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
           10, // Number of items to return at once.
           filter,
           true, // Return oldest first.
-          returnValues._address // The token address for which to return the submissions.
+          tokenAddress // The token address for which to return the submissions.
         )
         .call()).values.filter(ID => ID !== ZERO_ID)
 
