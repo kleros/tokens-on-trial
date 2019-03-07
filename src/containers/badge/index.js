@@ -502,7 +502,7 @@ class BadgeDetails extends PureComponent {
                         data-tip={
                           latestRequest.dispute.ruling.toString() !== '0'
                             ? ''
-                            : `If no sides receives appeal fees contributions, the token will revert to it's previous state.`
+                            : `If the requester doesn't receive appeal fee contributions, the request will fail and parties will be reimbursed.`
                         }
                       >
                         <FontAwesomeIcon
@@ -706,7 +706,7 @@ class BadgeDetails extends PureComponent {
                   <div
                     className="TokenDetails-meta"
                     style={{ margin: 0, marginRight: '26px' }}
-                    data-tip="If no one receives a fee contribution for appeals, the current ruling will be enforced after the appeal period. If fees are contributed but not enough are raised for a new appeal, the party that received the most contributions will win."
+                    data-tip="If there are appeal fee contributions, the party that received the most, wins."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
                       <FontAwesomeIcon
