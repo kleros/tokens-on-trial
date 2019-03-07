@@ -37,8 +37,6 @@ import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-l
 
 import './token.css'
 
-const { toBN } = web3.utils
-
 class TokenDetails extends PureComponent {
   static propTypes = {
     // State
@@ -76,7 +74,8 @@ class TokenDetails extends PureComponent {
     countdownCompleted: false,
     appealModalOpen: false,
     loserCountdownCompleted: false,
-    winnerCountdownCompleted: false
+    winnerCountdownCompleted: false,
+    evidenceListenerSet: false
   }
 
   handleFilterChange = key => {
@@ -173,42 +172,6 @@ class TokenDetails extends PureComponent {
 
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitrableTokenList.events.Evidence({ fromBlock: 0 }).on('data', e => {
-      const { token } = this.state
-      if (!token) return
-      const { latestRequest } = token
-
-      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-        return
-
-      archon.arbitrable
-        .getEvidence(
-          arbitrableTokenList._address,
-          arbitrator._address,
-          latestRequest.evidenceGroupID
-        )
-        .then(resp =>
-          resp
-            .filter(
-              evidence =>
-                evidence.evidenceJSONValid &&
-                (evidence.evidenceJSON.fileURI.length === 0 ||
-                  evidence.fileValid)
-            )
-            .forEach(evidence => {
-              const { evidences } = this.state
-              const { evidenceJSON } = evidence
-              const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-              evidenceJSON.icon = getFileIcon(mimeType)
-              this.setState({
-                evidences: {
-                  ...evidences,
-                  [evidence.transactionHash]: evidenceJSON
-                }
-              })
-            })
-        )
-    })
   }
 
   withdrawFunds = () => {
@@ -254,11 +217,58 @@ class TokenDetails extends PureComponent {
 
   componentDidUpdate() {
     const { match, fetchToken } = this.props
-    const { token, fetching } = this.state
+    const { token, fetching, evidenceListenerSet } = this.state
     const { tokenID } = match.params
     if (token && token.ID !== tokenID && !fetching) {
       fetchToken(tokenID)
       this.setState({ fetching: true })
+    }
+
+    if (token && !evidenceListenerSet && token.ID === tokenID) {
+      arbitrableTokenList.events
+        .Evidence({
+          fromBlock: 0,
+          filter: {
+            _evidenceGroupID: token.latestRequest.evidenceGroupID
+          }
+        })
+        .on('data', e => {
+          const { token } = this.state
+          if (!token) return
+          const { latestRequest } = token
+
+          if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+            return
+
+          archon.arbitrable
+            .getEvidence(
+              arbitrableTokenList._address,
+              arbitrator._address,
+              latestRequest.evidenceGroupID
+            )
+            .then(resp =>
+              resp
+                .filter(
+                  evidence =>
+                    evidence.evidenceJSONValid &&
+                    (evidence.evidenceJSON.fileURI.length === 0 ||
+                      evidence.fileValid)
+                )
+                .forEach(evidence => {
+                  const { evidences } = this.state
+                  const { evidenceJSON } = evidence
+                  const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                  evidenceJSON.icon = getFileIcon(mimeType)
+                  this.setState({
+                    evidences: {
+                      ...evidences,
+                      [evidence.transactionHash]: evidenceJSON
+                    }
+                  })
+                })
+            )
+        })
+      this.setState({ evidenceListenerSet: true })
     }
   }
 
@@ -271,6 +281,7 @@ class TokenDetails extends PureComponent {
       winnerCountdownCompleted,
       token
     } = this.state
+
     const { accounts, filter, match, arbitrableTokenListData } = this.props
     const { filters } = filter
     const { tokenID } = match.params
@@ -368,18 +379,21 @@ class TokenDetails extends PureComponent {
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
-      !latestRequest.latestRound.appealed &&
-      latestRound.requiredForSide[1].gt(toBN(0)) &&
-      latestRound.requiredForSide[2].gt(toBN(0))
+      !latestRequest.latestRound.appealed
     ) {
-      requesterFeesPercent =
-        (Number(latestRound.paidFees[1]) /
-          Number(latestRound.requiredForSide[1])) *
-        100
-      challengerFeesPercent =
-        (Number(latestRound.paidFees[2]) /
-          Number(latestRound.requiredForSide[2])) *
-        100
+      if (!latestRound.hasPaid[1])
+        requesterFeesPercent =
+          (Number(latestRound.paidFees[1]) /
+            Number(latestRound.requiredForSide[1])) *
+          100
+      else requesterFeesPercent = 100
+
+      if (!latestRound.hasPaid[2])
+        challengerFeesPercent =
+          (Number(latestRound.paidFees[2]) /
+            Number(latestRound.requiredForSide[2])) *
+          100
+      else challengerFeesPercent = 100
     }
 
     /* eslint-disable react/jsx-no-bind */

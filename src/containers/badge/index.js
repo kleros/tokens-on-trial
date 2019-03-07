@@ -39,8 +39,6 @@ import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-addre
 
 import './badge.css'
 
-const { toBN } = web3.utils
-
 class BadgeDetails extends PureComponent {
   static propTypes = {
     // State
@@ -73,7 +71,8 @@ class BadgeDetails extends PureComponent {
     evidences: [],
     appealModalOpen: false,
     loserCountdownCompleted: false,
-    winnerCountdownCompleted: false
+    winnerCountdownCompleted: false,
+    evidenceListenerSet: false
   }
 
   handleFilterChange = key => {
@@ -164,44 +163,6 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr)
     })
-    arbitrableAddressList.events
-      .Evidence({ fromBlock: 0 })
-      .on('data', async e => {
-        const { badge } = this.state
-        if (!badge) return
-        const { latestRequest } = badge
-
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-
-        archon.arbitrable
-          .getEvidence(
-            arbitrableAddressList._address,
-            arbitrator._address,
-            latestRequest.evidenceGroupID
-          )
-          .then(resp =>
-            resp
-              .filter(
-                evidence =>
-                  evidence.evidenceJSONValid &&
-                  (evidence.evidenceJSON.fileURI.length === 0 ||
-                    evidence.fileValid)
-              )
-              .forEach(evidence => {
-                const { evidences } = this.state
-                const { evidenceJSON } = evidence
-                const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                evidenceJSON.icon = getFileIcon(mimeType)
-                this.setState({
-                  evidences: {
-                    ...evidences,
-                    [evidence.transactionHash]: evidenceJSON
-                  }
-                })
-              })
-          )
-      })
     arbitrableAddressList.events.Ruling().on('data', event => {
       const { badge } = this.state
       if (!badge) return
@@ -234,11 +195,58 @@ class BadgeDetails extends PureComponent {
 
   componentDidUpdate() {
     const { match, fetchBadge } = this.props
-    const { badge, fetching } = this.state
+    const { badge, fetching, evidenceListenerSet } = this.state
     const { tokenAddr } = match.params
     if (badge && badge.addr !== tokenAddr && !fetching) {
       fetchBadge(tokenAddr)
       this.setState({ fetching: true })
+    }
+
+    if (badge && !evidenceListenerSet && badge.addr === tokenAddr) {
+      arbitrableAddressList.events
+        .Evidence({
+          fromBlock: 0,
+          filter: {
+            _evidenceGroupID: badge.latestRequest.evidenceGroupID
+          }
+        })
+        .on('data', e => {
+          const { badge } = this.state
+          if (!badge) return
+          const { latestRequest } = badge
+
+          if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+            return
+
+          archon.arbitrable
+            .getEvidence(
+              arbitrableAddressList._address,
+              arbitrator._address,
+              latestRequest.evidenceGroupID
+            )
+            .then(resp =>
+              resp
+                .filter(
+                  evidence =>
+                    evidence.evidenceJSONValid &&
+                    (evidence.evidenceJSON.fileURI.length === 0 ||
+                      evidence.fileValid)
+                )
+                .forEach(evidence => {
+                  const { evidences } = this.state
+                  const { evidenceJSON } = evidence
+                  const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
+                  evidenceJSON.icon = getFileIcon(mimeType)
+                  this.setState({
+                    evidences: {
+                      ...evidences,
+                      [evidence.transactionHash]: evidenceJSON
+                    }
+                  })
+                })
+            )
+        })
+      this.setState({ evidenceListenerSet: true })
     }
   }
 
@@ -348,19 +356,21 @@ class BadgeDetails extends PureComponent {
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
-      !latestRequest.latestRound.appealed &&
-      latestRound.requiredForSide[1].gt(toBN(0)) &&
-      latestRound.requiredForSide[2].gt(toBN(0))
+      !latestRequest.latestRound.appealed
     ) {
-      requesterFeesPercent =
-        (Number(latestRound.paidFees[1]) /
-          Number(latestRound.requiredForSide[1])) *
-        100
+      if (!latestRound.hasPaid[1])
+        requesterFeesPercent =
+          (Number(latestRound.paidFees[1]) /
+            Number(latestRound.requiredForSide[1])) *
+          100
+      else requesterFeesPercent = 100
 
-      challengerFeesPercent =
-        (Number(latestRound.paidFees[2]) /
-          Number(latestRound.requiredForSide[2])) *
-        100
+      if (!latestRound.hasPaid[2])
+        challengerFeesPercent =
+          (Number(latestRound.paidFees[2]) /
+            Number(latestRound.requiredForSide[2])) *
+          100
+      else challengerFeesPercent = 100
     }
 
     /* eslint-disable react/jsx-no-bind */
