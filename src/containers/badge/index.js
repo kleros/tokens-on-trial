@@ -460,43 +460,13 @@ class BadgeDetails extends PureComponent {
                   </p>
                 </div>
                 <div
-                  style={{ display: 'flex', marginTop: 'auto', width: '100%' }}
+                  style={{
+                    display: 'flex',
+                    marginTop: 'auto',
+                    width: '100%',
+                    alignItems: 'flex-start'
+                  }}
                 >
-                  <div
-                    className="BadgeDetails-meta"
-                    style={{ marginRight: 'auto' }}
-                  >
-                    <span
-                      className="BadgeDetails-meta--aligned BadgeDetails-timer"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#3d464d'
-                      }}
-                    >
-                      <a
-                        className="BadgeDetails--link"
-                        href={`https://etherscan.io/address/${tokenAddr}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                      >
-                        <div
-                          className="BadgeDetails-meta--aligned"
-                          style={{ display: 'flex', alignItems: 'center' }}
-                        >
-                          <Img
-                            className="BadgeDetails-icon BadgeDetails-meta--aligned"
-                            src={Etherscan}
-                          />
-                          <div style={{ marginRight: '14px' }}>
-                            {truncateMiddle(
-                              web3.utils.toChecksumAddress(tokenAddr)
-                            )}
-                          </div>
-                        </div>
-                      </a>
-                    </span>
-                  </div>
                   {latestRequest.dispute &&
                     Number(latestRequest.dispute.status) ===
                       tcrConstants.DISPUTE_STATUS.Appealable &&
@@ -507,7 +477,8 @@ class BadgeDetails extends PureComponent {
                           display: 'flex',
                           alignItems: 'center',
                           color: '#3d464d',
-                          fontSize: '14px'
+                          fontSize: '14px',
+                          marginRight: '14px'
                         }}
                         data-tip={
                           latestRequest.dispute.ruling.toString() !== '0'
@@ -526,9 +497,7 @@ class BadgeDetails extends PureComponent {
                               decisiveRuling,
                               SIDE !== tcrConstants.SIDE.None,
                               losingSide,
-                              tcrConstants.RULING_OPTIONS[
-                                latestRequest.dispute.ruling
-                              ]
+                              latestRequest.dispute.ruling.toString()
                             )
                           : 'Jurors did not rule.'}
                       </span>
@@ -785,6 +754,38 @@ class BadgeDetails extends PureComponent {
                   tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
                 )}
               </span>
+              <div className="BadgeDetails-meta" style={{ marginLeft: '14px' }}>
+                <span
+                  className="BadgeDetails-meta--aligned BadgeDetails-timer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    color: '#3d464d'
+                  }}
+                >
+                  <a
+                    className="BadgeDetails--link"
+                    href={`https://etherscan.io/address/${tokenAddr}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div
+                      className="BadgeDetails-meta--aligned"
+                      style={{ display: 'flex', alignItems: 'center' }}
+                    >
+                      <Img
+                        className="BadgeDetails-icon BadgeDetails-meta--aligned"
+                        src={Etherscan}
+                      />
+                      <div style={{ marginRight: '14px' }}>
+                        {truncateMiddle(
+                          web3.utils.toChecksumAddress(tokenAddr)
+                        )}
+                      </div>
+                    </div>
+                  </a>
+                </span>
+              </div>
               <div style={{ marginLeft: 'auto', marginRight: '26px' }}>
                 {Number(badge.status) > 1 &&
                 latestRequest.dispute &&

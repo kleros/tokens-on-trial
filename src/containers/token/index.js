@@ -490,9 +490,7 @@ class TokenDetails extends PureComponent {
                             decisiveRuling,
                             SIDE !== tcrConstants.SIDE.None,
                             losingSide,
-                            tcrConstants.RULING_OPTIONS[
-                              latestRequest.dispute.ruling
-                            ]
+                            latestRequest.dispute.ruling.toString()
                           )
                         : 'Jurors did not rule.'}
                     </span>
