@@ -32,10 +32,13 @@ export default class NavBar extends PureComponent {
         <div key={r.title}>
           <Link
             className={`NavBar-route ${r.extraStyle}`}
-            style={{ height: '55px', verticalAlign: 'center' }}
+            style={{ height: '55px' }}
             to={r.to}
           >
-            {r.title}
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              {r.title}
+              <i style={{ fontSize: '10px', letterSpacing: 0 }}>{r.subtitle}</i>
+            </div>
           </Link>
         </div>
       )),
