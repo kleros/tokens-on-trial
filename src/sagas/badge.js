@@ -310,7 +310,13 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (badge.latestRequest.disputed) {
       // Fetch dispute data.
-      badge.latestRequest.dispute = {}
+      badge.latestRequest.dispute = yield call(
+        arbitrator.methods.disputes(badge.latestRequest.disputeID).call
+      )
+      badge.latestRequest.dispute.court = yield call(
+        arbitrator.methods.getSubcourt(badge.latestRequest.dispute.subcourtID)
+          .call
+      )
       arbitrator.options.address = badge.latestRequest.arbitrator
       badge.latestRequest.dispute.status = yield call(
         arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call

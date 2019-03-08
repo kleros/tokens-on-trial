@@ -72,7 +72,8 @@ class BadgeDetails extends PureComponent {
     appealModalOpen: false,
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
-    evidenceListenerSet: false
+    evidenceListenerSet: false,
+    evidencePeriodEnded: false
   }
 
   handleFilterChange = key => {
@@ -129,6 +130,11 @@ class BadgeDetails extends PureComponent {
   onLoserCountdownComplete = time => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ loserCountdownCompleted: true })
+  }
+
+  onEvidenceCountdownComplete = time => {
+    if (typeof time === 'number' && time > 0) return
+    this.setState({ evidencePeriodEnded: true })
   }
 
   withdrawFunds = async () => {
@@ -257,7 +263,8 @@ class BadgeDetails extends PureComponent {
       appealModalOpen,
       loserCountdownCompleted,
       winnerCountdownCompleted,
-      badge
+      badge,
+      evidencePeriodEnded
     } = this.state
 
     const { accounts, filter, match, arbitrableAddressListData } = this.props
@@ -372,6 +379,13 @@ class BadgeDetails extends PureComponent {
           100
       else challengerFeesPercent = 100
     }
+
+    let evidenceRemainingTime = 0
+    if (latestRequest.dispute)
+      evidenceRemainingTime =
+        Number(latestRequest.dispute.lastPeriodChange) * 1000 +
+        Number(latestRequest.dispute.court.timesPerPeriod[0]) * 1000 -
+        Date.now()
 
     /* eslint-disable react/jsx-no-bind */
 
@@ -504,6 +518,42 @@ class BadgeDetails extends PureComponent {
                               latestRequest.dispute.ruling.toString()
                             )
                           : 'Jurors did not rule.'}
+                      </span>
+                    )}
+                  {latestRequest.dispute &&
+                    latestRequest.dispute.period.toString() === '0' && (
+                      <span
+                        className="TokenDetails-meta-item"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          color: '#f60c36'
+                        }}
+                      >
+                        <div className="BadgeDetails-timer">
+                          <FontAwesomeIcon
+                            className="TokenDetails-icon"
+                            color="#f60c36"
+                            icon="clock"
+                          />
+                          {evidencePeriodEnded ? (
+                            'Waiting Next Period'
+                          ) : (
+                            <>
+                              {'Evidence period ends in '}
+                              <Countdown
+                                date={Date.now() + evidenceRemainingTime}
+                                renderer={CountdownRenderer}
+                                onStart={() =>
+                                  this.onEvidenceCountdownComplete(
+                                    evidenceRemainingTime
+                                  )
+                                }
+                                onComplete={this.onEvidenceCountdownComplete}
+                              />
+                            </>
+                          )}
+                        </div>
                       </span>
                     )}
                   {!(
