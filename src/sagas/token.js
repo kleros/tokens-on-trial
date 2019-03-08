@@ -248,6 +248,7 @@ export function* fetchToken({ payload: { ID } }) {
 
     if (token.latestRequest.disputed) {
       // Fetch dispute data.
+      arbitrator.options.address = token.latestRequest.arbitrator
       token.latestRequest.dispute = yield call(
         arbitrator.methods.disputes(token.latestRequest.disputeID).call
       )
@@ -255,7 +256,6 @@ export function* fetchToken({ payload: { ID } }) {
         arbitrator.methods.getSubcourt(token.latestRequest.dispute.subcourtID)
           .call
       )
-      arbitrator.options.address = token.latestRequest.arbitrator
       token.latestRequest.dispute.status = yield call(
         arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
       )
