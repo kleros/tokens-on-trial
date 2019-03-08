@@ -1,0 +1,40 @@
+.TelegramButton {
+  bottom: 10px;
+  height: 80px;
+  position: fixed;
+  right: 10px;
+  width: 80px;
+  z-index: 200;
+
+  &-image {
+    height: 80px;
+    width: 80px;
+  }
+
+  &-closeButton {
+    background: #9b9b9b;
+    border: 1px solid #fff;
+    border-radius: 7.5px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 12px;
+    height: 15px;
+    line-height: 13px;
+    outline: none !important;
+    padding: 0;
+    position: absolute;
+    right: 7px;
+    text-align: center;
+    top: 3px;
+    width: 15px;
+  }
+
+  &-help {
+    bottom: 11px;
+    color: whitesmoke;
+    font-size: 10px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+  }
+}

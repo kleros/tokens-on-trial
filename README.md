@@ -1,5 +1,5 @@
 <p align="center">
-  <b style="font-size: 32px;">Tokens on Trial</b>
+  <b style="font-size: 32px;">Tokens on Trial</b> 
 </p>
 
 <p align="center">

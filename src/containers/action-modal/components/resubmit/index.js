@@ -6,6 +6,7 @@ import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable
 import * as tokenSelectors from '../../../../reducers/token'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { truncateETHValue } from '../../../../utils/ui'
 
 import './resubmit.css'
 
@@ -17,18 +18,20 @@ const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
     <div className="Challenge-cost">
       <span>Total Deposit:</span>
       <strong className="Challenge-total-value">
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.requesterBaseDeposit)
-                .add(
-                  web3.utils
-                    .toBN(tcr.data.arbitrationCost)
-                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                )
-                .add(web3.utils.toBN(tcr.data.arbitrationCost))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(
+                web3.utils
+                  .toBN(tcr.data.requesterBaseDeposit)
+                  .add(
+                    web3.utils
+                      .toBN(tcr.data.arbitrationCost)
+                      .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                      .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                  )
+                  .add(web3.utils.toBN(tcr.data.arbitrationCost))
+              )
             )
           )
         )} ETH`}

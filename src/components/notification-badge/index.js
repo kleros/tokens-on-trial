@@ -97,30 +97,15 @@ class NotificationBadge extends PureComponent {
                       {/* eslint-enable */}
                       <FontAwesomeIcon
                         className="NotificationBadge-notifications-notification-icon"
-                        color={
-                          n.clientStatus
-                            ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                            : tcrConstants.STATUS_COLOR_ENUM[0]
-                        }
-                        icon={
-                          n.clientStatus
-                            ? tcrConstants.STATUS_ICON_ENUM[n.clientStatus]
-                            : 'bell'
-                        }
+                        color={tcrConstants.STATUS_COLOR_ENUM[1]}
+                        icon="exclamation-circle"
                         size="lg"
                       />
                       <div className="NotificationBadge-notifications-notification-content">
                         <div className="NotificationBadge-notifications-notification-content-message">
                           {n.message}
                         </div>
-                        <div
-                          className="NotificationBadge-notifications-notification-content-footer"
-                          style={{
-                            color: n.clientStatus
-                              ? tcrConstants.STATUS_COLOR_ENUM[n.clientStatus]
-                              : tcrConstants.STATUS_COLOR_ENUM[0]
-                          }}
-                        >
+                        <div className="NotificationBadge-notifications-notification-content-footer">
                           <TimeAgo datetime={n.date} />
                         </div>
                       </div>

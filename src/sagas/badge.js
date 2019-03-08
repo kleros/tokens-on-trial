@@ -5,6 +5,7 @@ import {
   arbitrableAddressList,
   arbitrableTokenList,
   arbitrator,
+  ARBITRATOR_ADDRESS,
   web3
 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus, convertFromString } from '../utils/tcr'
@@ -190,6 +191,9 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
           Number(submission.numberOfRequests) - 1
         ).call
       )
+      if (submission.latestRequest.arbitratorExtraData === null)
+        submission.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
+
       submission.clientStatus = contractStatusToClientStatus(
         submission.status,
         submission.latestRequest.disputed
@@ -209,6 +213,8 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
         Number(badge.numberOfRequests) - 1
       ).call
     )
+    if (badge.latestRequest.arbitratorExtraData === null)
+      badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
     tokens.push({
       ...submission,
@@ -266,6 +272,8 @@ export function* fetchBadge({ payload: { addr } }) {
         Number(badge.numberOfRequests) - 1
       ).call
     )
+    if (badge.latestRequest.arbitratorExtraData === null)
+      badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
     badge.latestRequest.evidenceGroupID = web3.utils
       .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
@@ -302,8 +310,14 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (badge.latestRequest.disputed) {
       // Fetch dispute data.
-      badge.latestRequest.dispute = {}
       arbitrator.options.address = badge.latestRequest.arbitrator
+      badge.latestRequest.dispute = yield call(
+        arbitrator.methods.disputes(badge.latestRequest.disputeID).call
+      )
+      badge.latestRequest.dispute.court = yield call(
+        arbitrator.methods.getSubcourt(badge.latestRequest.dispute.subcourtID)
+          .call
+      )
       badge.latestRequest.dispute.status = yield call(
         arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
       )
@@ -325,8 +339,13 @@ export function* fetchBadge({ payload: { addr } }) {
           arbitrator.methods.currentRuling(badge.latestRequest.disputeID).call
         )
         badge.latestRequest.latestRound.appealCost = yield call(
-          arbitrator.methods.appealCost(badge.latestRequest.disputeID, '0x0')
-            .call
+          arbitrator.methods.appealCost(
+            badge.latestRequest.disputeID,
+            badge.latestRequest.arbitratorExtraData
+          ).call
+        )
+        const MULTIPLIER_DIVISOR = yield call(
+          arbitrableAddressList.methods.MULTIPLIER_DIVISOR().call
         )
 
         const winnerStakeMultiplier = yield select(
@@ -344,46 +363,46 @@ export function* fetchBadge({ payload: { addr } }) {
         if (ruling === 0) {
           badge.latestRequest.latestRound.requiredForSide.push(
             toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost).mul(
-                toBN(sharedStakeMultiplier)
-              )
+              toBN(badge.latestRequest.latestRound.appealCost)
+                .mul(toBN(sharedStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
           badge.latestRequest.latestRound.requiredForSide.push(
             toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost).mul(
-                toBN(sharedStakeMultiplier)
-              )
+              toBN(badge.latestRequest.latestRound.appealCost)
+                .mul(toBN(sharedStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
         } else if (ruling === 1) {
           badge.latestRequest.latestRound.requiredForSide.push(
             toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost).mul(
-                toBN(winnerStakeMultiplier)
-              )
+              toBN(badge.latestRequest.latestRound.appealCost)
+                .mul(toBN(winnerStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
           badge.latestRequest.latestRound.requiredForSide.push(
             toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost).mul(
-                toBN(loserStakeMultiplier)
-              )
+              toBN(badge.latestRequest.latestRound.appealCost)
+                .mul(toBN(loserStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
         } else {
           badge.latestRequest.latestRound.requiredForSide.push(
             toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost).mul(
-                toBN(loserStakeMultiplier)
-              )
+              toBN(badge.latestRequest.latestRound.appealCost)
+                .mul(toBN(loserStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
           badge.latestRequest.latestRound.requiredForSide.push(
             toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost).mul(
-                toBN(winnerStakeMultiplier)
-              )
+              toBN(badge.latestRequest.latestRound.appealCost)
+                .mul(toBN(winnerStakeMultiplier))
+                .div(toBN(MULTIPLIER_DIVISOR))
             )
           )
         }
@@ -456,6 +475,8 @@ export function* fetchBadge({ payload: { addr } }) {
         }
       }
     }
+
+  arbitrator.options.address = ARBITRATOR_ADDRESS
 
   return {
     ...badge,

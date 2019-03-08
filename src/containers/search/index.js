@@ -46,7 +46,7 @@ class SearchBar extends PureComponent {
         name: _name,
         ticker: _ticker,
         address: _address,
-        imgSrc: _symbolMultihash
+        symbolMultihash: _symbolMultihash
       })
     })
   }
@@ -86,7 +86,9 @@ class SearchBar extends PureComponent {
                               .includes(inputValue.toLowerCase()) ||
                               item.ticker
                                 .toLowerCase()
-                                .includes(inputValue.toLowerCase()))
+                                .includes(inputValue.toLowerCase()) ||
+                              item.address.toLowerCase() ===
+                                inputValue.toLowerCase())
                         )
                         .map((item, index) => (
                           <Item

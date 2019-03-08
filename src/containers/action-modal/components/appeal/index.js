@@ -9,6 +9,7 @@ import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-t
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { truncateETHValue } from '../../../../utils/ui'
 
 import { AppealForm, getAppealFormIsInvalid, submitAppealForm } from './form'
 import './appeal.css'
@@ -54,75 +55,38 @@ const FundAppeal = ({
     <div className="Appeal-cost">
       <span>Appeal Cost</span>
       {`${item.latestRequest.latestRound.appealCost &&
-        String(
-          web3.utils.fromWei(item.latestRequest.latestRound.appealCost)
+        truncateETHValue(
+          String(web3.utils.fromWei(item.latestRequest.latestRound.appealCost))
         )} ETH`}
     </div>
     <div className="Appeal-cost">
       <span>Arbitration Fee Stake</span>
-      {`${String(
-        item.latestRequest.latestRound.appealCost &&
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(String(item.latestRequest.latestRound.appealCost))
-                .mul(
-                  web3.utils.toBN(
-                    !decisiveRuling(item)
-                      ? String(tcr.data.sharedStakeMultiplier)
-                      : isLosingSide(item, side)
-                      ? String(tcr.data.loserStakeMultiplier)
-                      : String(tcr.data.winnerStakeMultiplier)
+      {`${truncateETHValue(
+        String(
+          item.latestRequest.latestRound.appealCost &&
+            web3.utils.fromWei(
+              String(
+                web3.utils
+                  .toBN(String(item.latestRequest.latestRound.appealCost))
+                  .mul(
+                    web3.utils.toBN(
+                      !decisiveRuling(item)
+                        ? String(tcr.data.sharedStakeMultiplier)
+                        : isLosingSide(item, side)
+                        ? String(tcr.data.loserStakeMultiplier)
+                        : String(tcr.data.winnerStakeMultiplier)
+                    )
                   )
-                )
-                .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
+                  .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
+              )
             )
-          )
+        )
       )} ETH `}
     </div>
     <div className="Appeal-cost">
       <span>Total Required:</span>
-      {`${String(
-        item.latestRequest.latestRound.appealCost &&
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(String(item.latestRequest.latestRound.appealCost))
-                .add(
-                  web3.utils
-                    .toBN(String(item.latestRequest.latestRound.appealCost))
-                    .mul(
-                      web3.utils.toBN(
-                        !decisiveRuling(item)
-                          ? String(tcr.data.sharedStakeMultiplier)
-                          : isLosingSide(item, side)
-                          ? String(tcr.data.loserStakeMultiplier)
-                          : String(tcr.data.winnerStakeMultiplier)
-                      )
-                    )
-                    .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
-                )
-            )
-          )
-      )} ETH `}
-    </div>
-    <div className="Appeal-cost">
-      <span>Amount Paid:</span>
-      {`${String(
-        web3.utils.fromWei(
-          String(
-            web3.utils.toBN(
-              String(item.latestRequest.latestRound.paidFees[side])
-            )
-          )
-        )
-      )} ETH `}
-    </div>
-    <br />
-    <div className="Appeal-cost">
-      <span>Amount Still Required:</span>
-      <strong className="Appeal-total-value">
-        {`${String(
+      {`${truncateETHValue(
+        String(
           item.latestRequest.latestRound.appealCost &&
             web3.utils.fromWei(
               String(
@@ -142,24 +106,33 @@ const FundAppeal = ({
                       )
                       .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
                   )
-                  .sub(
-                    web3.utils.toBN(
-                      String(item.latestRequest.latestRound.paidFees[side])
-                    )
-                  )
               )
             )
-        )} ETH `}
-      </strong>
+        )
+      )} ETH `}
     </div>
-    <AppealForm
-      className="Challenge-form"
-      onSubmit={fundAppeal}
-      initialValues={{
-        amount: !item.latestRequest.latestRound.appealCost
-          ? 0
-          : web3.utils
-              .fromWei(
+    <div className="Appeal-cost">
+      <span>Amount Paid:</span>
+      {`${truncateETHValue(
+        String(
+          web3.utils.fromWei(
+            String(
+              web3.utils.toBN(
+                String(item.latestRequest.latestRound.paidFees[side])
+              )
+            )
+          )
+        )
+      )} ETH `}
+    </div>
+    <br />
+    <div className="Appeal-cost">
+      <span>Amount Still Required:</span>
+      <strong className="Appeal-total-value">
+        {`${truncateETHValue(
+          String(
+            item.latestRequest.latestRound.appealCost &&
+              web3.utils.fromWei(
                 String(
                   web3.utils
                     .toBN(String(item.latestRequest.latestRound.appealCost))
@@ -169,7 +142,7 @@ const FundAppeal = ({
                         .mul(
                           web3.utils.toBN(
                             !decisiveRuling(item)
-                              ? String(tcr.data.loserStakeMultiplier)
+                              ? String(tcr.data.sharedStakeMultiplier)
                               : isLosingSide(item, side)
                               ? String(tcr.data.loserStakeMultiplier)
                               : String(tcr.data.winnerStakeMultiplier)
@@ -186,7 +159,49 @@ const FundAppeal = ({
                     )
                 )
               )
-              .toString()
+          )
+        )} ETH `}
+      </strong>
+    </div>
+    <AppealForm
+      className="Challenge-form"
+      onSubmit={fundAppeal}
+      initialValues={{
+        amount: !item.latestRequest.latestRound.appealCost
+          ? 0
+          : truncateETHValue(
+              web3.utils
+                .fromWei(
+                  String(
+                    web3.utils
+                      .toBN(String(item.latestRequest.latestRound.appealCost))
+                      .add(
+                        web3.utils
+                          .toBN(
+                            String(item.latestRequest.latestRound.appealCost)
+                          )
+                          .mul(
+                            web3.utils.toBN(
+                              !decisiveRuling(item)
+                                ? String(tcr.data.sharedStakeMultiplier)
+                                : isLosingSide(item, side)
+                                ? String(tcr.data.loserStakeMultiplier)
+                                : String(tcr.data.winnerStakeMultiplier)
+                            )
+                          )
+                          .div(
+                            web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR))
+                          )
+                      )
+                      .sub(
+                        web3.utils.toBN(
+                          String(item.latestRequest.latestRound.paidFees[side])
+                        )
+                      )
+                  )
+                )
+                .toString()
+            )
       }}
     />
     <div

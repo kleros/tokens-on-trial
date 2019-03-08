@@ -24,6 +24,7 @@ import * as notificationActions from '../actions/notification'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
+import TelegramButton from '../components/telegram-button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -115,7 +116,8 @@ class _ConnectedNavBar extends Component {
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
           {
-            title: 'Token² Curated List',
+            title: 'Token² Curated Registry',
+            subtitle: 'Beta',
             to: '/tokens',
             extraStyle: 'NavBar-route-title'
           },
@@ -183,6 +185,7 @@ const App = ({ store, history }) => (
               <Route component={GlobalComponents} exact path="*" />
             </div>
           </Switch>
+          <TelegramButton />
         </>
       </ConnectedRouter>
     </Initializer>

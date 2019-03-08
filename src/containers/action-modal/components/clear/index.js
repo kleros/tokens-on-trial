@@ -1,16 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { truncateETHValue } from '../../../../utils/ui'
 import './clear.css'
 
 const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
   <div>
     <h3 className="Modal-title">
-      {!badge ? `Clear ${item.name}` : 'Remove badge'}
+      {!badge ? `Remove ${item.name}` : 'Remove Badge'}
     </h3>
     <hr />
     <br />
@@ -21,18 +23,20 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
           <strong>
-            {String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(tcr.data.requesterBaseDeposit)
-                    .add(
-                      web3.utils
-                        .toBN(tcr.data.arbitrationCost)
-                        .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                        .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                    )
-                    .add(web3.utils.toBN(tcr.data.arbitrationCost))
+            {truncateETHValue(
+              String(
+                web3.utils.fromWei(
+                  String(
+                    web3.utils
+                      .toBN(tcr.data.requesterBaseDeposit)
+                      .add(
+                        web3.utils
+                          .toBN(tcr.data.arbitrationCost)
+                          .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                          .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                      )
+                      .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                  )
                 )
               )
             )}
@@ -43,6 +47,22 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
         <p className="Challenge-fees-line">
           <strong>ETH</strong>
         </p>
+      </div>
+    </div>
+    <div
+      style={{
+        textAlign: 'start',
+        fontSize: '12px',
+        marginTop: '10px',
+        display: 'flex'
+      }}
+    >
+      <FontAwesomeIcon icon="info-circle" />
+      <div style={{ marginLeft: '5px' }}>
+        <i>
+          Note: This is not a fee, it is a deposit and will be refunded if you
+          are correct.
+        </i>
       </div>
     </div>
     <br />

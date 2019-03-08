@@ -7,6 +7,7 @@ import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-t
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { truncateETHValue } from '../../../../utils/ui'
 
 import {
   ChallengeForm,
@@ -40,18 +41,20 @@ const Challenge = ({
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
           <strong>
-            {String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(tcr.data.challengerBaseDeposit)
-                    .add(
-                      web3.utils
-                        .toBN(tcr.data.arbitrationCost)
-                        .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                        .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                    )
-                    .add(web3.utils.toBN(tcr.data.arbitrationCost))
+            {truncateETHValue(
+              String(
+                web3.utils.fromWei(
+                  String(
+                    web3.utils
+                      .toBN(tcr.data.challengerBaseDeposit)
+                      .add(
+                        web3.utils
+                          .toBN(tcr.data.arbitrationCost)
+                          .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                          .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                      )
+                      .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                  )
                 )
               )
             )}

@@ -7,7 +7,10 @@ import { Link } from 'react-router-dom'
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import UnknownToken from '../../assets/images/unknown.svg'
 import * as tcrConstants from '../../constants/tcr'
-import { ARBITRABLE_ADDRESS_LIST_ADDRESS } from '../../bootstrap/dapp-api'
+import {
+  ARBITRABLE_ADDRESS_LIST_ADDRESS,
+  FILE_BASE_URL
+} from '../../bootstrap/dapp-api'
 
 import './badge-card.css'
 
@@ -59,9 +62,7 @@ const BadgeCard = ({ token, displayTokenInfo }) => (
             token.symbolMultihash
               ? token.symbolMultihash[0] === '/'
                 ? `https://ipfs.kleros.io/${token.symbolMultihash}`
-                : `https://staging-cfs.s3.us-east-2.amazonaws.com/${
-                    token.symbolMultihash
-                  }`
+                : `${FILE_BASE_URL}/${token.symbolMultihash}`
               : UnknownToken
           }
         />
@@ -76,6 +77,8 @@ const BadgeCard = ({ token, displayTokenInfo }) => (
     <div className="BadgeCard-footer">
       {displayTokenInfo ? (
         <h5 className="BadgeCard-footer-text">
+          Ethfinex Compliant
+          <br />
           {`${token.ticker ? token.ticker : ''}
           ${token.name && token.ticker ? '-' : ''}
           ${token.name ? token.name : ''}

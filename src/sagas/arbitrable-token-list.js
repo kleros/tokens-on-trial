@@ -1,13 +1,20 @@
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
-import { arbitrableTokenList, arbitrator, archon } from '../bootstrap/dapp-api'
+import {
+  arbitrableTokenList,
+  arbitrator,
+  archon,
+  web3
+} from '../bootstrap/dapp-api'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import readFile from '../utils/read-file'
 
 import ipfsPublish from './api/ipfs-publish'
+
+const { toBN } = web3.utils
 
 /**
  * Fetches the arbitrable token list's data.
@@ -39,25 +46,28 @@ export function* fetchArbitrableTokenListData() {
     MULTIPLIER_DIVISOR: call(
       arbitrableTokenList.methods.MULTIPLIER_DIVISOR().call
     ),
+    arbitratorExtraData: call(
+      arbitrableTokenList.methods.arbitratorExtraData().call
+    ),
     countByStatus: call(arbitrableTokenList.methods.countByStatus().call)
   })
 
   arbitrator.options.address = d.arbitrator
   const arbitrationCost = yield call(
-    arbitrator.methods.arbitrationCost('0x00').call
+    arbitrator.methods.arbitrationCost(d.arbitratorExtraData).call
   )
 
   return {
     arbitrator: d.arbitrator,
     governor: d.governor,
-    requesterBaseDeposit: Number(d.requesterBaseDeposit),
-    challengerBaseDeposit: Number(d.challengerBaseDeposit),
+    requesterBaseDeposit: toBN(d.requesterBaseDeposit),
+    challengerBaseDeposit: toBN(d.challengerBaseDeposit),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
-    arbitrationCost: Number(arbitrationCost),
-    winnerStakeMultiplier: Number(d.winnerStakeMultiplier),
-    loserStakeMultiplier: Number(d.loserStakeMultiplier),
-    sharedStakeMultiplier: Number(d.sharedStakeMultiplier),
-    MULTIPLIER_DIVISOR: Number(d.MULTIPLIER_DIVISOR),
+    arbitrationCost: toBN(arbitrationCost),
+    winnerStakeMultiplier: toBN(d.winnerStakeMultiplier),
+    loserStakeMultiplier: toBN(d.loserStakeMultiplier),
+    sharedStakeMultiplier: toBN(d.sharedStakeMultiplier),
+    MULTIPLIER_DIVISOR: toBN(d.MULTIPLIER_DIVISOR),
     countByStatus: tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce(
       (acc, value) => {
         acc[value] = Number(d.countByStatus[value.toLowerCase()])

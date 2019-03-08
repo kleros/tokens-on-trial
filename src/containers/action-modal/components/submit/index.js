@@ -10,6 +10,7 @@ import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
 import EthfinexLogo from '../../../../assets/images/ethfinex.svg'
+import { truncateETHValue } from '../../../../utils/ui'
 
 import './submit.css'
 
@@ -79,17 +80,22 @@ const Submit = ({
           file={file}
           message={
             <span>
-              (Max Size: 1MB)
+              (Max Size: 1 MB)
               <br />
-              Drag file or click here
+              Drag your transparent PNG or click here.
             </span>
           }
           multiple={false}
           onDropAccepted={handleOnFileDropAccepted}
+          imageFilePreviewURL={file ? file.preview : null}
         />
       </>
     )}
-    {!badge && fileInfoMessage && <div>{fileInfoMessage}</div>}
+    {!badge && fileInfoMessage && (
+      <div style={{ color: '#f66e0c', fontSize: '12px', textAlign: 'start' }}>
+        {fileInfoMessage}
+      </div>
+    )}
     {!badge && !item && (
       <div
         style={{
@@ -102,8 +108,13 @@ const Submit = ({
       >
         <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
         <div style={{ marginLeft: '5px' }}>
-          <i>Please, upload the logo with a transparent background</i>
+          <i>
+            Please ensure the logo is a transparent high resolution{' '}
+            <strong>PNG</strong>.
+          </i>
         </div>
+        <br />
+        <br />
       </div>
     )}
     <br />
@@ -114,18 +125,20 @@ const Submit = ({
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
           <strong>
-            {String(
-              web3.utils.fromWei(
-                String(
-                  web3.utils
-                    .toBN(tcr.data.requesterBaseDeposit)
-                    .add(
-                      web3.utils
-                        .toBN(tcr.data.arbitrationCost)
-                        .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                        .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                    )
-                    .add(web3.utils.toBN(tcr.data.arbitrationCost))
+            {truncateETHValue(
+              String(
+                web3.utils.fromWei(
+                  String(
+                    web3.utils
+                      .toBN(tcr.data.requesterBaseDeposit)
+                      .add(
+                        web3.utils
+                          .toBN(tcr.data.arbitrationCost)
+                          .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                          .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                      )
+                      .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                  )
                 )
               )
             )}
@@ -136,6 +149,22 @@ const Submit = ({
         <p className="Challenge-fees-line">
           <strong>ETH</strong>
         </p>
+      </div>
+    </div>
+    <div
+      style={{
+        textAlign: 'start',
+        fontSize: '12px',
+        marginTop: '10px',
+        display: 'flex'
+      }}
+    >
+      <FontAwesomeIcon icon="info-circle" />
+      <div style={{ marginLeft: '5px' }}>
+        <i>
+          Note: This is not a fee, it is a deposit and will be refunded if you
+          are correct.
+        </i>
       </div>
     </div>
     <br />

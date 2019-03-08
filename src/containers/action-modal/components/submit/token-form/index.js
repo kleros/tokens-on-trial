@@ -1,5 +1,9 @@
 import { form } from '../../../../../utils/form-generator'
-import { ETHAddress, required } from '../../../../../utils/validation'
+import {
+  ETHAddress,
+  required,
+  notEmptyAddress
+} from '../../../../../utils/validation'
 
 export const {
   Form: TokenForm,
@@ -13,7 +17,7 @@ export const {
   },
   addr: {
     type: 'text',
-    validate: [required, ETHAddress],
+    validate: [required, ETHAddress, notEmptyAddress],
     props: { placeholder: 'Address' }
   },
   ticker: {

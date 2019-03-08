@@ -6,6 +6,7 @@ import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-t
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3 } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
+import { truncateETHValue } from '../../../../utils/ui'
 import './fund-dispute.css'
 
 const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
@@ -21,13 +22,15 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
     <div className="Challenge-cost">
       <span>Arbitration Fee Stake</span>
       <strong>
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(tcr.data.arbitrationCost)
-                .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(
+                web3.utils
+                  .toBN(tcr.data.arbitrationCost)
+                  .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+              )
             )
           )
         )} ETH`}
@@ -36,8 +39,12 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
     <div className="Challenge-cost">
       <span>Required Arbitration Fee</span>
       <strong>
-        {`${String(
-          web3.utils.fromWei(String(web3.utils.toBN(tcr.data.arbitrationCost)))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(web3.utils.toBN(tcr.data.arbitrationCost))
+            )
+          )
         )} ETH`}
       </strong>
     </div>
@@ -45,17 +52,19 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
     <div className="FundDispute-cost">
       <span>Total Deposit:</span>
       <strong className="FundDispute-total-value">
-        {`${String(
-          web3.utils.fromWei(
-            String(
-              web3.utils
-                .toBN(
-                  web3.utils
-                    .toBN(tcr.data.arbitrationCost)
-                    .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                    .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
-                )
-                .add(web3.utils.toBN(tcr.data.arbitrationCost))
+        {`${truncateETHValue(
+          String(
+            web3.utils.fromWei(
+              String(
+                web3.utils
+                  .toBN(
+                    web3.utils
+                      .toBN(tcr.data.arbitrationCost)
+                      .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
+                      .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                  )
+                  .add(web3.utils.toBN(tcr.data.arbitrationCost))
+              )
             )
           )
         )} ETH`}

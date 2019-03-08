@@ -94,15 +94,9 @@ class ActionModal extends PureComponent {
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
 
-    const value = web3.utils
-      .toBN(requesterBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = requesterBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
 
     this.setState({ file: null, fileInfoMessage: null })
     createToken({ tokenData: token, fileData, file, value })
@@ -116,15 +110,9 @@ class ActionModal extends PureComponent {
       MULTIPLIER_DIVISOR,
       requesterBaseDeposit
     } = arbitrableTokenListData.data
-    const value = web3.utils
-      .toBN(requesterBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = requesterBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
     resubmitToken({ tokenData: token.data, value })
   }
 
@@ -137,15 +125,9 @@ class ActionModal extends PureComponent {
       requesterBaseDeposit
     } = arbitrableTokenListData.data
 
-    const value = web3.utils
-      .toBN(requesterBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = requesterBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
 
     clearToken({ tokenData: token.data, value })
   }
@@ -159,20 +141,33 @@ class ActionModal extends PureComponent {
       requesterBaseDeposit
     } = arbitrableAddressListData.data
 
-    const value = web3.utils
-      .toBN(requesterBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = requesterBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
 
     clearBadge({ badgeData: badge.data, value })
   }
 
   handleOnFileDropAccepted = ([file]) => {
+    if (file.size > 1e6)
+      return this.setState({
+        file: null,
+        fileInfoMessage: 'File is too big. It must be less than 1MB.'
+      })
+
+    this.setState({
+      file,
+      fileInfoMessage: null
+    })
+  }
+
+  handleOnImageDropAccepted = ([file]) => {
+    if (file.type !== 'image/png')
+      return this.setState({
+        file: null,
+        fileInfoMessage: 'File should be a PNG with a transparent background.'
+      })
+
     if (file.size > 1e6)
       return this.setState({
         file: null,
@@ -241,15 +236,9 @@ class ActionModal extends PureComponent {
     const ipfsHashEvidence =
       ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
-    const value = web3.utils
-      .toBN(challengerBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = challengerBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
     challengeRequest({
       ID: token.data.ID,
       value,
@@ -290,15 +279,9 @@ class ActionModal extends PureComponent {
     const ipfsHashEvidence =
       ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
 
-    const value = web3.utils
-      .toBN(challengerBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = challengerBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
     challengeBadgeRequest({
       addr: badge.data.addr,
       evidence: `/ipfs/${ipfsHashEvidence}`,
@@ -314,11 +297,8 @@ class ActionModal extends PureComponent {
       MULTIPLIER_DIVISOR
     } = arbitrableTokenListData.data
 
-    const value = web3.utils.toBN(arbitrationCost).add(
-      web3.utils
-        .toBN(arbitrationCost)
-        .mul(web3.utils.toBN(sharedStakeMultiplier))
-        .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
+    const value = arbitrationCost.add(
+      arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR)
     )
 
     fundDispute({
@@ -334,9 +314,8 @@ class ActionModal extends PureComponent {
     const { latestRound } = latestRequest
     const { arbitrationCost } = arbitrableTokenListData.data
 
-    const value = web3.utils
-      .toBN(latestRound.requiredFeeStake)
-      .add(web3.utils.toBN(arbitrationCost))
+    const value = latestRound.requiredFeeStake.add(arbitrationCost)
+
     fundDispute({
       ID: token.data.ID,
       value,
@@ -351,9 +330,8 @@ class ActionModal extends PureComponent {
     const { latestRound } = latestRequest
     const { arbitrationCost } = arbitrableTokenListData.data
 
-    const value = web3.utils
-      .toBN(latestRound.requiredFeeStake)
-      .add(web3.utils.toBN(arbitrationCost))
+    const value = latestRound.requiredFeeStake.add(arbitrationCost)
+
     fundBadgeDispute({
       addr: token.data.addr,
       ID: token.data.ID,
@@ -391,21 +369,21 @@ class ActionModal extends PureComponent {
       MULTIPLIER_DIVISOR
     } = arbitrableAddressListData.data
 
-    const value = web3.utils
-      .toBN(requesterBaseDeposit)
-      .add(web3.utils.toBN(arbitrationCost))
-      .add(
-        web3.utils
-          .toBN(arbitrationCost)
-          .mul(web3.utils.toBN(sharedStakeMultiplier))
-          .div(web3.utils.toBN(MULTIPLIER_DIVISOR))
-      )
+    const value = requesterBaseDeposit
+      .add(arbitrationCost)
+      .add(arbitrationCost.mul(sharedStakeMultiplier).div(MULTIPLIER_DIVISOR))
 
     this.setState({ file: null, fileInfoMessage: null })
     createBadge({ badgeData: badge, value })
   }
 
   handleCloseTokenSubmission = () => {
+    const { closeActionModal } = this.props
+    this.setState({ file: null, fileInfoMessage: null })
+    closeActionModal()
+  }
+
+  handleRequestClose = () => {
     const { closeActionModal } = this.props
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
@@ -465,7 +443,7 @@ class ActionModal extends PureComponent {
       <Modal
         className="ActionModal"
         isOpen={openActionModal !== null}
-        onRequestClose={closeActionModal}
+        onRequestClose={this.handleRequestClose}
       >
         {(() => {
           switch (openActionModal) {
@@ -480,7 +458,7 @@ class ActionModal extends PureComponent {
                   file={file}
                   formIsInvalid={tokenFormIsInvalid}
                   fileInfoMessage={fileInfoMessage}
-                  handleOnFileDropAccepted={this.handleOnFileDropAccepted}
+                  handleOnFileDropAccepted={this.handleOnImageDropAccepted}
                   closeActionModal={this.handleCloseTokenSubmission}
                   item={
                     openActionModal === modalConstants.ACTION_MODAL_ENUM.Submit
