@@ -380,12 +380,25 @@ class BadgeDetails extends PureComponent {
       else challengerFeesPercent = 100
     }
 
-    let evidenceRemainingTime = 0
+    let periodRemainingTime = 0
     if (latestRequest.dispute)
-      evidenceRemainingTime =
-        Number(latestRequest.dispute.lastPeriodChange) * 1000 +
-        Number(latestRequest.dispute.court.timesPerPeriod[0]) * 1000 -
-        Date.now()
+      if (latestRequest.dispute.period.toString() === '1') {
+        periodRemainingTime =
+          Number(latestRequest.dispute.lastPeriodChange) * 1000 +
+          Number(latestRequest.dispute.court.timesPerPeriod[1]) * 1000 +
+          Number(latestRequest.dispute.court.timesPerPeriod[2]) * 1000 -
+          Date.now()
+      } else {
+        periodRemainingTime =
+          Number(latestRequest.dispute.lastPeriodChange) * 1000 +
+          Number(
+            latestRequest.dispute.court.timesPerPeriod[
+              latestRequest.dispute.period
+            ]
+          ) *
+            1000 -
+          Date.now()
+      }
 
     /* eslint-disable react/jsx-no-bind */
 
@@ -521,7 +534,7 @@ class BadgeDetails extends PureComponent {
                       </span>
                     )}
                   {latestRequest.dispute &&
-                    latestRequest.dispute.period.toString() === '0' && (
+                    Number(latestRequest.dispute.period) <= 2 && (
                       <span
                         className="TokenDetails-meta-item"
                         style={{
@@ -540,13 +553,17 @@ class BadgeDetails extends PureComponent {
                             'Waiting Next Period'
                           ) : (
                             <>
-                              {'Evidence period ends in '}
+                              {`${
+                                tcrConstants.PERIOD_STRINGS[
+                                  latestRequest.dispute.period
+                                ]
+                              }`}
                               <Countdown
-                                date={Date.now() + evidenceRemainingTime}
+                                date={Date.now() + periodRemainingTime}
                                 renderer={CountdownRenderer}
                                 onStart={() =>
                                   this.onEvidenceCountdownComplete(
-                                    evidenceRemainingTime
+                                    periodRemainingTime
                                   )
                                 }
                                 onComplete={this.onEvidenceCountdownComplete}
