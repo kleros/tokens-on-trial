@@ -33,9 +33,10 @@ const Challenge = ({
     <h5 className="Modal-subtitle">
       In order to challenge, the following <br /> amount of ETH is required
     </h5>
+    <br />
     <div className="Challenge-fees">
       <div>
-        <p className="Challenge-fees-line">Total Due:</p>
+        <p className="Challenge-fees-line">Total Deposit:</p>
       </div>
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>

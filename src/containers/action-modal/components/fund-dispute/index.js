@@ -50,7 +50,7 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
     </div>
     <br />
     <div className="FundDispute-cost">
-      <span>Total Due:</span>
+      <span>Total Deposit:</span>
       <strong className="FundDispute-total-value">
         {`${truncateETHValue(
           String(

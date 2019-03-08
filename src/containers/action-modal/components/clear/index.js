@@ -18,7 +18,7 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
     <br />
     <div className="Challenge-fees">
       <div>
-        <p className="Challenge-fees-line">Amount Required:</p>
+        <p className="Challenge-fees-line">Total Deposit:</p>
       </div>
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>

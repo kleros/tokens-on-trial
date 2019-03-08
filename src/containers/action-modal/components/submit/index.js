@@ -117,9 +117,10 @@ const Submit = ({
         <br />
       </div>
     )}
+    <br />
     <div className="Challenge-fees">
       <div>
-        <p className="Challenge-fees-line">Amount Required:</p>
+        <p className="Challenge-fees-line">Total Deposit:</p>
       </div>
       <div>
         <p className="Challenge-fees-line" style={{ marginLeft: '67px' }}>
