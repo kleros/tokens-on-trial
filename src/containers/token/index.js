@@ -75,7 +75,8 @@ class TokenDetails extends PureComponent {
     appealModalOpen: false,
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
-    evidenceListenerSet: false
+    evidenceListenerSet: false,
+    evidencePeriodEnded: false
   }
 
   handleFilterChange = key => {
@@ -122,6 +123,7 @@ class TokenDetails extends PureComponent {
     fetchToken(tokenID)
     arbitrableTokenList.events.Ruling().on('data', event => {
       const { token } = this.state
+      if (!token) return
       const { latestRequest } = token
       if (
         latestRequest.disputed &&
@@ -197,6 +199,11 @@ class TokenDetails extends PureComponent {
   onLoserCountdownComplete = time => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ loserCountdownCompleted: true })
+  }
+
+  onEvidenceCountdownComplete = time => {
+    if (typeof time === 'number' && time > 0) return
+    this.setState({ evidencePeriodEnded: true })
   }
 
   submitBadgeAction = () =>
@@ -279,7 +286,8 @@ class TokenDetails extends PureComponent {
       appealModalOpen,
       loserCountdownCompleted,
       winnerCountdownCompleted,
-      token
+      token,
+      evidencePeriodEnded
     } = this.state
 
     const { accounts, filter, match, arbitrableTokenListData } = this.props
@@ -396,6 +404,13 @@ class TokenDetails extends PureComponent {
       else challengerFeesPercent = 100
     }
 
+    let evidenceRemainingTime = 0
+    if (latestRequest.dispute)
+      evidenceRemainingTime =
+        Number(latestRequest.dispute.lastPeriodChange) * 1000 +
+        Number(latestRequest.dispute.court.timesPerPeriod[0]) * 1000 -
+        Date.now()
+
     /* eslint-disable react/jsx-no-bind */
     return (
       <div className="Page">
@@ -497,6 +512,42 @@ class TokenDetails extends PureComponent {
                             latestRequest.dispute.ruling.toString()
                           )
                         : 'Jurors did not rule.'}
+                    </span>
+                  )}
+                {latestRequest.dispute &&
+                  latestRequest.dispute.period.toString() === '0' && (
+                    <span
+                      className="TokenDetails-meta-item"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        color: '#f60c36'
+                      }}
+                    >
+                      <div className="BadgeDetails-timer">
+                        <FontAwesomeIcon
+                          className="TokenDetails-icon"
+                          color="#f60c36"
+                          icon="clock"
+                        />
+                        {evidencePeriodEnded ? (
+                          'Waiting Next Period'
+                        ) : (
+                          <>
+                            {'Evidence period ends in '}
+                            <Countdown
+                              date={Date.now() + evidenceRemainingTime}
+                              renderer={CountdownRenderer}
+                              onStart={() =>
+                                this.onEvidenceCountdownComplete(
+                                  evidenceRemainingTime
+                                )
+                              }
+                              onComplete={this.onEvidenceCountdownComplete}
+                            />
+                          </>
+                        )}
+                      </div>
                     </span>
                   )}
                 {!(

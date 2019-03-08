@@ -116,7 +116,8 @@ class _ConnectedNavBar extends Component {
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
           {
-            title: 'Token² Curated List',
+            title: 'Token² Curated Registry',
+            subtitle: 'Beta',
             to: '/tokens',
             extraStyle: 'NavBar-route-title'
           },

@@ -248,8 +248,14 @@ export function* fetchToken({ payload: { ID } }) {
 
     if (token.latestRequest.disputed) {
       // Fetch dispute data.
-      token.latestRequest.dispute = {}
       arbitrator.options.address = token.latestRequest.arbitrator
+      token.latestRequest.dispute = yield call(
+        arbitrator.methods.disputes(token.latestRequest.disputeID).call
+      )
+      token.latestRequest.dispute.court = yield call(
+        arbitrator.methods.getSubcourt(token.latestRequest.dispute.subcourtID)
+          .call
+      )
       token.latestRequest.dispute.status = yield call(
         arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
       )
@@ -388,7 +394,13 @@ export function* fetchToken({ payload: { ID } }) {
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
         arbitrator.options.address = badge.latestRequest.arbitrator
-        badge.latestRequest.dispute = {}
+        badge.latestRequest.dispute = yield call(
+          arbitrator.methods.disputes(badge.latestRequest.disputeID).call
+        )
+        badge.latestRequest.dispute.court = yield call(
+          arbitrator.methods.getSubcourt(badge.latestRequest.dispute.subcourtID)
+            .call
+        )
         badge.latestRequest.dispute.status = yield call(
           arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
         )
