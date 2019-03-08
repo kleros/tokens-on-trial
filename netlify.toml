@@ -16,7 +16,7 @@
   REACT_APP_PROD_FILE_BASE_URL="https://staging-cfs.s3.us-east-2.amazonaws.com"
   REACT_APP_PROD_FILE_UPLOAD_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/cfs"
   REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings"
-  REACT_APP_PROD_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/Qmdtkc3gx6kNSQSmibeLvBXk2gmV6f8cv63DSejR9YMHJs/HC-Token-Listing-CriteriaV2.1.pdf"
+  REACT_APP_PROD_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/QmWwXgfFz3anaxfyVyZKD1L3UJqrExnE4NLS8FK6EDUkh4/Ethfinex-Court-Policy.pdf"
 # Production context: All deploys to the main
 # repository branch will inherit these settings.
 [context.production]
@@ -31,7 +31,7 @@
   REACT_APP_PROD_FILE_BASE_URL="https://production-doges-on-trial-doge-images.s3.us-east-2.amazonaws.com/"
   REACT_APP_PROD_FILE_UPLOAD_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/staging/cfs"
   REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings"
-  REACT_APP_PROD_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/Qmdtkc3gx6kNSQSmibeLvBXk2gmV6f8cv63DSejR9YMHJs/HC-Token-Listing-CriteriaV2.1.pdf"
+  REACT_APP_PROD_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/QmWwXgfFz3anaxfyVyZKD1L3UJqrExnE4NLS8FK6EDUkh4/Ethfinex-Court-Policy.pdf"
 
 [[redirects]]
   from = "/*"
