@@ -122,7 +122,7 @@ class _ConnectedNavBar extends Component {
             extraStyle: 'NavBar-route-title'
           },
           {
-            title: 'Badge Request',
+            title: 'Badge Requests',
             to: '/badges',
             extraStyle: 'NavBar-route-title'
           }
