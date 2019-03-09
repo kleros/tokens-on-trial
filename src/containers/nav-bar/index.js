@@ -15,6 +15,11 @@ export default class NavBar extends PureComponent {
         isExternal: PropTypes.bool
       }).isRequired
     ).isRequired,
+    extraRoutes: PropTypes.arrayOf(
+      PropTypes.shape({
+        title: PropTypes.node.isRequired
+      }).isRequired
+    ).isRequired,
     extras: PropTypes.arrayOf(PropTypes.node.isRequired).isRequired
   }
 
@@ -23,7 +28,7 @@ export default class NavBar extends PureComponent {
   }
 
   render() {
-    const { routes, extras } = this.props
+    const { routes, extras, extraRoutes } = this.props
     const { isMobile } = this.state
 
     const logoImg = <img alt="Logo" className="NavBar-logo" src={logo} />
@@ -40,6 +45,22 @@ export default class NavBar extends PureComponent {
               <i style={{ fontSize: '10px', letterSpacing: 0 }}>{r.subtitle}</i>
             </div>
           </Link>
+        </div>
+      )),
+      ...extraRoutes.map(r => (
+        <div key={r.title}>
+          <a
+            className={`NavBar-route ${r.extraStyle}`}
+            style={{ height: '55px' }}
+            rel="noopener noreferrer"
+            target="_blank"
+            href={r.to}
+          >
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              {r.title}
+              <i style={{ fontSize: '10px', letterSpacing: 0 }}>{r.subtitle}</i>
+            </div>
+          </a>
         </div>
       )),
       ...extras.map((e, i) => (

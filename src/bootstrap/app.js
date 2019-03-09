@@ -122,8 +122,15 @@ class _ConnectedNavBar extends Component {
             extraStyle: 'NavBar-route-title'
           },
           {
-            title: 'Badges',
+            title: 'Badge Request',
             to: '/badges',
+            extraStyle: 'NavBar-route-title'
+          }
+        ]}
+        extraRoutes={[
+          {
+            title: 'Guide',
+            to: 'https://blog.kleros.io/kleros-ethfinex-tcr-an-explainer/',
             extraStyle: 'NavBar-route-title'
           }
         ]}
