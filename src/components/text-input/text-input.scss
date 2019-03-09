@@ -27,6 +27,10 @@
     outline: none;
     padding: 15px 5px;
     width: 100%;
+
+    &-area {
+      min-height: 100px;
+    }
   }
 
   &-placeholder {
@@ -43,7 +47,7 @@
     &.is-touched {
       font-size: 8px;
       line-height: 8px;
-      top: 5px;
+      top: 5px !important;
       transform: none;
     }
   }

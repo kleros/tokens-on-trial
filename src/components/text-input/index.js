@@ -13,11 +13,11 @@ const TextInput = ({
   <div
     className={`TextInput ${
       error && touched ? 'is-error' : valid ? 'is-valid' : ''
-    } ${className}`}
+    } ${className} ${type === 'textarea' ? 'TextInput-input-area' : ''}`}
   >
-    {type === 'textarea' ? (
+    {type === 'textarea' && !touched ? (
       <textarea
-        className="TextInput-input"
+        className="TextInput-input TextInput-input-area"
         onBlur={onBlur}
         onChange={onChange}
         value={value}
@@ -39,7 +39,13 @@ const TextInput = ({
             ? ' is-touched'
             : ''
         }`}
+        style={
+          type === 'textarea' && (value === '' && !touched)
+            ? { top: '20%' }
+            : {}
+        }
       >
+        {console.info('v', value)}
         {placeholder}
       </div>
     )}

@@ -6,8 +6,9 @@
   display: flex;
   flex-direction: column;
 
-  &-form {
-    margin: 0 -30px;
+  &-form-fieldset {
+    margin: 0 0 !important;
+    padding: 0 0 !important;
   }
 
   &-actions {
