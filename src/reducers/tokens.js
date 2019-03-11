@@ -7,15 +7,15 @@ const cachedTokens = localStorage.getItem(
 
 const initialState = cachedTokens
   ? JSON.parse(cachedTokens)
-  : { blockHeight: 0 }
+  : { blockNumber: 0 }
 
 const tokens = (state = initialState, action) => {
   switch (action.type) {
     case ADD_TOKENS: {
-      const { tokens, blockHeight } = action.payload
+      const { tokens, blockNumber } = action.payload
       return {
         ...tokens,
-        blockHeight
+        blockNumber
       }
     }
     default:
