@@ -18,7 +18,7 @@ class SearchBar extends PureComponent {
       push: PropTypes.func.isRequired
     }).isRequired,
     tokens: PropTypes.shape({
-      blockHeight: PropTypes.number.isRequired
+      blockNumber: PropTypes.number.isRequired
     }).isRequired,
     addTokens: PropTypes.func.isRequired
   }
@@ -30,10 +30,10 @@ class SearchBar extends PureComponent {
   async componentDidMount() {
     const { tokens, addTokens } = this.props
     const events = await arbitrableTokenList.getPastEvents('TokenSubmitted', {
-      fromBlock: tokens.blockHeight
+      fromBlock: tokens.blockNumber
     })
 
-    const blockHeight = events.reduce((acc, event) => {
+    const blockNumber = events.reduce((acc, event) => {
       const { blockNumber } = event
       return blockNumber > acc ? blockNumber : acc
     }, 0)
@@ -55,19 +55,20 @@ class SearchBar extends PureComponent {
           name: _name,
           ticker: _ticker,
           address: _address,
-          symbolMultihash: _symbolMultihash
+          symbolMultihash: _symbolMultihash,
+          blockNumber: event.blockNumber
         }
         return acc
       },
       { ...tokens }
     )
-    addTokens({ tokens: receivedTokens, blockHeight })
+    addTokens({ tokens: receivedTokens, blockNumber })
   }
 
   componentWillReceiveProps(props) {
     const { tokens } = props
     const tokenSubmissions = Object.keys(tokens)
-      .filter(key => key !== 'blockHeight')
+      .filter(key => key !== 'blockNumber')
       .map(tokenID => {
         const { name, ticker, address, symbolMultihash } = tokens[tokenID]
 
