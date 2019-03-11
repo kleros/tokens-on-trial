@@ -45,7 +45,6 @@ const TextInput = ({
             : {}
         }
       >
-        {console.info('v', value)}
         {placeholder}
       </div>
     )}

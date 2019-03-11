@@ -11,6 +11,7 @@ import token from './token'
 import badge from './badge'
 import modal from './modal'
 import filter from './filter'
+import tokens from './tokens'
 
 // Export root reducer
 export default combineReducers({
@@ -24,5 +25,6 @@ export default combineReducers({
   token,
   badge,
   modal,
-  filter
+  filter,
+  tokens
 })
