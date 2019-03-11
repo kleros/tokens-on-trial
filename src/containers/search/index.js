@@ -30,8 +30,10 @@ class SearchBar extends PureComponent {
   async componentDidMount() {
     const { tokens, addTokens } = this.props
     const events = await arbitrableTokenList.getPastEvents('TokenSubmitted', {
-      fromBlock: 0
+      fromBlock: tokens.blockHeight
     })
+    console.info('t', tokens)
+
     const blockHeight = events.reduce((acc, curr) => {
       const { blockNumber } = curr
       return acc
