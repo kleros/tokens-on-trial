@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react'
 import Downshift from 'downshift'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
+import * as tokensActions from '../../actions/tokens'
 import { arbitrableTokenList, web3 } from '../../bootstrap/dapp-api'
 
 import Item from './item'
@@ -14,41 +16,75 @@ class SearchBar extends PureComponent {
   static propTypes = {
     history: PropTypes.shape({
       push: PropTypes.func.isRequired
-    }).isRequired
+    }).isRequired,
+    tokens: PropTypes.shape({
+      blockHeight: PropTypes.number.isRequired
+    }).isRequired,
+    addTokens: PropTypes.func.isRequired
   }
 
   state = {
     tokenSubmissions: []
   }
 
-  componentDidMount() {
-    arbitrableTokenList.events.TokenSubmitted({ fromBlock: 0 }, (err, data) => {
-      if (err) {
-        console.error('Error fetching token submission: ', err)
-        return
-      }
-      const { returnValues } = data
-      const { tokenSubmissions } = this.state
-      const { _name, _ticker, _symbolMultihash, _address } = returnValues
-      if (!_name || !_ticker) return
-
-      const tokenID = web3.utils.soliditySha3(
-        _name || '',
-        _ticker || '',
-        _address,
-        _symbolMultihash
-      )
-
-      tokenSubmissions.push({
-        value: _name || '',
-        searchVal: _name ? _name.toLowerCase() : '',
-        tokenID,
-        name: _name,
-        ticker: _ticker,
-        address: _address,
-        symbolMultihash: _symbolMultihash
-      })
+  async componentDidMount() {
+    const { tokens, addTokens } = this.props
+    const events = await arbitrableTokenList.getPastEvents('TokenSubmitted', {
+      fromBlock: 0
     })
+    const blockHeight = events.reduce((acc, curr) => {
+      const { blockNumber } = curr
+      return acc
+        ? blockNumber > acc.blockNumber
+          ? blockNumber
+          : acc.blockNumber
+        : blockNumber
+    })
+
+    const receivedTokens = events.reduce(
+      (acc, event) => {
+        const { returnValues } = event
+        const { _name, _ticker, _symbolMultihash, _address } = returnValues
+        if (!_name || !_ticker) return acc
+
+        const tokenID = web3.utils.soliditySha3(
+          _name || '',
+          _ticker || '',
+          _address,
+          _symbolMultihash
+        )
+
+        acc[tokenID] = {
+          name: _name,
+          ticker: _ticker,
+          address: _address,
+          symbolMultihash: _symbolMultihash
+        }
+        return acc
+      },
+      { ...tokens }
+    )
+    addTokens({ tokens: receivedTokens, blockHeight })
+  }
+
+  componentWillReceiveProps(props) {
+    const { tokens } = props
+    const tokenSubmissions = Object.keys(tokens)
+      .filter(key => key !== 'blockHeight')
+      .map(tokenID => {
+        const { name, ticker, address, symbolMultihash } = tokens[tokenID]
+
+        return {
+          value: name || '',
+          searchVal: name ? name.toLowerCase() : '',
+          tokenID,
+          name,
+          ticker,
+          address,
+          symbolMultihash
+        }
+      })
+    this.setState({ tokenSubmissions })
   }
 
   itemClicked = selection => {
@@ -111,4 +147,13 @@ class SearchBar extends PureComponent {
   }
 }
 
-export default withRouter(SearchBar)
+export default withRouter(
+  connect(
+    state => ({
+      tokens: state.tokens
+    }),
+    {
+      addTokens: tokensActions.addTokens
+    }
+  )(SearchBar)
+)
