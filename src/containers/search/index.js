@@ -32,16 +32,11 @@ class SearchBar extends PureComponent {
     const events = await arbitrableTokenList.getPastEvents('TokenSubmitted', {
       fromBlock: tokens.blockHeight
     })
-    console.info('t', tokens)
 
-    const blockHeight = events.reduce((acc, curr) => {
-      const { blockNumber } = curr
-      return acc
-        ? blockNumber > acc.blockNumber
-          ? blockNumber
-          : acc.blockNumber
-        : blockNumber
-    })
+    const blockHeight = events.reduce((acc, event) => {
+      const { blockNumber } = event
+      return blockNumber > acc ? blockNumber : acc
+    }, 0)
 
     const receivedTokens = events.reduce(
       (acc, event) => {
