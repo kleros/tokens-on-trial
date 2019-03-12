@@ -3,6 +3,7 @@ import { put, takeLatest, select, call } from 'redux-saga/effects'
 import { FETCH_TOKENS_CACHE, CACHE_TOKENS } from '../actions/tokens'
 import * as tokenSelectors from '../reducers/tokens'
 import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
+import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
   arbitrableTokenList.getPastEvents(eventName, { fromBlock })
@@ -62,11 +63,12 @@ function* fetchTokens() {
         address: _address,
         symbolMultihash: _symbolMultihash,
         blockNumber: event.blockNumber,
+        ID: tokenID,
         status: { blockNumber: 0 }
       }
       return acc
     },
-    { ...tokens }
+    { ...tokens.items }
   )
 
   // Get the lastest status change for every token.
@@ -92,8 +94,10 @@ function* fetchTokens() {
   })
 
   const cachedTokens = {
-    ...tokens,
-    ...receivedTokens,
+    items: {
+      ...tokens.items,
+      ...receivedTokens
+    },
     blockNumber,
     statusBlockNumber
   }
@@ -106,7 +110,7 @@ function* fetchTokens() {
     const { returnValues, blockNumber } = event
     const { _tokenID, _status, _disputed } = returnValues
 
-    if (!cachedTokens[_tokenID])
+    if (!cachedTokens.items[_tokenID])
       // This is a missing token due to the web3js bug described above.
       for (const missingToken of missingTokens) {
         const tokenInfo = yield call(
@@ -120,8 +124,9 @@ function* fetchTokens() {
         ) {
           missingToken.name = missingToken.name || '0x'
           missingToken.ticker = missingToken.ticker || '0x'
-          cachedTokens[_tokenID] = {
+          cachedTokens.items[_tokenID] = {
             ...missingToken,
+            ID: _tokenID,
             status: {
               blockNumber,
               status: Number(_status),
@@ -131,13 +136,22 @@ function* fetchTokens() {
         }
       }
 
-    if (blockNumber > cachedTokens[_tokenID].status.blockNumber)
-      cachedTokens[_tokenID].status = {
+    if (blockNumber > cachedTokens.items[_tokenID].status.blockNumber)
+      cachedTokens.items[_tokenID].status = {
         blockNumber,
         status: Number(_status),
         disputed: Boolean(Number(_disputed))
       }
   }
+
+  console.info(cachedTokens)
+
+  Object.keys(cachedTokens.items).forEach(tokenID => {
+    cachedTokens.items[tokenID].clientStatus = contractStatusToClientStatus(
+      cachedTokens.items[tokenID].status.status,
+      cachedTokens.items[tokenID].status.disputed
+    )
+  })
 
   yield put({ type: CACHE_TOKENS, payload: { tokens: cachedTokens } })
 }

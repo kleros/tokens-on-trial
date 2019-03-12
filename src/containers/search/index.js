@@ -22,14 +22,7 @@ class SearchBar extends Component {
     fetchTokens: PropTypes.func.isRequired
   }
 
-  state = {
-    tokenSubmissions: []
-  }
-
-  async componentDidMount() {
-    const { fetchTokens } = this.props
-    fetchTokens()
-  }
+  state = { tokenSubmissions: [] }
 
   componentWillReceiveProps(props) {
     const { tokens } = props

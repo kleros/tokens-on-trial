@@ -35,7 +35,7 @@ const TokenCard = ({ token }) => (
         }`}
       </h5>
       <a
-        href={`https://etherscan.io/token/${token.addr}`}
+        href={`https://etherscan.io/token/${token.address}`}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -79,7 +79,7 @@ TokenCard.propTypes = {
     name: PropTypes.string.isRequired,
     symbolMultihash: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
-    addr: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
     status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
   }).isRequired
