@@ -11,7 +11,8 @@ const initialState = cachedTokens
       loading: false,
       data: {
         blockNumber: 0,
-        statusBlockNumber: 0
+        statusBlockNumber: 0,
+        items: {}
       }
     }
 
