@@ -1,6 +1,6 @@
-export const ADD_TOKENS = 'ADD_TOKENS'
+export const CACHE_TOKENS = 'CACHE_TOKENS'
 
-export const addTokens = ({ tokens, blockNumber }) => ({
-  type: ADD_TOKENS,
-  payload: { tokens, blockNumber }
+export const cacheTokens = ({ tokens }) => ({
+  type: CACHE_TOKENS,
+  payload: { tokens }
 })
