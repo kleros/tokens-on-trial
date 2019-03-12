@@ -9,6 +9,7 @@ import arbitratorSaga from './arbitrator'
 import tokenSaga from './token'
 import badgeSaga from './badge'
 import notificationSaga from './notifications'
+import tokensSaga from './tokens'
 
 /**
  * Makes a saga restart after an uncaught error.
@@ -43,7 +44,8 @@ const rootSagas = [
   tokenSaga,
   badgeSaga,
   arbitratorSaga,
-  notificationSaga
+  notificationSaga,
+  tokensSaga
 ].map(makeRestartable)
 
 /**
