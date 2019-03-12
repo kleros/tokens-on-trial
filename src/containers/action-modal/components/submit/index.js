@@ -102,7 +102,6 @@ const Submit = ({
           textAlign: 'start',
           fontSize: '11.5px',
           marginTop: '10px',
-          marginBottom: '10px',
           display: 'flex'
         }}
       >
@@ -113,12 +112,9 @@ const Submit = ({
             <strong>PNG</strong>.
           </i>
         </div>
-        <br />
-        <br />
       </div>
     )}
-    <br />
-    <div className="Challenge-fees">
+    <div className="Challenge-fees" style={{ marginTop: '10px' }}>
       <div>
         <p className="Challenge-fees-line">Total Deposit:</p>
       </div>
@@ -161,9 +157,23 @@ const Submit = ({
     >
       <FontAwesomeIcon icon="info-circle" />
       <div style={{ marginLeft: '5px' }}>
+        <i>Note: This is a deposit and will be refunded if you are correct.</i>
+      </div>
+    </div>
+    <div
+      style={{
+        textAlign: 'start',
+        fontSize: '12px',
+        marginTop: '10px',
+        display: 'flex'
+      }}
+    >
+      <div style={{ marginLeft: '5px' }}>
         <i>
-          Note: This is not a fee, it is a deposit and will be refunded if you
-          are correct.
+          After your token is accepted, you can add badges to it to certify that
+          it meets some additional criteria. For example, add an Ethfinex badge
+          to certify that it meets Ethfinex’s listing criteria and qualifies for
+          the community vote.
         </i>
       </div>
     </div>
