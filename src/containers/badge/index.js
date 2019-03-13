@@ -240,8 +240,10 @@ class BadgeDetails extends PureComponent {
               `${IPFS_URL}${e.returnValues._evidence}`,
               { hash: calculatedMultihash }
             ))
-          )
+          ) {
+            console.warn('Invalid evidence', evidence)
             return
+          }
 
           const { evidences } = this.state
           const mimeType = mime.lookup(evidence.fileTypeExtension)
@@ -267,8 +269,6 @@ class BadgeDetails extends PureComponent {
       badge,
       evidencePeriodEnded
     } = this.state
-
-    console.info(evidences)
 
     const { accounts, filter, match, arbitrableAddressListData } = this.props
     const { filters } = filter
