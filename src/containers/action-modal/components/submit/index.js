@@ -114,7 +114,7 @@ const Submit = ({
         </div>
       </div>
     )}
-    <div className="Challenge-fees" style={{ marginTop: '10px' }}>
+    <div className="Challenge-fees" style={{ marginTop: '15px' }}>
       <div>
         <p className="Challenge-fees-line">Total Deposit:</p>
       </div>
@@ -151,7 +151,7 @@ const Submit = ({
       style={{
         textAlign: 'start',
         fontSize: '12px',
-        marginTop: '10px',
+        marginTop: '15px',
         display: 'flex'
       }}
     >
@@ -169,6 +169,7 @@ const Submit = ({
           display: 'flex'
         }}
       >
+        <FontAwesomeIcon icon="info-circle" color="#ef0101" />
         <div style={{ marginLeft: '5px' }}>
           <i>
             After your token is accepted, you can add badges to it to certify

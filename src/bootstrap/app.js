@@ -129,8 +129,14 @@ class _ConnectedNavBar extends Component {
         ]}
         extraRoutes={[
           {
-            title: 'Guide',
+            title: 'T²CR Guide',
             to: 'https://blog.kleros.io/kleros-ethfinex-tcr-an-explainer/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Ethfinex Guide',
+            to:
+              'https://blog.kleros.io/p/99a3bfb6-34ea-40f0-b2d5-ecb7de00a876/',
             extraStyle: 'NavBar-route-title'
           }
         ]}
