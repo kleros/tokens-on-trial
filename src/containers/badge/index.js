@@ -8,6 +8,7 @@ import { BeatLoader } from 'react-spinners'
 import { Link } from 'react-router-dom'
 import Countdown from 'react-countdown-now'
 import Progress from 'react-progressbar'
+import Archon from '@kleros/archon'
 
 import {
   arbitrableAddressList,
@@ -15,7 +16,8 @@ import {
   web3,
   ETHFINEX_CRITERIA_URL,
   archon,
-  FILE_BASE_URL
+  FILE_BASE_URL,
+  IPFS_URL
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
@@ -68,7 +70,7 @@ class BadgeDetails extends PureComponent {
 
   state = {
     countdownCompleted: false,
-    evidences: [],
+    evidences: null,
     appealModalOpen: false,
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
@@ -216,7 +218,7 @@ class BadgeDetails extends PureComponent {
             _evidenceGroupID: badge.latestRequest.evidenceGroupID
           }
         })
-        .on('data', e => {
+        .on('data', async e => {
           const { badge } = this.state
           if (!badge) return
           const { latestRequest } = badge
@@ -224,33 +226,32 @@ class BadgeDetails extends PureComponent {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
             return
 
-          archon.arbitrable
-            .getEvidence(
-              arbitrableAddressList._address,
-              arbitrator._address,
-              latestRequest.evidenceGroupID
-            )
-            .then(resp =>
-              resp
-                .filter(
-                  evidence =>
-                    evidence.evidenceJSONValid &&
-                    (evidence.evidenceJSON.fileURI.length === 0 ||
-                      evidence.fileValid)
-                )
-                .forEach(evidence => {
-                  const { evidences } = this.state
-                  const { evidenceJSON } = evidence
-                  const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                  evidenceJSON.icon = getFileIcon(mimeType)
-                  this.setState({
-                    evidences: {
-                      ...evidences,
-                      [evidence.transactionHash]: evidenceJSON
-                    }
-                  })
-                })
-            )
+          const evidence = await (await fetch(
+            `${IPFS_URL}${e.returnValues._evidence}`
+          )).json()
+          /* eslint-disable unicorn/number-literal-case */
+          const calculatedMultihash = archon.utils.multihashFile(
+            evidence,
+            0x1b // keccak-256
+          )
+
+          if (
+            !(await Archon.utils.validateFileFromURI(
+              `${IPFS_URL}${e.returnValues._evidence}`,
+              { hash: calculatedMultihash }
+            ))
+          )
+            return
+
+          const { evidences } = this.state
+          const mimeType = mime.lookup(evidence.fileTypeExtension)
+          evidence.icon = getFileIcon(mimeType)
+          this.setState({
+            evidences: {
+              ...evidences,
+              [e.transactionHash]: evidence
+            }
+          })
         })
       this.setState({ evidenceListenerSet: true })
     }
@@ -266,6 +267,8 @@ class BadgeDetails extends PureComponent {
       badge,
       evidencePeriodEnded
     } = this.state
+
+    console.info(evidences)
 
     const { accounts, filter, match, arbitrableAddressListData } = this.props
     const { filters } = filter
@@ -425,7 +428,7 @@ class BadgeDetails extends PureComponent {
                 src={`${
                   badge.token
                     ? badge.token.symbolMultihash[0] === '/'
-                      ? `https://ipfs.kleros.io/${badge.token.symbolMultihash}`
+                      ? `${IPFS_URL}${badge.token.symbolMultihash}`
                       : `${FILE_BASE_URL}/${badge.token.symbolMultihash}`
                     : UnknownToken
                 }`}
@@ -905,15 +908,33 @@ class BadgeDetails extends PureComponent {
             <h3>Evidence</h3>
             <div className="TokenDescription-evidence">
               <div className="TokenDescription-evidence--list">
-                {Object.keys(evidences).map(key => (
-                  <div
-                    className="TokenDescription-evidence--item"
-                    key={key}
-                    onClick={this.handleViewEvidenceClick(evidences[key])}
-                  >
-                    <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
-                  </div>
-                ))}
+                {latestRequest.disputed &&
+                  (evidences ? (
+                    <>
+                      {Object.keys(evidences).map(key => (
+                        <div
+                          className="TokenDescription-evidence--item"
+                          key={key}
+                          onClick={this.handleViewEvidenceClick(evidences[key])}
+                        >
+                          <FontAwesomeIcon
+                            icon={evidences[key].icon}
+                            size="2x"
+                          />
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <div>
+                      <BeatLoader color="#3d464d" />
+                      <small>
+                        <i>
+                          Evidence can take some time to load. Thanks for the
+                          patience
+                        </i>
+                      </small>
+                    </div>
+                  ))}
               </div>
               <Button onClick={this.handleOpenEvidenceModal} type="secondary">
                 Submit Evidence

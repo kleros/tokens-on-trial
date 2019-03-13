@@ -15,7 +15,7 @@ const TextInput = ({
       error && touched ? 'is-error' : valid ? 'is-valid' : ''
     } ${className} ${type === 'textarea' ? 'TextInput-input-area' : ''}`}
   >
-    {type === 'textarea' && !touched ? (
+    {type === 'textarea' ? (
       <textarea
         className="TextInput-input TextInput-input-area"
         onBlur={onBlur}
@@ -45,7 +45,6 @@ const TextInput = ({
             : {}
         }
       >
-        {console.info('v', value)}
         {placeholder}
       </div>
     )}

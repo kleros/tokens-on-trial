@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 
 import { truncateMiddle } from '../../../utils/ui'
-import { web3, FILE_BASE_URL } from '../../../bootstrap/dapp-api'
+import { web3, FILE_BASE_URL, IPFS_URL } from '../../../bootstrap/dapp-api'
 
 import './item.css'
 
@@ -14,7 +14,7 @@ const SearchItem = ({ onClick, item }) => (
       alt="submission-symbol"
       src={
         item.symbolMultihash && item.symbolMultihash[0] === '/'
-          ? `https://ipfs.kleros.io${item.symbolMultihash}`
+          ? `${IPFS_URL}${item.symbolMultihash}`
           : `${FILE_BASE_URL}/${item.symbolMultihash}`
       }
     />

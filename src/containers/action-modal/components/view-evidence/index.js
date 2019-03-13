@@ -1,11 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
+import { IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './view-evidence.css'
 
 const downloadClick = url => async () => {
-  window.open(`https://ipfs.kleros.io${url}`)
+  window.open(`${IPFS_URL}${url}`)
 }
 
 const ViewEvidence = ({ closeActionModal, evidence }) => (
