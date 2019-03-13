@@ -39,6 +39,10 @@ window.addEventListener('unload', () => {
     `${arbitrableTokenList.options.address}tokens`,
     JSON.stringify(store.getState().tokens)
   )
+  localStorage.setItem(
+    `${arbitrableAddressList.options.address}badges`,
+    JSON.stringify(store.getState().badges)
+  )
 })
 
 if (module.hot)

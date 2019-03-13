@@ -21,26 +21,36 @@ class Tokens extends Component {
     }).isRequired,
 
     // Redux State
-    tokens: tokenSelectors.tokensShape.isRequired
+    tokens: tokenSelectors.tokensShape.isRequired,
+    badges: PropTypes.shape({
+      statusBlockNumber: PropTypes.number.isRequired
+    }).isRequired
   }
 
   ref = React.createRef()
   fillPageTimeout = null
 
   render() {
-    const { tokens } = this.props
+    const { tokens, badges } = this.props
 
     return (
       <div className="Page" ref={this.ref}>
         <div className="TokenGrid">
           <div className="TokenGrid-container">
-            {tokens.data ? (
-              Object.keys(tokens.data.items).map(tokenID => (
-                <TokenCard
-                  token={tokens.data.items[tokenID]}
-                  key={tokens.data.items[tokenID].ID}
-                />
-              ))
+            {tokens ? (
+              Object.keys(tokens.items).map(tokenID => {
+                if (!tokens.items[tokenID]) {
+                  console.info(tokenID)
+                  return null
+                }
+                return (
+                  <TokenCard
+                    token={tokens.items[tokenID]}
+                    key={tokens.items[tokenID].ID}
+                    badge={badges.items[tokens.items[tokenID].address]}
+                  />
+                )
+              })
             ) : (
               <div className="TokenGrid-loading">
                 <BeatLoader color="#3d464d" />
@@ -56,7 +66,8 @@ class Tokens extends Component {
 export default withRouter(
   connect(
     state => ({
-      tokens: state.tokens,
+      tokens: state.tokens.data,
+      badges: state.badges.data,
       filter: state.filter
     }),
     {

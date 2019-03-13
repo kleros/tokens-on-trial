@@ -144,8 +144,6 @@ function* fetchTokens() {
       }
   }
 
-  console.info(cachedTokens)
-
   Object.keys(cachedTokens.items).forEach(tokenID => {
     cachedTokens.items[tokenID].clientStatus = contractStatusToClientStatus(
       cachedTokens.items[tokenID].status.status,
