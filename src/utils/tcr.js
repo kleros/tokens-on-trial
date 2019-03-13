@@ -27,10 +27,10 @@ export const contractStatusToClientStatus = (status, disputed) => {
       case 'ClearingRequested':
         return tcrConstants.STATUS_ENUM['Removal Request Challenged']
       default:
-        return status
+        return Number(status)
     }
 
-  return status
+  return Number(status)
 }
 
 export const getBlock = (block, web3, hash, callback) => {

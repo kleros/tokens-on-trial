@@ -4,10 +4,10 @@ import WaitingBadge from '../assets/images/badges/badge-waiting.svg'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 
-export const getBadgeStyle = (badge, tcrConstants) => {
-  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
+export const getBadgeStyle = badge => {
+  if (badge.status.status === 1)
     return { backgroundImage: `url(${RegisteredBadge})` }
-  if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
+  if (badge.status.disputed && badge.status.status > 1)
     return { backgroundImage: `url(${ChallengedBadge})` }
   return { backgroundImage: `url(${WaitingBadge})`, color: '#656565' }
 }

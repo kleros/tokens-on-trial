@@ -22,6 +22,7 @@ import * as walletSelectors from '../reducers/wallet'
 import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
 import * as tokensActions from '../actions/tokens'
+import * as badgesActions from '../actions/badges'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
@@ -29,7 +30,11 @@ import TelegramButton from '../components/telegram-button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
-import { onlyInfura, arbitrableTokenList } from './dapp-api'
+import {
+  onlyInfura,
+  arbitrableTokenList,
+  arbitrableAddressList
+} from './dapp-api'
 import './fontawesome'
 import './app.css'
 
@@ -50,7 +55,8 @@ class _ConnectedNavBar extends Component {
     closeNotificationsModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     fetchArbitrableAddressListData: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired,
+    fetchBadges: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
@@ -80,13 +86,18 @@ class _ConnectedNavBar extends Component {
     const {
       fetchArbitrableAddressListData,
       fetchArbitrableTokenListData,
-      fetchTokens
+      fetchTokens,
+      fetchBadges
     } = this.props
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
     fetchTokens()
     arbitrableTokenList.events.TokenStatusChange().on('data', () => {
       fetchTokens()
+    })
+    fetchBadges()
+    arbitrableAddressList.events.AddressStatusChange().on('data', () => {
+      fetchBadges()
     })
   }
 
@@ -161,7 +172,8 @@ const ConnectedNavBar = withRouter(
         arbitrableAddressListActions.fetchArbitrableAddressListData,
       fetchArbitrableTokenListData:
         arbitrableTokenListActions.fetchArbitrableTokenListData,
-      fetchTokens: tokensActions.fetchTokens
+      fetchTokens: tokensActions.fetchTokens,
+      fetchBadges: badgesActions.fetchBadges
     }
   )(_ConnectedNavBar)
 )

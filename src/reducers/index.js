@@ -12,6 +12,7 @@ import badge from './badge'
 import modal from './modal'
 import filter from './filter'
 import tokens from './tokens'
+import badges from './badges'
 
 // Export root reducer
 export default combineReducers({
@@ -26,5 +27,6 @@ export default combineReducers({
   badge,
   modal,
   filter,
-  tokens
+  tokens,
+  badges
 })
