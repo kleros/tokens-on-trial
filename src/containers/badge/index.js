@@ -27,7 +27,12 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, truncateMiddle, rulingMessage } from '../../utils/ui'
+import {
+  getRemainingTime,
+  truncateMiddle,
+  rulingMessage,
+  userFriendlyLabel
+} from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -825,7 +830,9 @@ class BadgeDetails extends PureComponent {
                   icon={tcrConstants.STATUS_ICON_ENUM[badge.clientStatus]}
                 />
                 {this.toSentenceCase(
-                  tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
+                  userFriendlyLabel[
+                    tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
+                  ]
                 )}
               </span>
               <div className="BadgeDetails-meta" style={{ marginLeft: '14px' }}>

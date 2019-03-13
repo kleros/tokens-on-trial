@@ -25,7 +25,12 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, getBadgeStyle, rulingMessage } from '../../utils/ui'
+import {
+  getRemainingTime,
+  getBadgeStyle,
+  rulingMessage,
+  userFriendlyLabel
+} from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -488,7 +493,9 @@ class TokenDetails extends PureComponent {
                     icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
                   />
                   {this.toSentenceCase(
-                    tcrConstants.STATUS_ENUM[token.clientStatus]
+                    userFriendlyLabel[
+                      tcrConstants.STATUS_ENUM[token.clientStatus]
+                    ]
                   )}
                 </span>
                 {latestRequest.dispute &&
