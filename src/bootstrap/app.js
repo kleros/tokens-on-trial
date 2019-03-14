@@ -135,8 +135,7 @@ class _ConnectedNavBar extends Component {
           },
           {
             title: 'Ethfinex Guide',
-            to:
-              'https://blog.kleros.io/p/99a3bfb6-34ea-40f0-b2d5-ecb7de00a876/',
+            to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
             extraStyle: 'NavBar-route-title'
           }
         ]}
