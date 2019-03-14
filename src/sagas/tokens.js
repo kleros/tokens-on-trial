@@ -98,6 +98,7 @@ function* fetchTokens() {
       ...tokens.items,
       ...receivedTokens
     },
+    addressToIDs: {},
     blockNumber,
     statusBlockNumber
   }
@@ -157,10 +158,14 @@ function* fetchTokens() {
   }
 
   Object.keys(cachedTokens.items).forEach(tokenID => {
-    cachedTokens.items[tokenID].clientStatus = contractStatusToClientStatus(
-      cachedTokens.items[tokenID].status.status,
-      cachedTokens.items[tokenID].status.disputed
+    const token = cachedTokens.items[tokenID]
+    token.clientStatus = contractStatusToClientStatus(
+      token.status.status,
+      token.status.disputed
     )
+    if (cachedTokens.addressToIDs[token.address])
+      cachedTokens.addressToIDs[token.address].push(tokenID)
+    else cachedTokens.addressToIDs[token.address] = [tokenID]
   })
 
   yield put({ type: CACHE_TOKENS, payload: { tokens: cachedTokens } })

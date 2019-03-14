@@ -3,6 +3,7 @@ import Img from 'react-image'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
+import { connect } from 'react-redux'
 
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import UnknownToken from '../../assets/images/unknown.svg'
@@ -15,85 +16,99 @@ import {
 
 import './badge-card.css'
 
-const getBadgeColor = token => {
-  const { badge } = token
-  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
-    return '#009aff' // blue
-  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'])
-    return '#f60c36' // red
-  if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
-    return '#ff9900' // orange
+const getBadgeColor = badge => {
+  if (badge.clientStatus === 0) return '#f60c36' // red
+  if (badge.clientStatus === 1) return '#009aff' // blue
+  if (badge.clientStatus > 3) return '#ff9900' // orange
   return '#ccc'
 }
 
-const getBadgeHeaderText = token => {
-  const { badge } = token
-  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'])
-    return 'Registered'
-  if (badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'])
-    return 'Absent' // red
-  if (badge.latestRequest.disputed && !badge.latestRequest.resolved)
-    return 'Challenged'
+const getBadgeHeaderText = badge => {
+  if (badge.clientStatus === 0) return 'Absent' // red
+  if (badge.clientStatus === 1) return 'Registered'
+  if (badge.clientStatus > 3) return 'Challenged'
   return 'Pending'
 }
 
-const BadgeCard = ({ token, displayTokenInfo }) => (
-  <div className="BadgeCard">
-    <div
-      className="BadgeCard-header"
-      style={{ backgroundColor: getBadgeColor(token) }}
-    >
-      <FontAwesomeIcon color="white" icon="check" />
-      <h5 style={{ color: 'white' }}>{getBadgeHeaderText(token)}</h5>
-      <FontAwesomeIcon
-        color="white"
-        icon="check"
-        style={{ visibility: 'hidden' }}
-      />{' '}
+const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
+  // Link to the oldest, registered token submission for this address.
+  let tokenSubmissions = []
+  if (tokens.addressToIDs[badge.address]) {
+    tokens.addressToIDs[badge.address].forEach(tokenID => {
+      if (
+        tokens.items[tokenID].status.status === 1 ||
+        tokens.items[tokenID].status.status === 3
+      )
+        tokenSubmissions.push(tokens.items[tokenID])
+    })
+
+    tokenSubmissions = tokenSubmissions.sort((a, b) =>
+      a.statusBlockNumber < b.statusBlockNumber ? -1 : 1
+    )
+  }
+  const token = displayTokenInfo ? tokenSubmissions[0] : null
+
+  return (
+    <div className="BadgeCard">
+      <div
+        className="BadgeCard-header"
+        style={{ backgroundColor: getBadgeColor(badge) }}
+      >
+        <FontAwesomeIcon color="white" icon="check" />
+        <h5 style={{ color: 'white' }}>{getBadgeHeaderText(badge)}</h5>
+        <FontAwesomeIcon
+          color="white"
+          icon="check"
+          style={{ visibility: 'hidden' }}
+        />{' '}
+      </div>
+      <Link
+        className="BadgeCard-content"
+        to={`/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}/${badge.address}`}
+      >
+        {displayTokenInfo ? (
+          <Img
+            alt="Token List Submission"
+            className="TokenCard-image"
+            src={
+              token
+                ? token.symbolMultihash[0] === '/'
+                  ? `${IPFS_URL}${token.symbolMultihash}`
+                  : `${FILE_BASE_URL}/${token.symbolMultihash}`
+                : UnknownToken
+            }
+          />
+        ) : (
+          <Img
+            alt="Badge List Submission"
+            className="BadgeCard-image"
+            src={EthfinexLogo}
+          />
+        )}
+      </Link>
+      <div className="BadgeCard-footer">
+        {displayTokenInfo ? (
+          <h5 className="BadgeCard-footer-text">
+            Ethfinex Compliant
+            <br />
+            {token
+              ? `
+              ${token.ticker ? token.ticker : ''}
+              ${token.name && token.ticker ? '-' : ''}
+              ${token.name ? token.name : ''}
+              ${!token ? 'Unknown Token' : ''}
+            `
+              : 'Unknown Token'}
+          </h5>
+        ) : (
+          <h5 className="BadgeCard-footer-text">
+            Compliant with Ethfinex listing criterion
+          </h5>
+        )}
+      </div>
     </div>
-    <Link
-      className="BadgeCard-content"
-      to={`/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}/${token.addr}`}
-    >
-      {displayTokenInfo ? (
-        <Img
-          alt="Token List Submission"
-          className="TokenCard-image"
-          src={
-            token.symbolMultihash
-              ? token.symbolMultihash[0] === '/'
-                ? `${IPFS_URL}${token.symbolMultihash}`
-                : `${FILE_BASE_URL}/${token.symbolMultihash}`
-              : UnknownToken
-          }
-        />
-      ) : (
-        <Img
-          alt="Badge List Submission"
-          className="BadgeCard-image"
-          src={EthfinexLogo}
-        />
-      )}
-    </Link>
-    <div className="BadgeCard-footer">
-      {displayTokenInfo ? (
-        <h5 className="BadgeCard-footer-text">
-          Ethfinex Compliant
-          <br />
-          {`${token.ticker ? token.ticker : ''}
-          ${token.name && token.ticker ? '-' : ''}
-          ${token.name ? token.name : ''}
-          ${!token.ticker && !token.name ? 'Unknown Token' : ''}
-        `}
-        </h5>
-      ) : (
-        <h5 className="BadgeCard-footer-text">
-          Compliant with Ethfinex listing criterion
-        </h5>
-      )}
-    </div>
-  </div>
-)
+  )
+}
 
 BadgeCard.propTypes = {
   token: PropTypes.shape({
@@ -104,6 +119,8 @@ BadgeCard.propTypes = {
     status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
   }).isRequired,
+  tokens: PropTypes.shape({}).isRequired,
+  badge: PropTypes.shape({}).isRequired,
   displayTokenInfo: PropTypes.bool
 }
 
@@ -111,4 +128,7 @@ BadgeCard.defaultProps = {
   displayTokenInfo: false
 }
 
-export default BadgeCard
+export default connect(state => ({
+  tokens: state.tokens.data,
+  badges: state.badges
+}))(BadgeCard)

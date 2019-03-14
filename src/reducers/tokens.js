@@ -12,7 +12,8 @@ const initialState = cachedTokens
       data: {
         blockNumber: 0,
         statusBlockNumber: 0,
-        items: {}
+        items: {},
+        addressToIDs: {}
       }
     }
 

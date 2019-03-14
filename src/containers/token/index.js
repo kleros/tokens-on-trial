@@ -62,6 +62,7 @@ class TokenDetails extends PureComponent {
         tokenID: PropTypes.string
       })
     }),
+    badges: PropTypes.shape({}).isRequired,
 
     // Functions
     timeout: PropTypes.func.isRequired,
@@ -296,7 +297,13 @@ class TokenDetails extends PureComponent {
       evidencePeriodEnded
     } = this.state
 
-    const { accounts, filter, match, arbitrableTokenListData } = this.props
+    const {
+      accounts,
+      filter,
+      match,
+      arbitrableTokenListData,
+      badges
+    } = this.props
     const { filters } = filter
     const { tokenID } = match.params
 
@@ -916,7 +923,7 @@ class TokenDetails extends PureComponent {
               tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
               token.status !==
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-                <BadgeCard token={token} />
+                <BadgeCard badge={badges[token.addr]} />
               )}
           </div>
         </div>
@@ -991,6 +998,7 @@ class TokenDetails extends PureComponent {
 export default connect(
   state => ({
     token: state.token.token.data,
+    badges: state.badges.data.items,
     accounts: state.wallet.accounts,
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
     filter: state.filter

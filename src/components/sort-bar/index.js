@@ -12,7 +12,7 @@ import './sort-bar.css'
 class SortBar extends PureComponent {
   static propTypes = {
     // Redux State
-    tokens: PropTypes.shape({
+    items: PropTypes.shape({
       data: PropTypes.shape({
         items: PropTypes.arrayOf(PropTypes.shape({})).isRequired
       }).isRequired
@@ -30,15 +30,15 @@ class SortBar extends PureComponent {
   }
 
   render() {
-    const { displayedItemsCount, tokens, filter } = this.props
+    const { displayedItemsCount, items, filter } = this.props
     const { oldestFirst } = filter
 
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {!tokens.loading || displayedItemsCount > 0
+          {!items.loading || displayedItemsCount > 0
             ? `${displayedItemsCount} submissions of ${
-                Object.keys(tokens.data.items).length
+                Object.keys(items.data.items).length
               }`
             : 'Loading submissions...'}
         </div>
@@ -60,8 +60,7 @@ class SortBar extends PureComponent {
 
 export default connect(
   state => ({
-    filter: state.filter,
-    tokens: state.tokens
+    filter: state.filter
   }),
   {
     setOldestFirst: filterActions.setOldestFirst,

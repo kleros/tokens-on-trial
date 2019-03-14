@@ -8,9 +8,6 @@ import TokenCard from '../../components/token-card'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
-import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
-import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
-import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
 
 import './tokens.css'
@@ -79,13 +76,13 @@ class Tokens extends Component {
       })
 
     return (
-      <div className="Page" ref={this.ref}>
+      <div className="Page">
         <FilterBar
           filter={filters}
           handleFilterChange={this.handleFilterChange}
           filterVisible
         />
-        <SortBar displayedItemsCount={displayedTokens.length} />
+        <SortBar displayedItemsCount={displayedTokens.length} items={tokens} />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
             {displayedTokens.length === 0 && !tokens.loading ? (
@@ -105,7 +102,7 @@ class Tokens extends Component {
                     <TokenCard
                       token={token}
                       key={token.ID}
-                      badge={badges.items[token.address]}
+                      badge={badges.data.items[token.address]}
                     />
                   ))
                 ) : (
@@ -126,16 +123,11 @@ export default withRouter(
   connect(
     state => ({
       tokens: state.tokens,
-      badges: state.badges.data,
+      badges: state.badges,
       filter: state.filter,
       accounts: state.wallet.accounts.data
     }),
     {
-      fetchArbitrableTokenListData:
-        arbitrableTokenListActions.fetchArbitrableTokenListData,
-      fetchArbitrableAddressListData:
-        arbitrableAddressListActions.fetchArbitrableAddressListData,
-      fetchTokens: tokenActions.fetchTokens,
       toggleFilter: filterActions.toggleFilter
     }
   )(Tokens)

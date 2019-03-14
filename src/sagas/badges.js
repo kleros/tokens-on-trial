@@ -1,7 +1,7 @@
 import { put, takeLatest, select, call } from 'redux-saga/effects'
 
 import { FETCH_BADGES_CACHE, CACHE_BADGES } from '../actions/badges'
-import * as badgeSelectors from '../reducers/badges'
+import * as badgesSelectors from '../reducers/badges'
 import { arbitrableAddressList } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
@@ -16,7 +16,7 @@ function* fetchBadges() {
   // Get the lastest status change for every token.
   let statusBlockNumber = 0
   const latestStatusChanges = {}
-  const badges = (yield select(badgeSelectors.getBadges)).data
+  const badges = (yield select(badgesSelectors.getBadges)).data
   const statusChanges = yield call(
     fetchEvents,
     'AddressStatusChange',
@@ -49,7 +49,7 @@ function* fetchBadges() {
   }
 
   statusEvents.forEach(event => {
-    const { returnValues } = event
+    const { returnValues, blockNumber } = event
     const {
       _address,
       _status,
@@ -59,6 +59,7 @@ function* fetchBadges() {
     } = returnValues
     cachedBadges.items[_address] = {
       address: _address,
+      blockNumber,
       status: {
         status: Number(_status),
         disputed: _disputed,
@@ -68,10 +69,10 @@ function* fetchBadges() {
     }
   })
 
-  Object.keys(cachedBadges.items).forEach(tokenID => {
-    cachedBadges.items[tokenID].clientStatus = contractStatusToClientStatus(
-      cachedBadges.items[tokenID].status.status,
-      cachedBadges.items[tokenID].status.disputed
+  Object.keys(cachedBadges.items).forEach(address => {
+    cachedBadges.items[address].clientStatus = contractStatusToClientStatus(
+      cachedBadges.items[address].status.status,
+      cachedBadges.items[address].status.disputed
     )
   })
 
