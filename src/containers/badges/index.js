@@ -7,7 +7,6 @@ import { BeatLoader } from 'react-spinners'
 import BadgeCard from '../../components/badge-card'
 import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
-import SortBar from '../../components/sort-bar'
 import * as badgeSelectors from '../../reducers/badge'
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as badgeActions from '../../actions/badge'
@@ -167,7 +166,6 @@ class Badges extends Component {
           handleFilterChange={this.handleFilterChange}
           filterVisible
         />
-        <SortBar items={badges} />
         <div className="BadgeGrid">
           <div className="BadgeGrid-container">
             {badges.data && !badges.loading ? (

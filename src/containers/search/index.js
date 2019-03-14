@@ -25,23 +25,23 @@ class SearchBar extends Component {
   state = { tokenSubmissions: [] }
 
   componentWillReceiveProps(props) {
+    console.info('asdf')
     const { tokens } = props
-    const tokenData = tokens.data
-    const tokenSubmissions = Object.keys(tokenData)
-      .filter(key => key !== 'blockNumber' && key !== 'statusBlockNumber')
-      .map(tokenID => {
-        const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
+    const tokenData = tokens.items
+    console.info(tokens, tokenData)
+    const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
+      const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
 
-        return {
-          value: name || '',
-          searchVal: name ? name.toLowerCase() : '',
-          tokenID,
-          name,
-          ticker,
-          address,
-          symbolMultihash
-        }
-      })
+      return {
+        value: name || '',
+        searchVal: name ? name.toLowerCase() : '',
+        tokenID,
+        name,
+        ticker,
+        address,
+        symbolMultihash
+      }
+    })
     this.setState({ tokenSubmissions })
   }
 
@@ -53,7 +53,20 @@ class SearchBar extends Component {
   itemCompute = item => (item ? item.value : '')
 
   render() {
-    const { tokenSubmissions } = this.state
+    const { tokens } = this.props
+    const tokenData = tokens.items
+    const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
+      const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
+      return {
+        value: name || '',
+        searchVal: name ? name.toLowerCase() : '',
+        tokenID,
+        name,
+        ticker,
+        address,
+        symbolMultihash
+      }
+    })
 
     return (
       <div className="SearchBar">
@@ -108,7 +121,7 @@ class SearchBar extends Component {
 export default withRouter(
   connect(
     state => ({
-      tokens: state.tokens
+      tokens: state.tokens.data
     }),
     {
       fetchTokens: tokensActions.fetchTokens
