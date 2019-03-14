@@ -27,7 +27,7 @@ class Tokens extends Component {
     badges: PropTypes.shape({
       statusBlockNumber: PropTypes.number.isRequired
     }).isRequired,
-    accounts: PropTypes.ArrayOf(PropTypes.string).isRequired,
+    accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
     filter: PropTypes.shape({}).isRequired,
 
     // Dispatchers
