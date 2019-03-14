@@ -22,29 +22,6 @@ class SearchBar extends Component {
     fetchTokens: PropTypes.func.isRequired
   }
 
-  state = { tokenSubmissions: [] }
-
-  componentWillReceiveProps(props) {
-    console.info('asdf')
-    const { tokens } = props
-    const tokenData = tokens.items
-    console.info(tokens, tokenData)
-    const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
-      const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
-
-      return {
-        value: name || '',
-        searchVal: name ? name.toLowerCase() : '',
-        tokenID,
-        name,
-        ticker,
-        address,
-        symbolMultihash
-      }
-    })
-    this.setState({ tokenSubmissions })
-  }
-
   itemClicked = selection => {
     const { history } = this.props
     history.push(`/token/${selection.tokenID}`)
