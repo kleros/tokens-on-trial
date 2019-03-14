@@ -16,7 +16,12 @@ function* fetchBadges() {
   // Get the lastest status change for every token.
   let statusBlockNumber = 0
   const latestStatusChanges = {}
-  const statusChanges = yield call(fetchEvents, 'AddressStatusChange', 0)
+  const badges = (yield select(badgeSelectors.getBadges)).data
+  const statusChanges = yield call(
+    fetchEvents,
+    'AddressStatusChange',
+    badges.statusBlockNumber
+  )
 
   statusChanges.forEach(event => {
     const { returnValues } = event
@@ -36,7 +41,6 @@ function* fetchBadges() {
     address => latestStatusChanges[address]
   )
 
-  const badges = (yield select(badgeSelectors.getBadges)).data
   const cachedBadges = {
     items: {
       ...badges.items
@@ -46,12 +50,20 @@ function* fetchBadges() {
 
   statusEvents.forEach(event => {
     const { returnValues } = event
-    const { _address, _status, _disputed } = returnValues
+    const {
+      _address,
+      _status,
+      _disputed,
+      _requester,
+      _challenger
+    } = returnValues
     cachedBadges.items[_address] = {
       address: _address,
       status: {
         status: Number(_status),
-        disputed: _disputed
+        disputed: _disputed,
+        requester: _requester,
+        challenger: _challenger
       }
     }
   })

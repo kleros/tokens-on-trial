@@ -108,9 +108,15 @@ function* fetchTokens() {
 
   for (const event of statusEvents) {
     const { returnValues, blockNumber } = event
-    const { _tokenID, _status, _disputed } = returnValues
+    const {
+      _tokenID,
+      _status,
+      _disputed,
+      _requester,
+      _challenger
+    } = returnValues
 
-    if (!cachedTokens.items[_tokenID])
+    if (!cachedTokens.items[_tokenID]) {
       // This is a missing token due to the web3js bug described above.
       for (const missingToken of missingTokens) {
         const tokenInfo = yield call(
@@ -130,17 +136,23 @@ function* fetchTokens() {
             status: {
               blockNumber,
               status: Number(_status),
-              disputed: Boolean(Number(_disputed))
+              disputed: Boolean(Number(_disputed)),
+              requester: _requester,
+              challenger: _challenger
             }
           }
         }
       }
+      continue
+    }
 
-    if (blockNumber > cachedTokens.items[_tokenID].status.blockNumber)
+    if (blockNumber >= cachedTokens.items[_tokenID].status.blockNumber)
       cachedTokens.items[_tokenID].status = {
         blockNumber,
         status: Number(_status),
-        disputed: Boolean(Number(_disputed))
+        disputed: Boolean(Number(_disputed)),
+        requester: _requester,
+        challenger: _challenger
       }
   }
 

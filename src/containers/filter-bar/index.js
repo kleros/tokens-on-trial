@@ -73,9 +73,8 @@ class FilterBar extends Component {
               className="FilterBar-filter"
               onClick={this.toggleFilterOptions}
             >
-              <div className="FilterBar-filter-label">Filter:</div>
-              <div className="FilterBar-filter-choice">All</div>
               <FontAwesomeIcon icon="filter" size="xs" />
+              <div className="FilterBar-filter-label">Filter</div>
             </div>
           )}
         </div>

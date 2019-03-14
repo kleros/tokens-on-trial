@@ -92,10 +92,10 @@ class _ConnectedNavBar extends Component {
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
     fetchTokens()
+    fetchBadges()
     arbitrableTokenList.events.TokenStatusChange().on('data', () => {
       fetchTokens()
     })
-    fetchBadges()
     arbitrableAddressList.events.AddressStatusChange().on('data', () => {
       fetchBadges()
     })
