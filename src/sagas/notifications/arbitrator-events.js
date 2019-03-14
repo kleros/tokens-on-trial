@@ -47,6 +47,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
       const latestRequest = await arbitrableTokenList.methods
         .getRequestInfo(tokenID, Number(token.numberOfRequests) - 1)
         .call()
+
       if (
         account !== latestRequest.parties[1] &&
         account !== latestRequest.parties[2]
@@ -69,6 +70,19 @@ const emitArbitratorNotifications = async (account, emit, events) => {
           returnValues._disputeID
         )
         .call()
+
+      const addressInfo = await arbitrableAddressList.methods
+        .getAddressInfo(tokenAddress)
+        .call()
+      const latestRequest = await arbitrableAddressList.methods
+        .getRequestInfo(tokenAddress, Number(addressInfo.numberOfRequests) - 1)
+        .call()
+
+      if (
+        account !== latestRequest.parties[1] &&
+        account !== latestRequest.parties[2]
+      )
+        continue
 
       const tokenIDs = (await arbitrableTokenList.methods
         .queryTokens(

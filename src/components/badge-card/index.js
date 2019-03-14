@@ -9,7 +9,8 @@ import UnknownToken from '../../assets/images/unknown.svg'
 import * as tcrConstants from '../../constants/tcr'
 import {
   ARBITRABLE_ADDRESS_LIST_ADDRESS,
-  FILE_BASE_URL
+  FILE_BASE_URL,
+  IPFS_URL
 } from '../../bootstrap/dapp-api'
 
 import './badge-card.css'
@@ -61,7 +62,7 @@ const BadgeCard = ({ token, displayTokenInfo }) => (
           src={
             token.symbolMultihash
               ? token.symbolMultihash[0] === '/'
-                ? `https://ipfs.kleros.io/${token.symbolMultihash}`
+                ? `${IPFS_URL}${token.symbolMultihash}`
                 : `${FILE_BASE_URL}/${token.symbolMultihash}`
               : UnknownToken
           }

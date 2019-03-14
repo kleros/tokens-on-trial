@@ -214,10 +214,7 @@ const FundAppeal = ({
     >
       <FontAwesomeIcon icon="info-circle" />
       <div style={{ marginLeft: '5px' }}>
-        <i>
-          Note: This is not a fee, it is a deposit and will be refunded if you
-          are correct.
-        </i>
+        <i>Note: This is a deposit and will be refunded if you are correct.</i>
       </div>
     </div>
     <br />

@@ -7,6 +7,7 @@ import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
 import Countdown from 'react-countdown-now'
 import Progress from 'react-progressbar'
+import Archon from '@kleros/archon'
 
 import {
   arbitrableTokenList,
@@ -14,7 +15,8 @@ import {
   arbitrator,
   web3,
   archon,
-  FILE_BASE_URL
+  FILE_BASE_URL,
+  IPFS_URL
 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
@@ -23,7 +25,12 @@ import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import CountdownRenderer from '../../components/countdown-renderer'
 import { hasPendingRequest } from '../../utils/tcr'
-import { getRemainingTime, getBadgeStyle, rulingMessage } from '../../utils/ui'
+import {
+  getRemainingTime,
+  getBadgeStyle,
+  rulingMessage,
+  userFriendlyLabel
+} from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
 import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
@@ -70,7 +77,7 @@ class TokenDetails extends PureComponent {
   }
 
   state = {
-    evidences: [],
+    evidences: null,
     countdownCompleted: false,
     appealModalOpen: false,
     loserCountdownCompleted: false,
@@ -239,7 +246,7 @@ class TokenDetails extends PureComponent {
             _evidenceGroupID: token.latestRequest.evidenceGroupID
           }
         })
-        .on('data', e => {
+        .on('data', async e => {
           const { token } = this.state
           if (!token) return
           const { latestRequest } = token
@@ -247,33 +254,32 @@ class TokenDetails extends PureComponent {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
             return
 
-          archon.arbitrable
-            .getEvidence(
-              arbitrableTokenList._address,
-              arbitrator._address,
-              latestRequest.evidenceGroupID
-            )
-            .then(resp =>
-              resp
-                .filter(
-                  evidence =>
-                    evidence.evidenceJSONValid &&
-                    (evidence.evidenceJSON.fileURI.length === 0 ||
-                      evidence.fileValid)
-                )
-                .forEach(evidence => {
-                  const { evidences } = this.state
-                  const { evidenceJSON } = evidence
-                  const mimeType = mime.lookup(evidenceJSON.fileTypeExtension)
-                  evidenceJSON.icon = getFileIcon(mimeType)
-                  this.setState({
-                    evidences: {
-                      ...evidences,
-                      [evidence.transactionHash]: evidenceJSON
-                    }
-                  })
-                })
-            )
+          const evidence = await (await fetch(
+            `${IPFS_URL}${e.returnValues._evidence}`
+          )).json()
+          /* eslint-disable unicorn/number-literal-case */
+          const calculatedMultihash = archon.utils.multihashFile(
+            evidence,
+            0x1b // keccak-256
+          )
+
+          if (
+            !(await Archon.utils.validateFileFromURI(
+              `${IPFS_URL}${e.returnValues._evidence}`,
+              { hash: calculatedMultihash }
+            ))
+          )
+            return
+
+          const { evidences } = this.state
+          const mimeType = mime.lookup(evidence.fileTypeExtension)
+          evidence.icon = getFileIcon(mimeType)
+          this.setState({
+            evidences: {
+              ...evidences,
+              [e.transactionHash]: evidence
+            }
+          })
         })
       this.setState({ evidenceListenerSet: true })
     }
@@ -457,7 +463,7 @@ class TokenDetails extends PureComponent {
             className="TokenDetails-img"
             src={`${
               token.symbolMultihash && token.symbolMultihash[0] === '/'
-                ? `https://ipfs.kleros.io/`
+                ? `${IPFS_URL}`
                 : `${FILE_BASE_URL}/`
             }${token.symbolMultihash}`}
           />
@@ -487,7 +493,9 @@ class TokenDetails extends PureComponent {
                     icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
                   />
                   {this.toSentenceCase(
-                    tcrConstants.STATUS_ENUM[token.clientStatus]
+                    userFriendlyLabel[
+                      tcrConstants.STATUS_ENUM[token.clientStatus]
+                    ]
                   )}
                 </span>
                 {latestRequest.dispute &&
@@ -841,15 +849,33 @@ class TokenDetails extends PureComponent {
             <h3>Evidence</h3>
             <div className="TokenDescription-evidence">
               <div className="TokenDescription-evidence--list">
-                {Object.keys(evidences).map(key => (
-                  <div
-                    className="TokenDescription-evidence--item"
-                    key={key}
-                    onClick={this.handleViewEvidenceClick(evidences[key])}
-                  >
-                    <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
-                  </div>
-                ))}
+                {latestRequest.disputed &&
+                  (evidences ? (
+                    <>
+                      {Object.keys(evidences).map(key => (
+                        <div
+                          className="TokenDescription-evidence--item"
+                          key={key}
+                          onClick={this.handleViewEvidenceClick(evidences[key])}
+                        >
+                          <FontAwesomeIcon
+                            icon={evidences[key].icon}
+                            size="2x"
+                          />
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <div>
+                      <BeatLoader color="#3d464d" />
+                      <small>
+                        <i>
+                          Evidence can take some time to load. Thanks for the
+                          patience
+                        </i>
+                      </small>
+                    </div>
+                  ))}
               </div>
               <Button onClick={this.handleOpenEvidenceModal} type="secondary">
                 Submit Evidence

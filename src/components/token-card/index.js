@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom'
 import * as tcrConstants from '../../constants/tcr'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import { getBadgeStyle } from '../../utils/ui'
-import { FILE_BASE_URL } from '../../bootstrap/dapp-api'
+import { FILE_BASE_URL, IPFS_URL } from '../../bootstrap/dapp-api'
 
 import './token-card.css'
 
@@ -48,7 +48,7 @@ const TokenCard = ({ token, badge }) => (
         className="TokenCard-image"
         src={`${
           token.symbolMultihash && token.symbolMultihash[0] === '/'
-            ? `https://ipfs.kleros.io/`
+            ? `${IPFS_URL}`
             : `${FILE_BASE_URL}/`
         }${token.symbolMultihash}`}
       />

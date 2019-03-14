@@ -11,11 +11,11 @@
   max-height: calc(100% - 50px);
   outline: none;
   overflow: auto;
-  padding: 30px 34px;
+  padding: 20px 34px;
   position: fixed;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: 370px;
+  width: 400px;
   z-index: 1000;
 
   &--overlay {
