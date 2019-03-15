@@ -98,7 +98,7 @@ function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
   /* eslint-enable */
 
   const evidenceJSON = {
-    name: evidenceData.name,
+    title: evidenceData.title,
     description: evidenceData.description,
     fileURI,
     fileHash: multihash,

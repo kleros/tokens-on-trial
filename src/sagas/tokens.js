@@ -13,7 +13,9 @@ const fetchEvents = async (eventName, fromBlock) =>
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
-  const tokens = (yield select(tokenSelectors.getTokens)).data
+  const tokens = JSON.parse(
+    JSON.stringify((yield select(tokenSelectors.getTokens)).data)
+  ) // Deep copy
   const submissionEvents = yield call(
     fetchEvents,
     'TokenSubmitted',
@@ -23,7 +25,7 @@ function* fetchTokens() {
   const blockNumber = submissionEvents.reduce((acc, event) => {
     const { blockNumber } = event
     return blockNumber > acc ? blockNumber : acc
-  }, 0)
+  }, tokens.blockNumber + 1)
 
   const missingTokens = []
   const receivedTokens = submissionEvents.reduce(

@@ -16,7 +16,9 @@ function* fetchBadges() {
   // Get the lastest status change for every token.
   let statusBlockNumber = 0
   const latestStatusChanges = {}
-  const badges = (yield select(badgesSelectors.getBadges)).data
+  const badges = JSON.parse(
+    JSON.stringify((yield select(badgesSelectors.getBadges)).data)
+  ) // Deep copy.
   const statusChanges = yield call(
     fetchEvents,
     'AddressStatusChange',
