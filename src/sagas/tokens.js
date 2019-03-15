@@ -1,6 +1,6 @@
 import { put, takeLatest, select, call } from 'redux-saga/effects'
 
-import { FETCH_TOKENS_CACHE, CACHE_TOKENS } from '../actions/tokens'
+import { FETCH_TOKENS_CACHE, cacheTokens } from '../actions/tokens'
 import * as tokenSelectors from '../reducers/tokens'
 import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
@@ -17,7 +17,7 @@ function* fetchTokens() {
   const submissionEvents = yield call(
     fetchEvents,
     'TokenSubmitted',
-    tokens.blockNumber
+    tokens.blockNumber + 1
   )
 
   const blockNumber = submissionEvents.reduce((acc, event) => {
@@ -168,7 +168,7 @@ function* fetchTokens() {
     else cachedTokens.addressToIDs[token.address] = [tokenID]
   })
 
-  yield put({ type: CACHE_TOKENS, payload: { tokens: cachedTokens } })
+  yield put(cacheTokens(cachedTokens))
 }
 
 /**

@@ -1,6 +1,6 @@
 import { put, takeLatest, select, call } from 'redux-saga/effects'
 
-import { FETCH_BADGES_CACHE, CACHE_BADGES } from '../actions/badges'
+import { FETCH_BADGES_CACHE, cacheBadges } from '../actions/badges'
 import * as badgesSelectors from '../reducers/badges'
 import { arbitrableAddressList } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
@@ -20,7 +20,7 @@ function* fetchBadges() {
   const statusChanges = yield call(
     fetchEvents,
     'AddressStatusChange',
-    badges.statusBlockNumber
+    badges.statusBlockNumber + 1
   )
 
   statusChanges.forEach(event => {
@@ -76,7 +76,7 @@ function* fetchBadges() {
     )
   })
 
-  yield put({ type: CACHE_BADGES, payload: { badges: cachedBadges } })
+  yield put(cacheBadges(cachedBadges))
 }
 
 /**

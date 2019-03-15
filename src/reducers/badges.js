@@ -26,10 +26,7 @@ const badges = (state = initialState, action) => {
     case CACHE_BADGES: {
       const { badges } = action.payload
       return {
-        data: {
-          ...state.data,
-          ...badges
-        },
+        data: { ...badges },
         loading: false
       }
     }

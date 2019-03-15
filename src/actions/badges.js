@@ -1,7 +1,7 @@
 export const CACHE_BADGES = 'CACHE_BADGES'
 export const FETCH_BADGES_CACHE = 'FETCH_BADGES_CACHE'
 
-export const cacheBadges = ({ badges }) => ({
+export const cacheBadges = badges => ({
   type: CACHE_BADGES,
   payload: { badges }
 })

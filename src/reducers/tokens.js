@@ -28,10 +28,7 @@ const tokens = (state = initialState, action) => {
     case CACHE_TOKENS: {
       const { tokens } = action.payload
       return {
-        data: {
-          ...state.data,
-          ...tokens
-        },
+        data: { ...tokens },
         loading: false
       }
     }
