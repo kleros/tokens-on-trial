@@ -6,7 +6,7 @@ export const {
   isInvalid: getEvidenceFormIsInvalid,
   submit: submitEvidenceForm
 } = form('evidenceForm', {
-  name: {
+  title: {
     type: 'text',
     validate: [required]
   },

@@ -14,8 +14,9 @@ const ViewEvidence = ({ closeActionModal, evidence }) => (
     <h3 className="Modal-title">Evidence</h3>
     <hr />
     <div className="ViewEvidence-information">
-      <h4 style={{ margin: 0 }}>Name:</h4>
-      <p>{evidence.name}</p>
+      <h4 style={{ margin: 0 }}>Title:</h4>
+      <p>{evidence.title ? evidence.title : evidence.name}</p>{' '}
+      {/* Read from name if title is unavailable for backwards compatibility */}
       <br />
       <h4 style={{ margin: 0 }}>Description:</h4>
       <p>{evidence.description}</p>
