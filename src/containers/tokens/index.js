@@ -6,11 +6,14 @@ import { BeatLoader } from 'react-spinners'
 
 import TokenCard from '../../components/token-card'
 import FilterBar from '../filter-bar'
+import Paging from '../../components/paging'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterActions from '../../actions/filter'
 
 import './tokens.css'
+
+const TOKENS_PER_PAGE = 40
 
 class Tokens extends Component {
   static propTypes = {
@@ -31,9 +34,29 @@ class Tokens extends Component {
     toggleFilter: PropTypes.func.isRequired
   }
 
+  state = { currentPage: 0 }
+
   handleFilterChange = key => {
     const { toggleFilter } = this.props
     toggleFilter(key)
+  }
+
+  handleFirstPageClicked = () => {
+    this.setState({ currentPage: 0 })
+  }
+
+  handlePreviousPageClicked = () => {
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage - 1 })
+  }
+
+  handleNextPageClicked = () => {
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage + 1 })
+  }
+
+  handleLastPageClicked = lastPage => {
+    this.setState({ currentPage: lastPage })
   }
 
   render() {
@@ -41,11 +64,11 @@ class Tokens extends Component {
     const tokensData = tokens.data
     const userAccount = accounts[0]
     const { filters } = filter
-    let displayedTokens = []
+    let filteredTokens = []
     Object.keys(tokensData.items).forEach(tokenID => {
-      displayedTokens.push(tokensData.items[tokenID])
+      filteredTokens.push(tokensData.items[tokenID])
     })
-    displayedTokens = displayedTokens
+    filteredTokens = filteredTokens
       .filter(token => {
         if (userAccount === token.status.requester && filter['My Submissions'])
           return true
@@ -74,6 +97,13 @@ class Tokens extends Component {
         if (b.clientStatus > a.clientStatus) return 1
         return 0
       })
+
+    const { currentPage } = this.state
+    const totalPages = Math.ceil(filteredTokens.length / TOKENS_PER_PAGE)
+    const displayedTokens = filteredTokens.slice(
+      currentPage * TOKENS_PER_PAGE,
+      currentPage * TOKENS_PER_PAGE + TOKENS_PER_PAGE
+    )
 
     return (
       <div className="Page">
@@ -113,6 +143,14 @@ class Tokens extends Component {
               </>
             )}
           </div>
+          <Paging
+            onFirstPageClick={this.handleFirstPageClicked}
+            onPreviousPageClick={this.handlePreviousPageClicked}
+            onNextPageClick={this.handleNextPageClicked}
+            onLastPageClick={this.handleLastPageClicked}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
         </div>
       </div>
     )

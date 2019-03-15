@@ -9,65 +9,45 @@ const Paging = ({
   onFirstPageClick,
   onLastPageClick,
   currentPage,
-  maxItemsPerPage,
-  itemCount,
-  lastPage,
-  totalByStatus,
-  currentPageNum,
   totalPages
 }) => (
   <div className="Paging">
-    <span>{`Page ${currentPageNum} of ${totalPages}`}</span>
+    <span>{`Page ${currentPage + 1} of ${totalPages}`}</span>
     <div className="Paging-navigation">
       <button
         className={`Paging-navigation-button ${
-          currentPage ? 'Paging-navigation-clickable' : ''
+          currentPage !== 0 ? 'Paging-navigation-clickable' : ''
         }`}
         onClick={onFirstPageClick}
-        disabled={!currentPage}
+        disabled={currentPage === 0}
       >
         First
       </button>
       <button
         className={`Paging-navigation-button ${
-          currentPage ? 'Paging-navigation-clickable' : ''
+          currentPage !== 0 ? 'Paging-navigation-clickable' : ''
         }`}
         onClick={onPreviousPageClick}
-        disabled={!currentPage}
+        disabled={currentPage === 0}
       >
         Previous
       </button>
       <button
         className={`Paging-navigation-button ${
-          itemCount < maxItemsPerPage ||
-          currentPage === lastPage ||
-          itemCount === totalByStatus
-            ? ''
-            : 'Paging-navigation-clickable'
+          currentPage === totalPages - 1 ? '' : 'Paging-navigation-clickable'
         }`}
         onClick={onNextPageClick}
-        disabled={
-          itemCount < maxItemsPerPage ||
-          currentPage === lastPage ||
-          itemCount === totalByStatus
-        }
+        disabled={currentPage === totalPages - 1}
       >
         Next
       </button>
+      {/* eslint-disable react/jsx-no-bind */}
       <button
         className={`Paging-navigation-button ${
-          itemCount < maxItemsPerPage ||
-          currentPage === lastPage ||
-          itemCount === totalByStatus
-            ? ''
-            : 'Paging-navigation-clickable'
+          currentPage === totalPages - 1 ? '' : 'Paging-navigation-clickable'
         }`}
-        onClick={onLastPageClick}
-        disabled={
-          itemCount < maxItemsPerPage ||
-          currentPage === lastPage ||
-          itemCount === totalByStatus
-        }
+        onClick={() => onLastPageClick(totalPages - 1)}
+        disabled={currentPage === totalPages - 1}
       >
         Last
       </button>
@@ -76,12 +56,7 @@ const Paging = ({
 )
 
 Paging.propTypes = {
-  currentPage: PropTypes.string,
-  maxItemsPerPage: PropTypes.number.isRequired,
-  itemCount: PropTypes.number.isRequired,
-  lastPage: PropTypes.string,
-  totalByStatus: PropTypes.number.isRequired,
-  currentPageNum: PropTypes.number.isRequired,
+  currentPage: PropTypes.number.isRequired,
   totalPages: PropTypes.number.isRequired,
 
   // Navigation handlers
@@ -89,11 +64,6 @@ Paging.propTypes = {
   onPreviousPageClick: PropTypes.func.isRequired,
   onNextPageClick: PropTypes.func.isRequired,
   onLastPageClick: PropTypes.func.isRequired
-}
-
-Paging.defaultProps = {
-  currentPage: null,
-  lastPage: null
 }
 
 export default Paging
