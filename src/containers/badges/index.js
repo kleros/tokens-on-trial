@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom'
 import { BeatLoader } from 'react-spinners'
 
 import BadgeCard from '../../components/badge-card'
+import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as badgeSelectors from '../../reducers/badge'
@@ -14,6 +15,8 @@ import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 
 import './badges.css'
+
+const ITEMS_PER_PAGE = 40
 
 class Badges extends Component {
   static propTypes = {
@@ -34,9 +37,29 @@ class Badges extends Component {
     toggleFilter: PropTypes.func.isRequired
   }
 
+  state = { currentPage: 0 }
+
   handleFilterChange = key => {
     const { toggleFilter } = this.props
     toggleFilter(key)
+  }
+
+  handleFirstPageClicked = () => {
+    this.setState({ currentPage: 0 })
+  }
+
+  handlePreviousPageClicked = () => {
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage - 1 })
+  }
+
+  handleNextPageClicked = () => {
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage + 1 })
+  }
+
+  handleLastPageClicked = lastPage => {
+    this.setState({ currentPage: lastPage })
   }
 
   render() {
@@ -45,7 +68,7 @@ class Badges extends Component {
     const badgesData = badges.data
     const { filters } = filter
 
-    const displayedBadges = Object.keys(badgesData.items)
+    const filteredBadges = Object.keys(badgesData.items)
       .map(address => badgesData.items[address])
       .filter(badge => {
         if (userAccount === badge.status.requester && filter['My Submissions'])
@@ -75,6 +98,13 @@ class Badges extends Component {
         if (b.clientStatus > a.clientStatus) return 1
         return 0
       })
+
+    const { currentPage } = this.state
+    const totalPages = Math.ceil(filteredBadges.length / ITEMS_PER_PAGE)
+    const displayedBadges = filteredBadges.slice(
+      currentPage * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+    )
 
     return (
       <div className="Page">
@@ -114,6 +144,14 @@ class Badges extends Component {
               </>
             )}
           </div>
+          <Paging
+            onFirstPageClick={this.handleFirstPageClicked}
+            onPreviousPageClick={this.handlePreviousPageClicked}
+            onNextPageClick={this.handleNextPageClicked}
+            onLastPageClick={this.handleLastPageClicked}
+            currentPage={currentPage}
+            totalPages={totalPages}
+          />
         </div>
       </div>
     )

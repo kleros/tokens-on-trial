@@ -13,7 +13,7 @@ import * as filterActions from '../../actions/filter'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 40
+const ITEMS_PER_PAGE = 40
 
 class Tokens extends Component {
   static propTypes = {
@@ -99,10 +99,10 @@ class Tokens extends Component {
       })
 
     const { currentPage } = this.state
-    const totalPages = Math.ceil(filteredTokens.length / TOKENS_PER_PAGE)
+    const totalPages = Math.ceil(filteredTokens.length / ITEMS_PER_PAGE)
     const displayedTokens = filteredTokens.slice(
-      currentPage * TOKENS_PER_PAGE,
-      currentPage * TOKENS_PER_PAGE + TOKENS_PER_PAGE
+      currentPage * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE + ITEMS_PER_PAGE
     )
 
     return (
