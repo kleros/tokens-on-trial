@@ -26,6 +26,8 @@
     flex-direction: column;
     text-align: start;
     width: 100%;
+    word-break: break-all;
+    word-wrap: anywhere;
   }
 
   &-description {
