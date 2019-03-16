@@ -520,7 +520,7 @@ class BadgeDetails extends PureComponent {
                         className="BadgeDetails-meta--aligned BadgeDetails-timer"
                         style={{
                           display: 'flex',
-                          alignItems: 'center',
+                          alignItems: 'flex-start',
                           color: '#3d464d',
                           fontSize: '14px',
                           marginRight: '14px'
@@ -644,7 +644,7 @@ class BadgeDetails extends PureComponent {
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      margin: '5px 0 5px auto',
+                                      margin: '5px 5px 5px auto',
                                       fontSize: '14px'
                                     }}
                                   >
@@ -681,7 +681,7 @@ class BadgeDetails extends PureComponent {
                                           style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            margin: '5px 0 5px auto',
+                                            margin: '5px 5px 5px auto',
                                             fontSize: '14px'
                                           }}
                                         >
@@ -721,7 +721,7 @@ class BadgeDetails extends PureComponent {
                                           style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            margin: '5px 0 5px auto',
+                                            margin: '5px 5px 5px auto',
                                             fontSize: '14px'
                                           }}
                                         >
@@ -896,7 +896,9 @@ class BadgeDetails extends PureComponent {
                     onClick={this.fundAppeal}
                     disabled={
                       decisiveRuling
-                        ? winnerCountdownCompleted && loserCountdownCompleted
+                        ? (winnerCountdownCompleted &&
+                            loserCountdownCompleted) ||
+                          loserTimedOut
                         : countdownCompleted
                     }
                   >
@@ -905,7 +907,8 @@ class BadgeDetails extends PureComponent {
                       icon="coins"
                     />
                     {(decisiveRuling
-                    ? !winnerCountdownCompleted || !loserCountdownCompleted
+                    ? (!winnerCountdownCompleted || !loserCountdownCompleted) &&
+                      !loserTimedOut
                     : !countdownCompleted)
                       ? 'Contribute Fees'
                       : 'Waiting Enforcement'}

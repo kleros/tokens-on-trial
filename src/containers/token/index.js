@@ -805,7 +805,9 @@ class TokenDetails extends PureComponent {
                     onClick={this.fundAppeal}
                     disabled={
                       decisiveRuling
-                        ? winnerCountdownCompleted && loserCountdownCompleted
+                        ? (winnerCountdownCompleted &&
+                            loserCountdownCompleted) ||
+                          !loserTimedOut
                         : countdownCompleted
                     }
                   >
@@ -814,7 +816,8 @@ class TokenDetails extends PureComponent {
                       icon="coins"
                     />
                     {(decisiveRuling
-                    ? !winnerCountdownCompleted || !loserCountdownCompleted
+                    ? (!winnerCountdownCompleted || !loserCountdownCompleted) &&
+                      !loserTimedOut
                     : !countdownCompleted)
                       ? 'Fund Appeal'
                       : 'Waiting Enforcement'}
