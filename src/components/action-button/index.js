@@ -18,7 +18,10 @@ const getActionButton = ({
   countdownCompleted,
   handleActionClick,
   handleExecuteRequestClick,
-  isBadge
+  isBadge,
+  decisiveRuling,
+  loserPercent,
+  loserCountdownCompleted
 }) => {
   let method
   let disabled = true
@@ -30,6 +33,14 @@ const getActionButton = ({
       <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
         <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
         {label}
+      </Button>
+    )
+
+  if (decisiveRuling && loserPercent < 100 && loserCountdownCompleted)
+    return (
+      <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
+        <FontAwesomeIcon className="TokenDetails-icon" icon="gavel" />
+        Awaiting Enforcement
       </Button>
     )
 

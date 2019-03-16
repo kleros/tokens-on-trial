@@ -5,10 +5,7 @@ import { connect } from 'react-redux'
 import Dropdown from '../dropdown'
 import * as filterConstants from '../../constants/filter'
 import * as filterActions from '../../actions/filter'
-import * as tokenActions from '../../actions/token'
-import * as tokenSelectors from '../../reducers/token'
 import * as filterSelectors from '../../reducers/filter'
-import { filterToContractParam, totalByStatus } from '../../utils/filter'
 
 import './sort-bar.css'
 
@@ -16,39 +13,33 @@ class SortBar extends PureComponent {
   static propTypes = {
     // Redux State
     items: PropTypes.shape({
-      data: PropTypes.arrayOf(tokenSelectors._tokenShape.isRequired)
+      data: PropTypes.shape({
+        items: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+      }).isRequired
     }).isRequired,
     filter: filterSelectors.filterShape.isRequired,
+    displayedItemsCount: PropTypes.number.isRequired,
 
     // Action Dispatchers
-    setOldestFirst: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired
+    setOldestFirst: PropTypes.func.isRequired
   }
 
   handleSortChange = oldestFirst => {
-    const { setOldestFirst, fetchTokens, items, filter } = this.props
-    const { filters } = filter
+    const { setOldestFirst } = this.props
     setOldestFirst(oldestFirst)
-    const filterValue = filterToContractParam(filters)
-    if (!items.loading) fetchTokens('', 10, filterValue, oldestFirst)
   }
 
   render() {
-    const { items, filter } = this.props
+    const { displayedItemsCount, items, filter } = this.props
     const { oldestFirst } = filter
-    const itemsData = items.data
-
-    let numTokens = 0
-    if (itemsData && itemsData && itemsData.countByStatus)
-      numTokens = totalByStatus(itemsData.countByStatus, filter.filters)
 
     return (
       <div className="SortBar">
         <div className="SortBar-count">
-          {itemsData &&
-          typeof itemsData.totalCount !== 'undefined' &&
-          typeof numTokens !== 'undefined'
-            ? `${items.data.length} submissions of ${itemsData.totalCount}`
+          {!items.loading || displayedItemsCount > 0
+            ? `${displayedItemsCount} submissions of ${
+                Object.keys(items.data.items).length
+              }`
             : 'Loading submissions...'}
         </div>
         <div className="SortBar-sort">
@@ -73,7 +64,6 @@ export default connect(
   }),
   {
     setOldestFirst: filterActions.setOldestFirst,
-    fetchTokens: tokenActions.fetchTokens,
     toggleFilter: filterActions.toggleFilter
   }
 )(SortBar)

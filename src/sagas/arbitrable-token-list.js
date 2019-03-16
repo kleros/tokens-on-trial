@@ -99,7 +99,7 @@ function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
   /* eslint-enable */
 
   const evidenceJSON = {
-    name: evidenceData.name,
+    title: evidenceData.title,
     description: evidenceData.description,
     fileURI,
     fileTypeExtension

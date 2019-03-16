@@ -4,7 +4,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3 } from '../../../../bootstrap/dapp-api'
+import { web3, ETHFINEX_CRITERIA_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
 import './clear.css'
@@ -15,7 +15,23 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
       {!badge ? `Remove ${item.name}` : 'Remove Badge'}
     </h3>
     <hr />
-    <br />
+    {badge && (
+      <>
+        <p>
+          See the{' '}
+          <a
+            className="TokenDetails-withdraw"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={ETHFINEX_CRITERIA_URL}
+            style={{ margin: 0, textDecoration: 'underline' }}
+          >
+            listing criteria.
+          </a>
+        </p>
+        <br />
+      </>
+    )}
     <div className="Challenge-fees">
       <div>
         <p className="Challenge-fees-line">Total Deposit:</p>

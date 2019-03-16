@@ -11,7 +11,7 @@ import { FILE_BASE_URL, IPFS_URL } from '../../bootstrap/dapp-api'
 
 import './token-card.css'
 
-const TokenCard = ({ token }) => (
+const TokenCard = ({ token, badge }) => (
   <div className="TokenCard">
     <div
       className="TokenCard-statusOverlay"
@@ -35,7 +35,7 @@ const TokenCard = ({ token }) => (
         }`}
       </h5>
       <a
-        href={`https://etherscan.io/token/${token.addr}`}
+        href={`https://etherscan.io/token/${token.address}`}
         target="_blank"
         rel="noopener noreferrer"
       >
@@ -55,20 +55,18 @@ const TokenCard = ({ token }) => (
     </Link>
     <div
       className={`TokenCard-footer${
-        token.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] ||
-        token.status ===
+        token.status.status ===
+          tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] ||
+        token.status.status ===
           tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested'] ||
-        !token.badge ||
-        token.badge.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent']
+        !badge ||
+        badge.status.status === 0
           ? ' TokenCard-hidden'
           : ''
       }`}
     >
-      {token.badge && (
-        <span
-          className="TokenCard-footer-badge"
-          style={getBadgeStyle(token.badge, tcrConstants)}
-        />
+      {badge && badge.status.status !== 0 && (
+        <span className="TokenCard-footer-badge" style={getBadgeStyle(badge)} />
       )}
     </div>
   </div>
@@ -79,10 +77,21 @@ TokenCard.propTypes = {
     name: PropTypes.string.isRequired,
     symbolMultihash: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
-    addr: PropTypes.string.isRequired,
+    address: PropTypes.string.isRequired,
     status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
       .isRequired
-  }).isRequired
+  }).isRequired,
+  badge: PropTypes.shape({
+    address: PropTypes.string.isRequired,
+    status: PropTypes.shape({
+      disputed: PropTypes.bool.isRequired,
+      status: PropTypes.number.isRequired
+    })
+  })
+}
+
+TokenCard.defaultProps = {
+  badge: null
 }
 
 export default TokenCard

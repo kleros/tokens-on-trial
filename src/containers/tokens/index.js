@@ -5,21 +5,15 @@ import { withRouter } from 'react-router-dom'
 import { BeatLoader } from 'react-spinners'
 
 import TokenCard from '../../components/token-card'
-import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
+import Paging from '../../components/paging'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
-import * as arbitrableTokenListActions from '../../actions/arbitrable-token-list'
-import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
-import * as tokenActions from '../../actions/token'
 import * as filterActions from '../../actions/filter'
-import * as filterSelectors from '../../reducers/filter'
-import { filterToContractParam, totalByStatus } from '../../utils/filter'
-import { arbitrableTokenList } from '../../bootstrap/dapp-api'
 
 import './tokens.css'
 
-const TOKENS_PER_PAGE = 40
+const ITEMS_PER_PAGE = 40
 
 class Tokens extends Component {
   static propTypes = {
@@ -27,190 +21,137 @@ class Tokens extends Component {
     history: PropTypes.shape({
       push: PropTypes.func.isRequired
     }).isRequired,
-    location: PropTypes.shape({
-      search: PropTypes.string.isRequired
-    }).isRequired,
 
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
-    filter: filterSelectors.filterShape.isRequired,
+    badges: PropTypes.shape({
+      statusBlockNumber: PropTypes.number.isRequired
+    }).isRequired,
+    accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    filter: PropTypes.shape({}).isRequired,
 
-    // Action Dispatchers
-    fetchArbitrableTokenListData: PropTypes.func.isRequired,
-    fetchArbitrableAddressListData: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired,
+    // Dispatchers
     toggleFilter: PropTypes.func.isRequired
   }
 
-  ref = React.createRef()
-  fillPageTimeout = null
-
-  componentDidMount() {
-    const {
-      fetchArbitrableTokenListData,
-      fetchArbitrableAddressListData
-    } = this.props
-    fetchArbitrableTokenListData()
-    fetchArbitrableAddressListData()
-    this.fetchTokens({})
-    arbitrableTokenList.events.TokenStatusChange().on('data', () => {
-      this.fetchTokens({})
-    })
-  }
-
-  mapTokens = tokens => {
-    const keys = {}
-    if (Array.isArray(tokens))
-      return tokens
-        .filter(token => {
-          if (!keys[token.ID]) {
-            keys[token.ID] = true
-            return true
-          } else return false
-        })
-        .sort((a, b) => {
-          if (
-            a.status > 1 &&
-            b.status > 1 &&
-            Number(a.latestRequest.submissionTime) >
-              Number(b.latestRequest.submissionTime)
-          )
-            return -1
-          if (
-            a.status > 1 &&
-            b.status > 1 &&
-            Number(a.latestRequest.submissionTime) <
-              Number(b.latestRequest.submissionTime)
-          )
-            return 1
-          if (a.status > 1 && b.status <= 1) return -1
-          if (a.status <= 1 && b.status > 1) return 1
-          if (a.badge.status > 1 && b.badge.status <= 1) return -1
-          if (a.badge.status <= 1 && b.badge.status > 1) return 1
-          if (a.badge.status > 1 && b.badge.status > 1) {
-            if (
-              !a.badge.latestRequest.disputed &&
-              b.badge.latestRequest.disputed
-            )
-              return -1
-            if (
-              a.badge.latestRequest.disputed &&
-              !b.badge.latestRequest.disputed
-            )
-              return 1
-          }
-          if (a.status > 1 && b.status > 1) {
-            if (!a.latestRequest.disputed && b.latestRequest.disputed) return -1
-            if (a.latestRequest.disputed && !b.latestRequest.disputed) return 1
-          }
-          return 0
-        })
-        .map(token => <TokenCard key={token.ID} token={token} />)
-
-    return null
-  }
+  state = { currentPage: 0 }
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
     toggleFilter(key)
-    this.fetchTokens({ key })
   }
 
   handleFirstPageClicked = () => {
-    const { history } = this.props
-    history.push('/tokens')
-    this.fetchTokens({ page: '' })
+    this.setState({ currentPage: 0 })
   }
 
   handlePreviousPageClicked = () => {
-    const { tokens, history } = this.props
-    const { previousPage } = tokens.data
-    if (previousPage) {
-      history.push({ search: `?p=${previousPage}` })
-      this.fetchTokens({ page: previousPage })
-    } else {
-      history.push({ search: `` })
-      this.fetchTokens({ page: '' })
-    }
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage - 1 })
   }
 
   handleNextPageClicked = () => {
-    const { tokens, history } = this.props
-    history.push({ search: `?p=${tokens.data[tokens.data.length - 1].ID}` })
-    this.fetchTokens({ page: tokens.data[tokens.data.length - 1].ID })
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage + 1 })
   }
 
-  handleLastPageClicked = () => {
-    const { tokens, history } = this.props
-    history.push({ search: `?p=${tokens.data.lastPage}` })
-    this.fetchTokens({ page: tokens.data.lastPage })
-  }
-
-  fetchTokens = ({ key, page }) => {
-    const { tokens, fetchTokens, filter, location } = this.props
-    const pageFromUrl =
-      typeof page === 'undefined'
-        ? new URLSearchParams(location.search).get('p')
-        : page
-
-    const { filters, oldestFirst } = filter
-    const updatedFilters = { ...filters }
-    if (key) updatedFilters[key] = !filters[key]
-
-    const filterValue = filterToContractParam(updatedFilters)
-
-    if (!tokens.loading)
-      fetchTokens(
-        pageFromUrl && pageFromUrl.length === 66 ? pageFromUrl : '',
-        TOKENS_PER_PAGE,
-        filterValue,
-        oldestFirst
-      )
+  handleLastPageClicked = lastPage => {
+    this.setState({ currentPage: lastPage })
   }
 
   render() {
-    const { tokens, filter, location } = this.props
+    const { tokens, badges, filter, accounts } = this.props
+    const tokensData = tokens.data
+    const userAccount = accounts[0]
     const { filters } = filter
+    let filteredTokens = []
+    Object.keys(tokensData.items).forEach(tokenID => {
+      filteredTokens.push(tokensData.items[tokenID])
+    })
+    filteredTokens = filteredTokens
+      .filter(token => {
+        if (userAccount === token.status.requester && filter['My Submissions'])
+          return true
+        if (userAccount === token.status.challenger && filter['My Challenges'])
+          return true
 
-    const currentPage = new URLSearchParams(location.search).get('p')
-    let totalFiltered = 0
-    if (tokens.data && tokens.data.countByStatus)
-      totalFiltered = totalByStatus(tokens.data.countByStatus, filter.filters)
+        const { clientStatus } = token
+        if (clientStatus === 0 && filters.Absent) return true
+        if (clientStatus === 1 && filters.Registered) return true
+        if (clientStatus === 2 && filters['Registration Requests']) return true
+        if (clientStatus === 3 && filters['Clearing Requests']) return true
+        if (clientStatus === 4 && filters['Challenged Registration Requests'])
+          return true
+        if (clientStatus === 5 && filters['Challenged Clearing Requests'])
+          return true
+
+        return false
+      })
+      .sort((a, b) => {
+        const { oldestFirst } = filter
+        if (oldestFirst) return a.blockNumber < b.blockNumber ? -1 : 1
+        else return a.blockNumber > b.blockNumber ? -1 : 1
+      })
+      .sort((a, b) => {
+        if (a.clientStatus > b.clientStatus) return -1
+        if (b.clientStatus > a.clientStatus) return 1
+        return 0
+      })
+
+    const { currentPage } = this.state
+    const totalPages = Math.ceil(filteredTokens.length / ITEMS_PER_PAGE)
+    const displayedTokens = filteredTokens.slice(
+      currentPage * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+    )
 
     return (
-      <div className="Page" ref={this.ref}>
+      <div className="Page">
         <FilterBar
           filter={filters}
           handleFilterChange={this.handleFilterChange}
           filterVisible
         />
-        <SortBar items={tokens} />
+        <SortBar displayedItemsCount={displayedTokens.length} items={tokens} />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
-            {tokens.data && !tokens.loading ? (
-              this.mapTokens(tokens.data)
+            {displayedTokens.length === 0 && !tokens.loading ? (
+              <p
+                style={{
+                  textAlign: 'center',
+                  width: '100%',
+                  marginTop: '50px'
+                }}
+              >
+                No tokens found for the selected filters
+              </p>
             ) : (
-              <div className="TokenGrid-loading">
-                <BeatLoader color="#3d464d" />
-              </div>
+              <>
+                {displayedTokens.length > 0 || !tokens.loading ? (
+                  displayedTokens.map(token => (
+                    <TokenCard
+                      token={token}
+                      key={token.ID}
+                      badge={badges.data.items[token.address]}
+                    />
+                  ))
+                ) : (
+                  <div className="TokenGrid-loading">
+                    <BeatLoader color="#3d464d" />
+                  </div>
+                )}
+              </>
             )}
           </div>
-        </div>
-        {tokens.data && !tokens.loading && (
           <Paging
             onFirstPageClick={this.handleFirstPageClicked}
             onPreviousPageClick={this.handlePreviousPageClicked}
             onNextPageClick={this.handleNextPageClicked}
             onLastPageClick={this.handleLastPageClicked}
             currentPage={currentPage}
-            maxItemsPerPage={TOKENS_PER_PAGE}
-            itemCount={tokens.data.length}
-            lastPage={tokens.data.lastPage}
-            totalByStatus={totalFiltered}
-            currentPageNum={tokens.data.currentPage}
-            totalPages={tokens.data.totalPages}
+            totalPages={totalPages}
           />
-        )}
+        </div>
       </div>
     )
   }
@@ -219,15 +160,12 @@ class Tokens extends Component {
 export default withRouter(
   connect(
     state => ({
-      tokens: state.token.tokens,
-      filter: state.filter
+      tokens: state.tokens,
+      badges: state.badges,
+      filter: state.filter,
+      accounts: state.wallet.accounts.data
     }),
     {
-      fetchArbitrableTokenListData:
-        arbitrableTokenListActions.fetchArbitrableTokenListData,
-      fetchArbitrableAddressListData:
-        arbitrableAddressListActions.fetchArbitrableAddressListData,
-      fetchTokens: tokenActions.fetchTokens,
       toggleFilter: filterActions.toggleFilter
     }
   )(Tokens)

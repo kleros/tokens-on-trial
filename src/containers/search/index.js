@@ -1,54 +1,25 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import Downshift from 'downshift'
 import { withRouter } from 'react-router-dom'
+import { connect } from 'react-redux'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
-import { arbitrableTokenList, web3 } from '../../bootstrap/dapp-api'
+import * as tokensActions from '../../actions/tokens'
 
 import Item from './item'
 
 import './search-bar.css'
 
-class SearchBar extends PureComponent {
+class SearchBar extends Component {
   static propTypes = {
     history: PropTypes.shape({
       push: PropTypes.func.isRequired
-    }).isRequired
-  }
-
-  state = {
-    tokenSubmissions: []
-  }
-
-  componentDidMount() {
-    arbitrableTokenList.events.TokenSubmitted({ fromBlock: 0 }, (err, data) => {
-      if (err) {
-        console.error('Error fetching token submission: ', err)
-        return
-      }
-      const { returnValues } = data
-      const { tokenSubmissions } = this.state
-      const { _name, _ticker, _symbolMultihash, _address } = returnValues
-      if (!_name || !_ticker) return
-
-      const tokenID = web3.utils.soliditySha3(
-        _name || '',
-        _ticker || '',
-        _address,
-        _symbolMultihash
-      )
-
-      tokenSubmissions.push({
-        value: _name || '',
-        searchVal: _name ? _name.toLowerCase() : '',
-        tokenID,
-        name: _name,
-        ticker: _ticker,
-        address: _address,
-        symbolMultihash: _symbolMultihash
-      })
-    })
+    }).isRequired,
+    tokens: PropTypes.shape({
+      blockNumber: PropTypes.number.isRequired
+    }).isRequired,
+    fetchTokens: PropTypes.func.isRequired
   }
 
   itemClicked = selection => {
@@ -59,7 +30,20 @@ class SearchBar extends PureComponent {
   itemCompute = item => (item ? item.value : '')
 
   render() {
-    const { tokenSubmissions } = this.state
+    const { tokens } = this.props
+    const tokenData = tokens.items
+    const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
+      const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
+      return {
+        value: name || '',
+        searchVal: name ? name.toLowerCase() : '',
+        tokenID,
+        name,
+        ticker,
+        address,
+        symbolMultihash
+      }
+    })
 
     return (
       <div className="SearchBar">
@@ -74,7 +58,7 @@ class SearchBar extends PureComponent {
           }) => (
             <div className="SearchBar-box">
               <input {...getInputProps()} className="SearchBar-input" />
-              {isOpen && inputValue.length > 0 && (
+              {isOpen && tokenSubmissions.length > 0 && inputValue.length > 0 && (
                 <ul {...getMenuProps()} className="SearchBar-results">
                   {isOpen
                     ? tokenSubmissions
@@ -111,4 +95,13 @@ class SearchBar extends PureComponent {
   }
 }
 
-export default withRouter(SearchBar)
+export default withRouter(
+  connect(
+    state => ({
+      tokens: state.tokens.data
+    }),
+    {
+      fetchTokens: tokensActions.fetchTokens
+    }
+  )(SearchBar)
+)

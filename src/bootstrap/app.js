@@ -21,6 +21,8 @@ import * as arbitrableAddressListActions from '../actions/arbitrable-address-lis
 import * as walletSelectors from '../reducers/wallet'
 import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
+import * as tokensActions from '../actions/tokens'
+import * as badgesActions from '../actions/badges'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
@@ -28,7 +30,11 @@ import TelegramButton from '../components/telegram-button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
-import { onlyInfura } from './dapp-api'
+import {
+  onlyInfura,
+  arbitrableTokenList,
+  arbitrableAddressList
+} from './dapp-api'
 import './fontawesome'
 import './app.css'
 
@@ -48,7 +54,9 @@ class _ConnectedNavBar extends Component {
     deleteNotification: PropTypes.func.isRequired,
     closeNotificationsModal: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
-    fetchArbitrableAddressListData: PropTypes.func.isRequired
+    fetchArbitrableAddressListData: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired,
+    fetchBadges: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
@@ -77,10 +85,20 @@ class _ConnectedNavBar extends Component {
   componentDidMount() {
     const {
       fetchArbitrableAddressListData,
-      fetchArbitrableTokenListData
+      fetchArbitrableTokenListData,
+      fetchTokens,
+      fetchBadges
     } = this.props
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
+    fetchTokens()
+    fetchBadges()
+    arbitrableTokenList.events.TokenStatusChange().on('data', () => {
+      fetchTokens()
+    })
+    arbitrableAddressList.events.AddressStatusChange().on('data', () => {
+      fetchBadges()
+    })
   }
 
   render() {
@@ -158,7 +176,9 @@ const ConnectedNavBar = withRouter(
       fetchArbitrableAddressListData:
         arbitrableAddressListActions.fetchArbitrableAddressListData,
       fetchArbitrableTokenListData:
-        arbitrableTokenListActions.fetchArbitrableTokenListData
+        arbitrableTokenListActions.fetchArbitrableTokenListData,
+      fetchTokens: tokensActions.fetchTokens,
+      fetchBadges: badgesActions.fetchBadges
     }
   )(_ConnectedNavBar)
 )

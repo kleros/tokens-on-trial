@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3 } from '../../../../bootstrap/dapp-api'
+import { web3, ETHFINEX_CRITERIA_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
 
@@ -22,7 +22,8 @@ const Challenge = ({
   closeActionModal,
   fundDispute,
   challengeFormIsInvalid,
-  submitChallengeForm
+  submitChallengeForm,
+  badge
 }) => (
   <div>
     <h3 className="Modal-title">
@@ -30,10 +31,25 @@ const Challenge = ({
       Challenge
     </h3>
     <hr />
+    {badge && (
+      <>
+        <p>
+          See the{' '}
+          <a
+            className="TokenDetails-withdraw"
+            target="_blank"
+            rel="noopener noreferrer"
+            href={ETHFINEX_CRITERIA_URL}
+            style={{ margin: 0, textDecoration: 'underline' }}
+          >
+            listing criteria.
+          </a>
+        </p>
+      </>
+    )}
     <h5 className="Modal-subtitle">
       In order to challenge, the following <br /> amount of ETH is required
     </h5>
-    <br />
     <div className="Challenge-fees">
       <div>
         <p className="Challenge-fees-line">Total Deposit:</p>
@@ -102,11 +118,16 @@ Challenge.propTypes = {
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
   challengeFormIsInvalid: PropTypes.bool.isRequired,
+  badge: PropTypes.shape({}),
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   fundDispute: PropTypes.func.isRequired,
   submitChallengeForm: PropTypes.func.isRequired
+}
+
+Challenge.defaultProps = {
+  badge: null
 }
 
 export default connect(

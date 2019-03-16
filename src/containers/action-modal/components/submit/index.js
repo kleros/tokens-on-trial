@@ -50,6 +50,7 @@ const Submit = ({
         <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
           Complete the information below and submit.
         </h5>
+        <br />
       </>
     )}
     {badge && (
@@ -59,7 +60,7 @@ const Submit = ({
           <strong>Compliant with Ethfinex Listing Criteria</strong>
         </h4>
         <p>
-          See the listing criteria{' '}
+          See the{' '}
           <a
             className="TokenDetails-withdraw"
             target="_blank"
@@ -67,19 +68,18 @@ const Submit = ({
             href={ETHFINEX_CRITERIA_URL}
             style={{ margin: 0, textDecoration: 'underline' }}
           >
-            here.
+            listing criteria.
           </a>
         </p>
       </>
     )}
-    <br />
     {!badge && !item && (
       <>
         <TokenForm className="Submit-form" onSubmit={submitItem} />
         <FilePicker
           file={file}
           message={
-            <span>
+            <span style={{ color: '#505050' }}>
               (Max Size: 1 MB)
               <br />
               Drag your transparent PNG or click here.

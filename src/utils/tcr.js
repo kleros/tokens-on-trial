@@ -27,15 +27,16 @@ export const contractStatusToClientStatus = (status, disputed) => {
       case 'ClearingRequested':
         return tcrConstants.STATUS_ENUM['Removal Request Challenged']
       default:
-        return status
+        return Number(status)
     }
 
-  return status
+  return Number(status)
 }
 
 export const getBlock = (block, web3, hash, callback) => {
   if (!block || !block.timestamp)
-    // Due to a web3js this method sometimes returns a null block https://github.com/paritytech/parity-ethereum/issues/8788.
+    // Due to a web3js bug, this method sometimes returns a null block
+    // https://github.com/paritytech/parity-ethereum/issues/8788.
     web3.eth.getBlock(hash, (err, block) => {
       if (err) throw err
       getBlock(block, web3, hash, callback)

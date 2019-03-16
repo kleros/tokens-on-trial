@@ -13,12 +13,10 @@ import * as arbitrableAddressListActions from '../../actions/arbitrable-address-
 import * as badgeActions from '../../actions/badge'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
-import { filterToContractParam, totalByStatus } from '../../utils/filter'
-import { arbitrableAddressList } from '../../bootstrap/dapp-api'
 
 import './badges.css'
 
-const BADGES_PER_PAGE = 40
+const ITEMS_PER_PAGE = 40
 
 class Badges extends Component {
   static propTypes = {
@@ -33,167 +31,128 @@ class Badges extends Component {
     // Redux State
     badges: badgeSelectors.badgesShape.isRequired,
     filter: filterSelectors.filterShape.isRequired,
+    accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
 
     // Action Dispatchers
-    fetchArbitrableAddressListData: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired
   }
 
-  ref = React.createRef()
-  fillPageTimeout = null
-
-  componentDidMount() {
-    const { fetchArbitrableAddressListData } = this.props
-    fetchArbitrableAddressListData()
-    this.fetchBadges({})
-    arbitrableAddressList.events.AddressStatusChange().on('data', () => {
-      this.fetchBadges({})
-    })
-  }
-
-  mapBadges = tokens => {
-    const keys = {}
-    if (Array.isArray(tokens))
-      return tokens
-        .filter(token => {
-          if (!keys[token.badge.addr]) {
-            keys[token.badge.addr] = true
-            return true
-          } else return false
-        })
-        .sort((a, b) => {
-          if (
-            a.status > 1 &&
-            b.status > 1 &&
-            Number(a.latestRequest.submissionTime) >
-              Number(b.latestRequest.submissionTime)
-          )
-            return -1
-          if (
-            a.status > 1 &&
-            b.status > 1 &&
-            Number(a.latestRequest.submissionTime) <
-              Number(b.latestRequest.submissionTime)
-          )
-            return 1
-
-          if (a.status > 1 && b.status <= 1) return -1
-          if (a.status <= 1 && b.status > 1) return 1
-          if (a.status > 1 && b.status > 1) {
-            if (!a.latestRequest.disputed && b.latestRequest.disputed) return -1
-            if (a.latestRequest.disputed && !b.latestRequest.disputed) return 1
-          }
-          return 0
-        })
-        .map(token => (
-          <BadgeCard key={token.ID} token={token} displayTokenInfo />
-        ))
-
-    return null
-  }
+  state = { currentPage: 0 }
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
     toggleFilter(key)
-    this.fetchBadges({ key })
   }
 
   handleFirstPageClicked = () => {
-    const { history } = this.props
-    history.push('/badges')
-    this.fetchBadges({ page: '' })
+    this.setState({ currentPage: 0 })
   }
 
   handlePreviousPageClicked = () => {
-    const { badges, history } = this.props
-    const { previousPage } = badges.data
-    if (previousPage) {
-      history.push({ search: `?p=${previousPage}` })
-      this.fetchBadges({ page: previousPage })
-    } else {
-      history.push({ search: `` })
-      this.fetchBadges({ page: '' })
-    }
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage - 1 })
   }
 
   handleNextPageClicked = () => {
-    const { badges, history } = this.props
-    history.push({ search: `?p=${badges.data[badges.data.length - 1].ID}` })
-    this.fetchBadges({ page: badges.data[badges.data.length - 1].ID })
+    const { currentPage } = this.state
+    this.setState({ currentPage: currentPage + 1 })
   }
 
-  handleLastPageClicked = () => {
-    const { badges, history } = this.props
-    history.push({ search: `?p=${badges.data.lastPage}` })
-    this.fetchBadges({ page: badges.data.lastPage })
-  }
-
-  fetchBadges = ({ key, page }) => {
-    const { badges, fetchBadges, filter, location } = this.props
-    const pageFromUrl =
-      typeof page === 'undefined'
-        ? new URLSearchParams(location.search).get('p')
-        : page
-
-    const { filters, oldestFirst } = filter
-    const updatedFilters = { ...filters }
-    if (key) updatedFilters[key] = !filters[key]
-
-    const filterValue = filterToContractParam(updatedFilters)
-
-    if (!badges.loading)
-      fetchBadges(
-        pageFromUrl && pageFromUrl.length === 66 ? pageFromUrl : '',
-        BADGES_PER_PAGE,
-        filterValue,
-        oldestFirst
-      )
+  handleLastPageClicked = lastPage => {
+    this.setState({ currentPage: lastPage })
   }
 
   render() {
-    const { badges, filter, location } = this.props
+    const { badges, filter, accounts } = this.props
+    const userAccount = accounts[0]
+    const badgesData = badges.data
     const { filters } = filter
 
-    const currentPage = new URLSearchParams(location.search).get('p')
-    let totalFiltered = 0
-    if (badges.data && badges.data.countByStatus)
-      totalFiltered = totalByStatus(badges.data.countByStatus, filter.filters)
+    const filteredBadges = Object.keys(badgesData.items)
+      .map(address => badgesData.items[address])
+      .filter(badge => {
+        if (userAccount === badge.status.requester && filter['My Submissions'])
+          return true
+        if (userAccount === badge.status.challenger && filter['My Challenges'])
+          return true
+
+        const { clientStatus } = badge
+        if (clientStatus === 0 && filters.Absent) return true
+        if (clientStatus === 1 && filters.Registered) return true
+        if (clientStatus === 2 && filters['Registration Requests']) return true
+        if (clientStatus === 3 && filters['Clearing Requests']) return true
+        if (clientStatus === 4 && filters['Challenged Registration Requests'])
+          return true
+        if (clientStatus === 5 && filters['Challenged Clearing Requests'])
+          return true
+
+        return false
+      })
+      .sort((a, b) => {
+        const { oldestFirst } = filter
+        if (oldestFirst) return a.blockNumber < b.blockNumber ? -1 : 1
+        else return a.blockNumber > b.blockNumber ? -1 : 1
+      })
+      .sort((a, b) => {
+        if (a.clientStatus > b.clientStatus) return -1
+        if (b.clientStatus > a.clientStatus) return 1
+        return 0
+      })
+
+    const { currentPage } = this.state
+    const totalPages = Math.ceil(filteredBadges.length / ITEMS_PER_PAGE)
+    const displayedBadges = filteredBadges.slice(
+      currentPage * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE + ITEMS_PER_PAGE
+    )
 
     return (
-      <div className="Page" ref={this.ref}>
+      <div className="Page">
         <FilterBar
           filter={filters}
           handleFilterChange={this.handleFilterChange}
           filterVisible
         />
-        <SortBar items={badges} />
+        <SortBar displayedItemsCount={displayedBadges.length} items={badges} />
         <div className="BadgeGrid">
           <div className="BadgeGrid-container">
-            {badges.data && !badges.loading ? (
-              this.mapBadges(badges.data)
+            {displayedBadges.length === 0 && !badges.loading ? (
+              <p
+                style={{
+                  textAlign: 'center',
+                  width: '100%',
+                  marginTop: '50px'
+                }}
+              >
+                No badges found for the selected filters
+              </p>
             ) : (
-              <div className="BadgeGrid-loading">
-                <BeatLoader color="#3d464d" />
-              </div>
+              <>
+                {displayedBadges.length > 0 || !badges.loading ? (
+                  displayedBadges.map(badge => (
+                    <BadgeCard
+                      badge={badge}
+                      key={badge.address}
+                      displayTokenInfo
+                    />
+                  ))
+                ) : (
+                  <div className="BadgeGrid-loading">
+                    <BeatLoader color="#3d464d" />
+                  </div>
+                )}
+              </>
             )}
           </div>
-        </div>
-        {badges.data && !badges.loading && (
           <Paging
             onFirstPageClick={this.handleFirstPageClicked}
             onPreviousPageClick={this.handlePreviousPageClicked}
             onNextPageClick={this.handleNextPageClicked}
             onLastPageClick={this.handleLastPageClicked}
             currentPage={currentPage}
-            maxItemsPerPage={BADGES_PER_PAGE}
-            itemCount={badges.data.length}
-            lastPage={badges.data.lastPage}
-            totalByStatus={totalFiltered}
-            currentPageNum={badges.data.currentPage}
-            totalPages={badges.data.totalPages}
+            totalPages={totalPages}
           />
-        )}
+        </div>
       </div>
     )
   }
@@ -202,8 +161,10 @@ class Badges extends Component {
 export default withRouter(
   connect(
     state => ({
-      badges: state.badge.badges,
-      filter: state.filter
+      badges: state.badges,
+      tokens: state.tokens,
+      filter: state.filter,
+      accounts: state.wallet.accounts.data
     }),
     {
       fetchArbitrableAddressListData:
