@@ -6,7 +6,8 @@ import App from './bootstrap/app'
 import registerServiceWorker from './bootstrap/register-service-worker'
 import {
   arbitrableTokenList,
-  arbitrableAddressList
+  arbitrableAddressList,
+  APP_VERSION
 } from './bootstrap/dapp-api'
 
 const { store, history } = configureStore()
@@ -36,11 +37,11 @@ window.addEventListener('unload', () => {
     JSON.stringify(store.getState().filter)
   )
   localStorage.setItem(
-    `${arbitrableTokenList.options.address}tokens`,
+    `${arbitrableTokenList.options.address}tokens@${APP_VERSION}`,
     JSON.stringify(store.getState().tokens)
   )
   localStorage.setItem(
-    `${arbitrableAddressList.options.address}badges`,
+    `${arbitrableAddressList.options.address}badges@${APP_VERSION}`,
     JSON.stringify(store.getState().badges)
   )
 })

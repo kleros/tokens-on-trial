@@ -18,6 +18,8 @@
   REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings"
   REACT_APP_PROD_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/QmVzwEBpGsbFY3UgyjA3SxgGXx3r5gFGynNpaoXkp6jenu/Ethfinex%20Court%20Policy.pdf"
   REACT_APP_PROD_IPFS_URL="https://ipfs.kleros.io"
+  REACT_APP_PROD_VERSION=$npm_package_version
+
 # Production context: All deploys to the main
 # repository branch will inherit these settings.
 [context.production]
@@ -34,6 +36,7 @@
   REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings"
   REACT_APP_PROD_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/QmVzwEBpGsbFY3UgyjA3SxgGXx3r5gFGynNpaoXkp6jenu/Ethfinex%20Court%20Policy.pdf"
   REACT_APP_PROD_IPFS_URL="https://ipfs.kleros.io"
+  REACT_APP_PROD_VERSION=$npm_package_version
 
 [[redirects]]
   from = "/*"

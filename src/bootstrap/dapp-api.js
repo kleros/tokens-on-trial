@@ -19,6 +19,7 @@ const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
 const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
 const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
+const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
 
 let web3
 let onlyInfura = false
@@ -92,5 +93,6 @@ export {
   requiredNetwork,
   ETHFINEX_CRITERIA_URL,
   ARBITRATOR_ADDRESS,
-  IPFS_URL
+  IPFS_URL,
+  APP_VERSION
 }
