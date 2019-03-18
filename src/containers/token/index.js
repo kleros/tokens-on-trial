@@ -231,13 +231,10 @@ class TokenDetails extends PureComponent {
   }
 
   componentDidUpdate() {
-    const { match, fetchToken } = this.props
+    const { match } = this.props
     const { token, fetching, evidenceListenerSet } = this.state
     const { tokenID } = match.params
-    if (token && token.ID !== tokenID && !fetching) {
-      fetchToken(tokenID)
-      this.setState({ fetching: true })
-    }
+    if (token && token.ID !== tokenID && !fetching) window.reload(true)
 
     if (token && !evidenceListenerSet && token.ID === tokenID) {
       arbitrableTokenList.events

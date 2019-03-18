@@ -207,13 +207,10 @@ class BadgeDetails extends PureComponent {
   }
 
   componentDidUpdate() {
-    const { match, fetchBadge } = this.props
+    const { match } = this.props
     const { badge, fetching, evidenceListenerSet } = this.state
     const { tokenAddr } = match.params
-    if (badge && badge.addr !== tokenAddr && !fetching) {
-      fetchBadge(tokenAddr)
-      this.setState({ fetching: true })
-    }
+    if (badge && badge.addr !== tokenAddr && !fetching) window.reload(true)
 
     if (badge && !evidenceListenerSet && badge.addr === tokenAddr) {
       arbitrableAddressList.events

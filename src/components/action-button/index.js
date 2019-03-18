@@ -36,8 +36,6 @@ const getActionButton = ({
       </Button>
     )
 
-  console.info(decisiveRuling, loserPercent, loserCountdownCompleted)
-
   if (decisiveRuling && loserPercent < 100 && loserCountdownCompleted)
     return (
       <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
