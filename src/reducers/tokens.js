@@ -1,4 +1,8 @@
-import { CACHE_TOKENS, FETCH_TOKENS_CACHE } from '../actions/tokens'
+import {
+  CACHE_TOKENS,
+  FETCH_TOKENS_CACHE,
+  FETCH_TOKENS_FAILED
+} from '../actions/tokens'
 import { arbitrableTokenList, APP_VERSION } from '../bootstrap/dapp-api'
 
 const cachedTokens = localStorage.getItem(
@@ -9,6 +13,7 @@ const initialState = cachedTokens
   ? JSON.parse(cachedTokens)
   : {
       loading: false,
+      loadingFailed: false,
       data: {
         blockNumber: 0,
         statusBlockNumber: 0,
@@ -23,6 +28,13 @@ const tokens = (state = initialState, action) => {
       return {
         ...state,
         loading: true
+      }
+    }
+    case FETCH_TOKENS_FAILED: {
+      return {
+        ...state,
+        loading: false,
+        loadingFailed: true
       }
     }
     case CACHE_TOKENS: {

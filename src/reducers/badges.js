@@ -1,4 +1,8 @@
-import { CACHE_BADGES, FETCH_BADGES_CACHE } from '../actions/badges'
+import {
+  CACHE_BADGES,
+  FETCH_BADGES_CACHE,
+  FETCH_BADGES_FAILED
+} from '../actions/badges'
 import { arbitrableAddressList, APP_VERSION } from '../bootstrap/dapp-api'
 
 const cachedBadges = localStorage.getItem(
@@ -21,6 +25,13 @@ const badges = (state = initialState, action) => {
       return {
         ...state,
         loading: true
+      }
+    }
+    case FETCH_BADGES_FAILED: {
+      return {
+        ...state,
+        loading: false,
+        loadingFailed: true
       }
     }
     case CACHE_BADGES: {
