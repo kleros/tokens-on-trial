@@ -1,5 +1,4 @@
 import Web3 from 'web3'
-import Eth from 'ethjs'
 import Archon from '@kleros/archon'
 
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list.json'
@@ -22,23 +21,14 @@ const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
 const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
 
 let web3
+const viewWeb3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
 let onlyInfura = false
 if (process.env.NODE_ENV === 'test')
   web3 = new Web3(require('ganache-cli').provider())
 else if (window.web3 && window.web3.currentProvider)
   web3 = new Web3(window.web3.currentProvider)
-else {
-  web3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
-  onlyInfura = true
-}
 
-let eth
-if (process.env.NODE_ENV === 'test')
-  eth = new Eth(require('ganache-cli').provider())
-else if (window.ethereum) eth = new Eth(window.ethereum)
-else if (window.web3 && window.web3.currentProvider)
-  eth = new Eth(window.web3.currentProvider)
-else eth = new Eth(new Eth.HttpProvider(ETHEREUM_PROVIDER))
+if (!web3) onlyInfura = true
 
 const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
 
@@ -66,6 +56,19 @@ const ETHAddressRegExpCaptureGroup = '(0x[a-fA-F0-9]{40})'
 const ETHAddressRegExp = /0x[a-fA-F0-9]{40}/
 const strictETHAddressRegExp = /^0x[a-fA-F0-9]{40}$/
 
+const arbitrableTokenListView = new viewWeb3.eth.Contract(
+  ArbitrableTokenList.abi,
+  ARBITRABLE_TOKEN_LIST_ADDRESS
+)
+const arbitrableAddressListView = new viewWeb3.eth.Contract(
+  ArbitrableAddressList.abi,
+  ARBITRABLE_ADDRESS_LIST_ADDRESS
+)
+const arbitratorView = new viewWeb3.eth.Contract(
+  Arbitrator.abi,
+  ARBITRATOR_ADDRESS
+)
+
 const arbitrableTokenList = new web3.eth.Contract(
   ArbitrableTokenList.abi,
   ARBITRABLE_TOKEN_LIST_ADDRESS
@@ -78,7 +81,7 @@ const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
   web3,
-  eth,
+  viewWeb3,
   onlyInfura,
   network,
   ETHAddressRegExpCaptureGroup,
@@ -94,5 +97,8 @@ export {
   ETHFINEX_CRITERIA_URL,
   ARBITRATOR_ADDRESS,
   IPFS_URL,
-  APP_VERSION
+  APP_VERSION,
+  arbitrableTokenListView,
+  arbitratorView,
+  arbitrableAddressListView
 }

@@ -4,8 +4,10 @@ import readFile from '../utils/read-file'
 import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableTokenList,
-  arbitrableAddressList,
   arbitrator,
+  arbitrableTokenListView,
+  arbitrableAddressListView,
+  arbitratorView,
   archon,
   ARBITRATOR_ADDRESS,
   web3
@@ -39,7 +41,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   if (cursor === '') cursor = ZERO_ID
 
   const totalCount = Number(
-    yield call(arbitrableTokenList.methods.tokenCount().call, {
+    yield call(arbitrableTokenListView.methods.tokenCount().call, {
       from: yield select(walletSelectors.getAccount)
     })
   )
@@ -51,7 +53,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
       : Math.floor(totalCount / count) + 1
 
   let countByStatus = yield call(
-    arbitrableTokenList.methods.countByStatus().call,
+    arbitrableTokenListView.methods.countByStatus().call,
     {
       from: yield select(walletSelectors.getAccount)
     }
@@ -80,11 +82,14 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   let firstToken = ZERO_ID
   let lastToken = ZERO_ID
   if (totalCount > 0) {
-    firstToken = yield call(arbitrableTokenList.methods.tokensList(0).call, {
-      from: yield select(walletSelectors.getAccount)
-    })
+    firstToken = yield call(
+      arbitrableTokenListView.methods.tokensList(0).call,
+      {
+        from: yield select(walletSelectors.getAccount)
+      }
+    )
     lastToken = yield call(
-      arbitrableTokenList.methods.tokensList(totalCount - 1).call,
+      arbitrableTokenListView.methods.tokensList(totalCount - 1).call,
       { from: yield select(walletSelectors.getAccount) }
     )
   }
@@ -94,7 +99,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   /* eslint-disable no-unused-vars */
   try {
     const lastTokens = yield call(
-      arbitrableTokenList.methods.queryTokens(
+      arbitrableTokenListView.methods.queryTokens(
         lastToken,
         count,
         filterValue,
@@ -115,7 +120,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   let currentPage = 1
   if (cursor !== firstToken && cursor !== ZERO_ID) {
     const itemsBefore = (yield call(
-      arbitrableTokenList.methods.queryTokens(
+      arbitrableTokenListView.methods.queryTokens(
         cursor === firstToken ? ZERO_ID : cursor,
         100,
         filterValue,
@@ -135,7 +140,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
 
   // Fetch tokens
   const data = yield call(
-    arbitrableTokenList.methods.queryTokens(
+    arbitrableTokenListView.methods.queryTokens(
       cursor === firstToken ? ZERO_ID : cursor,
       count,
       filterValue,
@@ -155,7 +160,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   let previousPage
   try {
     const previousTokens = yield call(
-      arbitrableTokenList.methods.queryTokens(
+      arbitrableTokenListView.methods.queryTokens(
         tokenIDs[0],
         count + 1,
         filterValue,
@@ -188,7 +193,7 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
  * @returns {object} - The fetched token.
  */
 export function* fetchToken({ payload: { ID } }) {
-  let token = yield call(arbitrableTokenList.methods.getTokenInfo(ID).call)
+  let token = yield call(arbitrableTokenListView.methods.getTokenInfo(ID).call)
   const account = yield select(walletSelectors.getAccount)
 
   // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
@@ -204,7 +209,7 @@ export function* fetchToken({ payload: { ID } }) {
 
   if (Number(token.numberOfRequests > 0)) {
     token.latestRequest = yield call(
-      arbitrableTokenList.methods.getRequestInfo(
+      arbitrableTokenListView.methods.getRequestInfo(
         ID,
         Number(token.numberOfRequests) - 1
       ).call
@@ -225,14 +230,14 @@ export function* fetchToken({ payload: { ID } }) {
 
     while (i >= 0) {
       const amount = yield call(
-        arbitrableTokenList.methods.amountWithdrawable(ID, account, i).call
+        arbitrableTokenListView.methods.amountWithdrawable(ID, account, i).call
       )
       token.withdrawable = token.withdrawable.add(web3.utils.toBN(amount))
       i--
     }
 
     token.latestRequest.latestRound = yield call(
-      arbitrableTokenList.methods.getRoundInfo(
+      arbitrableTokenListView.methods.getRoundInfo(
         ID,
         Number(token.numberOfRequests) - 1,
         Number(token.latestRequest.numberOfRounds) - 1
@@ -250,14 +255,15 @@ export function* fetchToken({ payload: { ID } }) {
       // Fetch dispute data.
       arbitrator.options.address = token.latestRequest.arbitrator
       token.latestRequest.dispute = yield call(
-        arbitrator.methods.disputes(token.latestRequest.disputeID).call
+        arbitratorView.methods.disputes(token.latestRequest.disputeID).call
       )
       token.latestRequest.dispute.court = yield call(
-        arbitrator.methods.getSubcourt(token.latestRequest.dispute.subcourtID)
-          .call
+        arbitratorView.methods.getSubcourt(
+          token.latestRequest.dispute.subcourtID
+        ).call
       )
       token.latestRequest.dispute.status = yield call(
-        arbitrator.methods.disputeStatus(token.latestRequest.disputeID).call
+        arbitratorView.methods.disputeStatus(token.latestRequest.disputeID).call
       )
 
       // Fetch appeal disputeID, if there was an appeal.
@@ -274,16 +280,17 @@ export function* fetchToken({ payload: { ID } }) {
         !token.latestRequest.latestRound.appealed
       ) {
         token.latestRequest.dispute.ruling = yield call(
-          arbitrator.methods.currentRuling(token.latestRequest.disputeID).call
+          arbitratorView.methods.currentRuling(token.latestRequest.disputeID)
+            .call
         )
         token.latestRequest.latestRound.appealCost = yield call(
-          arbitrator.methods.appealCost(
+          arbitratorView.methods.appealCost(
             token.latestRequest.disputeID,
             token.latestRequest.arbitratorExtraData
           ).call
         )
         const MULTIPLIER_DIVISOR = yield call(
-          arbitrableTokenList.methods.MULTIPLIER_DIVISOR().call
+          arbitrableTokenListView.methods.MULTIPLIER_DIVISOR().call
         )
 
         const winnerStakeMultiplier = yield select(
@@ -345,9 +352,10 @@ export function* fetchToken({ payload: { ID } }) {
           )
         }
 
-        if (typeof arbitrator.methods.appealPeriod === 'function')
+        if (typeof arbitratorView.methods.appealPeriod === 'function')
           token.latestRequest.latestRound.appealPeriod = yield call(
-            arbitrator.methods.appealPeriod(token.latestRequest.disputeID).call
+            arbitratorView.methods.appealPeriod(token.latestRequest.disputeID)
+              .call
           )
         else
           token.latestRequest.latestRound.appealPeriod = [
@@ -359,12 +367,12 @@ export function* fetchToken({ payload: { ID } }) {
 
     const { addr } = token
     let badge = yield call(
-      arbitrableAddressList.methods.getAddressInfo(addr).call
+      arbitrableAddressListView.methods.getAddressInfo(addr).call
     )
 
     if (Number(badge.numberOfRequests > 0)) {
       badge.latestRequest = yield call(
-        arbitrableAddressList.methods.getRequestInfo(
+        arbitrableAddressListView.methods.getRequestInfo(
           addr,
           Number(badge.numberOfRequests) - 1
         ).call
@@ -377,7 +385,7 @@ export function* fetchToken({ payload: { ID } }) {
         .toString()
 
       badge.latestRequest.latestRound = yield call(
-        arbitrableAddressList.methods.getRoundInfo(
+        arbitrableAddressListView.methods.getRoundInfo(
           addr,
           Number(badge.numberOfRequests) - 1,
           Number(badge.latestRequest.numberOfRounds) - 1
@@ -395,14 +403,16 @@ export function* fetchToken({ payload: { ID } }) {
         // Fetch dispute data.
         arbitrator.options.address = badge.latestRequest.arbitrator
         badge.latestRequest.dispute = yield call(
-          arbitrator.methods.disputes(badge.latestRequest.disputeID).call
+          arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
         )
         badge.latestRequest.dispute.court = yield call(
-          arbitrator.methods.getSubcourt(badge.latestRequest.dispute.subcourtID)
-            .call
+          arbitratorView.methods.getSubcourt(
+            badge.latestRequest.dispute.subcourtID
+          ).call
         )
         badge.latestRequest.dispute.status = yield call(
-          arbitrator.methods.disputeStatus(badge.latestRequest.disputeID).call
+          arbitratorView.methods.disputeStatus(badge.latestRequest.disputeID)
+            .call
         )
 
         // Fetch appeal disputeID, if there was an appeal.
@@ -419,10 +429,11 @@ export function* fetchToken({ payload: { ID } }) {
           !badge.latestRequest.latestRound.appealed
         ) {
           badge.latestRequest.dispute.ruling = yield call(
-            arbitrator.methods.currentRuling(badge.latestRequest.disputeID).call
+            arbitratorView.methods.currentRuling(badge.latestRequest.disputeID)
+              .call
           )
           badge.latestRequest.latestRound.appealCost = yield call(
-            arbitrator.methods.appealCost(
+            arbitratorView.methods.appealCost(
               badge.latestRequest.disputeID,
               badge.latestRequest.arbitratorExtraData
             ).call
@@ -438,7 +449,7 @@ export function* fetchToken({ payload: { ID } }) {
             arbitrableAddressListSelectors.getSharedStakeMultiplier
           )
           const MULTIPLIER_DIVISOR = yield call(
-            arbitrableAddressList.methods.MULTIPLIER_DIVISOR().call
+            arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
           )
           badge.latestRequest.latestRound.requiredForSide = [0]
 
@@ -490,9 +501,9 @@ export function* fetchToken({ payload: { ID } }) {
             )
           }
 
-          if (typeof arbitrator.methods.appealPeriod === 'function')
+          if (typeof arbitratorView.methods.appealPeriod === 'function')
             badge.latestRequest.latestRound.appealPeriod = yield call(
-              arbitrator.methods.appealPeriod(badge.latestRequest.disputeID)
+              arbitratorView.methods.appealPeriod(badge.latestRequest.disputeID)
                 .call
             )
           else

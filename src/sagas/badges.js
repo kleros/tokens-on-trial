@@ -6,11 +6,11 @@ import {
   fetchBadgesFailed
 } from '../actions/badges'
 import * as badgesSelectors from '../reducers/badges'
-import { arbitrableAddressList } from '../bootstrap/dapp-api'
+import { arbitrableAddressListView } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
-  arbitrableAddressList.getPastEvents(eventName, { fromBlock })
+  arbitrableAddressListView.getPastEvents(eventName, { fromBlock })
 
 /**
  * Fetches a paginatable list of badges.

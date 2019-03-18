@@ -6,11 +6,11 @@ import {
   fetchTokensFailed
 } from '../actions/tokens'
 import * as tokenSelectors from '../reducers/tokens'
-import { arbitrableTokenList, web3 } from '../bootstrap/dapp-api'
+import { arbitrableTokenListView, web3 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
-  arbitrableTokenList.getPastEvents(eventName, { fromBlock })
+  arbitrableTokenListView.getPastEvents(eventName, { fromBlock })
 
 /**
  * Fetches a paginatable list of tokens.
@@ -130,7 +130,7 @@ function* fetchTokens() {
         // This is a missing token due to the web3js bug described above.
         for (const missingToken of missingTokens) {
           const tokenInfo = yield call(
-            arbitrableTokenList.methods.getTokenInfo(_tokenID).call
+            arbitrableTokenListView.methods.getTokenInfo(_tokenID).call
           )
           if (
             tokenInfo.name === missingToken.name &&
