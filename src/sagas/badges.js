@@ -27,7 +27,7 @@ function* fetchBadges() {
     const statusChanges = yield call(
       fetchEvents,
       'AddressStatusChange',
-      badges.statusBlockNumber + 1
+      badges.statusBlockNumber
     )
 
     statusChanges.forEach(event => {

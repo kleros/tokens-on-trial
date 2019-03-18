@@ -25,7 +25,7 @@ function* fetchTokens() {
     const submissionEvents = yield call(
       fetchEvents,
       'TokenSubmitted',
-      tokens.blockNumber + 1
+      tokens.blockNumber
     )
 
     const blockNumber = submissionEvents.reduce((acc, event) => {
