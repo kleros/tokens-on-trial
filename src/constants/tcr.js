@@ -47,8 +47,8 @@ export const STATUS_ICON_ENUM = createEnum([
 export const STATUS_COLOR_ENUM = createEnum([
   '#EF0101', // Red
   '#009aff', // Blue
-  '##CCC', // Grey
-  '##CCC', // Grey
+  '#4a4a4a', // Grey
+  '#4a4a4a', // Grey
   '#FB7413', // Orange
   '#FB7413' // Orange
 ])
