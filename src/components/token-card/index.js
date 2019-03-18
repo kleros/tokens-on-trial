@@ -13,17 +13,6 @@ import './token-card.css'
 
 const TokenCard = ({ token, badge }) => (
   <div className="TokenCard">
-    <div
-      className="TokenCard-statusOverlay"
-      style={{ color: tcrConstants.STATUS_COLOR_ENUM[token.clientStatus] }}
-    >
-      <FontAwesomeIcon
-        className="TokenCard-statusOverlay-icon"
-        color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
-        icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
-      />
-      {tcrConstants.STATUS_ENUM[token.clientStatus]}
-    </div>
     <div className="TokenCard-header">
       <FontAwesomeIcon
         color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
@@ -43,15 +32,37 @@ const TokenCard = ({ token, badge }) => (
       </a>
     </div>
     <Link className="TokenCard-content" to={`/token/${token.ID}`}>
-      <Img
-        alt="Token List Submission"
-        className="TokenCard-image"
-        src={`${
-          token.symbolMultihash && token.symbolMultihash[0] === '/'
-            ? `${IPFS_URL}`
-            : `${FILE_BASE_URL}/`
-        }${token.symbolMultihash}`}
-      />
+      <div
+        style={{
+          position: 'relative',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }}
+      >
+        <div
+          className="TokenCard-content-statusOverlay"
+          style={{ color: tcrConstants.STATUS_COLOR_ENUM[token.clientStatus] }}
+        >
+          <FontAwesomeIcon
+            className="TokenCard-content-statusOverlay-icon"
+            color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
+            icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
+          />
+          {tcrConstants.STATUS_ENUM[token.clientStatus]}
+        </div>
+        <Img
+          alt="Token List Submission"
+          className="TokenCard-image"
+          src={`${
+            token.symbolMultihash && token.symbolMultihash[0] === '/'
+              ? `${IPFS_URL}`
+              : `${FILE_BASE_URL}/`
+          }${token.symbolMultihash}`}
+        />
+      </div>
     </Link>
     <div
       className={`TokenCard-footer${
