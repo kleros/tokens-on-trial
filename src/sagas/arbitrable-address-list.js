@@ -91,10 +91,9 @@ function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
 
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
-    file.name = sanitize(file.name)
     fileTypeExtension = file.name.split('.')[1]
     const data = yield call(readFile, file.preview)
-    const ipfsFileObj = yield call(ipfsPublish, file.name, data)
+    const ipfsFileObj = yield call(ipfsPublish, sanitize(file.name), data)
     fileURI = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
   }
   /* eslint-enable */
