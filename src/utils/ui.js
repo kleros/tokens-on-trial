@@ -111,11 +111,11 @@ export const sanitize = str => {
   return str
     .toString()
     .toLowerCase()
+    .replace(/#/g, '-') // Replace all # with -
     .replace(/\s+/g, '-') // Replace spaces with -
     .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
     .replace(/&/g, '-and-') // Replace & with ‘and’
-    .replace('#', '-') // Replace # with -
-    .replace(/+/g, '-') // Replace multiple - with single -
+    .replace(/--+/g, '-') // Replace multiple - with single -
     .replace(/^-+/, '') // Trim - from start of text
     .replace(/-+$/, '') // Trim - from end of text
 }
