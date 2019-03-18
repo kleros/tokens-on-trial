@@ -878,33 +878,29 @@ class TokenDetails extends PureComponent {
             <h3>Evidence</h3>
             <div className="TokenDescription-evidence">
               <div className="TokenDescription-evidence--list">
-                {latestRequest.disputed &&
-                  (evidences ? (
-                    <>
-                      {Object.keys(evidences).map(key => (
-                        <div
-                          className="TokenDescription-evidence--item"
-                          key={key}
-                          onClick={this.handleViewEvidenceClick(evidences[key])}
-                        >
-                          <FontAwesomeIcon
-                            icon={evidences[key].icon}
-                            size="2x"
-                          />
-                        </div>
-                      ))}
-                    </>
-                  ) : (
-                    <div>
-                      <BeatLoader color="#3d464d" />
-                      <small>
-                        <i>
-                          Evidence can take some time to load. Thanks for the
-                          patience
-                        </i>
-                      </small>
-                    </div>
-                  ))}
+                {evidences ? (
+                  <>
+                    {Object.keys(evidences).map(key => (
+                      <div
+                        className="TokenDescription-evidence--item"
+                        key={key}
+                        onClick={this.handleViewEvidenceClick(evidences[key])}
+                      >
+                        <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <div>
+                    <BeatLoader color="#3d464d" />
+                    <small>
+                      <i>
+                        Evidence can take some time to load. Thanks for the
+                        patience
+                      </i>
+                    </small>
+                  </div>
+                )}
               </div>
               <Button onClick={this.handleOpenEvidenceModal} type="secondary">
                 Submit Evidence
