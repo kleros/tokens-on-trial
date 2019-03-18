@@ -2,6 +2,7 @@ import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import readFile from '../utils/read-file'
+import { sanitize } from '../utils/ui'
 import {
   arbitrableAddressList,
   arbitrator,
@@ -90,6 +91,7 @@ function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
 
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
+    file.name = sanitize(file.name)
     fileTypeExtension = file.name.split('.')[1]
     const data = yield call(readFile, file.preview)
     const ipfsFileObj = yield call(ipfsPublish, file.name, data)

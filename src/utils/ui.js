@@ -103,3 +103,19 @@ export const truncateETHValue = str => {
   if (str.indexOf('.') === -1) return str
   return str.substring(0, str.indexOf('.') + 5)
 }
+
+export const sanitize = str => {
+  const a = 'àáäâãåăæçèéëêǵḧìíïîḿńǹñòóöôœṕŕßśșțùúüûǘẃẍÿź·/_,:;'
+  const b = 'aaaaaaaaceeeeghiiiimnnnoooooprssstuuuuuwxyz------'
+  const p = new RegExp(a.split('').join('|'), 'g')
+  return str
+    .toString()
+    .toLowerCase()
+    .replace(/\s+/g, '-') // Replace spaces with -
+    .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
+    .replace(/&/g, '-and-') // Replace & with ‘and’
+    .replace('#', '-') // Replace # with -
+    .replace(/+/g, '-') // Replace multiple - with single -
+    .replace(/^-+/, '') // Trim - from start of text
+    .replace(/-+$/, '') // Trim - from end of text
+}
