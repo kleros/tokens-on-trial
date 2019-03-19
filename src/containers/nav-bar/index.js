@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { pushRotate as ReactBurgerMenu } from 'react-burger-menu'
+import debounce from 'debounce'
 
 import logo from '../../assets/images/kleros-logo.png'
 import './nav-bar.css'
@@ -24,8 +25,21 @@ export default class NavBar extends PureComponent {
   }
 
   state = {
-    isMobile: document.body.clientWidth < 780
+    isMobile: document.body.clientWidth < 1010
   }
+
+  constructor(props) {
+    super(props)
+    window.addEventListener('resize', this.handleWindowResize)
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleWindowResize)
+  }
+
+  handleWindowResize = debounce(({ currentTarget: { innerWidth } }) =>
+    this.setState({ isMobile: innerWidth < 1010 })
+  )
 
   render() {
     const { routes, extras, extraRoutes } = this.props
@@ -64,14 +78,18 @@ export default class NavBar extends PureComponent {
         </div>
       )),
       ...extras.map((e, i) => (
-        <div
-          className={`NavBar-extra ${isMobile ? 'is-mobile' : ''} ${
-            i === 0 ? 'NavBar-extra--first' : ''
-          }`}
-          key={i}
-        >
-          {e}
-        </div>
+        <>
+          {!isMobile && (
+            <div
+              className={`NavBar-extra ${isMobile ? 'is-mobile' : ''} ${
+                i === 0 ? 'NavBar-extra--first' : ''
+              }`}
+              key={i}
+            >
+              {e}
+            </div>
+          )}
+        </>
       ))
     ]
     return (

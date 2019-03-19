@@ -65,7 +65,13 @@
   }
 }
 
-@media (min-width: 400px) {
+@media (max-width: 569px) {
+  .BadgeCard {
+    flex: 0 0 calc(90%);
+  }
+}
+
+@media (min-width: 570px) {
   .BadgeCard {
     flex: 0 0 calc(45% - 10px);
   }
