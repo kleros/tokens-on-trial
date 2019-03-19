@@ -891,15 +891,19 @@ class TokenDetails extends PureComponent {
                     ))}
                   </>
                 ) : (
-                  <div>
-                    <BeatLoader color="#3d464d" />
-                    <small>
-                      <i>
-                        Evidence can take some time to load. Thanks for the
-                        patience
-                      </i>
-                    </small>
-                  </div>
+                  <>
+                    {latestRequest.disputed && (
+                      <div>
+                        <BeatLoader color="#3d464d" />
+                        <small>
+                          <i>
+                            Evidence can take some time to load. Thanks for the
+                            patience
+                          </i>
+                        </small>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
               <Button onClick={this.handleOpenEvidenceModal} type="secondary">
