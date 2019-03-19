@@ -35,6 +35,7 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
   // Link to the oldest, registered token submission for this address.
   const tokenData = tokens.data
   let tokenSubmissions = []
+  if (!badge) return <BeatLoader color="#3d464d" />
   if (tokenData.addressToIDs[badge.address]) {
     tokenData.addressToIDs[badge.address].forEach(tokenID => {
       if (
