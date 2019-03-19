@@ -170,8 +170,8 @@ function* fetchTokens() {
         token.status.status,
         token.status.disputed
       )
-      token.name = token.name === null ? '0x' : token.name
-      token.ticker = token.ticker === null ? '0x' : token.ticker
+      token.name = !token.name ? '0x' : token.name
+      token.ticker = !token.ticker ? '0x' : token.ticker
       if (cachedTokens.addressToIDs[token.address])
         cachedTokens.addressToIDs[token.address].push(tokenID)
       else cachedTokens.addressToIDs[token.address] = [tokenID]
