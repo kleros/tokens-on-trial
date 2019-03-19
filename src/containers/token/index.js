@@ -484,19 +484,10 @@ class TokenDetails extends PureComponent {
           <div className="TokenDetails-card">
             <div className="TokenDetails-card-content">
               <div className="TokenDetails-label">
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    marginLeft: '38px',
-                    alignSelf: 'flex-start'
-                  }}
-                >
-                  <span className="TokenDetails-label-name">{token.name}</span>
-                  <span className="TokenDetails-label-ticker">
-                    {token.ticker}
-                  </span>
-                </div>
+                <span className="TokenDetails-label-name">{token.name}</span>
+                <span className="TokenDetails-label-ticker">
+                  {token.ticker}
+                </span>
               </div>
               <div className="TokenDetails-divider" />
               <div className="TokenDetails-meta">
@@ -506,11 +497,13 @@ class TokenDetails extends PureComponent {
                     color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
                     icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
                   />
-                  {this.toSentenceCase(
-                    userFriendlyLabel[
-                      tcrConstants.STATUS_ENUM[token.clientStatus]
-                    ]
-                  )}
+                  <div>
+                    {this.toSentenceCase(
+                      userFriendlyLabel[
+                        tcrConstants.STATUS_ENUM[token.clientStatus]
+                      ]
+                    )}
+                  </div>
                 </span>
                 {latestRequest.dispute &&
                   Number(latestRequest.dispute.status) ===
@@ -569,11 +562,13 @@ class TokenDetails extends PureComponent {
                           'Waiting Next Period'
                         ) : (
                           <>
-                            {`${
-                              tcrConstants.PERIOD_STRINGS[
-                                latestRequest.dispute.period
-                              ]
-                            }`}
+                            <span style={{ marginRight: '6px' }}>
+                              {
+                                tcrConstants.PERIOD_STRINGS[
+                                  latestRequest.dispute.period
+                                ]
+                              }
+                            </span>
                             <Countdown
                               date={Date.now() + periodRemainingTime}
                               renderer={CountdownRenderer}
@@ -617,13 +612,18 @@ class TokenDetails extends PureComponent {
                                   color="#f60c36"
                                   icon="clock"
                                 />
-                                {'Challenge Deadline '}
-                                <Countdown
-                                  date={Date.now() + time}
-                                  renderer={CountdownRenderer}
-                                  onComplete={this.onCountdownComplete}
-                                  onStart={() => this.onCountdownComplete(time)}
-                                />
+                                <div>
+                                  {'Challenge Deadline '}
+                                  <Countdown
+                                    style={{ marginLeft: '6px' }}
+                                    date={Date.now() + time}
+                                    renderer={CountdownRenderer}
+                                    onComplete={this.onCountdownComplete}
+                                    onStart={() =>
+                                      this.onCountdownComplete(time)
+                                    }
+                                  />
+                                </div>
                               </div>
                             </span>
                           )}
@@ -650,6 +650,7 @@ class TokenDetails extends PureComponent {
                                     />
                                     {'Appeal Deadline '}
                                     <Countdown
+                                      style={{ marginLeft: '6px' }}
                                       date={Date.now() + time}
                                       renderer={CountdownRenderer}
                                       onComplete={this.onCountdownComplete}
@@ -677,7 +678,9 @@ class TokenDetails extends PureComponent {
                                             color="#f60c36"
                                             icon="clock"
                                           />
-                                          {'Winner Deadline '}
+                                          <span style={{ marginRight: '6px' }}>
+                                            {'Winner Deadline '}
+                                          </span>
                                           <Countdown
                                             date={
                                               Date.now() + winnerRemainingTime
@@ -708,7 +711,9 @@ class TokenDetails extends PureComponent {
                                             color="#f60c36"
                                             icon="clock"
                                           />
-                                          {'Loser Deadline '}
+                                          <span style={{ marginRight: '6px' }}>
+                                            {'Loser Deadline '}
+                                          </span>
                                           <Countdown
                                             date={
                                               Date.now() + loserRemainingTime
@@ -743,7 +748,7 @@ class TokenDetails extends PureComponent {
                 latestRequest.numberOfRounds > 1 &&
                 (!decisiveRuling || !loserTimedOut) && (
                   <div
-                    className="TokenDetails-meta"
+                    className="TokenDetails-meta TokenDetails-meta-crowdfunding"
                     data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
@@ -756,14 +761,13 @@ class TokenDetails extends PureComponent {
                     </span>
                     <span>Requester</span>
                     <Progress
-                      className="TokenDetails-meta-item"
+                      className="TokenDetails-meta-item TokenDetails-crowdfundingBar"
                       completed={requesterFeesPercent}
                       height="5px"
                       color={
                         requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff'
                       }
                       style={{
-                        width: '200px',
                         border: '1px solid #009aff',
                         borderColor:
                           requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
@@ -773,14 +777,13 @@ class TokenDetails extends PureComponent {
                     />
                     <span>Challenger</span>
                     <Progress
-                      className="TokenDetails-meta-item"
+                      className="TokenDetails-meta-item TokenDetails-crowdfundingBar"
                       completed={challengerFeesPercent}
                       height="5px"
                       color={
                         challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
                       }
                       style={{
-                        width: '200px',
                         border: '1px solid #009aff',
                         borderColor:
                           challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
@@ -859,7 +862,7 @@ class TokenDetails extends PureComponent {
                 token.status !==
                   tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
                 token.badge && (
-                  <span>
+                  <span className="TokenDetails-footer-badge">
                     <span
                       className="TokenDetails-icon-badge TokenDetails-meta--aligned"
                       style={getBadgeStyle(token.badge, tcrConstants)}

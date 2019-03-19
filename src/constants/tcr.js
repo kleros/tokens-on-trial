@@ -9,7 +9,7 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
 ])
 
 export const PERIOD_STRINGS = createEnum([
-  'Evidence submission period ends in ',
+  'Evidence period ends in ',
   'Jurors are voting ',
   'Jurors are voting ',
   'Appeal',

@@ -4,15 +4,28 @@
 .TokenDetails {
   align-items: center;
   display: flex;
-  flex-wrap: nowrap;
+  justify-content: center;
   padding: 15px 0;
 
+  @media (min-width: 840px) {
+    flex-direction: row;
+  }
+
+  @media (max-width: 839px) {
+    flex-direction: column;
+  }
+
   &-img {
-    align-self: start;
+    align-self: flex-start;
     height: 98px;
     margin: 0 26px 26px 0;
     object-fit: contain;
     width: 98px;
+
+    @media (max-width: 839px) {
+      align-self: unset;
+      margin: 0 0 26px 0;
+    }
   }
 
   &-card {
@@ -25,6 +38,7 @@
     flex-direction: column;
     flex-grow: 2;
     justify-content: space-between;
+    width: 100%;
 
     &-info {
       padding: 17px 0;
@@ -32,9 +46,16 @@
 
     &-content {
       display: flex;
-      flex-direction: row;
       min-height: 102px;
-      overflow-x: auto;
+
+      @media (min-width: 840px) {
+        flex-direction: row;
+      }
+
+      @media (max-width: 839px) {
+        flex-direction: column;
+        margin-top: 26px;
+      }
     }
   }
 
@@ -46,6 +67,16 @@
     font-size: 14px;
     height: 48px;
     padding-left: 36px;
+
+    @media (max-width: 839px) {
+      &-badge {
+        display: none;
+      }
+    }
+
+    @media (max-width: 839px) {
+      padding: 0 26px;
+    }
   }
 
   &-label {
@@ -54,11 +85,21 @@
     flex-direction: column;
     font-size: 21px;
     justify-content: center;
-    min-width: 150px;
+    margin: 0 26px;
+    min-width: 100px;
+
+    @media (min-width: 840px) {
+      align-items: flex-start;
+    }
+
+    @media (max-width: 839px) {
+      flex-direction: row;
+    }
 
     &-name {
       color: $darkGrey;
       font-weight: 500;
+      margin-right: 6px;
     }
 
     &-ticker {
@@ -70,10 +111,16 @@
   &-divider {
     border-left: 1px solid $border;
     margin: 17px;
+
+    @media (max-width: 839px) {
+      border-top: 1px solid $border;
+    }
   }
 
   &--link {
     color: $darkGrey;
+    display: flex;
+    overflow-x: auto;
     text-decoration: none;
 
     :visited {
@@ -92,20 +139,29 @@
     margin-right: 17px;
     vertical-align: middle;
 
+    @media (max-width: 839px) {
+      margin: 0 26px;
+
+      &-crowdfunding {
+        margin-top: 17px;
+      }
+    }
+
     &--aligned {
       display: inline-block;
       vertical-align: middle;
     }
 
     &-item {
-      display: inline-block;
-      margin: 7px;
+      display: flex;
+      margin: 7px 0;
       vertical-align: middle;
     }
   }
 
   &-icon {
     margin-right: 14px;
+    width: 14px;
 
     &-badge {
       background-image: url('../../assets/images/badge.svg');
@@ -130,14 +186,23 @@
     padding-right: 36px;
     position: relative;
 
-    &::after {
-      border-bottom: 50px solid transparent;
-      border-left: 20px solid $white;
-      border-top: 50px solid transparent;
-      content: "";
-      height: 0;
-      left: 0;
-      position: absolute;
+    @media (max-width: 839px) {
+      flex-direction: column;
+      margin: 0;
+      margin-top: 17px;
+      padding: 26px;
+    }
+
+    @media (min-width: 840px) {
+      &::after {
+        border-bottom: 50px solid transparent;
+        border-left: 20px solid $white;
+        border-top: 50px solid transparent;
+        content: "";
+        height: 0;
+        left: 0;
+        position: absolute;
+      }
     }
   }
 
@@ -152,6 +217,26 @@
 
     &-value {
       color: $darkGrey;
+    }
+  }
+
+  &-crowdfundingBar {
+    width: 180px;
+
+    @media (max-width: 1000px) {
+      width: 120px;
+    }
+
+    @media (max-width: 839px) {
+      width: 250px;
+    }
+
+    @media (max-width: 450px) {
+      width: 200px;
+    }
+
+    @media (max-width: 330px) {
+      width: 140px;
     }
   }
 }
@@ -170,16 +255,19 @@
   &-evidence {
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
     justify-content: space-between;
 
     &--list {
       display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
     }
 
     &--item {
       color: $badgeBlue;
       cursor: pointer;
-      margin-right: 12px;
+      margin: 6px;
     }
   }
 
