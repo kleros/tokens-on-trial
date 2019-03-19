@@ -85,8 +85,15 @@ function* fetchBadges() {
 
     yield put(cacheBadges(cachedBadges))
   } catch (err) {
-    console.error('Error fetching badges: ', err)
-    yield put(fetchBadgesFailed())
+    if (err.message === 'Returned error: request failed or timed out')
+      // This is a web3js bug. https://github.com/ethereum/web3.js/issues/2311
+      // We can't upgrade to version 37 as suggested because we hit bug https://github.com/ethereum/web3.js/issues/1802.
+      // Work around it by just trying again.
+      yield put({ type: FETCH_BADGES_CACHE })
+    else {
+      console.error('Error fetching badges ', err)
+      yield put(fetchBadgesFailed())
+    }
   }
 }
 

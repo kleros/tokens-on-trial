@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import { BeatLoader } from 'react-spinners'
 
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import UnknownToken from '../../assets/images/unknown.svg'
@@ -32,14 +33,15 @@ const getBadgeHeaderText = badge => {
 
 const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
   // Link to the oldest, registered token submission for this address.
+  const tokenData = tokens.data
   let tokenSubmissions = []
-  if (tokens.addressToIDs[badge.address]) {
-    tokens.addressToIDs[badge.address].forEach(tokenID => {
+  if (tokenData.addressToIDs[badge.address]) {
+    tokenData.addressToIDs[badge.address].forEach(tokenID => {
       if (
-        tokens.items[tokenID].status.status === 1 ||
-        tokens.items[tokenID].status.status === 3
+        tokenData.items[tokenID].status.status === 1 ||
+        tokenData.items[tokenID].status.status === 3
       )
-        tokenSubmissions.push(tokens.items[tokenID])
+        tokenSubmissions.push(tokenData.items[tokenID])
     })
 
     tokenSubmissions = tokenSubmissions.sort((a, b) =>
@@ -67,17 +69,21 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
         to={`/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}/${badge.address}`}
       >
         {displayTokenInfo ? (
-          <Img
-            alt="Token List Submission"
-            className="TokenCard-image"
-            src={
-              token
-                ? token.symbolMultihash[0] === '/'
-                  ? `${IPFS_URL}${token.symbolMultihash}`
-                  : `${FILE_BASE_URL}/${token.symbolMultihash}`
-                : UnknownToken
-            }
-          />
+          !tokens.loading || token ? (
+            <Img
+              alt="Token List Submission"
+              className="TokenCard-image"
+              src={
+                token
+                  ? token.symbolMultihash[0] === '/'
+                    ? `${IPFS_URL}${token.symbolMultihash}`
+                    : `${FILE_BASE_URL}/${token.symbolMultihash}`
+                  : UnknownToken
+              }
+            />
+          ) : (
+            <BeatLoader color="#3d464d" />
+          )
         ) : (
           <Img
             alt="Badge List Submission"
@@ -89,16 +95,15 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
       <div className="BadgeCard-footer">
         {displayTokenInfo ? (
           <h5 className="BadgeCard-footer-text">
-            Ethfinex Compliant
+            {(!tokens.loading || token) && `Ethfinex Compliant`}
             <br />
-            {token
-              ? `
-              ${token.ticker ? token.ticker : ''}
-              ${token.name && token.ticker ? '-' : ''}
-              ${token.name ? token.name : ''}
-              ${!token ? 'Unknown Token' : ''}
-            `
-              : 'Unknown Token'}
+            {!tokens.loading || token
+              ? token
+                ? `${token.ticker ? token.ticker : ''}
+                ${token.name && token.ticker ? '-' : ''}
+                ${token.name ? token.name : ''}`
+                : `Unknown Token`
+              : 'Loading...'}
           </h5>
         ) : (
           <h5 className="BadgeCard-footer-text">
@@ -129,6 +134,6 @@ BadgeCard.defaultProps = {
 }
 
 export default connect(state => ({
-  tokens: state.tokens.data,
+  tokens: state.tokens,
   badges: state.badges
 }))(BadgeCard)
