@@ -39,9 +39,11 @@ function* fetchTokens() {
         const { returnValues } = event
         const { _name, _ticker, _symbolMultihash, _address } = returnValues
 
-        // Web3js does not handle the string "0x" well and returns null. This can
+        // Web3js does not handle the string "0x" well and returns null
+        // or an empty string (depending on the web3 js version). This can
         // be a problem for the case of the ZRX token (previously, 0x), where a
         // party may submit it as either the name or the ticker.
+        //
         // Additionaly, there is another bug with the web3.utils.soliditySha3 which
         // also does not parse string "0x" correctly as a paramter and calculates the
         // incorrect token ID.
@@ -133,8 +135,7 @@ function* fetchTokens() {
             arbitrableTokenListView.methods.getTokenInfo(_tokenID).call
           )
           if (
-            tokenInfo.name === missingToken.name &&
-            tokenInfo.ticker === missingToken.ticker &&
+            (tokenInfo.name === null || tokenInfo.ticker === null) &&
             tokenInfo.addr === missingToken.address &&
             tokenInfo.symbolMultihash === missingToken.symbolMultihash
           )
