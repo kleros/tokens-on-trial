@@ -119,9 +119,11 @@ class _ConnectedNavBar extends Component {
           <SettingsModal key="2">
             <FontAwesomeIcon color="white" icon="envelope" />
           </SettingsModal>,
-          <Identicon address={accounts.data[0]} round scale={2} size={15} />,
+          <Identicon address={accounts.data[0]} round scale={2} size={15} />
+        ]}
+        action={
           <Button
-            className="Button-submitToken"
+            className={`Button-submitToken`}
             disabled={onlyInfura}
             onClick={this.handleSubmitTokenClick}
             tooltip={onlyInfura ? 'Please install MetaMask.' : null}
@@ -130,7 +132,7 @@ class _ConnectedNavBar extends Component {
             <FontAwesomeIcon className="Button-submitToken-icon" icon="plus" />
             Submit Token
           </Button>
-        ]}
+        }
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
           {

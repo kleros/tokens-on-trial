@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { stack as ReactBurgerMenu } from 'react-burger-menu'
+import { slide as ReactBurgerMenu } from 'react-burger-menu'
 import debounce from 'debounce'
 
 import logo from '../../assets/images/kleros-logo.png'
@@ -21,7 +21,8 @@ export default class NavBar extends PureComponent {
         title: PropTypes.node.isRequired
       }).isRequired
     ).isRequired,
-    extras: PropTypes.arrayOf(PropTypes.node.isRequired).isRequired
+    extras: PropTypes.arrayOf(PropTypes.node.isRequired).isRequired,
+    action: PropTypes.node.isRequired
   }
 
   state = {
@@ -52,7 +53,7 @@ export default class NavBar extends PureComponent {
   }
 
   render() {
-    const { routes, extras, extraRoutes } = this.props
+    const { routes, extras, extraRoutes, action } = this.props
     const { isMobile, isOpen } = this.state
 
     const logoImg = <img alt="Logo" className="NavBar-logo" src={logo} />
@@ -101,7 +102,13 @@ export default class NavBar extends PureComponent {
             </div>
           )}
         </>
-      ))
+      )),
+      <div
+        style={{ marginLeft: '20px', width: '135px' }}
+        onClick={this.closeMenu}
+      >
+        {action}
+      </div>
     ]
     return (
       <div className="NavBar">
