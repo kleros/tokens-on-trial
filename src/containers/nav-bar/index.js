@@ -89,17 +89,16 @@ export default class NavBar extends PureComponent {
           </a>
         </div>
       )),
-      ...extras.map((e, i) => (
-        <div key={i}>
-          {!isMobile && (
-            <div
-              className={`NavBar-extra ${i === 0 ? 'NavBar-extra--first' : ''}`}
-            >
-              {e}
-            </div>
-          )}
-        </div>
-      )),
+      ...extras
+        .filter(() => !isMobile)
+        .map((e, i) => (
+          <div
+            key={i}
+            className={`NavBar-extra ${i === 0 ? 'NavBar-extra--first' : ''}`}
+          >
+            {e}
+          </div>
+        )),
       <div
         style={{ marginLeft: '20px', width: '135px' }}
         onClick={this.closeMenu}
