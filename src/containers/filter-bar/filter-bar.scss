@@ -24,18 +24,33 @@
   &-filterSelect {
     align-content: stretch;
     display: flex;
+
+    @media (max-width: 590px) {
+      flex-wrap: wrap;
+    }
   }
 
   &-my {
     display: flex;
-    flex-wrap: wrap;
-    margin: 7px 0;
     min-height: 30px;
-    width: 40%;
+
+    @media (max-width: 820px) {
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 590px) {
+      width: 100%;
+    }
 
     &-button {
       justify-content: center;
       margin-right: 16px;
+
+      @media (max-width: 590px) {
+        margin-bottom: 7px;
+        margin-right: 0;
+        width: 100%;
+      }
     }
   }
 
@@ -43,8 +58,12 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
+    margin-left: auto;
     min-height: 10px;
-    width: 60%;
+
+    @media (max-width: 590px) {
+      width: 100%;
+    }
 
     &-button {
       justify-content: center;
@@ -53,14 +72,32 @@
 
       &-small {
         min-width: 136px;
+
+        @media (max-width: 590px) {
+          margin: 0;
+          margin-bottom: 7px;
+          width: 100%;
+        }
       }
 
       &-medium {
         min-width: 161px;
+
+        @media (max-width: 590px) {
+          margin: 0;
+          margin-bottom: 7px;
+          width: 100%;
+        }
       }
 
       &-large {
         min-width: 226px;
+
+        @media (max-width: 590px) {
+          margin: 0;
+          margin-bottom: 7px;
+          width: 100%;
+        }
       }
     }
   }
