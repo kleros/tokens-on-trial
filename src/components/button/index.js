@@ -23,7 +23,15 @@ const Button = ({
       onClick={disabled ? null : onClick}
       {...rest}
     >
-      <h2 className={`Button-label ${labelClassName}`}>{children}</h2>
+      <h2
+        className={`Button-label ${labelClassName}${
+          disabled && type === 'secondary'
+            ? `Button--secondary--is-disabled`
+            : ''
+        }`}
+      >
+        {children}
+      </h2>
     </div>
   )
   return to ? (

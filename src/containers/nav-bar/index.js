@@ -5,6 +5,7 @@ import { slide as ReactBurgerMenu } from 'react-burger-menu'
 import debounce from 'debounce'
 
 import logo from '../../assets/images/kleros-logo.png'
+import { onlyInfura } from '../../bootstrap/dapp-api'
 import './nav-bar.css'
 
 export default class NavBar extends PureComponent {
@@ -101,7 +102,7 @@ export default class NavBar extends PureComponent {
         )),
       <div
         style={{ marginLeft: '20px', width: '135px' }}
-        onClick={this.closeMenu}
+        onClick={onlyInfura ? null : this.closeMenu}
         key="navbar-action"
       >
         {action}

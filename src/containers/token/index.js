@@ -946,7 +946,7 @@ class TokenDetails extends PureComponent {
                   disabled={onlyInfura}
                   onClick={this.submitBadgeAction}
                   type="secondary"
-                  style={{ width: '135px' }}
+                  style={{ width: '130px' }}
                 >
                   Add Badge
                 </Button>
