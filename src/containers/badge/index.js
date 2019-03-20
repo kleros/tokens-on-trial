@@ -831,7 +831,7 @@ class BadgeDetails extends PureComponent {
               </div>
               <div
                 className="BadgeDetails-footer-short-divider"
-                style={{ height: '60%' }}
+                style={{ height: '20px' }}
               />
               <span
                 className="BadgeDetails-meta--aligned"

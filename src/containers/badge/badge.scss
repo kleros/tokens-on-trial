@@ -36,6 +36,7 @@
 
     &-img {
       height: 30px;
+      margin-right: 7px;
       object-fit: contain;
       width: 30px;
     }
@@ -210,7 +211,7 @@
 
     &-short {
       font-size: 14px;
-      min-width: 264px;
+      min-width: 238px;
       text-align: center;
       white-space: pre-line;
 
@@ -224,6 +225,7 @@
 
       &-divider {
         border-left: 1px solid $border;
+        height: 100%;
         margin: 10px 13px 10px 0;
       }
     }
