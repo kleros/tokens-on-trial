@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 
 import { truncateMiddle } from '../../../utils/ui'
-import { web3, FILE_BASE_URL, IPFS_URL } from '../../../bootstrap/dapp-api'
+import { viewWeb3, FILE_BASE_URL, IPFS_URL } from '../../../bootstrap/dapp-api'
 
 import './item.css'
 
@@ -23,7 +23,7 @@ const SearchItem = ({ onClick, item }) => (
         {item.name} ({item.ticker})
       </span>
       <span className="SearchItem-text-address">
-        {truncateMiddle(web3.utils.toChecksumAddress(item.address))}
+        {truncateMiddle(viewWeb3.utils.toChecksumAddress(item.address))}
       </span>
     </div>
   </li>
