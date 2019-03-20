@@ -57,7 +57,11 @@ class SearchBar extends Component {
             inputValue
           }) => (
             <div className="SearchBar-box">
-              <input {...getInputProps()} className="SearchBar-input" />
+              <input
+                {...getInputProps()}
+                className="SearchBar-input"
+                placeholder="Search tokens.."
+              />
               {isOpen && tokenSubmissions.length > 0 && inputValue.length > 0 && (
                 <ul {...getMenuProps()} className="SearchBar-results">
                   {isOpen

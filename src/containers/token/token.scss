@@ -271,6 +271,12 @@
     }
   }
 
+  &-info {
+    @media (max-width: 510px) {
+      max-width: 140px;
+    }
+  }
+
   &--icon {
     margin-right: 14px;
 
@@ -290,9 +296,9 @@
   }
 
   &-badge-header {
-    align-items: center;
+    align-items: flex-start;
     display: flex;
     justify-content: space-between;
-    margin: 7px 0 10px 0;
+    margin: 26px 0 10px 0;
   }
 }

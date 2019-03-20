@@ -424,13 +424,12 @@ class BadgeDetails extends PureComponent {
           filter={filters}
           handleFilterChange={this.handleFilterChange}
         />
-        <div
-          style={{ display: 'flex', flexDirection: 'row', overflowX: 'auto' }}
-        >
-          <h4 style={{ marginLeft: 0, marginRight: 0, minWidth: '247px' }}>
-            Badge Details
-          </h4>
-          <div className="TokenDetails-divider" />
+        <div className="BadgeDetails-header">
+          <h4 className="BadgeDetails-header-title">Badge Details</h4>
+          <div
+            className="BadgeDetails-header-divider"
+            style={{ height: '30px' }}
+          />
           {badge.token ? (
             <Link
               to={`/token/${badge.token.ID}`}
@@ -505,7 +504,7 @@ class BadgeDetails extends PureComponent {
                 <div
                   style={{
                     display: 'flex',
-                    marginTop: 'auto',
+                    marginTop: '26px',
                     width: '100%',
                     alignItems: 'flex-start'
                   }}
@@ -605,6 +604,7 @@ class BadgeDetails extends PureComponent {
                           <>
                             {!countdownCompleted && (
                               <span
+                                className="BadgeDetails-meta-item"
                                 style={{
                                   display: 'flex',
                                   alignItems: 'center'
@@ -619,15 +619,17 @@ class BadgeDetails extends PureComponent {
                                     color="#f60c36"
                                     icon="clock"
                                   />
-                                  {'Challenge Deadline '}
-                                  <Countdown
-                                    onStart={() =>
-                                      this.onCountdownComplete(time)
-                                    }
-                                    date={Date.now() + time}
-                                    renderer={CountdownRenderer}
-                                    onComplete={this.onCountdownComplete}
-                                  />
+                                  <div>
+                                    {'Challenge Deadline '}
+                                    <Countdown
+                                      onStart={() =>
+                                        this.onCountdownComplete(time)
+                                      }
+                                      date={Date.now() + time}
+                                      renderer={CountdownRenderer}
+                                      onComplete={this.onCountdownComplete}
+                                    />
+                                  </div>
                                 </div>
                               </span>
                             )}
@@ -824,17 +826,13 @@ class BadgeDetails extends PureComponent {
                 )}
             </div>
             <div className="BadgeDetails-footer">
-              <div
-                style={{
-                  whiteSpace: 'pre-line',
-                  textAlign: 'center',
-                  fontSize: '14px',
-                  width: '264px'
-                }}
-              >
+              <div className="BadgeDetails-footer-short">
                 {`Compliant With \n Ethfinex Listing Critera`}
               </div>
-              <div className="BadgeDetails-divider" style={{ height: '60%' }} />
+              <div
+                className="BadgeDetails-footer-short-divider"
+                style={{ height: '60%' }}
+              />
               <span
                 className="BadgeDetails-meta--aligned"
                 style={{ fontSize: '14px' }}
@@ -844,13 +842,15 @@ class BadgeDetails extends PureComponent {
                   color={tcrConstants.STATUS_COLOR_ENUM[badge.clientStatus]}
                   icon={tcrConstants.STATUS_ICON_ENUM[badge.clientStatus]}
                 />
-                {this.toSentenceCase(
-                  userFriendlyLabel[
-                    tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
-                  ]
-                )}
+                <div>
+                  {this.toSentenceCase(
+                    userFriendlyLabel[
+                      tcrConstants.BADGE_STATUS_ENUM[badge.clientStatus]
+                    ]
+                  )}
+                </div>
               </span>
-              <div className="BadgeDetails-meta" style={{ marginLeft: '14px' }}>
+              <div className="BadgeDetails-meta">
                 <span
                   className="BadgeDetails-meta--aligned BadgeDetails-timer"
                   style={{
@@ -882,7 +882,7 @@ class BadgeDetails extends PureComponent {
                   </a>
                 </span>
               </div>
-              <div style={{ marginLeft: 'auto', marginRight: '26px' }}>
+              <div className="BadgeDetails-action">
                 {Number(badge.status) > 1 &&
                 latestRequest.dispute &&
                 Number(latestRequest.dispute.status) ===

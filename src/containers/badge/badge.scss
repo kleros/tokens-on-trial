@@ -10,14 +10,32 @@
   &-header {
     align-items: center;
     display: flex;
+    flex-direction: row;
+
+    @media (max-width: 899px) {
+      &-title {
+        min-width: 0;
+      }
+    }
+
+    @media (min-width: 840px) {
+      &-title {
+        min-width: 247px;
+      }
+    }
+
+    &-divider {
+      border-left: 1px solid $border;
+      margin: 10px 13px 10px 0;
+    }
 
     &-title {
-      margin-right: 2vw;
+      margin-left: 0;
+      margin-right: 17px;
     }
 
     &-img {
       height: 30px;
-      margin-right: 0.5vw;
       object-fit: contain;
       width: 30px;
     }
@@ -29,6 +47,11 @@
     flex-direction: column;
     margin: 26px 26px 26px 0;
     width: 100%;
+
+    @media (max-width: 890px) {
+      margin: 0;
+      margin-top: 26px;
+    }
   }
 
   &-img {
@@ -37,6 +60,11 @@
     min-width: 212px;
     object-fit: contain;
     padding: 15px;
+
+    @media (max-width: 890px) {
+      margin: 0;
+      margin-bottom: 26px;
+    }
   }
 
   &-card {
@@ -59,6 +87,12 @@
       display: flex;
       flex-direction: row;
       overflow-x: auto;
+
+      @media (max-width: 890px) {
+        align-items: center;
+        flex-direction: column;
+        padding: 26px;
+      }
     }
   }
 
@@ -85,6 +119,12 @@
   &-divider {
     border-left: 1px solid $border;
     margin: 17px 26px 17px 0;
+
+    @media (max-width: 890px) {
+      border-top: 1px solid $border;
+      margin: 0;
+      width: 100%;
+    }
   }
 
   &--link {
@@ -102,11 +142,31 @@
     flex-direction: column;
     font-size: 14px;
     justify-content: space-around;
+    margin-left: 14px;
     padding: 0;
 
+    @media (max-width: 620px) {
+      margin-left: 0;
+    }
+
     &--aligned {
+      display: flex;
       margin: 5px 0;
       vertical-align: middle;
+    }
+
+    &-item {
+      display: flex;
+      margin: 7px 0;
+      vertical-align: middle;
+    }
+  }
+
+  &-action {
+    margin-left: auto;
+
+    @media (max-width: 620px) {
+      margin-left: 0;
     }
   }
 
@@ -132,7 +192,7 @@
     align-items: center;
     display: flex;
     flex-direction: row;
-    margin: 0 14px;
+    margin: 0 0;
     text-decoration: none;
   }
 
@@ -141,7 +201,32 @@
     background-color: $darkWhite;
     display: flex;
     flex-direction: row;
-    height: 58px;
+    padding: 0 26px;
+
+    @media (max-width: 620px) {
+      flex-direction: column;
+      padding: 26px;
+    }
+
+    &-short {
+      font-size: 14px;
+      min-width: 264px;
+      text-align: center;
+      white-space: pre-line;
+
+      @media (max-width: 890px) {
+        display: none;
+
+        &-divider {
+          display: none;
+        }
+      }
+
+      &-divider {
+        border-left: 1px solid $border;
+        margin: 10px 13px 10px 0;
+      }
+    }
   }
 
   &-timer {
@@ -166,6 +251,7 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    padding: 26px;
 
     &--list {
       display: flex;

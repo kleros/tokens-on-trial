@@ -648,16 +648,17 @@ class TokenDetails extends PureComponent {
                                       color="#f60c36"
                                       icon="clock"
                                     />
-                                    {'Appeal Deadline '}
-                                    <Countdown
-                                      style={{ marginLeft: '6px' }}
-                                      date={Date.now() + time}
-                                      renderer={CountdownRenderer}
-                                      onComplete={this.onCountdownComplete}
-                                      onStart={() =>
-                                        this.onCountdownComplete(time)
-                                      }
-                                    />
+                                    <div>
+                                      {'Appeal Deadline '}
+                                      <Countdown
+                                        date={Date.now() + time}
+                                        renderer={CountdownRenderer}
+                                        onComplete={this.onCountdownComplete}
+                                        onStart={() =>
+                                          this.onCountdownComplete(time)
+                                        }
+                                      />
+                                    </div>
                                   </div>
                                 </span>
                               ) : (
@@ -919,7 +920,7 @@ class TokenDetails extends PureComponent {
         <div className="TokenDescription">
           <hr className="TokenDescription-separator" />
           <div className="TokenDescription-badge-header">
-            <h3>Badges</h3>
+            <h3 style={{ marginTop: 0 }}>Badges</h3>
             {(token.status ===
               tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
               token.status ===
@@ -940,7 +941,9 @@ class TokenDetails extends PureComponent {
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] &&
               token.badge.status ===
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-                <span>Token must be registered to add badges.</span>
+                <span className="TokenDescription-info">
+                  Tokens must be registered to receive badges.
+                </span>
               )}
           </div>
           <div className="TokenDescription-evidence">
