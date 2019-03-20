@@ -37,7 +37,7 @@ class SortBar extends PureComponent {
       <div className="SortBar">
         <div className="SortBar-count">
           {!items.loading || displayedItemsCount > 0
-            ? `${displayedItemsCount} submissions of ${
+            ? `${displayedItemsCount} of ${
                 Object.keys(items.data.items).length
               }`
             : 'Loading submissions...'}

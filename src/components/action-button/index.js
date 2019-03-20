@@ -40,7 +40,7 @@ const getActionButton = ({
     return (
       <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
         <FontAwesomeIcon className="TokenDetails-icon" icon="gavel" />
-        Awaiting Enforcement
+        Waiting Enforcement
       </Button>
     )
 
