@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-import { pushRotate as ReactBurgerMenu } from 'react-burger-menu'
+import { stack as ReactBurgerMenu } from 'react-burger-menu'
 import debounce from 'debounce'
 
 import logo from '../../assets/images/kleros-logo.png'
@@ -25,7 +25,8 @@ export default class NavBar extends PureComponent {
   }
 
   state = {
-    isMobile: document.body.clientWidth < 1010
+    isMobile: document.body.clientWidth < 1010,
+    isOpen: false
   }
 
   constructor(props) {
@@ -41,9 +42,18 @@ export default class NavBar extends PureComponent {
     this.setState({ isMobile: innerWidth < 1010 })
   )
 
+  handleStateChange(state) {
+    const { isOpen } = state
+    this.setState({ isOpen })
+  }
+
+  closeMenu = () => {
+    this.setState({ isOpen: false })
+  }
+
   render() {
     const { routes, extras, extraRoutes } = this.props
-    const { isMobile } = this.state
+    const { isMobile, isOpen } = this.state
 
     const logoImg = <img alt="Logo" className="NavBar-logo" src={logo} />
     const routesAndExtras = [
@@ -53,6 +63,7 @@ export default class NavBar extends PureComponent {
             className={`NavBar-route ${r.extraStyle}`}
             style={{ height: '55px' }}
             to={r.to}
+            onClick={this.closeMenu}
           >
             <div style={{ display: 'flex', alignItems: 'flex-end' }}>
               {r.title}
@@ -94,15 +105,33 @@ export default class NavBar extends PureComponent {
     ]
     return (
       <div className="NavBar">
-        <Link to="/">{logoImg}</Link>
+        {!isMobile && <Link to="/">{logoImg}</Link>}
+        {isMobile && (
+          <>
+            <span class="NavBar-hamburger" />
+            <span
+              style={{
+                color: 'white',
+                marginLeft: '14px',
+                fontSize: '16px',
+                alignSelf: 'center'
+              }}
+            >
+              K L E R O S
+            </span>
+          </>
+        )}
+        {/* eslint-disable react/jsx-no-bind */}
         {isMobile ? (
           <ReactBurgerMenu
             className="NavBar-burgerMenu"
+            isOpen={isOpen}
+            onStateChange={state => this.handleStateChange(state)}
+            itemListClassName="NavBar-burgerMenu-itemList"
+            overlayClassName="NavBar-burgerMenu-overlay"
             customBurgerIcon={<div />}
             customCrossIcon={logoImg}
-            itemListClassName="NavBar-burgerMenu-itemList"
             outerContainerId="router-root"
-            overlayClassName="NavBar-burgerMenu-overlay"
             pageWrapId="scroll-root"
           >
             {routesAndExtras}
