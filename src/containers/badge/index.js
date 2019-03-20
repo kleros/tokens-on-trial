@@ -501,14 +501,7 @@ class BadgeDetails extends PureComponent {
                     </a>
                   </p>
                 </div>
-                <div
-                  style={{
-                    display: 'flex',
-                    marginTop: '26px',
-                    width: '100%',
-                    alignItems: 'flex-start'
-                  }}
-                >
+                <div className="BadgeDetails-description-status">
                   {latestRequest.dispute &&
                     Number(latestRequest.dispute.status) ===
                       tcrConstants.DISPUTE_STATUS.Appealable &&
@@ -644,7 +637,7 @@ class BadgeDetails extends PureComponent {
                                     style={{
                                       display: 'flex',
                                       alignItems: 'center',
-                                      margin: '5px 5px 5px auto',
+                                      margin: '5px 5px 5px 0',
                                       fontSize: '14px'
                                     }}
                                   >
@@ -681,7 +674,7 @@ class BadgeDetails extends PureComponent {
                                           style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            margin: '5px 5px 5px auto',
+                                            margin: '5px 5px 5px 0',
                                             fontSize: '14px'
                                           }}
                                         >
@@ -721,7 +714,7 @@ class BadgeDetails extends PureComponent {
                                           style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            margin: '5px 5px 5px auto',
+                                            margin: '5px 5px 5px 0',
                                             fontSize: '14px'
                                           }}
                                         >
@@ -777,7 +770,11 @@ class BadgeDetails extends PureComponent {
                 (!decisiveRuling || !loserTimedOut) && (
                   <div
                     className="TokenDetails-meta"
-                    style={{ margin: 0, marginRight: '26px' }}
+                    style={{
+                      margin: 0,
+                      alignSelf: 'flex-start',
+                      marginTop: '26px'
+                    }}
                     data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
                   >
                     <span style={{ color: '#009aff', marginBottom: '7px' }}>
@@ -790,14 +787,13 @@ class BadgeDetails extends PureComponent {
                     </span>
                     <span>Requester</span>
                     <Progress
-                      className="TokenDetails-meta-item"
+                      className="TokenDetails-meta-item BadgeDetails-crowdfundingBar"
                       completed={requesterFeesPercent}
                       height="5px"
                       color={
                         requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff'
                       }
                       style={{
-                        width: '170px',
                         border: '1px solid #009aff',
                         borderColor:
                           requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
@@ -807,14 +803,13 @@ class BadgeDetails extends PureComponent {
                     />
                     <span>Challenger</span>
                     <Progress
-                      className="TokenDetails-meta-item"
+                      className="TokenDetails-meta-item BadgeDetails-crowdfundingBar"
                       completed={challengerFeesPercent}
                       height="5px"
                       color={
                         challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
                       }
                       style={{
-                        width: '170px',
                         border: '1px solid #009aff',
                         borderColor:
                           challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
