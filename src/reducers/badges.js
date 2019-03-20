@@ -3,10 +3,10 @@ import {
   FETCH_BADGES_CACHE,
   FETCH_BADGES_FAILED
 } from '../actions/badges'
-import { arbitrableAddressList, APP_VERSION } from '../bootstrap/dapp-api'
+import { arbitrableAddressListView, APP_VERSION } from '../bootstrap/dapp-api'
 
 const cachedBadges = localStorage.getItem(
-  `${arbitrableAddressList.options.address}badges@${APP_VERSION}`
+  `${arbitrableAddressListView.options.address}badges@${APP_VERSION}`
 )
 
 const initialState = cachedBadges

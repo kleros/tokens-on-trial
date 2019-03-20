@@ -10,6 +10,7 @@ import {
   arbitratorView,
   archon,
   ARBITRATOR_ADDRESS,
+  viewWeb3,
   web3
 } from '../bootstrap/dapp-api'
 import {
@@ -26,7 +27,7 @@ import * as errorConstants from '../constants/error'
 
 import ipfsPublish from './api/ipfs-publish'
 
-const { toBN } = web3.utils
+const { toBN } = viewWeb3.utils
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'

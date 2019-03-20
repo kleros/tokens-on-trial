@@ -2,8 +2,8 @@ import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
 
 import {
-  arbitrableTokenList,
-  arbitrableAddressList
+  arbitrableTokenListView,
+  arbitrableAddressListView
 } from '../bootstrap/dapp-api'
 
 // Common Shapes
@@ -30,8 +30,8 @@ export { notificationsShape, notificationShape }
 
 // Reducer
 const cachedNotifications = localStorage.getItem(
-  arbitrableTokenList.options.address +
-    arbitrableAddressList.options.address +
+  arbitrableTokenListView.options.address +
+    arbitrableAddressListView.options.address +
     'notifications'
 )
 export default createReducer({

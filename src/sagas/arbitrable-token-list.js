@@ -4,9 +4,10 @@ import { lessduxSaga } from '../utils/saga'
 import { sanitize } from '../utils/ui'
 import {
   arbitrableTokenList,
-  arbitrator,
+  arbitrableTokenListView,
+  arbitratorView,
   archon,
-  web3
+  viewWeb3
 } from '../bootstrap/dapp-api'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
@@ -15,7 +16,7 @@ import readFile from '../utils/read-file'
 
 import ipfsPublish from './api/ipfs-publish'
 
-const { toBN } = web3.utils
+const { toBN } = viewWeb3.utils
 
 /**
  * Fetches the arbitrable token list's data.
@@ -24,38 +25,38 @@ const { toBN } = web3.utils
  */
 export function* fetchArbitrableTokenListData() {
   const d = yield all({
-    arbitrator: call(arbitrableTokenList.methods.arbitrator().call),
+    arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
     requesterBaseDeposit: call(
-      arbitrableTokenList.methods.requesterBaseDeposit().call
+      arbitrableTokenListView.methods.requesterBaseDeposit().call
     ),
     challengerBaseDeposit: call(
-      arbitrableTokenList.methods.challengerBaseDeposit().call
+      arbitrableTokenListView.methods.challengerBaseDeposit().call
     ),
     challengePeriodDuration: call(
-      arbitrableTokenList.methods.challengePeriodDuration().call
+      arbitrableTokenListView.methods.challengePeriodDuration().call
     ),
-    governor: call(arbitrableTokenList.methods.governor().call),
+    governor: call(arbitrableTokenListView.methods.governor().call),
     winnerStakeMultiplier: call(
-      arbitrableTokenList.methods.winnerStakeMultiplier().call
+      arbitrableTokenListView.methods.winnerStakeMultiplier().call
     ),
     loserStakeMultiplier: call(
-      arbitrableTokenList.methods.loserStakeMultiplier().call
+      arbitrableTokenListView.methods.loserStakeMultiplier().call
     ),
     sharedStakeMultiplier: call(
-      arbitrableTokenList.methods.sharedStakeMultiplier().call
+      arbitrableTokenListView.methods.sharedStakeMultiplier().call
     ),
     MULTIPLIER_DIVISOR: call(
-      arbitrableTokenList.methods.MULTIPLIER_DIVISOR().call
+      arbitrableTokenListView.methods.MULTIPLIER_DIVISOR().call
     ),
     arbitratorExtraData: call(
-      arbitrableTokenList.methods.arbitratorExtraData().call
+      arbitrableTokenListView.methods.arbitratorExtraData().call
     ),
-    countByStatus: call(arbitrableTokenList.methods.countByStatus().call)
+    countByStatus: call(arbitrableTokenListView.methods.countByStatus().call)
   })
 
-  arbitrator.options.address = d.arbitrator
+  arbitratorView.options.address = d.arbitrator
   const arbitrationCost = yield call(
-    arbitrator.methods.arbitrationCost(d.arbitratorExtraData).call
+    arbitratorView.methods.arbitrationCost(d.arbitratorExtraData).call
   )
 
   return {

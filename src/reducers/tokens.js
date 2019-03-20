@@ -3,10 +3,10 @@ import {
   FETCH_TOKENS_CACHE,
   FETCH_TOKENS_FAILED
 } from '../actions/tokens'
-import { arbitrableTokenList, APP_VERSION } from '../bootstrap/dapp-api'
+import { arbitrableTokenListView, APP_VERSION } from '../bootstrap/dapp-api'
 
 const cachedTokens = localStorage.getItem(
-  `${arbitrableTokenList.options.address}tokens@${APP_VERSION}`
+  `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
 )
 
 const initialState = cachedTokens

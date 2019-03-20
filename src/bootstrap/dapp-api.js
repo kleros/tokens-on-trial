@@ -28,29 +28,44 @@ if (process.env.NODE_ENV === 'test')
 else if (window.web3 && window.web3.currentProvider)
   web3 = new Web3(window.web3.currentProvider)
 
+let network
+let arbitrableTokenList
+let arbitrableAddressList
+let arbitrator
 if (!web3) onlyInfura = true
+else {
+  network =
+    web3.eth &&
+    web3.eth.net
+      .getId()
+      .then(networkID => {
+        switch (networkID) {
+          case 1:
+            return 'main'
+          case 3:
+            return 'ropsten'
+          case 4:
+            return 'rinkeby'
+          case 42:
+            return 'kovan'
+          default:
+            return null
+        }
+      })
+      .catch(() => null)
+
+  arbitrableTokenList = new web3.eth.Contract(
+    ArbitrableTokenList.abi,
+    ARBITRABLE_TOKEN_LIST_ADDRESS
+  )
+  arbitrableAddressList = new web3.eth.Contract(
+    ArbitrableAddressList.abi,
+    ARBITRABLE_ADDRESS_LIST_ADDRESS
+  )
+  arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+}
 
 const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
-
-const network =
-  web3.eth &&
-  web3.eth.net
-    .getId()
-    .then(networkID => {
-      switch (networkID) {
-        case 1:
-          return 'main'
-        case 3:
-          return 'ropsten'
-        case 4:
-          return 'rinkeby'
-        case 42:
-          return 'kovan'
-        default:
-          return null
-      }
-    })
-    .catch(() => null)
 
 const ETHAddressRegExpCaptureGroup = '(0x[a-fA-F0-9]{40})'
 const ETHAddressRegExp = /0x[a-fA-F0-9]{40}/
@@ -68,16 +83,6 @@ const arbitratorView = new viewWeb3.eth.Contract(
   Arbitrator.abi,
   ARBITRATOR_ADDRESS
 )
-
-const arbitrableTokenList = new web3.eth.Contract(
-  ArbitrableTokenList.abi,
-  ARBITRABLE_TOKEN_LIST_ADDRESS
-)
-const arbitrableAddressList = new web3.eth.Contract(
-  ArbitrableAddressList.abi,
-  ARBITRABLE_ADDRESS_LIST_ADDRESS
-)
-const arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 
 export {
   web3,

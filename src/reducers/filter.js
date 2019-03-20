@@ -4,7 +4,7 @@ import createReducer from 'lessdux'
 import * as filterActions from '../actions/filter'
 import * as filterConstants from '../constants/filter'
 import { defaultFilter } from '../utils/filter'
-import { arbitrableTokenList } from '../bootstrap/dapp-api'
+import { arbitrableTokenListView } from '../bootstrap/dapp-api'
 
 // Shapes
 const filterShape = PropTypes.shape({
@@ -24,7 +24,7 @@ export { filterShape }
 
 // Reducer
 const cachedFilters = localStorage.getItem(
-  `${arbitrableTokenList.options.address}filter`
+  `${arbitrableTokenListView.options.address}filter`
 )
 const parsedFilters =
   cachedFilters && cachedFilters !== 'undefined'

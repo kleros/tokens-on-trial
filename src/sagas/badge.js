@@ -8,6 +8,7 @@ import {
   arbitrableTokenListView,
   arbitratorView,
   ARBITRATOR_ADDRESS,
+  viewWeb3,
   web3
 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus, convertFromString } from '../utils/tcr'
@@ -16,7 +17,7 @@ import * as walletSelectors from '../reducers/wallet'
 import * as tcrConstants from '../constants/tcr'
 import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 
-const { toBN } = web3.utils
+const { toBN } = viewWeb3.utils
 
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'

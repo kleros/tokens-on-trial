@@ -56,7 +56,7 @@ class Initializer extends PureComponent {
         failedLoading={
           <>
             <RequiresMetaMaskPage
-              needsUnlock={Boolean(web3.eth.accounts[0])}
+              needsUnlock={web3 && Boolean(web3.eth.accounts[0])}
               needsMetamask={Boolean(onlyInfura)}
               requiredNetwork={requiredNetwork}
               metamaskNetwork={metamaskNetwork}

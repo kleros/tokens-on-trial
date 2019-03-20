@@ -5,9 +5,10 @@ import readFile from '../utils/read-file'
 import { sanitize } from '../utils/ui'
 import {
   arbitrableAddressList,
-  arbitrator,
+  arbitrableAddressListView,
+  arbitratorView,
   archon,
-  web3
+  viewWeb3
 } from '../bootstrap/dapp-api'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
@@ -15,7 +16,7 @@ import * as walletSelectors from '../reducers/wallet'
 
 import ipfsPublish from './api/ipfs-publish'
 
-const { toBN } = web3.utils
+const { toBN } = viewWeb3.utils
 
 /**
  * Fetches the arbitrable address list's data.
@@ -24,38 +25,38 @@ const { toBN } = web3.utils
  */
 export function* fetchArbitrableAddressListData() {
   const d = yield all({
-    arbitrator: call(arbitrableAddressList.methods.arbitrator().call),
+    arbitrator: call(arbitrableAddressListView.methods.arbitrator().call),
     requesterBaseDeposit: call(
-      arbitrableAddressList.methods.requesterBaseDeposit().call
+      arbitrableAddressListView.methods.requesterBaseDeposit().call
     ),
     challengerBaseDeposit: call(
-      arbitrableAddressList.methods.challengerBaseDeposit().call
+      arbitrableAddressListView.methods.challengerBaseDeposit().call
     ),
     challengePeriodDuration: call(
-      arbitrableAddressList.methods.challengePeriodDuration().call
+      arbitrableAddressListView.methods.challengePeriodDuration().call
     ),
-    governor: call(arbitrableAddressList.methods.governor().call),
+    governor: call(arbitrableAddressListView.methods.governor().call),
     winnerStakeMultiplier: call(
-      arbitrableAddressList.methods.winnerStakeMultiplier().call
+      arbitrableAddressListView.methods.winnerStakeMultiplier().call
     ),
     loserStakeMultiplier: call(
-      arbitrableAddressList.methods.loserStakeMultiplier().call
+      arbitrableAddressListView.methods.loserStakeMultiplier().call
     ),
     sharedStakeMultiplier: call(
-      arbitrableAddressList.methods.sharedStakeMultiplier().call
+      arbitrableAddressListView.methods.sharedStakeMultiplier().call
     ),
     MULTIPLIER_DIVISOR: call(
-      arbitrableAddressList.methods.MULTIPLIER_DIVISOR().call
+      arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
     ),
     arbitratorExtraData: call(
-      arbitrableAddressList.methods.arbitratorExtraData().call
+      arbitrableAddressListView.methods.arbitratorExtraData().call
     ),
-    countByStatus: call(arbitrableAddressList.methods.countByStatus().call)
+    countByStatus: call(arbitrableAddressListView.methods.countByStatus().call)
   })
 
-  arbitrator.options.address = d.arbitrator
+  arbitratorView.options.address = d.arbitrator
   const arbitrationCost = yield call(
-    arbitrator.methods.arbitrationCost(d.arbitratorExtraData).call
+    arbitratorView.methods.arbitrationCost(d.arbitratorExtraData).call
   )
 
   return {
