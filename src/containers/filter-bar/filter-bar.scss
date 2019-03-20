@@ -32,10 +32,12 @@
 
   &-my {
     display: flex;
+    margin: 7px 0;
     min-height: 30px;
 
     @media (max-width: 820px) {
       flex-wrap: wrap;
+      margin: 0;
     }
 
     @media (max-width: 590px) {
@@ -59,7 +61,7 @@
     flex-wrap: wrap;
     justify-content: flex-end;
     margin-left: auto;
-    min-height: 10px;
+    max-width: 600px;
 
     @media (max-width: 590px) {
       width: 100%;
@@ -76,6 +78,7 @@
         @media (max-width: 590px) {
           margin: 0;
           margin-bottom: 7px;
+          min-width: 0;
           width: 100%;
         }
       }
@@ -86,6 +89,7 @@
         @media (max-width: 590px) {
           margin: 0;
           margin-bottom: 7px;
+          min-width: 0;
           width: 100%;
         }
       }
@@ -96,6 +100,7 @@
         @media (max-width: 590px) {
           margin: 0;
           margin-bottom: 7px;
+          min-width: 0;
           width: 100%;
         }
       }
