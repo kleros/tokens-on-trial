@@ -808,7 +808,7 @@ class TokenDetails extends PureComponent {
                       decisiveRuling
                         ? (winnerCountdownCompleted &&
                             loserCountdownCompleted) ||
-                          !loserTimedOut
+                          loserTimedOut
                         : countdownCompleted
                     }
                   >
