@@ -90,22 +90,20 @@ export default class NavBar extends PureComponent {
         </div>
       )),
       ...extras.map((e, i) => (
-        <>
+        <div key={i}>
           {!isMobile && (
             <div
-              className={`NavBar-extra ${isMobile ? 'is-mobile' : ''} ${
-                i === 0 ? 'NavBar-extra--first' : ''
-              }`}
-              key={i}
+              className={`NavBar-extra ${i === 0 ? 'NavBar-extra--first' : ''}`}
             >
               {e}
             </div>
           )}
-        </>
+        </div>
       )),
       <div
         style={{ marginLeft: '20px', width: '135px' }}
         onClick={this.closeMenu}
+        key="navbar-action"
       >
         {action}
       </div>
@@ -115,7 +113,7 @@ export default class NavBar extends PureComponent {
         {!isMobile && <Link to="/">{logoImg}</Link>}
         {isMobile && (
           <>
-            <span class="NavBar-hamburger" />
+            <span className="NavBar-hamburger" />
             <span
               style={{
                 color: 'white',
