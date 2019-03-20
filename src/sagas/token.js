@@ -4,14 +4,12 @@ import readFile from '../utils/read-file'
 import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableTokenList,
-  arbitrator,
   arbitrableTokenListView,
   arbitrableAddressListView,
   arbitratorView,
   archon,
   ARBITRATOR_ADDRESS,
-  viewWeb3,
-  web3
+  viewWeb3
 } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
@@ -218,13 +216,13 @@ export function* fetchToken({ payload: { ID } }) {
     if (token.latestRequest.arbitratorExtraData === null)
       token.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-    token.latestRequest.evidenceGroupID = web3.utils
-      .toBN(web3.utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
+    token.latestRequest.evidenceGroupID = viewWeb3.utils
+      .toBN(viewWeb3.utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
       .toString()
 
     // Calculate amount withdrawable
     let i
-    token.withdrawable = web3.utils.toBN(0)
+    token.withdrawable = viewWeb3.utils.toBN(0)
     if (token.latestRequest.resolved) i = token.numberOfRequests - 1
     // Start from the last round.
     else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
@@ -233,7 +231,7 @@ export function* fetchToken({ payload: { ID } }) {
       const amount = yield call(
         arbitrableTokenListView.methods.amountWithdrawable(ID, account, i).call
       )
-      token.withdrawable = token.withdrawable.add(web3.utils.toBN(amount))
+      token.withdrawable = token.withdrawable.add(viewWeb3.utils.toBN(amount))
       i--
     }
 
@@ -254,7 +252,7 @@ export function* fetchToken({ payload: { ID } }) {
 
     if (token.latestRequest.disputed) {
       // Fetch dispute data.
-      arbitrator.options.address = token.latestRequest.arbitrator
+      arbitratorView.options.address = token.latestRequest.arbitrator
       token.latestRequest.dispute = yield call(
         arbitratorView.methods.disputes(token.latestRequest.disputeID).call
       )
@@ -381,8 +379,10 @@ export function* fetchToken({ payload: { ID } }) {
       if (badge.latestRequest.arbitratorExtraData === null)
         badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-      badge.latestRequest.evidenceGroupID = web3.utils
-        .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
+      badge.latestRequest.evidenceGroupID = viewWeb3.utils
+        .toBN(
+          viewWeb3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1)
+        )
         .toString()
 
       badge.latestRequest.latestRound = yield call(
@@ -402,7 +402,7 @@ export function* fetchToken({ payload: { ID } }) {
 
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
-        arbitrator.options.address = badge.latestRequest.arbitrator
+        arbitratorView.options.address = badge.latestRequest.arbitrator
         badge.latestRequest.dispute = yield call(
           arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
         )
@@ -529,8 +529,8 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: new Array(3).fill(web3.utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3.utils.toBN(0))
+          paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
+          requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
         }
       }
 
@@ -558,8 +558,8 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: new Array(3).fill(web3.utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3.utils.toBN(0))
+          paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
+          requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
         }
       },
       badge: {
@@ -577,8 +577,8 @@ export function* fetchToken({ payload: { ID } }) {
           parties: [],
           latestRound: {
             appealed: false,
-            paidFees: new Array(3).fill(web3.utils.toBN(0)),
-            requiredForSide: new Array(3).fill(web3.utils.toBN(0))
+            paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
+            requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
           }
         }
       },
@@ -591,7 +591,7 @@ export function* fetchToken({ payload: { ID } }) {
       latestRequest: { disputed: false }
     }
 
-  arbitrator.options.address = ARBITRATOR_ADDRESS
+  arbitratorView.options.address = ARBITRATOR_ADDRESS
 
   return {
     ...token,
@@ -613,7 +613,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: web3.utils.toChecksumAddress(token.addr),
+    addr: viewWeb3.utils.toChecksumAddress(token.addr),
     symbolMultihash: token.symbolMultihash
   }
 
@@ -636,7 +636,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = web3.utils.soliditySha3(
+  const ID = viewWeb3.utils.soliditySha3(
     name || '',
     ticker || '',
     addr,
@@ -656,7 +656,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value: value.add(web3.utils.toBN('4100000000000000'))
+      value: value.add(viewWeb3.utils.toBN('4100000000000000'))
     }
   )
 
@@ -675,7 +675,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: web3.utils.toChecksumAddress(token.addr),
+    addr: viewWeb3.utils.toChecksumAddress(token.addr),
     symbolMultihash: token.symbolMultihash
   }
 
@@ -698,7 +698,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = web3.utils.soliditySha3(
+  const ID = viewWeb3.utils.soliditySha3(
     name || '',
     ticker || '',
     addr,
@@ -723,7 +723,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value: value.add(web3.utils.toBN('4100000000000000'))
+      value: value.add(viewWeb3.utils.toBN('4100000000000000'))
     }
   )
 

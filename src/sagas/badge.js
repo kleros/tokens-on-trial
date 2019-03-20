@@ -3,13 +3,11 @@ import { all, call, select, takeLatest } from 'redux-saga/effects'
 import { lessduxSaga } from '../utils/saga'
 import {
   arbitrableAddressList,
-  arbitrator,
   arbitrableAddressListView,
   arbitrableTokenListView,
   arbitratorView,
   ARBITRATOR_ADDRESS,
-  viewWeb3,
-  web3
+  viewWeb3
 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus, convertFromString } from '../utils/tcr'
 import * as badgeActions from '../actions/badge'
@@ -43,7 +41,7 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
   if (cursor === '') cursor = ZERO_ADDR
 
   const totalCount = Number(
-    yield call(arbitrableAddressList.methods.addressCount().call, {
+    yield call(arbitrableAddressListView.methods.addressCount().call, {
       from: yield select(walletSelectors.getAccount)
     })
   )
@@ -55,7 +53,7 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
       : Math.floor(totalCount / count) + 1
 
   let countByStatus = yield call(
-    arbitrableAddressList.methods.countByStatus().call,
+    arbitrableAddressListView.methods.countByStatus().call,
     {
       from: yield select(walletSelectors.getAccount)
     }
@@ -84,11 +82,14 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
   let firstToken = ZERO_ADDR
   let lastToken = ZERO_ADDR
   if (totalCount > 0) {
-    firstToken = yield call(arbitrableAddressList.methods.addressList(0).call, {
-      from: yield select(walletSelectors.getAccount)
-    })
+    firstToken = yield call(
+      arbitrableAddressListView.methods.addressList(0).call,
+      {
+        from: yield select(walletSelectors.getAccount)
+      }
+    )
     lastToken = yield call(
-      arbitrableAddressList.methods.addressList(totalCount - 1).call,
+      arbitrableAddressListView.methods.addressList(totalCount - 1).call,
       { from: yield select(walletSelectors.getAccount) }
     )
   }
@@ -98,7 +99,7 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
   /* eslint-disable no-unused-vars */
   try {
     const lastTokens = yield call(
-      arbitrableAddressList.methods.queryAddresses(
+      arbitrableAddressListView.methods.queryAddresses(
         lastToken,
         count,
         filterValue,
@@ -118,7 +119,7 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
   let currentPage = 1
   if (cursor !== firstToken && cursor !== ZERO_ADDR) {
     const itemsBefore = (yield call(
-      arbitrableAddressList.methods.queryAddresses(
+      arbitrableAddressListView.methods.queryAddresses(
         cursor === firstToken ? ZERO_ADDR : cursor,
         100,
         filterValue,
@@ -137,7 +138,7 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
 
   // Fetch tokens
   const data = yield call(
-    arbitrableAddressList.methods.queryAddresses(
+    arbitrableAddressListView.methods.queryAddresses(
       cursor === firstToken ? ZERO_ADDR : cursor,
       count,
       filterValue,
@@ -204,14 +205,16 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
     }
 
     const badge = {
-      ...(yield call(arbitrableAddressList.methods.getAddressInfo(addr).call)),
+      ...(yield call(
+        arbitrableAddressListView.methods.getAddressInfo(addr).call
+      )),
       addr
     }
 
     badge.status = Number(badge.status)
 
     badge.latestRequest = yield call(
-      arbitrableAddressList.methods.getRequestInfo(
+      arbitrableAddressListView.methods.getRequestInfo(
         addr,
         Number(badge.numberOfRequests) - 1
       ).call
@@ -231,7 +234,7 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
   let previousPage
   try {
     const previousTokens = yield call(
-      arbitrableAddressList.methods.queryAddresses(
+      arbitrableAddressListView.methods.queryAddresses(
         tokenAddresses[0],
         count + 1,
         filterValue,
@@ -278,13 +281,15 @@ export function* fetchBadge({ payload: { addr } }) {
     if (badge.latestRequest.arbitratorExtraData === null)
       badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-    badge.latestRequest.evidenceGroupID = web3.utils
-      .toBN(web3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
+    badge.latestRequest.evidenceGroupID = viewWeb3.utils
+      .toBN(
+        viewWeb3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1)
+      )
       .toString()
 
     // Calculate amount withdrawable
     let i
-    badge.withdrawable = web3.utils.toBN(0)
+    badge.withdrawable = viewWeb3.utils.toBN(0)
     if (badge.latestRequest.resolved) i = badge.numberOfRequests - 1
     // Start from the last round.
     else if (badge.numberOfRequests > 1) i = badge.numberOfRequests - 2 // Start from the penultimate round.
@@ -294,7 +299,7 @@ export function* fetchBadge({ payload: { addr } }) {
         arbitrableAddressListView.methods.amountWithdrawable(addr, account, i)
           .call
       )
-      badge.withdrawable = badge.withdrawable.add(web3.utils.toBN(amount))
+      badge.withdrawable = badge.withdrawable.add(viewWeb3.utils.toBN(amount))
       i--
     }
 
@@ -314,7 +319,7 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (badge.latestRequest.disputed) {
       // Fetch dispute data.
-      arbitrator.options.address = badge.latestRequest.arbitrator
+      arbitratorView.options.address = badge.latestRequest.arbitrator
       badge.latestRequest.dispute = yield call(
         arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
       )
@@ -477,13 +482,13 @@ export function* fetchBadge({ payload: { addr } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: new Array(3).fill(web3.utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3.utils.toBN(0))
+          paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
+          requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
         }
       }
     }
 
-  arbitrator.options.address = ARBITRATOR_ADDRESS
+  arbitratorView.options.address = ARBITRATOR_ADDRESS
 
   return {
     ...badge,

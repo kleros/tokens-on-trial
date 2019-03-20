@@ -3,16 +3,18 @@ import memoizeOne from 'memoize-one'
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
 import {
-  arbitrableAddressList,
-  arbitrableTokenList,
-  web3
+  arbitrableAddressListView,
+  arbitrableTokenListView,
+  viewWeb3
 } from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
 
 // Helpers
 const getBlockDate = memoizeOne(blockHash =>
-  web3.eth.getBlock(blockHash).then(block => new Date(block.timestamp * 1000))
+  viewWeb3.eth
+    .getBlock(blockHash)
+    .then(block => new Date(block.timestamp * 1000))
 )
 
 const ZERO_ID = `0x0000000000000000000000000000000000000000000000000000000000000000`
@@ -46,7 +48,7 @@ const emitBadgeNotifications = async (
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
-    const requests = await arbitrableAddressList.getPastEvents(
+    const requests = await arbitrableAddressListView.getPastEvents(
       `RequestSubmitted`,
       {
         filter: { _address: returnValues._address },
@@ -55,7 +57,7 @@ const emitBadgeNotifications = async (
       }
     )
 
-    const tokenIDs = (await arbitrableTokenList.methods
+    const tokenIDs = (await arbitrableTokenListView.methods
       .queryTokens(
         ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
         10, // Number of items to return at once.
@@ -67,7 +69,9 @@ const emitBadgeNotifications = async (
 
     let token
     if (tokenIDs && tokenIDs.length > 0)
-      token = await arbitrableTokenList.methods.getTokenInfo(tokenIDs[0]).call()
+      token = await arbitrableTokenListView.methods
+        .getTokenInfo(tokenIDs[0])
+        .call()
 
     const isRegistrationRequest =
       requests[requests.length - 1].returnValues._registrationRequest
@@ -189,7 +193,7 @@ const emitBadgeNotifications = async (
       emit({
         ID: returnValues._address,
         addr: returnValues._address,
-        badgeAddr: arbitrableAddressList._address,
+        badgeAddr: arbitrableAddressListView._address,
         date: await getBlockDate(event.blockHash),
         message,
         clientStatus,
@@ -211,7 +215,7 @@ const emitBadgeNotifications = async (
         ID: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
         addr: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
         date,
-        badgeAddr: arbitrableAddressList._address,
+        badgeAddr: arbitrableAddressListView._address,
         message: `Badge request pending execution.`,
         clientStatus: oldestNonDisputedSubmittedStatusEvent.returnValues._status
       })
@@ -219,7 +223,7 @@ const emitBadgeNotifications = async (
 
   if (events[0])
     localStorage.setItem(
-      `${arbitrableAddressList.options.address}nextEventsBlockNumber`,
+      `${arbitrableAddressListView.options.address}nextEventsBlockNumber`,
       events[0].blockNumber + 1
     )
 }

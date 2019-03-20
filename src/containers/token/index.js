@@ -10,13 +10,14 @@ import Progress from 'react-progressbar'
 import Archon from '@kleros/archon'
 
 import {
-  arbitrableTokenList,
-  arbitrableAddressList,
-  arbitrator,
-  web3,
+  arbitrableTokenListView,
+  arbitrableAddressListView,
+  arbitratorView,
+  viewWeb3,
   archon,
   FILE_BASE_URL,
-  IPFS_URL
+  IPFS_URL,
+  onlyInfura
 } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
@@ -129,7 +130,7 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken, accounts } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
-    arbitrableTokenList.events.Ruling().on('data', event => {
+    arbitrableTokenListView.events.Ruling().on('data', event => {
       const { token } = this.state
       if (!token) return
       const { latestRequest } = token
@@ -141,7 +142,7 @@ class TokenDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
-    arbitrableTokenList.events.RewardWithdrawal().on('data', event => {
+    arbitrableTokenListView.events.RewardWithdrawal().on('data', event => {
       const { token } = this.state
       if (
         !token ||
@@ -151,13 +152,13 @@ class TokenDetails extends PureComponent {
         return
       fetchToken(event.returnValues._tokenID)
     })
-    arbitrableTokenList.events.TokenStatusChange().on('data', event => {
+    arbitrableTokenListView.events.TokenStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitrator.events.AppealPossible().on('data', event => {
+    arbitratorView.events.AppealPossible().on('data', event => {
       const { token } = this.state
       if (!token) return
 
@@ -170,13 +171,13 @@ class TokenDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
-    arbitrableAddressList.events.AddressStatusChange().on('data', event => {
+    arbitrableAddressListView.events.AddressStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
       if (token.addr === event.returnValues._address) fetchToken(tokenID)
     })
-    arbitrableTokenList.events.TokenStatusChange().on('data', event => {
+    arbitrableTokenListView.events.TokenStatusChange().on('data', event => {
       const { token } = this.state
       if (!token) return
 
@@ -237,7 +238,7 @@ class TokenDetails extends PureComponent {
     if (token && token.ID !== tokenID && !fetching) window.location.reload(true)
 
     if (token && !evidenceListenerSet && token.ID === tokenID) {
-      arbitrableTokenList.events
+      arbitrableTokenListView.events
         .Evidence({
           fromBlock: 0,
           filter: {
@@ -245,6 +246,7 @@ class TokenDetails extends PureComponent {
           }
         })
         .on('data', async e => {
+          console.info('got evidence data (token)')
           const { token } = this.state
           if (!token) return
           const { latestRequest } = token
@@ -453,7 +455,7 @@ class TokenDetails extends PureComponent {
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <h4 style={{ marginLeft: 0 }}>Token Details</h4>
-          {token.withdrawable.gt(web3.utils.toBN(0)) && (
+          {token.withdrawable.gt(viewWeb3.utils.toBN(0)) && (
             <>
               <div className="TokenDetails-divider" />
               <h5
@@ -462,7 +464,7 @@ class TokenDetails extends PureComponent {
               >
                 <span className="TokenDetails-withdraw-value">
                   {Number(
-                    web3.utils.fromWei(token.withdrawable.toString())
+                    viewWeb3.utils.fromWei(token.withdrawable.toString())
                   ).toFixed(4)}{' '}
                   ETH{' '}
                 </span>
@@ -804,12 +806,14 @@ class TokenDetails extends PureComponent {
                   <Button
                     type="primary"
                     onClick={this.fundAppeal}
+                    tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                     disabled={
-                      decisiveRuling
+                      onlyInfura ||
+                      (decisiveRuling
                         ? (winnerCountdownCompleted &&
                             loserCountdownCompleted) ||
                           loserTimedOut
-                        : countdownCompleted
+                        : countdownCompleted)
                     }
                   >
                     <FontAwesomeIcon
@@ -850,7 +854,7 @@ class TokenDetails extends PureComponent {
                   className="TokenDetails-icon TokenDetails-meta--aligned"
                   src={EtherScanLogo}
                 />
-                {token.addr ? web3.utils.toChecksumAddress(token.addr) : ''}
+                {token.addr ? viewWeb3.utils.toChecksumAddress(token.addr) : ''}
               </a>
               {(token.badge.status ===
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
@@ -910,7 +914,12 @@ class TokenDetails extends PureComponent {
                   </>
                 )}
               </div>
-              <Button onClick={this.handleOpenEvidenceModal} type="secondary">
+              <Button
+                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+                disabled={onlyInfura}
+                onClick={this.handleOpenEvidenceModal}
+                type="secondary"
+              >
                 Submit Evidence
               </Button>
             </div>
@@ -928,6 +937,8 @@ class TokenDetails extends PureComponent {
               token.badge.status ===
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
                 <Button
+                  tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+                  disabled={onlyInfura}
                   onClick={this.submitBadgeAction}
                   type="secondary"
                   style={{ width: '135px' }}
@@ -983,10 +994,12 @@ class TokenDetails extends PureComponent {
                 className="Appeal-request"
                 type="primary"
                 style={{ marginLeft: 0, marginRight: '6px' }}
+                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                 disabled={
-                  decisiveRuling &&
-                  requesterIsLoser &&
-                  (loserRemainingTime === 0 || loserCountdownCompleted)
+                  onlyInfura ||
+                  (decisiveRuling &&
+                    requesterIsLoser &&
+                    (loserRemainingTime === 0 || loserCountdownCompleted))
                 }
                 onClick={() => {
                   this.setState({ appealModalOpen: false })
@@ -1002,10 +1015,12 @@ class TokenDetails extends PureComponent {
                 className="Appeal-request"
                 type="primary"
                 style={{ marginLeft: '6px' }}
+                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                 disabled={
-                  decisiveRuling &&
-                  challengerIsLoser &&
-                  (loserRemainingTime === 0 || loserCountdownCompleted)
+                  onlyInfura ||
+                  (decisiveRuling &&
+                    challengerIsLoser &&
+                    (loserRemainingTime === 0 || loserCountdownCompleted))
                 }
                 onClick={() => {
                   this.setState({ appealModalOpen: false })

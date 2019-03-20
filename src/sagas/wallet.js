@@ -10,8 +10,10 @@ import { web3 } from '../bootstrap/dapp-api'
  * @returns {string[]} - The accounts.
  */
 function* fetchAccounts() {
-  if (window.ethereum) yield call(window.ethereum.enable)
-  return yield call(web3.eth.getAccounts)
+  if (window.ethereum) {
+    yield call(window.ethereum.enable)
+    return yield call(web3.eth.getAccounts)
+  } else return []
 }
 
 /**

@@ -34,13 +34,13 @@ class Initializer extends PureComponent {
 
   async componentDidMount() {
     const { fetchAccounts } = this.props
-    this.setState({ metamaskNetwork: await networkPromise })
-    fetchAccounts()
-
-    if (window.ethereum)
+    if (window.ethereum) {
+      this.setState({ metamaskNetwork: await networkPromise })
       window.ethereum.on('accountsChanged', () => {
         fetchAccounts()
       })
+    }
+    fetchAccounts()
   }
 
   render() {
@@ -56,7 +56,9 @@ class Initializer extends PureComponent {
         failedLoading={
           <>
             <RequiresMetaMaskPage
-              needsUnlock={web3 && Boolean(web3.eth.accounts[0])}
+              needsUnlock={
+                window.ethereum && web3 && Boolean(web3.eth.accounts[0])
+              }
               needsMetamask={Boolean(onlyInfura)}
               requiredNetwork={requiredNetwork}
               metamaskNetwork={metamaskNetwork}
@@ -64,8 +66,8 @@ class Initializer extends PureComponent {
           </>
         }
         extraLoadingValues={[
-          !accounts.data || accounts.data.length === 0,
-          !metamaskNetwork
+          !accounts.data || (window.ethereum && accounts.data.length === 0),
+          window.ethereum && !metamaskNetwork
         ]}
         loading={
           <div

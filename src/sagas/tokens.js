@@ -6,7 +6,7 @@ import {
   fetchTokensFailed
 } from '../actions/tokens'
 import * as tokenSelectors from '../reducers/tokens'
-import { arbitrableTokenListView, web3 } from '../bootstrap/dapp-api'
+import { arbitrableTokenListView, viewWeb3 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
@@ -61,7 +61,7 @@ function* fetchTokens() {
           return acc
         }
 
-        const tokenID = web3.utils.soliditySha3(
+        const tokenID = viewWeb3.utils.soliditySha3(
           _name,
           _ticker,
           _address,

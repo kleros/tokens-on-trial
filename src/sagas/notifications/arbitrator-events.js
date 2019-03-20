@@ -1,10 +1,10 @@
 import memoizeOne from 'memoize-one'
 
 import {
-  arbitrator,
-  arbitrableAddressList,
-  arbitrableTokenList,
-  web3
+  arbitratorView,
+  arbitrableAddressListView,
+  arbitrableTokenListView,
+  viewWeb3
 } from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
@@ -23,7 +23,9 @@ const filter = [
 
 // Helpers
 const getBlockDate = memoizeOne(blockHash =>
-  web3.eth.getBlock(blockHash).then(block => new Date(block.timestamp * 1000))
+  viewWeb3.eth
+    .getBlock(blockHash)
+    .then(block => new Date(block.timestamp * 1000))
 )
 
 /**
@@ -33,18 +35,18 @@ const emitArbitratorNotifications = async (account, emit, events) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
 
-    if (returnValues._arbitrable === arbitrableTokenList._address) {
-      const tokenID = await arbitrableTokenList.methods
+    if (returnValues._arbitrable === arbitrableTokenListView._address) {
+      const tokenID = await arbitrableTokenListView.methods
         .arbitratorDisputeIDToTokenID(
-          arbitrator._address,
+          arbitratorView._address,
           returnValues._disputeID
         )
         .call()
 
-      const token = await arbitrableTokenList.methods
+      const token = await arbitrableTokenListView.methods
         .getTokenInfo(tokenID)
         .call()
-      const latestRequest = await arbitrableTokenList.methods
+      const latestRequest = await arbitrableTokenListView.methods
         .getRequestInfo(tokenID, Number(token.numberOfRequests) - 1)
         .call()
 
@@ -63,18 +65,20 @@ const emitArbitratorNotifications = async (account, emit, events) => {
         message,
         clientStatus: 4
       })
-    } else if (returnValues._arbitrable === arbitrableAddressList._address) {
-      const tokenAddress = await arbitrableAddressList.methods
+    } else if (
+      returnValues._arbitrable === arbitrableAddressListView._address
+    ) {
+      const tokenAddress = await arbitrableAddressListView.methods
         .arbitratorDisputeIDToAddress(
-          arbitrator._address,
+          arbitratorView._address,
           returnValues._disputeID
         )
         .call()
 
-      const addressInfo = await arbitrableAddressList.methods
+      const addressInfo = await arbitrableAddressListView.methods
         .getAddressInfo(tokenAddress)
         .call()
-      const latestRequest = await arbitrableAddressList.methods
+      const latestRequest = await arbitrableAddressListView.methods
         .getRequestInfo(tokenAddress, Number(addressInfo.numberOfRequests) - 1)
         .call()
 
@@ -84,7 +88,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
       )
         continue
 
-      const tokenIDs = (await arbitrableTokenList.methods
+      const tokenIDs = (await arbitrableTokenListView.methods
         .queryTokens(
           ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
           10, // Number of items to return at once.
@@ -96,7 +100,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
 
       let token
       if (tokenIDs && tokenIDs.length > 0)
-        token = await arbitrableTokenList.methods
+        token = await arbitrableTokenListView.methods
           .getTokenInfo(tokenIDs[0])
           .call()
 
@@ -107,7 +111,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
       emit({
         ID: tokenAddress,
         addr: tokenAddress,
-        badgeAddr: arbitrableAddressList._address,
+        badgeAddr: arbitrableAddressListView._address,
         date: await getBlockDate(event.blockHash),
         message,
         clientStatus: 4
@@ -117,7 +121,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
 
   if (events[0])
     localStorage.setItem(
-      `${arbitrator.options.address}nextEventsBlockNumber`,
+      `${arbitratorView.options.address}nextEventsBlockNumber`,
       events[0].blockNumber + 1
     )
 }

@@ -5,7 +5,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Button from '../button'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
-import { viewWeb3 } from '../../bootstrap/dapp-api'
+import { viewWeb3, onlyInfura } from '../../bootstrap/dapp-api'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/tcr'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
@@ -211,7 +211,8 @@ const getActionButton = ({
 
   return (
     <Button
-      disabled={disabled}
+      disabled={onlyInfura || disabled}
+      tooltip={onlyInfura ? 'Please install MetaMask.' : null}
       onClick={method}
       style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
       type="primary"

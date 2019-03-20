@@ -12,9 +12,9 @@ import * as arbitrableAddressListActions from '../../actions/arbitrable-address-
 import { lessduxSaga } from '../../utils/saga'
 import { action } from '../../utils/action'
 import {
-  arbitrableTokenList,
-  arbitrableAddressList,
-  arbitrator
+  arbitrableTokenListView,
+  arbitrableAddressListView,
+  arbitratorView
 } from '../../bootstrap/dapp-api'
 
 import emitTokenNotifications from './token-events'
@@ -51,17 +51,17 @@ function* pushNotificationsListener() {
       const txHashes = {}
 
       // T2CR events
-      arbitrableTokenList
+      arbitrableTokenListView
         .getPastEvents('TokenStatusChange', {
           fromBlock:
             localStorage.getItem(
-              `${arbitrableTokenList.options.address}nextEventsBlockNumber`
+              `${arbitrableTokenListView.options.address}nextEventsBlockNumber`
             ) || 0
         })
         .then(events => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events)
         })
-      arbitrableTokenList.events.TokenStatusChange().on('data', event => {
+      arbitrableTokenListView.events.TokenStatusChange().on('data', event => {
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
           emitTokenNotifications(account, t2crTimeToChallenge, emit, [event])
@@ -69,35 +69,39 @@ function* pushNotificationsListener() {
       })
 
       // Badge events
-      arbitrableAddressList
+      arbitrableAddressListView
         .getPastEvents('AddressStatusChange', {
           fromBlock:
             localStorage.getItem(
-              `${arbitrableAddressList.options.address}nextEventsBlockNumber`
+              `${
+                arbitrableAddressListView.options.address
+              }nextEventsBlockNumber`
             ) || 0
         })
         .then(events => {
           emitBadgeNotifications(account, badgeTimeToChallenge, emit, events)
         })
-      arbitrableAddressList.events.AddressStatusChange().on('data', event => {
-        if (!txHashes[event.transactionHash]) {
-          txHashes[event.transactionHash] = true
-          emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event])
-        }
-      })
+      arbitrableAddressListView.events
+        .AddressStatusChange()
+        .on('data', event => {
+          if (!txHashes[event.transactionHash]) {
+            txHashes[event.transactionHash] = true
+            emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event])
+          }
+        })
 
       // Arbitator events
-      arbitrator
+      arbitratorView
         .getPastEvents('AppealPossible', {
           fromBlock:
             localStorage.getItem(
-              `${arbitrator.options.address}nextEventsBlockNumber`
+              `${arbitratorView.options.address}nextEventsBlockNumber`
             ) || 0
         })
         .then(events => {
           emitArbitratorNotifications(account, emit, events)
         })
-      arbitrator.events.AppealPossible().on('data', event => {
+      arbitratorView.events.AppealPossible().on('data', event => {
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
           emitArbitratorNotifications(account, emit, [event])

@@ -32,8 +32,8 @@ import Initializer from './initializer'
 import GlobalComponents from './global-components'
 import {
   onlyInfura,
-  arbitrableTokenList,
-  arbitrableAddressList
+  arbitrableTokenListView,
+  arbitrableAddressListView
 } from './dapp-api'
 import './fontawesome'
 import './app.css'
@@ -93,10 +93,10 @@ class _ConnectedNavBar extends Component {
     fetchArbitrableAddressListData()
     fetchTokens()
     fetchBadges()
-    arbitrableTokenList.events.TokenStatusChange().on('data', () => {
+    arbitrableTokenListView.events.TokenStatusChange().on('data', () => {
       fetchTokens()
     })
-    arbitrableAddressList.events.AddressStatusChange().on('data', () => {
+    arbitrableAddressListView.events.AddressStatusChange().on('data', () => {
       fetchBadges()
     })
   }

@@ -2,13 +2,15 @@ import memoizeOne from 'memoize-one'
 
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
-import { arbitrableTokenList, web3 } from '../../bootstrap/dapp-api'
+import { arbitrableTokenListView, viewWeb3 } from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
 
 // Helpers
 const getBlockDate = memoizeOne(blockHash =>
-  web3.eth.getBlock(blockHash).then(block => new Date(block.timestamp * 1000))
+  viewWeb3.eth
+    .getBlock(blockHash)
+    .then(block => new Date(block.timestamp * 1000))
 )
 
 /**
@@ -30,7 +32,7 @@ const emitTokenNotifications = async (
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
-    const requests = await arbitrableTokenList.getPastEvents(
+    const requests = await arbitrableTokenListView.getPastEvents(
       'RequestSubmitted',
       {
         filter: { _tokenID: returnValues._tokenID },
@@ -39,7 +41,7 @@ const emitTokenNotifications = async (
       }
     )
 
-    const token = await arbitrableTokenList.methods
+    const token = await arbitrableTokenListView.methods
       .getTokenInfo(returnValues._tokenID)
       .call()
 
@@ -170,7 +172,7 @@ const emitTokenNotifications = async (
 
   if (events[0])
     localStorage.setItem(
-      `${arbitrableTokenList.options.address}nextEventsBlockNumber`,
+      `${arbitrableTokenListView.options.address}nextEventsBlockNumber`,
       events[0].blockNumber + 1
     )
 }

@@ -11,13 +11,14 @@ import Progress from 'react-progressbar'
 import Archon from '@kleros/archon'
 
 import {
-  arbitrableAddressList,
-  arbitrator,
-  web3,
+  arbitrableAddressListView,
+  arbitratorView,
+  viewWeb3,
   ETHFINEX_CRITERIA_URL,
   archon,
   FILE_BASE_URL,
-  IPFS_URL
+  IPFS_URL,
+  onlyInfura
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
@@ -157,15 +158,15 @@ class BadgeDetails extends PureComponent {
     const { match, fetchBadge } = this.props
     const { tokenAddr } = match.params
     fetchBadge(tokenAddr)
-    arbitrableAddressList.events.RewardWithdrawal().on('data', event => {
+    arbitrableAddressListView.events.RewardWithdrawal().on('data', event => {
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
     })
-    arbitrableAddressList.events.AddressStatusChange().on('data', event => {
+    arbitrableAddressListView.events.AddressStatusChange().on('data', event => {
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
     })
-    arbitrator.events.AppealPossible().on('data', event => {
+    arbitratorView.events.AppealPossible().on('data', event => {
       const { badge } = this.state
       if (!badge) return
       const { latestRequest } = badge
@@ -176,7 +177,7 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr)
     })
-    arbitrableAddressList.events.Ruling().on('data', event => {
+    arbitrableAddressListView.events.Ruling().on('data', event => {
       const { badge } = this.state
       if (!badge) return
       const { latestRequest } = badge
@@ -214,7 +215,7 @@ class BadgeDetails extends PureComponent {
       window.location.reload(true)
 
     if (badge && !evidenceListenerSet && badge.addr === tokenAddr) {
-      arbitrableAddressList.events
+      arbitrableAddressListView.events
         .Evidence({
           fromBlock: 0,
           filter: {
@@ -222,6 +223,7 @@ class BadgeDetails extends PureComponent {
           }
         })
         .on('data', async e => {
+          console.info('got data')
           const { badge } = this.state
           if (!badge) return
           const { latestRequest } = badge
@@ -459,7 +461,7 @@ class BadgeDetails extends PureComponent {
               <h4 className="BadgeDetails-label-name">Unknown Token</h4>
             </div>
           )}
-          {badge.withdrawable.gt(web3.utils.toBN(0)) && (
+          {badge.withdrawable.gt(viewWeb3.utils.toBN(0)) && (
             <>
               <div className="TokenDetails-divider" />
               <h5
@@ -468,7 +470,7 @@ class BadgeDetails extends PureComponent {
               >
                 <span className="TokenDetails-withdraw-value">
                   {Number(
-                    web3.utils.fromWei(badge.withdrawable.toString())
+                    viewWeb3.utils.fromWei(badge.withdrawable.toString())
                   ).toFixed(4)}{' '}
                   ETH{' '}
                 </span>
@@ -870,7 +872,7 @@ class BadgeDetails extends PureComponent {
                       />
                       <div style={{ marginRight: '14px' }}>
                         {truncateMiddle(
-                          web3.utils.toChecksumAddress(tokenAddr)
+                          viewWeb3.utils.toChecksumAddress(tokenAddr)
                         )}
                       </div>
                     </div>
@@ -887,12 +889,14 @@ class BadgeDetails extends PureComponent {
                   <Button
                     type="primary"
                     onClick={this.fundAppeal}
+                    tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                     disabled={
-                      decisiveRuling
+                      onlyInfura ||
+                      (decisiveRuling
                         ? (winnerCountdownCompleted &&
                             loserCountdownCompleted) ||
                           loserTimedOut
-                        : countdownCompleted
+                        : countdownCompleted)
                     }
                   >
                     <FontAwesomeIcon
@@ -959,7 +963,12 @@ class BadgeDetails extends PureComponent {
                   </>
                 )}
               </div>
-              <Button onClick={this.handleOpenEvidenceModal} type="secondary">
+              <Button
+                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+                disabled={onlyInfura}
+                onClick={this.handleOpenEvidenceModal}
+                type="secondary"
+              >
                 Submit Evidence
               </Button>
             </div>
@@ -993,10 +1002,12 @@ class BadgeDetails extends PureComponent {
                 className="Appeal-request"
                 type="primary"
                 style={{ marginLeft: 0, marginRight: '6px' }}
+                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                 disabled={
-                  decisiveRuling &&
-                  requesterIsLoser &&
-                  (loserRemainingTime === 0 || loserCountdownCompleted)
+                  onlyInfura ||
+                  (decisiveRuling &&
+                    requesterIsLoser &&
+                    (loserRemainingTime === 0 || loserCountdownCompleted))
                 }
                 onClick={() => {
                   this.setState({ appealModalOpen: false })
@@ -1012,10 +1023,12 @@ class BadgeDetails extends PureComponent {
                 className="Appeal-request"
                 type="primary"
                 style={{ marginLeft: '6px' }}
+                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                 disabled={
-                  decisiveRuling &&
-                  challengerIsLoser &&
-                  (loserRemainingTime === 0 || loserCountdownCompleted)
+                  onlyInfura ||
+                  (decisiveRuling &&
+                    challengerIsLoser &&
+                    (loserRemainingTime === 0 || loserCountdownCompleted))
                 }
                 onClick={() => {
                   this.setState({ appealModalOpen: false })
