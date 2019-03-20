@@ -207,27 +207,28 @@ class BadgeDetails extends PureComponent {
     }
   }
 
-  componentDidUpdate() {
+  async componentDidUpdate() {
     const { match } = this.props
     const { badge, fetching, evidenceListenerSet } = this.state
     const { tokenAddr } = match.params
+    if (!badge) return
+
     if (badge && badge.addr !== tokenAddr && !fetching)
       window.location.reload(true)
 
-    if (badge && !evidenceListenerSet && badge.addr === tokenAddr) {
-      arbitrableAddressListView.events
-        .Evidence({
-          fromBlock: 0,
+    if (evidenceListenerSet) return
+
+    const { latestRequest } = badge
+
+    if (badge && !evidenceListenerSet) {
+      await Promise.all(
+        (await arbitrableAddressListView.getPastEvents('Evidence', {
           filter: {
             _evidenceGroupID: badge.latestRequest.evidenceGroupID
-          }
-        })
-        .on('data', async e => {
-          console.info('got data')
-          const { badge } = this.state
-          if (!badge) return
-          const { latestRequest } = badge
-
+          },
+          fromBlock: 0,
+          toBlock: 'latest'
+        })).map(async e => {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
             return
 
@@ -260,6 +261,8 @@ class BadgeDetails extends PureComponent {
             }
           })
         })
+      )
+
       this.setState({ evidenceListenerSet: true })
     }
   }

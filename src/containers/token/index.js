@@ -231,26 +231,27 @@ class TokenDetails extends PureComponent {
     }
   }
 
-  componentDidUpdate() {
+  async componentDidUpdate() {
     const { match } = this.props
     const { token, fetching, evidenceListenerSet } = this.state
     const { tokenID } = match.params
+    if (!token) return
+
     if (token && token.ID !== tokenID && !fetching) window.location.reload(true)
 
-    if (token && !evidenceListenerSet && token.ID === tokenID) {
-      arbitrableTokenListView.events
-        .Evidence({
-          fromBlock: 0,
-          filter: {
-            _evidenceGroupID: token.latestRequest.evidenceGroupID
-          }
-        })
-        .on('data', async e => {
-          console.info('got evidence data (token)')
-          const { token } = this.state
-          if (!token) return
-          const { latestRequest } = token
+    if (evidenceListenerSet) return
 
+    const { latestRequest } = token
+
+    if (token && !evidenceListenerSet) {
+      await Promise.all(
+        (await arbitrableTokenListView.getPastEvents('Evidence', {
+          filter: {
+            _evidenceGroupID: latestRequest.evidenceGroupID
+          },
+          fromBlock: 0,
+          toBlock: 'latest'
+        })).map(async e => {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
             return
 
@@ -268,8 +269,10 @@ class TokenDetails extends PureComponent {
               `${IPFS_URL}${e.returnValues._evidence}`,
               { hash: calculatedMultihash }
             ))
-          )
+          ) {
+            console.warn('Invalid evidence', evidence)
             return
+          }
 
           const { evidences } = this.state
           const mimeType = mime.lookup(evidence.fileTypeExtension)
@@ -281,6 +284,8 @@ class TokenDetails extends PureComponent {
             }
           })
         })
+      )
+
       this.setState({ evidenceListenerSet: true })
     }
   }
