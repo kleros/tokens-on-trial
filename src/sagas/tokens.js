@@ -35,7 +35,7 @@ function* fetchTokens() {
     const blockNumber = submissionEvents.reduce((acc, event) => {
       const { blockNumber } = event
       return blockNumber > acc ? blockNumber : acc
-    }, tokens.blockNumber + 1)
+    }, tokens.blockNumber)
 
     const missingTokens = []
     const receivedTokens = submissionEvents.reduce(
