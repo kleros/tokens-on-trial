@@ -90,26 +90,7 @@ if (window.web3) {
     console.info('checking', test)
     if (window.web3) {
       web3 = window.web3
-      network =
-        web3.eth &&
-        web3.eth.net
-          .getId()
-          .then(networkID => {
-            switch (networkID) {
-              case 1:
-                return 'main'
-              case 3:
-                return 'ropsten'
-              case 4:
-                return 'rinkeby'
-              case 42:
-                return 'kovan'
-              default:
-                return null
-            }
-          })
-          .catch(() => null)
-
+      network = 'main' // Trust wallet web3 doesn't have web3.eth.net.
       arbitrableTokenList = new web3.eth.Contract(
         ArbitrableTokenList.abi,
         ARBITRABLE_TOKEN_LIST_ADDRESS
