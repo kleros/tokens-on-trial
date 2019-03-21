@@ -6,7 +6,10 @@ import {
   fetchBadgesFailed
 } from '../actions/badges'
 import * as badgesSelectors from '../reducers/badges'
-import { arbitrableAddressListView, FROM_BLOCK } from '../bootstrap/dapp-api'
+import {
+  arbitrableAddressListView,
+  ETHFINEX_BADGE_BLOCK
+} from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
@@ -19,7 +22,7 @@ const fetchEvents = async (eventName, fromBlock) =>
 function* fetchBadges() {
   try {
     // Get the lastest status change for every token.
-    let statusBlockNumber = FROM_BLOCK
+    let statusBlockNumber = ETHFINEX_BADGE_BLOCK
     const latestStatusChanges = {}
     const badges = JSON.parse(
       JSON.stringify((yield select(badgesSelectors.getBadges)).data)

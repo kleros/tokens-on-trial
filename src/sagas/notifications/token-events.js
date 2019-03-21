@@ -2,7 +2,11 @@ import memoizeOne from 'memoize-one'
 
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
-import { arbitrableTokenListView, viewWeb3 } from '../../bootstrap/dapp-api'
+import {
+  arbitrableTokenListView,
+  viewWeb3,
+  T2CR_BLOCK
+} from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
 
@@ -36,7 +40,7 @@ const emitTokenNotifications = async (
       'RequestSubmitted',
       {
         filter: { _tokenID: returnValues._tokenID },
-        fromBlock: 0,
+        fromBlock: T2CR_BLOCK,
         toBlock: 'latest'
       }
     )

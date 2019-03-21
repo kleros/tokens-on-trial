@@ -17,7 +17,10 @@ import {
   arbitrableTokenListEvents,
   arbitrableAddressListEvents,
   arbitratorView,
-  arbitratorEvents
+  arbitratorEvents,
+  ETHFINEX_BADGE_BLOCK,
+  T2CR_BLOCK,
+  ARBITRATOR_BLOCK
 } from '../../bootstrap/dapp-api'
 
 import emitTokenNotifications from './token-events'
@@ -59,7 +62,7 @@ function* pushNotificationsListener() {
           fromBlock:
             localStorage.getItem(
               `${arbitrableTokenListView.options.address}nextEventsBlockNumber`
-            ) || 0
+            ) || T2CR_BLOCK
         })
         .then(events => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events)
@@ -83,7 +86,7 @@ function* pushNotificationsListener() {
               `${
                 arbitrableAddressListView.options.address
               }nextEventsBlockNumber`
-            ) || 0
+            ) || ETHFINEX_BADGE_BLOCK
         })
         .then(events => {
           emitBadgeNotifications(account, badgeTimeToChallenge, emit, events)
@@ -105,7 +108,7 @@ function* pushNotificationsListener() {
           fromBlock:
             localStorage.getItem(
               `${arbitratorView.options.address}nextEventsBlockNumber`
-            ) || 0
+            ) || ARBITRATOR_BLOCK
         })
         .then(events => {
           emitArbitratorNotifications(account, emit, events)

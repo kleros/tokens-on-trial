@@ -14,6 +14,7 @@ import {
   arbitrableTokenListEvents,
   arbitrableAddressListEvents,
   arbitratorEvents,
+  T2CR_BLOCK,
   viewWeb3,
   archon,
   FILE_BASE_URL,
@@ -311,7 +312,7 @@ class TokenDetails extends PureComponent {
           filter: {
             _evidenceGroupID: latestRequest.evidenceGroupID
           },
-          fromBlock: 0,
+          fromBlock: T2CR_BLOCK,
           toBlock: 'latest'
         })).map(async e => {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)

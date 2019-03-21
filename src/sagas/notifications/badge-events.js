@@ -5,7 +5,8 @@ import { contractStatusToClientStatus } from '../../utils/tcr'
 import {
   arbitrableAddressListView,
   arbitrableTokenListView,
-  viewWeb3
+  viewWeb3,
+  ETHFINEX_BADGE_BLOCK
 } from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
@@ -52,7 +53,7 @@ const emitBadgeNotifications = async (
       `RequestSubmitted`,
       {
         filter: { _address: returnValues._address },
-        fromBlock: 0,
+        fromBlock: ETHFINEX_BADGE_BLOCK,
         toBlock: `latest`
       }
     )

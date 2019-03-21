@@ -20,7 +20,7 @@ import {
   FILE_BASE_URL,
   IPFS_URL,
   onlyInfura,
-  FROM_BLOCK
+  ETHFINEX_BADGE_BLOCK
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
@@ -284,7 +284,7 @@ class BadgeDetails extends PureComponent {
           filter: {
             _evidenceGroupID: badge.latestRequest.evidenceGroupID
           },
-          fromBlock: FROM_BLOCK,
+          fromBlock: ETHFINEX_BADGE_BLOCK,
           toBlock: 'latest'
         })).map(async e => {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)

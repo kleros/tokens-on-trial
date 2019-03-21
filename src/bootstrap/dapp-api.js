@@ -20,7 +20,10 @@ const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
 const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
 const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
-const FROM_BLOCK = process.env[`REACT_APP_${env}_FROM_BLOCK`]
+const T2CR_BLOCK = process.env[`REACT_APP_${env}_T2CR_BLOCK`]
+const ARBITRATOR_BLOCK = process.env[`REACT_APP_${env}_ARBITRATOR_BLOCK`]
+const ETHFINEX_BADGE_BLOCK =
+  process.env[`REACT_APP_${env}_ETHFINEX_BADGE_BLOCK`]
 
 // We have to use 3 different providers:
 // 1. web3 - Injected by the browser. If available allows sending transactions
@@ -31,15 +34,15 @@ const FROM_BLOCK = process.env[`REACT_APP_${env}_FROM_BLOCK`]
 // rely on it to also view the data.
 // 3. viewWeb3 - Uses infura http to view blockchain data.
 //
-// In short, websockets are only used to receive subscribe to events.
+// In short, websockets are only used to subscribe to events.
 
 const websocketProvider = new Web3.providers.WebsocketProvider(WS_PROVIDER)
 websocketProvider.on('error', () => console.info('WS closed'))
 websocketProvider.on('end', () => console.info('WS closed'))
-const eventsWeb3 = new Web3(websocketProvider)
+let eventsWeb3 = new Web3(websocketProvider)
 
 const httpProvider = new Web3.providers.HttpProvider(HTTP_PROVIDER)
-const viewWeb3 = new Web3(httpProvider)
+let viewWeb3 = new Web3(httpProvider)
 
 let web3
 let onlyInfura = false
@@ -84,6 +87,10 @@ else {
     ARBITRABLE_ADDRESS_LIST_ADDRESS
   )
   arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+
+  // Also use injected web3 for viewing and event subscription.
+  viewWeb3 = web3
+  eventsWeb3 = web3
 }
 
 const archon = new Archon(HTTP_PROVIDER, 'https://ipfs.kleros.io')
@@ -143,5 +150,7 @@ export {
   arbitrableTokenListEvents,
   arbitratorEvents,
   arbitrableAddressListEvents,
-  FROM_BLOCK
+  T2CR_BLOCK,
+  ARBITRATOR_BLOCK,
+  ETHFINEX_BADGE_BLOCK
 }

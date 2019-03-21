@@ -9,7 +9,7 @@ import * as tokenSelectors from '../reducers/tokens'
 import {
   arbitrableTokenListView,
   viewWeb3,
-  FROM_BLOCK
+  T2CR_BLOCK
 } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
@@ -79,7 +79,7 @@ function* fetchTokens() {
           symbolMultihash: _symbolMultihash,
           blockNumber: event.blockNumber,
           ID: tokenID,
-          status: { blockNumber: FROM_BLOCK }
+          status: { blockNumber: T2CR_BLOCK }
         }
         return acc
       },
@@ -87,7 +87,7 @@ function* fetchTokens() {
     )
 
     // Get the lastest status change for every token.
-    let statusBlockNumber = FROM_BLOCK
+    let statusBlockNumber = T2CR_BLOCK
     const latestStatusChanges = {}
     const statusChanges = yield call(
       fetchEvents,
