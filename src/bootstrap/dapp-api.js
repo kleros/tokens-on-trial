@@ -34,37 +34,43 @@ let arbitrableTokenList
 let arbitrableAddressList
 let arbitrator
 if (!web3) onlyInfura = true
-else {
-  network =
-    web3.eth &&
-    web3.eth.net
-      .getId()
-      .then(networkID => {
-        switch (networkID) {
-          case 1:
-            return 'main'
-          case 3:
-            return 'ropsten'
-          case 4:
-            return 'rinkeby'
-          case 42:
-            return 'kovan'
-          default:
-            return null
-        }
-      })
-      .catch(() => null)
 
-  arbitrableTokenList = new web3.eth.Contract(
-    ArbitrableTokenList.abi,
-    ARBITRABLE_TOKEN_LIST_ADDRESS
-  )
-  arbitrableAddressList = new web3.eth.Contract(
-    ArbitrableAddressList.abi,
-    ARBITRABLE_ADDRESS_LIST_ADDRESS
-  )
-  arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
-}
+console.info('dapp api')
+
+setInterval(() => {
+  console.info('checking')
+  if (window.web3) {
+    network =
+      web3.eth &&
+      web3.eth.net
+        .getId()
+        .then(networkID => {
+          switch (networkID) {
+            case 1:
+              return 'main'
+            case 3:
+              return 'ropsten'
+            case 4:
+              return 'rinkeby'
+            case 42:
+              return 'kovan'
+            default:
+              return null
+          }
+        })
+        .catch(() => null)
+
+    arbitrableTokenList = new web3.eth.Contract(
+      ArbitrableTokenList.abi,
+      ARBITRABLE_TOKEN_LIST_ADDRESS
+    )
+    arbitrableAddressList = new web3.eth.Contract(
+      ArbitrableAddressList.abi,
+      ARBITRABLE_ADDRESS_LIST_ADDRESS
+    )
+    arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+  }
+}, 1000)
 
 const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
 
