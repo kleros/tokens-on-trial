@@ -26,15 +26,16 @@ const FROM_BLOCK = process.env[`REACT_APP_${env}_FROM_BLOCK`]
 // 1. web3 - Injected by the browser. If available allows sending transactions
 // 2. eventsWeb3 - Since infura no longer supports subscribing to events by http
 // we have to use websockets. Unfortunately, websockets are not reliable yet
-// as discussed here: https://github.com/INFURA/infura/issues/97 so we can't
-// get rely on it to also view the data.
+// as discussed here: https://github.com/INFURA/infura/issues/97,
+// and here https://github.com/INFURA/infura/issues/100 so we can't
+// rely on it to also view the data.
 // 3. viewWeb3 - Uses infura http to view blockchain data.
 //
 // In short, websockets are only used to receive subscribe to events.
 
 const websocketProvider = new Web3.providers.WebsocketProvider(WS_PROVIDER)
-websocketProvider.on('error', e => console.error('WS Error', e))
-websocketProvider.on('end', e => console.log('WS closed', e))
+websocketProvider.on('error', () => console.info('WS closed'))
+websocketProvider.on('end', () => console.info('WS closed'))
 const eventsWeb3 = new Web3(websocketProvider)
 
 const httpProvider = new Web3.providers.HttpProvider(HTTP_PROVIDER)
