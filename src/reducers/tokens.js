@@ -3,7 +3,11 @@ import {
   FETCH_TOKENS_CACHE,
   FETCH_TOKENS_FAILED
 } from '../actions/tokens'
-import { arbitrableTokenListView, APP_VERSION } from '../bootstrap/dapp-api'
+import {
+  arbitrableTokenListView,
+  APP_VERSION,
+  T2CR_BLOCK
+} from '../bootstrap/dapp-api'
 
 const cachedTokens = localStorage.getItem(
   `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
@@ -15,8 +19,8 @@ const initialState = cachedTokens
       loading: false,
       loadingFailed: false,
       data: {
-        blockNumber: 0,
-        statusBlockNumber: 0,
+        blockNumber: T2CR_BLOCK,
+        statusBlockNumber: T2CR_BLOCK,
         items: {},
         addressToIDs: {}
       }

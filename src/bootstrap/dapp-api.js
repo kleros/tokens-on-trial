@@ -19,6 +19,10 @@ const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
 const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
 const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
+const ARBITRATOR_BLOCK = process.env[`REACT_APP_${env}_ARBITRATOR_BLOCK`]
+const T2CR_BLOCK = process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_BLOCK`]
+const ETHFINEX_BADGE_BLOCK =
+  process.env[`REACT_APP_${env}_ARBITRABLE_ADDRESS_LIST_BLOCK`]
 
 let web3
 const viewWeb3 = new Web3(
@@ -108,5 +112,8 @@ export {
   APP_VERSION,
   arbitrableTokenListView,
   arbitratorView,
-  arbitrableAddressListView
+  arbitrableAddressListView,
+  ARBITRATOR_BLOCK,
+  T2CR_BLOCK,
+  ETHFINEX_BADGE_BLOCK
 }
