@@ -89,6 +89,7 @@ if (window.web3) {
   const web3Poll = setInterval(() => {
     console.info('checking', test)
     if (window.web3) {
+      web3 = window.web3
       network =
         web3.eth &&
         web3.eth.net
