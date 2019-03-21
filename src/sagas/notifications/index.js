@@ -61,7 +61,11 @@ function* pushNotificationsListener() {
         .then(events => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events)
         })
-      arbitrableTokenListView.events.TokenStatusChange().on('data', event => {
+      arbitrableTokenListView.events.TokenStatusChange((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
           emitTokenNotifications(account, t2crTimeToChallenge, emit, [event])
@@ -81,14 +85,16 @@ function* pushNotificationsListener() {
         .then(events => {
           emitBadgeNotifications(account, badgeTimeToChallenge, emit, events)
         })
-      arbitrableAddressListView.events
-        .AddressStatusChange()
-        .on('data', event => {
-          if (!txHashes[event.transactionHash]) {
-            txHashes[event.transactionHash] = true
-            emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event])
-          }
-        })
+      arbitrableAddressListView.events.AddressStatusChange((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        if (!txHashes[event.transactionHash]) {
+          txHashes[event.transactionHash] = true
+          emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event])
+        }
+      })
 
       // Arbitator events
       arbitratorView
@@ -101,7 +107,11 @@ function* pushNotificationsListener() {
         .then(events => {
           emitArbitratorNotifications(account, emit, events)
         })
-      arbitratorView.events.AppealPossible().on('data', event => {
+      arbitratorView.events.AppealPossible((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
           emitArbitratorNotifications(account, emit, [event])

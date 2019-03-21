@@ -158,15 +158,27 @@ class BadgeDetails extends PureComponent {
     const { match, fetchBadge } = this.props
     const { tokenAddr } = match.params
     fetchBadge(tokenAddr)
-    arbitrableAddressListView.events.RewardWithdrawal().on('data', event => {
+    arbitrableAddressListView.events.RewardWithdrawal((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
     })
-    arbitrableAddressListView.events.AddressStatusChange().on('data', event => {
+    arbitrableAddressListView.events.AddressStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
     })
-    arbitratorView.events.AppealPossible().on('data', event => {
+    arbitratorView.events.AppealPossible((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { badge } = this.state
       if (!badge) return
       const { latestRequest } = badge
@@ -177,7 +189,11 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr)
     })
-    arbitrableAddressListView.events.Ruling().on('data', event => {
+    arbitrableAddressListView.events.Ruling((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { badge } = this.state
       if (!badge) return
       const { latestRequest } = badge

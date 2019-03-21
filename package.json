@@ -1,6 +1,6 @@
 {
   "name": "token-on-trial",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Kleros' token curated list of tokens.",
   "keywords": [
     "blockchain",
@@ -91,7 +91,7 @@
     "redux-saga": "^0.16.0",
     "redux-unhandled-action": "^1.3.0",
     "timeago-react": "^2.0.0",
-    "web3": "1.0.0-beta.34"
+    "web3": "1.0.0-beta.33"
   },
   "browserslist": [
     ">0.2%",

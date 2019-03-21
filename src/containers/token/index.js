@@ -130,7 +130,11 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken, accounts } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
-    arbitrableTokenListView.events.Ruling().on('data', event => {
+    arbitrableTokenListView.events.Ruling((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { token } = this.state
       if (!token) return
       const { latestRequest } = token
@@ -142,7 +146,11 @@ class TokenDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
-    arbitrableTokenListView.events.RewardWithdrawal().on('data', event => {
+    arbitrableTokenListView.events.RewardWithdrawal((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { token } = this.state
       if (
         !token ||
@@ -152,13 +160,21 @@ class TokenDetails extends PureComponent {
         return
       fetchToken(event.returnValues._tokenID)
     })
-    arbitrableTokenListView.events.TokenStatusChange().on('data', event => {
+    arbitrableTokenListView.events.TokenStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { token } = this.state
       if (!token) return
 
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitratorView.events.AppealPossible().on('data', event => {
+    arbitratorView.events.AppealPossible((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { token } = this.state
       if (!token) return
 
@@ -171,16 +187,23 @@ class TokenDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
-    arbitrableAddressListView.events.AddressStatusChange().on('data', event => {
+    arbitrableAddressListView.events.AddressStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { token } = this.state
       if (!token) return
 
       if (token.addr === event.returnValues._address) fetchToken(tokenID)
     })
-    arbitrableTokenListView.events.TokenStatusChange().on('data', event => {
+    arbitrableTokenListView.events.TokenStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
       const { token } = this.state
       if (!token) return
-
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
   }

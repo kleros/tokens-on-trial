@@ -21,7 +21,9 @@ const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
 const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
 
 let web3
-const viewWeb3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
+const viewWeb3 = new Web3(
+  new Web3.providers.WebsocketProvider(ETHEREUM_PROVIDER)
+)
 let onlyInfura = false
 if (process.env.NODE_ENV === 'test')
   web3 = new Web3(require('ganache-cli').provider())
