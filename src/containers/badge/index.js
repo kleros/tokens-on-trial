@@ -12,13 +12,15 @@ import Archon from '@kleros/archon'
 
 import {
   arbitrableAddressListView,
-  arbitratorView,
+  arbitrableAddressListEvents,
+  arbitratorEvents,
   viewWeb3,
   ETHFINEX_CRITERIA_URL,
   archon,
   FILE_BASE_URL,
   IPFS_URL,
-  onlyInfura
+  onlyInfura,
+  FROM_BLOCK
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
@@ -158,7 +160,7 @@ class BadgeDetails extends PureComponent {
     const { match, fetchBadge } = this.props
     const { tokenAddr } = match.params
     fetchBadge(tokenAddr)
-    arbitrableAddressListView.events.RewardWithdrawal((err, event) => {
+    arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -166,7 +168,7 @@ class BadgeDetails extends PureComponent {
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
     })
-    arbitrableAddressListView.events.AddressStatusChange((err, event) => {
+    arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -174,7 +176,7 @@ class BadgeDetails extends PureComponent {
       const { tokenAddr } = match.params
       if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
     })
-    arbitratorView.events.AppealPossible((err, event) => {
+    arbitratorEvents.events.AppealPossible((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -189,7 +191,7 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr)
     })
-    arbitrableAddressListView.events.Ruling((err, event) => {
+    arbitrableAddressListEvents.events.Ruling((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -204,6 +206,46 @@ class BadgeDetails extends PureComponent {
             Number(event.returnValues._disputeID))
       )
         fetchBadge(tokenAddr)
+    })
+    arbitrableAddressListEvents.events.Evidence(async (err, e) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { badge } = this.state
+      if (!badge) return
+      const { latestRequest } = badge
+      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+        return
+
+      const evidence = await (await fetch(
+        `${IPFS_URL}${e.returnValues._evidence}`
+      )).json()
+      /* eslint-disable unicorn/number-literal-case */
+      const calculatedMultihash = archon.utils.multihashFile(
+        evidence,
+        0x1b // keccak-256
+      )
+
+      if (
+        !(await Archon.utils.validateFileFromURI(
+          `${IPFS_URL}${e.returnValues._evidence}`,
+          { hash: calculatedMultihash }
+        ))
+      ) {
+        console.warn('Invalid evidence', evidence)
+        return
+      }
+
+      const { evidences } = this.state
+      const mimeType = mime.lookup(evidence.fileTypeExtension)
+      evidence.icon = getFileIcon(mimeType)
+      this.setState({
+        evidences: {
+          ...evidences,
+          [e.transactionHash]: evidence
+        }
+      })
     })
   }
 
@@ -242,7 +284,7 @@ class BadgeDetails extends PureComponent {
           filter: {
             _evidenceGroupID: badge.latestRequest.evidenceGroupID
           },
-          fromBlock: 0,
+          fromBlock: FROM_BLOCK,
           toBlock: 'latest'
         })).map(async e => {
           if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)

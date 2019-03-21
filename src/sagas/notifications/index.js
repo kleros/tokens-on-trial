@@ -14,7 +14,10 @@ import { action } from '../../utils/action'
 import {
   arbitrableTokenListView,
   arbitrableAddressListView,
-  arbitratorView
+  arbitrableTokenListEvents,
+  arbitrableAddressListEvents,
+  arbitratorView,
+  arbitratorEvents
 } from '../../bootstrap/dapp-api'
 
 import emitTokenNotifications from './token-events'
@@ -61,7 +64,7 @@ function* pushNotificationsListener() {
         .then(events => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events)
         })
-      arbitrableTokenListView.events.TokenStatusChange((err, event) => {
+      arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
         if (err) {
           console.error(err)
           return
@@ -85,7 +88,7 @@ function* pushNotificationsListener() {
         .then(events => {
           emitBadgeNotifications(account, badgeTimeToChallenge, emit, events)
         })
-      arbitrableAddressListView.events.AddressStatusChange((err, event) => {
+      arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
         if (err) {
           console.error(err)
           return
@@ -107,7 +110,7 @@ function* pushNotificationsListener() {
         .then(events => {
           emitArbitratorNotifications(account, emit, events)
         })
-      arbitratorView.events.AppealPossible((err, event) => {
+      arbitratorEvents.events.AppealPossible((err, event) => {
         if (err) {
           console.error(err)
           return

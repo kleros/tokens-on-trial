@@ -11,8 +11,9 @@ import Archon from '@kleros/archon'
 
 import {
   arbitrableTokenListView,
-  arbitrableAddressListView,
-  arbitratorView,
+  arbitrableTokenListEvents,
+  arbitrableAddressListEvents,
+  arbitratorEvents,
   viewWeb3,
   archon,
   FILE_BASE_URL,
@@ -130,7 +131,7 @@ class TokenDetails extends PureComponent {
     const { match, fetchToken, accounts } = this.props
     const { tokenID } = match.params
     fetchToken(tokenID)
-    arbitrableTokenListView.events.Ruling((err, event) => {
+    arbitrableTokenListEvents.events.Ruling((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -146,7 +147,7 @@ class TokenDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
-    arbitrableTokenListView.events.RewardWithdrawal((err, event) => {
+    arbitrableTokenListEvents.events.RewardWithdrawal((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -160,7 +161,7 @@ class TokenDetails extends PureComponent {
         return
       fetchToken(event.returnValues._tokenID)
     })
-    arbitrableTokenListView.events.TokenStatusChange((err, event) => {
+    arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -170,7 +171,7 @@ class TokenDetails extends PureComponent {
 
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitratorView.events.AppealPossible((err, event) => {
+    arbitratorEvents.events.AppealPossible((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -187,7 +188,7 @@ class TokenDetails extends PureComponent {
       )
         fetchToken(tokenID)
     })
-    arbitrableAddressListView.events.AddressStatusChange((err, event) => {
+    arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -197,7 +198,7 @@ class TokenDetails extends PureComponent {
 
       if (token.addr === event.returnValues._address) fetchToken(tokenID)
     })
-    arbitrableTokenListView.events.TokenStatusChange((err, event) => {
+    arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
       if (err) {
         console.error(err)
         return
@@ -205,6 +206,46 @@ class TokenDetails extends PureComponent {
       const { token } = this.state
       if (!token) return
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
+    })
+    arbitrableTokenListEvents.events.Evidence(async (err, e) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (!token) return
+      const { latestRequest } = token
+      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+        return
+
+      const evidence = await (await fetch(
+        `${IPFS_URL}${e.returnValues._evidence}`
+      )).json()
+      /* eslint-disable unicorn/number-literal-case */
+      const calculatedMultihash = archon.utils.multihashFile(
+        evidence,
+        0x1b // keccak-256
+      )
+
+      if (
+        !(await Archon.utils.validateFileFromURI(
+          `${IPFS_URL}${e.returnValues._evidence}`,
+          { hash: calculatedMultihash }
+        ))
+      ) {
+        console.warn('Invalid evidence', evidence)
+        return
+      }
+
+      const { evidences } = this.state
+      const mimeType = mime.lookup(evidence.fileTypeExtension)
+      evidence.icon = getFileIcon(mimeType)
+      this.setState({
+        evidences: {
+          ...evidences,
+          [e.transactionHash]: evidence
+        }
+      })
     })
   }
 
@@ -259,9 +300,7 @@ class TokenDetails extends PureComponent {
     const { token, fetching, evidenceListenerSet } = this.state
     const { tokenID } = match.params
     if (!token) return
-
     if (token && token.ID !== tokenID && !fetching) window.location.reload(true)
-
     if (evidenceListenerSet) return
 
     const { latestRequest } = token

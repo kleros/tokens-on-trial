@@ -6,7 +6,7 @@ import {
 import {
   arbitrableTokenListView,
   APP_VERSION,
-  T2CR_BLOCK
+  FROM_BLOCK
 } from '../bootstrap/dapp-api'
 
 const cachedTokens = localStorage.getItem(
@@ -19,8 +19,8 @@ const initialState = cachedTokens
       loading: false,
       loadingFailed: false,
       data: {
-        blockNumber: T2CR_BLOCK,
-        statusBlockNumber: T2CR_BLOCK,
+        blockNumber: FROM_BLOCK,
+        statusBlockNumber: FROM_BLOCK,
         items: {},
         addressToIDs: {}
       }

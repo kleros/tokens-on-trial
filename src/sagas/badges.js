@@ -6,7 +6,7 @@ import {
   fetchBadgesFailed
 } from '../actions/badges'
 import * as badgesSelectors from '../reducers/badges'
-import { arbitrableAddressListView } from '../bootstrap/dapp-api'
+import { arbitrableAddressListView, FROM_BLOCK } from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
@@ -19,7 +19,7 @@ const fetchEvents = async (eventName, fromBlock) =>
 function* fetchBadges() {
   try {
     // Get the lastest status change for every token.
-    let statusBlockNumber = 0
+    let statusBlockNumber = FROM_BLOCK
     const latestStatusChanges = {}
     const badges = JSON.parse(
       JSON.stringify((yield select(badgesSelectors.getBadges)).data)

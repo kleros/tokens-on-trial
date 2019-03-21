@@ -44,6 +44,7 @@ window.addEventListener('unload', () => {
     `${arbitrableAddressList.options.address}badges@${APP_VERSION}`,
     JSON.stringify(store.getState().badges)
   )
+  localStorage.clear()
 })
 
 if (module.hot)

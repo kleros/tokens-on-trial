@@ -6,7 +6,11 @@ import {
   fetchTokensFailed
 } from '../actions/tokens'
 import * as tokenSelectors from '../reducers/tokens'
-import { arbitrableTokenListView, viewWeb3 } from '../bootstrap/dapp-api'
+import {
+  arbitrableTokenListView,
+  viewWeb3,
+  FROM_BLOCK
+} from '../bootstrap/dapp-api'
 import { contractStatusToClientStatus } from '../utils/tcr'
 
 const fetchEvents = async (eventName, fromBlock) =>
@@ -75,7 +79,7 @@ function* fetchTokens() {
           symbolMultihash: _symbolMultihash,
           blockNumber: event.blockNumber,
           ID: tokenID,
-          status: { blockNumber: 0 }
+          status: { blockNumber: FROM_BLOCK }
         }
         return acc
       },
@@ -83,7 +87,7 @@ function* fetchTokens() {
     )
 
     // Get the lastest status change for every token.
-    let statusBlockNumber = 0
+    let statusBlockNumber = FROM_BLOCK
     const latestStatusChanges = {}
     const statusChanges = yield call(
       fetchEvents,

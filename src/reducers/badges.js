@@ -6,7 +6,7 @@ import {
 import {
   arbitrableAddressListView,
   APP_VERSION,
-  ETHFINEX_BADGE_BLOCK
+  FROM_BLOCK
 } from '../bootstrap/dapp-api'
 
 const cachedBadges = localStorage.getItem(
@@ -18,7 +18,7 @@ const initialState = cachedBadges
   : {
       loading: false,
       data: {
-        statusBlockNumber: ETHFINEX_BADGE_BLOCK,
+        statusBlockNumber: FROM_BLOCK,
         items: {}
       }
     }

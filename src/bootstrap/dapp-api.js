@@ -7,7 +7,8 @@ import Arbitrator from '../assets/contracts/arbitrator.json'
 
 const env = process.env.NODE_ENV === 'production' ? 'PROD' : 'DEV'
 const requiredNetwork = process.env[`REACT_APP_${env}_NETWORK`]
-const ETHEREUM_PROVIDER = process.env[`REACT_APP_${env}_ETHEREUM_PROVIDER`]
+const WS_PROVIDER = process.env[`REACT_APP_${env}_WS_PROVIDER`]
+const HTTP_PROVIDER = process.env[`REACT_APP_${env}_HTTP_PROVIDER`]
 const ARBITRABLE_TOKEN_LIST_ADDRESS =
   process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
 export const ARBITRABLE_ADDRESS_LIST_ADDRESS =
@@ -19,15 +20,27 @@ const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
 const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
 const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
-const ARBITRATOR_BLOCK = process.env[`REACT_APP_${env}_ARBITRATOR_BLOCK`]
-const T2CR_BLOCK = process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_BLOCK`]
-const ETHFINEX_BADGE_BLOCK =
-  process.env[`REACT_APP_${env}_ARBITRABLE_ADDRESS_LIST_BLOCK`]
+const FROM_BLOCK = process.env[`REACT_APP_${env}_FROM_BLOCK`]
+
+// We have to use 3 different providers:
+// 1. web3 - Injected by the browser. If available allows sending transactions
+// 2. eventsWeb3 - Since infura no longer supports subscribing to events by http
+// we have to use websockets. Unfortunately, websockets are not reliable yet
+// as discussed here: https://github.com/INFURA/infura/issues/97 so we can't
+// get rely on it to also view the data.
+// 3. viewWeb3 - Uses infura http to view blockchain data.
+//
+// In short, websockets are only used to receive subscribe to events.
+
+const websocketProvider = new Web3.providers.WebsocketProvider(WS_PROVIDER)
+websocketProvider.on('error', e => console.error('WS Error', e))
+websocketProvider.on('end', e => console.log('WS closed', e))
+const eventsWeb3 = new Web3(websocketProvider)
+
+const httpProvider = new Web3.providers.HttpProvider(HTTP_PROVIDER)
+const viewWeb3 = new Web3(httpProvider)
 
 let web3
-const viewWeb3 = new Web3(
-  new Web3.providers.WebsocketProvider(ETHEREUM_PROVIDER)
-)
 let onlyInfura = false
 if (process.env.NODE_ENV === 'test')
   web3 = new Web3(require('ganache-cli').provider())
@@ -72,7 +85,7 @@ else {
   arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
 }
 
-const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
+const archon = new Archon(HTTP_PROVIDER, 'https://ipfs.kleros.io')
 
 const ETHAddressRegExpCaptureGroup = '(0x[a-fA-F0-9]{40})'
 const ETHAddressRegExp = /0x[a-fA-F0-9]{40}/
@@ -87,6 +100,19 @@ const arbitrableAddressListView = new viewWeb3.eth.Contract(
   ARBITRABLE_ADDRESS_LIST_ADDRESS
 )
 const arbitratorView = new viewWeb3.eth.Contract(
+  Arbitrator.abi,
+  ARBITRATOR_ADDRESS
+)
+
+const arbitrableTokenListEvents = new eventsWeb3.eth.Contract(
+  ArbitrableTokenList.abi,
+  ARBITRABLE_TOKEN_LIST_ADDRESS
+)
+const arbitrableAddressListEvents = new eventsWeb3.eth.Contract(
+  ArbitrableAddressList.abi,
+  ARBITRABLE_ADDRESS_LIST_ADDRESS
+)
+const arbitratorEvents = new eventsWeb3.eth.Contract(
   Arbitrator.abi,
   ARBITRATOR_ADDRESS
 )
@@ -113,7 +139,8 @@ export {
   arbitrableTokenListView,
   arbitratorView,
   arbitrableAddressListView,
-  ARBITRATOR_BLOCK,
-  T2CR_BLOCK,
-  ETHFINEX_BADGE_BLOCK
+  arbitrableTokenListEvents,
+  arbitratorEvents,
+  arbitrableAddressListEvents,
+  FROM_BLOCK
 }
