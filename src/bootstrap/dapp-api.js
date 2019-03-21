@@ -19,61 +19,9 @@ const ETHFINEX_CRITERIA_URL =
   process.env[`REACT_APP_${env}_ETHFINEX_CRITERIA_URL`]
 const IPFS_URL = process.env[`REACT_APP_${env}_IPFS_URL`]
 const APP_VERSION = process.env[`REACT_APP_${env}_VERSION`]
-
-let web3
-const viewWeb3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
-let onlyInfura = false
-if (process.env.NODE_ENV === 'test')
-  web3 = new Web3(require('ganache-cli').provider())
-else if (window.ethereum) web3 = new Web3(window.ethereum)
-else if (window.web3 && window.web3.currentProvider)
-  web3 = new Web3(window.web3.currentProvider)
-
-let network
-let arbitrableTokenList
-let arbitrableAddressList
-let arbitrator
-if (!web3) onlyInfura = true
-
-console.info('dapp api')
-
-setInterval(() => {
-  console.info('checking')
-  if (window.web3) {
-    network =
-      web3.eth &&
-      web3.eth.net
-        .getId()
-        .then(networkID => {
-          switch (networkID) {
-            case 1:
-              return 'main'
-            case 3:
-              return 'ropsten'
-            case 4:
-              return 'rinkeby'
-            case 42:
-              return 'kovan'
-            default:
-              return null
-          }
-        })
-        .catch(() => null)
-
-    arbitrableTokenList = new web3.eth.Contract(
-      ArbitrableTokenList.abi,
-      ARBITRABLE_TOKEN_LIST_ADDRESS
-    )
-    arbitrableAddressList = new web3.eth.Contract(
-      ArbitrableAddressList.abi,
-      ARBITRABLE_ADDRESS_LIST_ADDRESS
-    )
-    arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
-  }
-}, 1000)
-
 const archon = new Archon(ETHEREUM_PROVIDER, 'https://ipfs.kleros.io')
 
+const viewWeb3 = new Web3(new Web3.providers.HttpProvider(ETHEREUM_PROVIDER))
 const ETHAddressRegExpCaptureGroup = '(0x[a-fA-F0-9]{40})'
 const ETHAddressRegExp = /0x[a-fA-F0-9]{40}/
 const strictETHAddressRegExp = /^0x[a-fA-F0-9]{40}$/
@@ -90,6 +38,93 @@ const arbitratorView = new viewWeb3.eth.Contract(
   Arbitrator.abi,
   ARBITRATOR_ADDRESS
 )
+
+let web3
+let onlyInfura = false
+if (process.env.NODE_ENV === 'test')
+  web3 = new Web3(require('ganache-cli').provider())
+else if (window.ethereum) web3 = new Web3(window.ethereum)
+else if (window.web3 && window.web3.currentProvider)
+  web3 = new Web3(window.web3.currentProvider)
+
+let network
+let arbitrableTokenList
+let arbitrableAddressList
+let arbitrator
+if (!web3) onlyInfura = true
+
+if (window.web3) {
+  network =
+    web3.eth &&
+    web3.eth.net
+      .getId()
+      .then(networkID => {
+        switch (networkID) {
+          case 1:
+            return 'main'
+          case 3:
+            return 'ropsten'
+          case 4:
+            return 'rinkeby'
+          case 42:
+            return 'kovan'
+          default:
+            return null
+        }
+      })
+      .catch(() => null)
+
+  arbitrableTokenList = new web3.eth.Contract(
+    ArbitrableTokenList.abi,
+    ARBITRABLE_TOKEN_LIST_ADDRESS
+  )
+  arbitrableAddressList = new web3.eth.Contract(
+    ArbitrableAddressList.abi,
+    ARBITRABLE_ADDRESS_LIST_ADDRESS
+  )
+  arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+} else {
+  // poll
+  const test = 'poller'
+  const web3Poll = setInterval(() => {
+    console.info('checking', test)
+    if (window.web3) {
+      network =
+        web3.eth &&
+        web3.eth.net
+          .getId()
+          .then(networkID => {
+            switch (networkID) {
+              case 1:
+                return 'main'
+              case 3:
+                return 'ropsten'
+              case 4:
+                return 'rinkeby'
+              case 42:
+                return 'kovan'
+              default:
+                return null
+            }
+          })
+          .catch(() => null)
+
+      arbitrableTokenList = new web3.eth.Contract(
+        ArbitrableTokenList.abi,
+        ARBITRABLE_TOKEN_LIST_ADDRESS
+      )
+      arbitrableAddressList = new web3.eth.Contract(
+        ArbitrableAddressList.abi,
+        ARBITRABLE_ADDRESS_LIST_ADDRESS
+      )
+      arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+      onlyInfura = false
+      clearInterval(web3Poll)
+    }
+  }, 1000)
+}
+
+console.info('exporting')
 
 export {
   web3,
