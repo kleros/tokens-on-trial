@@ -624,11 +624,13 @@ class BadgeDetails extends PureComponent {
                             'Waiting Next Period'
                           ) : (
                             <>
-                              {`${
-                                tcrConstants.PERIOD_STRINGS[
-                                  latestRequest.dispute.period
-                                ]
-                              }`}
+                              <span style={{ marginRight: '6px' }}>
+                                {
+                                  tcrConstants.PERIOD_STRINGS[
+                                    latestRequest.dispute.period
+                                  ]
+                                }
+                              </span>
                               <Countdown
                                 date={Date.now() + periodRemainingTime}
                                 renderer={CountdownRenderer}

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 import * as tcrConstants from '../../constants/tcr'
 import EtherScanLogo from '../../assets/images/etherscan.png'
-import { getBadgeStyle } from '../../utils/ui'
+import { getBadgeStyle, userFriendlyLabel } from '../../utils/ui'
 import { FILE_BASE_URL, IPFS_URL } from '../../bootstrap/dapp-api'
 
 import './token-card.css'
@@ -51,7 +51,7 @@ const TokenCard = ({ token, badge }) => (
             color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
             icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
           />
-          {tcrConstants.STATUS_ENUM[token.clientStatus]}
+          {userFriendlyLabel[tcrConstants.STATUS_ENUM[token.clientStatus]]}
         </div>
         <Img
           alt="Token List Submission"
