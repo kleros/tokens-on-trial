@@ -53,7 +53,7 @@ const TokenCard = ({ token, badge }) => (
           />
           {userFriendlyLabel[tcrConstants.STATUS_ENUM[token.clientStatus]]}
         </div>
-        <Img
+        <img
           alt="Token List Submission"
           className="TokenCard-image"
           src={`${
