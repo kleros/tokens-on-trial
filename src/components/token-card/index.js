@@ -54,7 +54,7 @@ const TokenCard = ({ token, badge }) => (
           {userFriendlyLabel[tcrConstants.STATUS_ENUM[token.clientStatus]]}
         </div>
         <img
-          alt="Token List Submission"
+          alt="Token Submission"
           className="TokenCard-image"
           src={`${
             token.symbolMultihash && token.symbolMultihash[0] === '/'

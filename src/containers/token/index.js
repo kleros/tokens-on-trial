@@ -543,7 +543,8 @@ class TokenDetails extends PureComponent {
         </div>
         <hr className="TokenDescription-separator" />
         <div className="TokenDetails">
-          <Img
+          <img
+            alt="Token Symbol"
             className="TokenDetails-img"
             src={`${
               token.symbolMultihash && token.symbolMultihash[0] === '/'
