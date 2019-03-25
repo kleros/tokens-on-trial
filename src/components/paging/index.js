@@ -12,7 +12,9 @@ const Paging = ({
   totalPages
 }) => (
   <div className="Paging">
-    <span>{`Page ${currentPage + 1} of ${totalPages}`}</span>
+    <span>{`Page ${currentPage + 1} of ${
+      totalPages === 0 ? 1 : totalPages
+    }`}</span>
     <div className="Paging-navigation">
       <button
         className={`Paging-navigation-button ${
@@ -37,7 +39,7 @@ const Paging = ({
           currentPage === totalPages - 1 ? '' : 'Paging-navigation-clickable'
         }`}
         onClick={onNextPageClick}
-        disabled={currentPage === totalPages - 1}
+        disabled={totalPages === 0 || currentPage === totalPages - 1}
       >
         Next
       </button>
@@ -47,7 +49,7 @@ const Paging = ({
           currentPage === totalPages - 1 ? '' : 'Paging-navigation-clickable'
         }`}
         onClick={() => onLastPageClick(totalPages - 1)}
-        disabled={currentPage === totalPages - 1}
+        disabled={totalPages === 0 || currentPage === totalPages - 1}
       >
         Last
       </button>
