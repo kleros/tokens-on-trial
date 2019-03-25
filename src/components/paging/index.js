@@ -36,7 +36,9 @@ const Paging = ({
       </button>
       <button
         className={`Paging-navigation-button ${
-          currentPage === totalPages - 1 ? '' : 'Paging-navigation-clickable'
+          totalPages === 0 || currentPage === totalPages - 1
+            ? ''
+            : 'Paging-navigation-clickable'
         }`}
         onClick={onNextPageClick}
         disabled={totalPages === 0 || currentPage === totalPages - 1}
@@ -46,7 +48,9 @@ const Paging = ({
       {/* eslint-disable react/jsx-no-bind */}
       <button
         className={`Paging-navigation-button ${
-          currentPage === totalPages - 1 ? '' : 'Paging-navigation-clickable'
+          totalPages === 0 || currentPage === totalPages - 1
+            ? ''
+            : 'Paging-navigation-clickable'
         }`}
         onClick={() => onLastPageClick(totalPages - 1)}
         disabled={totalPages === 0 || currentPage === totalPages - 1}
