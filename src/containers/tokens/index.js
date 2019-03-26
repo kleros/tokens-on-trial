@@ -112,7 +112,11 @@ class Tokens extends Component {
           handleFilterChange={this.handleFilterChange}
           filterVisible
         />
-        <SortBar displayedItemsCount={displayedTokens.length} items={tokens} />
+        <SortBar
+          displayedItemsCount={displayedTokens.length}
+          items={tokens}
+          totalFiltered={filteredTokens.length}
+        />
         <div className="TokenGrid">
           <div className="TokenGrid-container">
             {displayedTokens.length === 0 && !tokens.loading ? (

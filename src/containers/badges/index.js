@@ -113,7 +113,11 @@ class Badges extends Component {
           handleFilterChange={this.handleFilterChange}
           filterVisible
         />
-        <SortBar displayedItemsCount={displayedBadges.length} items={badges} />
+        <SortBar
+          displayedItemsCount={displayedBadges.length}
+          items={badges}
+          totalFiltered={filteredBadges.length}
+        />
         <div className="BadgeGrid">
           <div className="BadgeGrid-container">
             {displayedBadges.length === 0 && !badges.loading ? (

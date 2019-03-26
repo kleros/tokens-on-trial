@@ -19,6 +19,7 @@ class SortBar extends PureComponent {
     }).isRequired,
     filter: filterSelectors.filterShape.isRequired,
     displayedItemsCount: PropTypes.number.isRequired,
+    totalFiltered: PropTypes.number.isRequired,
 
     // Action Dispatchers
     setOldestFirst: PropTypes.func.isRequired
@@ -30,16 +31,14 @@ class SortBar extends PureComponent {
   }
 
   render() {
-    const { displayedItemsCount, items, filter } = this.props
+    const { displayedItemsCount, items, filter, totalFiltered } = this.props
     const { oldestFirst } = filter
 
     return (
       <div className="SortBar">
         <div className="SortBar-count">
           {!items.loading || displayedItemsCount > 0
-            ? `${displayedItemsCount} of ${
-                Object.keys(items.data.items).length
-              }`
+            ? `${displayedItemsCount} of ${totalFiltered}`
             : 'Loading submissions...'}
         </div>
         <div className="SortBar-sort">
