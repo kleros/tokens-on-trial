@@ -161,6 +161,12 @@ class _ConnectedNavBar extends Component {
                 title: 'Ethfinex Guide',
                 to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
                 extraStyle: 'NavBar-route-title'
+              },
+              {
+                title: 'Crowdfunding Guide',
+                to:
+                  'https://blog.kleros.io/kleros-decentralized-token-listing-appeal-fees/',
+                extraStyle: 'NavBar-route-title'
               }
             ]
           }
