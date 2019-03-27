@@ -17,7 +17,7 @@ export default class NavBar extends PureComponent {
         isExternal: PropTypes.bool
       }).isRequired
     ).isRequired,
-    extraRoutes: PropTypes.arrayOf(
+    submenus: PropTypes.arrayOf(
       PropTypes.shape({
         title: PropTypes.node.isRequired
       }).isRequired
@@ -54,7 +54,7 @@ export default class NavBar extends PureComponent {
   }
 
   render() {
-    const { routes, extras, extraRoutes, action } = this.props
+    const { routes, extras, submenus, action } = this.props
     const { isMobile, isOpen } = this.state
 
     const logoImg = <img alt="Logo" className="NavBar-logo" src={logo} />
@@ -74,22 +74,58 @@ export default class NavBar extends PureComponent {
           </Link>
         </div>
       )),
-      ...extraRoutes.map(r => (
-        <div key={r.title}>
-          <a
-            className={`NavBar-route ${r.extraStyle}`}
-            style={{ height: '55px' }}
-            rel="noopener noreferrer"
-            target="_blank"
-            href={r.to}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-              {r.title}
-              <i style={{ fontSize: '10px', letterSpacing: 0 }}>{r.subtitle}</i>
+      ...submenus.map(s => {
+        if (!isMobile)
+          return (
+            <div
+              key={s.title}
+              className={`NavBar-route ${s.extraStyle} NavBar-submenu`}
+            >
+              {s.title}
+              <ul className="NavBar-submenu-list">
+                {s.routes.map(r => (
+                  <a
+                    className={`NavBar-route ${
+                      r.extraStyle
+                    } NavBar-submenu-item`}
+                    style={{ height: '55px' }}
+                    rel="noopener noreferrer"
+                    target="_blank"
+                    href={r.to}
+                    key={r.title}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                      {r.title}
+                      <i style={{ fontSize: '10px', letterSpacing: 0 }}>
+                        {r.subtitle}
+                      </i>
+                    </div>
+                  </a>
+                ))}
+              </ul>
             </div>
-          </a>
-        </div>
-      )),
+          )
+        else
+          return s.routes.map(r => (
+            <div key={r.title}>
+              <a
+                className={`NavBar-route ${r.extraStyle}`}
+                style={{ height: '55px' }}
+                rel="noopener noreferrer"
+                target="_blank"
+                href={r.to}
+                key={r.to}
+              >
+                <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                  {r.title}
+                  <i style={{ fontSize: '10px', letterSpacing: 0 }}>
+                    {r.subtitle}
+                  </i>
+                </div>
+              </a>
+            </div>
+          ))
+      }),
       ...extras
         .filter(() => !isMobile)
         .map((e, i) => (
