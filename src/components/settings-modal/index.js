@@ -20,6 +20,7 @@ class SettingsModal extends PureComponent {
     isSettingsModalOpen: PropTypes.oneOf([true, false]).isRequired,
     settings: walletSelectors.settingsShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
+    envObjects: PropTypes.shape({}).isRequired,
 
     // Handlers
     closeSettingsModal: PropTypes.func.isRequired,

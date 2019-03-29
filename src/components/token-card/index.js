@@ -12,7 +12,7 @@ import { IPFS_URL } from '../../bootstrap/dapp-api'
 
 import './token-card.css'
 
-const TokenCard = ({ token, badge, fileBaseURL, envObjects }) => {
+const TokenCard = ({ token, badge, envObjects }) => {
   const { FILE_BASE_URL } = envObjects
   return (
     <div className="TokenCard">
@@ -107,7 +107,8 @@ TokenCard.propTypes = {
       disputed: PropTypes.bool.isRequired,
       status: PropTypes.number.isRequired
     })
-  })
+  }),
+  envObjects: PropTypes.shape({}).isRequired
 }
 
 TokenCard.defaultProps = {

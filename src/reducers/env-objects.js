@@ -25,7 +25,7 @@ export { envObjectsShape }
 
 // Reducer
 export default createReducer(envObjectsInitialState, {
-  [envObjectActions.SET_ENV_OBJECTS]: (state, action) => ({
+  [envObjectActions.SET_ENV_OBJECTS]: (_, action) => ({
     data: action.payload.data
   })
 })

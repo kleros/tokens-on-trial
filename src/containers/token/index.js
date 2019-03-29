@@ -56,6 +56,7 @@ class TokenDetails extends PureComponent {
       })
     }),
     badges: PropTypes.shape({}).isRequired,
+    envObjects: PropTypes.shape({}).isRequired,
 
     // Functions
     timeout: PropTypes.func.isRequired,
@@ -167,10 +168,12 @@ class TokenDetails extends PureComponent {
   }
 
   async componentDidUpdate() {
-    if (!this.context || !this.context.arbitrableTokenListView) return
+    if (!this.context) return
+    const { arbitrableTokenListView } = this.context
+    if (!arbitrableTokenListView) return
+
     const { match, fetchToken, accounts } = this.props
     const {
-      arbitrableTokenListView,
       T2CR_BLOCK,
       arbitrableTokenListEvents,
       arbitrableAddressListEvents,

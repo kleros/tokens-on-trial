@@ -36,6 +36,7 @@ const SearchItem = ({
 
 SearchItem.propTypes = {
   onClick: PropTypes.func.isRequired,
+  envObjects: PropTypes.shape({}).isRequired,
   item: PropTypes.shape({
     name: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,

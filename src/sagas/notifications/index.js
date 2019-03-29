@@ -19,7 +19,6 @@ import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-addre
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import { lessduxSaga } from '../../utils/saga'
 import { action } from '../../utils/action'
-import { network as networkPromise } from '../../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../../utils/tcr'
 
 import emitTokenNotifications from './token-events'
@@ -30,9 +29,6 @@ import emitArbitratorNotifications from './arbitrator-events'
  * Notification listener.
  */
 function* pushNotificationsListener() {
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-
   const {
     arbitrableTokenListView,
     arbitrableAddressListView,
@@ -44,7 +40,7 @@ function* pushNotificationsListener() {
     arbitratorEvents,
     arbitrableAddressListEvents,
     arbitrableTokenListEvents
-  } = instantiateEnvObjects(env)
+  } = yield call(instantiateEnvObjects)
 
   // Start after receiving accounts and data
   yield put(action(arbitrableTokenListActions.arbitrableTokenListData.FETCH))

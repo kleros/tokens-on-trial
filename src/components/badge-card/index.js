@@ -124,6 +124,7 @@ BadgeCard.propTypes = {
   }).isRequired,
   tokens: PropTypes.shape({}).isRequired,
   badge: PropTypes.shape({}).isRequired,
+  envObjects: PropTypes.shape({}).isRequired,
   displayTokenInfo: PropTypes.bool
 }
 

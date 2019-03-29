@@ -52,6 +52,7 @@ class BadgeDetails extends PureComponent {
     arbitrableAddressListData:
       arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
     badge: PropTypes.shape({}),
+    envObjects: PropTypes.shape({}).isRequired,
     match: PropTypes.shape({
       params: PropTypes.shape({
         tokenID: PropTypes.string
@@ -170,12 +171,13 @@ class BadgeDetails extends PureComponent {
   }
 
   async componentDidUpdate() {
-    if (!this.context || !this.context.arbitrableAddressListView) return
-    const { match, fetchBadge, envObjects } = this.props
+    if (!this.context) return
+    const { arbitrableAddressListView } = this.context
+    if (!arbitrableAddressListView) return
+
+    const { match, fetchBadge } = this.props
     const {
-      arbitrableAddressListView,
       ETHFINEX_BADGE_BLOCK,
-      arbitrableTokenListEvents,
       arbitrableAddressListEvents,
       arbitratorEvents,
       archon

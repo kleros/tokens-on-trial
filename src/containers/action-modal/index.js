@@ -47,6 +47,7 @@ class ActionModal extends PureComponent {
     openActionModal: modalSelectors.openActionModalShape,
     closeActionModal: PropTypes.func.isRequired,
     actionModalParam: PropTypes.shape({}),
+    envObjects: PropTypes.shape({}).isRequired,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     arbitrableAddressListData:
@@ -407,15 +408,15 @@ class ActionModal extends PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    // const { token: prevToken, badge: prevBadge } = prevProps
-    // const { token, badge, closeActionModal } = this.props
-    // if (
-    //   (prevToken.creating && !token.creating) ||
-    //   (prevToken.updating && !token.updating) ||
-    //   (prevBadge.creating && !badge.creating) ||
-    //   (prevBadge.updating && !badge.updating)
-    // )
-    //   closeActionModal()
+    const { token: prevToken, badge: prevBadge } = prevProps
+    const { token, badge, closeActionModal } = this.props
+    if (
+      (prevToken.creating && !token.creating) ||
+      (prevToken.updating && !token.updating) ||
+      (prevBadge.creating && !badge.creating) ||
+      (prevBadge.updating && !badge.updating)
+    )
+      closeActionModal()
   }
 
   render() {

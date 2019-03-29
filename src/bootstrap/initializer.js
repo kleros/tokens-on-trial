@@ -16,7 +16,12 @@ import { instantiateEnvObjects } from '../utils/tcr'
 import { ContractsContext } from './contexts'
 
 class ContractsProvider extends Component {
+  static propTypes = {
+    children: PropTypes.node.isRequired
+  }
+
   state = {}
+
   async componentDidMount() {
     const envObjects = await instantiateEnvObjects()
     console.info('provider mounted', envObjects)
@@ -41,6 +46,11 @@ class Initializer extends PureComponent {
 
     // Action Dispatchers
     fetchAccounts: PropTypes.func.isRequired,
+    fetchArbitrableTokenListData: PropTypes.func.isRequired,
+    fetchArbitrableAddressListData: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired,
+    fetchBadges: PropTypes.func.isRequired,
+    initialize: PropTypes.func.isRequired,
 
     // State
     children: PropTypes.oneOfType([

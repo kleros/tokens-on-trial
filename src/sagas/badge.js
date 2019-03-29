@@ -10,8 +10,6 @@ import * as badgeActions from '../actions/badge'
 import * as walletSelectors from '../reducers/wallet'
 import * as tcrConstants from '../constants/tcr'
 import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
-import * as envObjectSelectors from '../reducers/env-objects'
-import { network as networkPromise } from '../bootstrap/dapp-api'
 import { web3Utils } from '../bootstrap/dapp-api'
 
 const { toBN } = web3Utils
@@ -39,12 +37,9 @@ function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
   // Token count and stats
   if (cursor === '') cursor = ZERO_ADDR
 
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const {
-    arbitrableAddressListView,
-    arbitrableTokenListView
-  } = instantiateEnvObjects(env)
+  const { arbitrableAddressListView, arbitrableTokenListView } = yield call(
+    instantiateEnvObjects
+  )
 
   const totalCount = Number(
     yield call(arbitrableAddressListView.methods.addressCount().call, {
@@ -277,8 +272,7 @@ export function* fetchBadge({ payload: { addr } }) {
     arbitrableAddressListView,
     arbitrableTokenListView,
     arbitratorView,
-    ARBITRATOR_ADDRESS,
-    viewWeb3
+    ARBITRATOR_ADDRESS
   } = yield call(instantiateEnvObjects)
 
   let badge = yield call(
@@ -525,20 +519,18 @@ function* requestStatusChangeBadge({ payload: { badge, value } }) {
   if (isInvalid(badge.addr))
     throw new Error('Missing address on badge submit', badge)
 
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
 
-  // yield call(
-  //   arbitrableAddressList.methods.requestStatusChange(badge.addr).send,
-  //   {
-  //     from: yield select(walletSelectors.getAccount),
-  //     value
-  //   }
-  // )
+  yield call(
+    arbitrableAddressList.methods.requestStatusChange(badge.addr).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value
+    }
+  )
 
-  // const { addr } = badge
-  // return yield call(fetchBadge, { payload: { addr } })
+  const { addr } = badge
+  return yield call(fetchBadge, { payload: { addr } })
 }
 
 /**
@@ -547,17 +539,15 @@ function* requestStatusChangeBadge({ payload: { badge, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* challengeBadgeRequest({ payload: { addr, value, evidence } }) {
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
-  // yield call(
-  //   arbitrableAddressList.methods.challengeRequest(addr, evidence).send,
-  //   {
-  //     from: yield select(walletSelectors.getAccount),
-  //     value
-  //   }
-  // )
-  // return yield call(fetchBadge, { payload: { addr } })
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  yield call(
+    arbitrableAddressList.methods.challengeRequest(addr, evidence).send,
+    {
+      from: yield select(walletSelectors.getAccount),
+      value
+    }
+  )
+  return yield call(fetchBadge, { payload: { addr } })
 }
 
 /**
@@ -566,14 +556,13 @@ function* challengeBadgeRequest({ payload: { addr, value, evidence } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* fundBadgeDispute({ payload: { addr, side, value } }) {
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
-  // yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
-  //   from: yield select(walletSelectors.getAccount),
-  //   value
-  // })
-  // return yield call(fetchBadge, { payload: { addr } })
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+
+  yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
+  return yield call(fetchBadge, { payload: { addr } })
 }
 
 /**
@@ -582,14 +571,12 @@ function* fundBadgeDispute({ payload: { addr, side, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* fundBadgeAppeal({ payload: { addr, side, value } }) {
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
-  // yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
-  //   from: yield select(walletSelectors.getAccount),
-  //   value
-  // })
-  // return yield call(fetchBadge, { payload: { addr } })
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
+    from: yield select(walletSelectors.getAccount),
+    value
+  })
+  return yield call(fetchBadge, { payload: { addr } })
 }
 
 /**
@@ -598,13 +585,11 @@ function* fundBadgeAppeal({ payload: { addr, side, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* badgeTimeout({ payload: { addr } }) {
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
-  // yield call(arbitrableAddressList.methods.executeRequest(addr).send, {
-  //   from: yield select(walletSelectors.getAccount)
-  // })
-  // return yield call(fetchBadge, { payload: { addr } })
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  yield call(arbitrableAddressList.methods.executeRequest(addr).send, {
+    from: yield select(walletSelectors.getAccount)
+  })
+  return yield call(fetchBadge, { payload: { addr } })
 }
 
 /**
@@ -613,14 +598,12 @@ function* badgeTimeout({ payload: { addr } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
 function* feeTimeoutBadge({ payload: { badge } }) {
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
-  // yield call(arbitrableAddressList.methods.executeRequest(badge.addr).send, {
-  //   from: yield select(walletSelectors.getAccount)
-  // })
-  // const { addr } = badge
-  // return yield call(fetchBadge, { payload: { addr } })
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  yield call(arbitrableAddressList.methods.executeRequest(badge.addr).send, {
+    from: yield select(walletSelectors.getAccount)
+  })
+  const { addr } = badge
+  return yield call(fetchBadge, { payload: { addr } })
 }
 
 /**
@@ -629,23 +612,21 @@ function* feeTimeoutBadge({ payload: { badge } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the badge object.
  */
 function* withdrawBadgeFunds({ payload: { address, item } }) {
-  // let count = 0
-  // if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
-  // const { arbitrableAddressList } = yield select(
-  //   envObjectSelectors.getEnvObjects
-  // )
-  // yield call(
-  //   arbitrableAddressList.methods.batchRequestWithdraw(
-  //     yield select(walletSelectors.getAccount),
-  //     address,
-  //     0,
-  //     count,
-  //     0,
-  //     0
-  //   ).send,
-  //   { from: yield select(walletSelectors.getAccount) }
-  // )
-  // return yield call(fetchBadge, { payload: { address } })
+  let count = 0
+  if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
+  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  yield call(
+    arbitrableAddressList.methods.batchRequestWithdraw(
+      yield select(walletSelectors.getAccount),
+      address,
+      0,
+      count,
+      0,
+      0
+    ).send,
+    { from: yield select(walletSelectors.getAccount) }
+  )
+  return yield call(fetchBadge, { payload: { address } })
 }
 
 /**

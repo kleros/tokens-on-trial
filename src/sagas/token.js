@@ -5,16 +5,16 @@ import { lessduxSaga } from '../utils/saga'
 import {
   contractStatusToClientStatus,
   hasPendingRequest,
-  convertFromString
+  convertFromString,
+  instantiateEnvObjects
 } from '../utils/tcr'
 import * as tokenActions from '../actions/token'
 import * as walletSelectors from '../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
-import { instantiateEnvObjects } from '../utils/tcr'
 import * as errorConstants from '../constants/error'
-import { web3Utils, network as networkPromise } from '../bootstrap/dapp-api'
+import { web3Utils } from '../bootstrap/dapp-api'
 
 import ipfsPublish from './api/ipfs-publish'
 
@@ -31,9 +31,7 @@ const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   // Token count and stats
   if (cursor === '') cursor = ZERO_ID
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenListView } = instantiateEnvObjects(env)
+  const { arbitrableTokenListView } = yield call(instantiateEnvObjects)
 
   const totalCount = Number(
     yield call(arbitrableTokenListView.methods.tokenCount().call, {
@@ -611,9 +609,9 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestRegistration({ payload: { token, file, fileData, value } }) {
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { web3Utils, archon, arbitrableTokenList } = instantiateEnvObjects(env)
+  const { web3Utils, archon, arbitrableTokenList } = yield call(
+    instantiateEnvObjects
+  )
 
   const tokenToSubmit = {
     name: token.name,
@@ -677,9 +675,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (isInvalid(token.ID) && isInvalid(token.addr))
     throw new Error('Missing address on token submit', token)
 
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList, archon, viewWeb3 } = instantiateEnvObjects(env)
+  const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
 
   const tokenToSubmit = {
     name: token.name,
@@ -745,9 +741,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* challengeRequest({ payload: { ID, value, evidence } }) {
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList } = instantiateEnvObjects(env)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
@@ -768,9 +762,7 @@ function* challengeRequest({ payload: { ID, value, evidence } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* fundDispute({ payload: { ID, value, side } }) {
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList } = instantiateEnvObjects(env)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
@@ -791,9 +783,7 @@ function* fundDispute({ payload: { ID, value, side } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* fundAppeal({ payload: { ID, side, value } }) {
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList } = instantiateEnvObjects(env)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   yield call(arbitrableTokenList.methods.fundAppeal(ID, side).send, {
     from: yield select(walletSelectors.getAccount),
@@ -810,9 +800,7 @@ function* fundAppeal({ payload: { ID, side, value } }) {
  */
 function* executeRequest({ payload: { ID } }) {
   const status = Number((yield call(fetchToken, { payload: { ID } })).status)
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList } = instantiateEnvObjects(env)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
   if (
     status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
     status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
@@ -832,9 +820,7 @@ function* executeRequest({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the token.
  */
 function* feeTimeout({ payload: { token } }) {
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList } = instantiateEnvObjects(env)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   yield call(arbitrableTokenList.methods.executeRequest(token.ID).send, {
     from: yield select(walletSelectors.getAccount)
@@ -851,9 +837,7 @@ function* feeTimeout({ payload: { token } }) {
 function* withdrawTokenFunds({ payload: { ID, item } }) {
   let count = 0
   if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
-  const network = yield call(async () => await networkPromise)
-  const env = network === 1 ? 'PROD' : 'DEV'
-  const { arbitrableTokenList } = instantiateEnvObjects(env)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   yield call(
     arbitrableTokenList.methods.batchRequestWithdraw(

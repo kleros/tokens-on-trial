@@ -7,7 +7,7 @@ import * as arbitrableAddressListActions from '../actions/arbitrable-address-lis
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import * as envObjectSelectors from '../reducers/env-objects'
-import { web3Utils, network as networkPromise } from '../bootstrap/dapp-api'
+import { web3Utils } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 
 import ipfsPublish from './api/ipfs-publish'

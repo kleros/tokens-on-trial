@@ -44,11 +44,7 @@ class _ConnectedNavBar extends Component {
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,
     deleteNotification: PropTypes.func.isRequired,
-    closeNotificationsModal: PropTypes.func.isRequired,
-    fetchArbitrableTokenListData: PropTypes.func.isRequired,
-    fetchArbitrableAddressListData: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired
+    closeNotificationsModal: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
