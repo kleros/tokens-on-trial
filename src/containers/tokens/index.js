@@ -167,7 +167,8 @@ export default withRouter(
       tokens: state.tokens,
       badges: state.badges,
       filter: state.filter,
-      accounts: state.wallet.accounts.data
+      accounts: state.wallet.accounts.data,
+      envObjects: state.envObjects.data
     }),
     {
       toggleFilter: filterActions.toggleFilter

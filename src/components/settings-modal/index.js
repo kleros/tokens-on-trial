@@ -8,7 +8,6 @@ import * as walletActions from '../../actions/wallet'
 import * as walletSelectors from '../../reducers/wallet'
 import Button from '../../components/button'
 import NavOverlay from '../../components/nav-overlay'
-import { web3 } from '../../bootstrap/dapp-api'
 
 import { SettingsForm, submitSettingsForm } from './components/settings-form'
 
@@ -42,7 +41,8 @@ class SettingsModal extends PureComponent {
   }
 
   handleUpdateSettingsClick = async ({ fullName, email, ...rest }) => {
-    const { accounts } = this.props
+    const { accounts, envObjects } = this.props
+    const { web3 } = envObjects
     const settings = {
       fullName: { S: fullName },
       email: { S: email },
@@ -142,7 +142,8 @@ export default connect(
   state => ({
     accounts: state.wallet.accounts,
     isSettingsModalOpen: state.modal.isSettingsModalOpen,
-    settings: state.wallet.settings
+    settings: state.wallet.settings,
+    envObjects: state.envObjects.data
   }),
   {
     openSettingsModal: modalActions.openSettingsModal,

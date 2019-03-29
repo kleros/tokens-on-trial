@@ -5,11 +5,11 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Button from '../button'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
-import { viewWeb3, onlyInfura } from '../../bootstrap/dapp-api'
+import { onlyInfura, web3Utils } from '../../bootstrap/dapp-api'
 import { hasPendingRequest, isRegistrationRequest } from '../../utils/tcr'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
-const { toBN } = viewWeb3.utils
+const { toBN } = web3Utils
 
 const getActionButton = ({
   item,

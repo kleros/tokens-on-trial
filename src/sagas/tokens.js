@@ -7,20 +7,22 @@ import {
 } from '../actions/tokens'
 import * as tokenSelectors from '../reducers/tokens'
 import {
-  arbitrableTokenListView,
-  viewWeb3,
-  T2CR_BLOCK
-} from '../bootstrap/dapp-api'
-import { contractStatusToClientStatus } from '../utils/tcr'
+  contractStatusToClientStatus,
+  instantiateEnvObjects
+} from '../utils/tcr'
 
-const fetchEvents = async (eventName, fromBlock) =>
-  arbitrableTokenListView.getPastEvents(eventName, { fromBlock })
+const fetchEvents = async (eventName, fromBlock, contract) =>
+  contract.getPastEvents(eventName, { fromBlock })
 
 /**
  * Fetches a paginatable list of tokens.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
+  const { arbitrableTokenListView, viewWeb3, T2CR_BLOCK } = yield call(
+    instantiateEnvObjects
+  )
+
   try {
     const tokens = JSON.parse(
       JSON.stringify((yield select(tokenSelectors.getTokens)).data)
@@ -29,7 +31,8 @@ function* fetchTokens() {
     const submissionEvents = yield call(
       fetchEvents,
       'TokenSubmitted',
-      tokens.blockNumber
+      tokens.blockNumber,
+      arbitrableTokenListView
     )
 
     const blockNumber = submissionEvents.reduce((acc, event) => {
@@ -92,7 +95,8 @@ function* fetchTokens() {
     const statusChanges = yield call(
       fetchEvents,
       'TokenStatusChange',
-      tokens.statusBlockNumber
+      tokens.statusBlockNumber,
+      arbitrableTokenListView
     )
     statusChanges.forEach(event => {
       const { returnValues } = event

@@ -1,13 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
+import { connect } from 'react-redux'
 
 import { truncateMiddle } from '../../../utils/ui'
-import { viewWeb3, FILE_BASE_URL, IPFS_URL } from '../../../bootstrap/dapp-api'
+import { web3Utils } from '../../../bootstrap/dapp-api'
 
 import './item.css'
 
-const SearchItem = ({ onClick, item }) => (
+const SearchItem = ({
+  onClick,
+  item,
+  envObjects: { IPFS_URL, FILE_BASE_URL }
+}) => (
   <li onClick={onClick} className="SearchItem">
     <Img
       className="SearchItem-symbol"
@@ -23,7 +28,7 @@ const SearchItem = ({ onClick, item }) => (
         {item.name} ({item.ticker})
       </span>
       <span className="SearchItem-text-address">
-        {truncateMiddle(viewWeb3.utils.toChecksumAddress(item.address))}
+        {truncateMiddle(web3Utils.toChecksumAddress(item.address))}
       </span>
     </div>
   </li>
@@ -39,4 +44,6 @@ SearchItem.propTypes = {
   }).isRequired
 }
 
-export default SearchItem
+export default connect(state => ({
+  envObjects: state.envObjects.data
+}))(SearchItem)

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
 
-import { web3 } from '../bootstrap/dapp-api'
+import { web3Utils } from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
 
 // Shapes
@@ -52,7 +52,7 @@ export const getSharedStakeMultiplier = state =>
 // Selectors
 export const getSubmitCost = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&
-  web3.utils.toBN(
+  web3Utils.toBN(
     state.arbitrableTokenList.arbitrableTokenListData.data.requesterBaseDeposit
   )
 

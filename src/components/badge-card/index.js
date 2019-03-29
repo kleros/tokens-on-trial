@@ -9,11 +9,7 @@ import { BeatLoader } from 'react-spinners'
 import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import UnknownToken from '../../assets/images/unknown.svg'
 import * as tcrConstants from '../../constants/tcr'
-import {
-  ARBITRABLE_ADDRESS_LIST_ADDRESS,
-  FILE_BASE_URL,
-  IPFS_URL
-} from '../../bootstrap/dapp-api'
+import { IPFS_URL } from '../../bootstrap/dapp-api'
 
 import './badge-card.css'
 
@@ -31,7 +27,7 @@ const getBadgeHeaderText = badge => {
   return 'Pending'
 }
 
-const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
+const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
   // Link to the oldest, registered token submission for this address.
   const tokenData = tokens.data
   let tokenSubmissions = []
@@ -50,6 +46,7 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo }) => {
     )
   }
   const token = displayTokenInfo ? tokenSubmissions[0] : null
+  const { FILE_BASE_URL, ARBITRABLE_ADDRESS_LIST_ADDRESS } = envObjects
 
   return (
     <div className="BadgeCard">
@@ -136,5 +133,6 @@ BadgeCard.defaultProps = {
 
 export default connect(state => ({
   tokens: state.tokens,
-  badges: state.badges
+  badges: state.badges,
+  envObjects: state.envObjects.data
 }))(BadgeCard)

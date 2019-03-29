@@ -1,6 +1,14 @@
 import { eventChannel } from 'redux-saga'
 
-import { fork, put, race, select, take, takeLatest } from 'redux-saga/effects'
+import {
+  fork,
+  put,
+  call,
+  race,
+  select,
+  take,
+  takeLatest
+} from 'redux-saga/effects'
 
 import * as notificationActions from '../../actions/notification'
 import * as walletSelectors from '../../reducers/wallet'
@@ -11,17 +19,8 @@ import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-addre
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import { lessduxSaga } from '../../utils/saga'
 import { action } from '../../utils/action'
-import {
-  arbitrableTokenListView,
-  arbitrableAddressListView,
-  arbitrableTokenListEvents,
-  arbitrableAddressListEvents,
-  arbitratorView,
-  arbitratorEvents,
-  ETHFINEX_BADGE_BLOCK,
-  T2CR_BLOCK,
-  ARBITRATOR_BLOCK
-} from '../../bootstrap/dapp-api'
+import { network as networkPromise } from '../../bootstrap/dapp-api'
+import { instantiateEnvObjects } from '../../utils/tcr'
 
 import emitTokenNotifications from './token-events'
 import emitBadgeNotifications from './badge-events'
@@ -31,6 +30,22 @@ import emitArbitratorNotifications from './arbitrator-events'
  * Notification listener.
  */
 function* pushNotificationsListener() {
+  const network = yield call(async () => await networkPromise)
+  const env = network === 1 ? 'PROD' : 'DEV'
+
+  const {
+    arbitrableTokenListView,
+    arbitrableAddressListView,
+    arbitratorView,
+    T2CR_BLOCK,
+    viewWeb3,
+    ETHFINEX_BADGE_BLOCK,
+    ARBITRATOR_BLOCK,
+    arbitratorEvents,
+    arbitrableAddressListEvents,
+    arbitrableTokenListEvents
+  } = instantiateEnvObjects(env)
+
   // Start after receiving accounts and data
   yield put(action(arbitrableTokenListActions.arbitrableTokenListData.FETCH))
   yield put(
@@ -65,7 +80,11 @@ function* pushNotificationsListener() {
             ) || T2CR_BLOCK
         })
         .then(events => {
-          emitTokenNotifications(account, t2crTimeToChallenge, emit, events)
+          emitTokenNotifications(account, t2crTimeToChallenge, emit, events, {
+            arbitrableTokenListView,
+            T2CR_BLOCK,
+            viewWeb3
+          })
         })
       arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
         if (err) {
@@ -74,7 +93,11 @@ function* pushNotificationsListener() {
         }
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
-          emitTokenNotifications(account, t2crTimeToChallenge, emit, [event])
+          emitTokenNotifications(account, t2crTimeToChallenge, emit, [event], {
+            arbitrableTokenListView,
+            T2CR_BLOCK,
+            viewWeb3
+          })
         }
       })
 
@@ -89,7 +112,12 @@ function* pushNotificationsListener() {
             ) || ETHFINEX_BADGE_BLOCK
         })
         .then(events => {
-          emitBadgeNotifications(account, badgeTimeToChallenge, emit, events)
+          emitBadgeNotifications(account, badgeTimeToChallenge, emit, events, {
+            arbitrableAddressListView,
+            arbitrableTokenListView,
+            viewWeb3,
+            ETHFINEX_BADGE_BLOCK
+          })
         })
       arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
         if (err) {

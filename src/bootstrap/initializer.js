@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { RenderIf } from 'lessdux'
@@ -6,14 +6,33 @@ import { BeatLoader } from 'react-spinners'
 
 import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
-import RequiresMetaMaskPage from '../containers/requires-meta-mask-page'
+import * as initializationActions from '../actions/initialization'
+import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
+import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
+import * as tokensActions from '../actions/tokens'
+import * as badgesActions from '../actions/badges'
+import { instantiateEnvObjects } from '../utils/tcr'
 
-import {
-  web3,
-  network as networkPromise,
-  requiredNetwork,
-  onlyInfura
-} from './dapp-api'
+import { ContractsContext } from './contexts'
+
+class ContractsProvider extends Component {
+  state = {}
+  async componentDidMount() {
+    const envObjects = await instantiateEnvObjects()
+    console.info('provider mounted', envObjects)
+    this.setState({ envObjects })
+  }
+
+  render() {
+    const { envObjects } = this.state
+    const { children } = this.props
+    return (
+      <ContractsContext.Provider value={envObjects}>
+        {children}
+      </ContractsContext.Provider>
+    )
+  }
+}
 
 class Initializer extends PureComponent {
   static propTypes = {
@@ -30,44 +49,31 @@ class Initializer extends PureComponent {
     ]).isRequired
   }
 
-  state = { metamaskNetwork: null }
-
   async componentDidMount() {
-    const { fetchAccounts } = this.props
-    if (window.ethereum) {
-      this.setState({ metamaskNetwork: await networkPromise })
-      window.ethereum.on('accountsChanged', () => {
-        fetchAccounts()
-      })
-    }
+    const {
+      fetchArbitrableAddressListData,
+      fetchArbitrableTokenListData,
+      fetchTokens,
+      fetchBadges,
+      fetchAccounts,
+      initialize
+    } = this.props
+
     fetchAccounts()
+    initialize()
+    fetchArbitrableTokenListData()
+    fetchArbitrableAddressListData()
+    fetchTokens()
+    fetchBadges()
   }
 
   render() {
     const { accounts, children } = this.props
-    const { metamaskNetwork } = this.state
     return (
       <RenderIf
-        done={children}
-        extraFailedValues={[
-          typeof metamaskNetwork === 'string' &&
-            requiredNetwork !== metamaskNetwork
-        ]}
-        failedLoading={
-          <>
-            <RequiresMetaMaskPage
-              needsUnlock={
-                window.ethereum && web3 && Boolean(web3.eth.accounts[0])
-              }
-              needsMetamask={Boolean(onlyInfura)}
-              requiredNetwork={requiredNetwork}
-              metamaskNetwork={metamaskNetwork}
-            />
-          </>
-        }
+        done={<ContractsProvider>{children}</ContractsProvider>}
         extraLoadingValues={[
-          !accounts.data || (window.ethereum && accounts.data.length === 0),
-          window.ethereum && !metamaskNetwork
+          !accounts.data || (window.ethereum && accounts.data.length === 0)
         ]}
         loading={
           <div
@@ -82,6 +88,7 @@ class Initializer extends PureComponent {
             <BeatLoader color="#3d464d" />
           </div>
         }
+        failedLoading="There was an error loading your statuses..."
         resource={accounts}
       />
     )
@@ -92,5 +99,14 @@ export default connect(
   state => ({
     accounts: state.wallet.accounts
   }),
-  { fetchAccounts: walletActions.fetchAccounts }
+  {
+    fetchAccounts: walletActions.fetchAccounts,
+    fetchArbitrableAddressListData:
+      arbitrableAddressListActions.fetchArbitrableAddressListData,
+    fetchArbitrableTokenListData:
+      arbitrableTokenListActions.fetchArbitrableTokenListData,
+    fetchTokens: tokensActions.fetchTokens,
+    fetchBadges: badgesActions.fetchBadges,
+    initialize: initializationActions.initialize
+  }
 )(Initializer)

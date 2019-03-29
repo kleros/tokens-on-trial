@@ -1,8 +1,8 @@
-import { all, call, takeLatest } from 'redux-saga/effects'
+import { all, call, takeLatest, select } from 'redux-saga/effects'
 
 import * as arbitratorActions from '../actions/arbitrator'
 import { lessduxSaga } from '../utils/saga'
-import { arbitrator } from '../bootstrap/dapp-api'
+import * as envObjectSelectors from '../reducers/env-objects'
 
 /**
  * Fetches the arbitrators's data.
@@ -10,15 +10,15 @@ import { arbitrator } from '../bootstrap/dapp-api'
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitratorData() {
-  const d = yield all({
-    arbitratorExtraData: call(arbitrator.methods.arbitratorExtraData().call)
-  })
-
-  return {
-    owner: d.owner,
-    timeOut: Number(d.timeOut),
-    arbitratorExtraData: d.arbitratorExtraData
-  }
+  // const { arbitratorView } = yield select(envObjectSelectors.getEnvObjects)
+  // const d = yield all({
+  //   arbitratorExtraData: call(arbitratorView.methods.arbitratorExtraData().call)
+  // })
+  // return {
+  //   owner: d.owner,
+  //   timeOut: Number(d.timeOut),
+  //   arbitratorExtraData: d.arbitratorExtraData
+  // }
 }
 
 /**

@@ -4,7 +4,6 @@ import createReducer from 'lessdux'
 import * as filterActions from '../actions/filter'
 import * as filterConstants from '../constants/filter'
 import { defaultFilter } from '../utils/filter'
-import { arbitrableTokenListView } from '../bootstrap/dapp-api'
 
 // Shapes
 const filterShape = PropTypes.shape({
@@ -23,18 +22,10 @@ const filterShape = PropTypes.shape({
 export { filterShape }
 
 // Reducer
-const cachedFilters = localStorage.getItem(
-  `${arbitrableTokenListView.options.address}filter`
-)
-const parsedFilters =
-  cachedFilters && cachedFilters !== 'undefined'
-    ? JSON.parse(cachedFilters)
-    : undefined
-
 export default createReducer(
   {
-    oldestFirst: parsedFilters ? parsedFilters.oldestFirst : 0,
-    filters: parsedFilters ? parsedFilters.filters : defaultFilter()
+    oldestFirst: 0,
+    filters: defaultFilter()
   },
   {
     [filterActions.SET_OLDEST_FIRST]: (
@@ -50,6 +41,10 @@ export default createReducer(
         ...state.filters,
         [key]: !state.filters[key]
       }
+    }),
+    [filterActions.LOAD_FILTERS_STATE]: (state, { payload: { data } }) => ({
+      ...state,
+      data
     })
   }
 )

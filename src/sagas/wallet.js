@@ -1,9 +1,11 @@
 import { call, select, takeLatest } from 'redux-saga/effects'
 
 import * as walletSelectors from '../reducers/wallet'
+import * as envObjectsSelectors from '../reducers/env-objects'
 import * as walletActions from '../actions/wallet'
 import { lessduxSaga } from '../utils/saga'
-import { web3 } from '../bootstrap/dapp-api'
+import { network as networkPromise } from '../bootstrap/dapp-api'
+import { instantiateEnvObjects } from '../utils/tcr'
 
 /**
  * Fetches the current wallet's accounts.
@@ -11,6 +13,8 @@ import { web3 } from '../bootstrap/dapp-api'
  */
 function* fetchAccounts() {
   if (window.ethereum) {
+    const { web3 } = yield call(instantiateEnvObjects)
+
     yield call(window.ethereum.enable)
     return yield call(web3.eth.getAccounts)
   } else return []
@@ -21,12 +25,12 @@ function* fetchAccounts() {
  * @returns {string} - The balance.
  */
 function* fetchBalance() {
-  const balance = yield call(
-    web3.eth.getBalance,
-    yield select(walletSelectors.getAccount)
-  )
-
-  return String(balance)
+  // const { web3 } = yield select(envObjectsSelectors.getEnvObjects)
+  // const balance = yield call(
+  //   web3.eth.getBalance,
+  //   yield select(walletSelectors.getAccount)
+  // )
+  // return String(balance)
 }
 
 /**

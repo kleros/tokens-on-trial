@@ -9,18 +9,7 @@ import Countdown from 'react-countdown-now'
 import Progress from 'react-progressbar'
 import Archon from '@kleros/archon'
 
-import {
-  arbitrableTokenListView,
-  arbitrableTokenListEvents,
-  arbitrableAddressListEvents,
-  arbitratorEvents,
-  T2CR_BLOCK,
-  viewWeb3,
-  archon,
-  FILE_BASE_URL,
-  IPFS_URL,
-  onlyInfura
-} from '../../bootstrap/dapp-api'
+import { IPFS_URL, onlyInfura, web3Utils } from '../../bootstrap/dapp-api'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import Button from '../../components/button'
 import BadgeCard from '../../components/badge-card'
@@ -44,6 +33,7 @@ import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import './token.css'
 
@@ -74,6 +64,8 @@ class TokenDetails extends PureComponent {
     toggleFilter: PropTypes.func.isRequired,
     withdrawTokenFunds: PropTypes.func.isRequired
   }
+
+  static contextType = ContractsContext
 
   static defaultProps = {
     match: {},
@@ -128,128 +120,6 @@ class TokenDetails extends PureComponent {
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
-  componentDidMount() {
-    const { match, fetchToken, accounts } = this.props
-    const { tokenID } = match.params
-    fetchToken(tokenID)
-    arbitrableTokenListEvents.events.Ruling((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-      const { latestRequest } = token
-      if (
-        latestRequest.disputed &&
-        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-          latestRequest.appealDisputeID ===
-            Number(event.returnValues._disputeID))
-      )
-        fetchToken(tokenID)
-    })
-    arbitrableTokenListEvents.events.RewardWithdrawal((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (
-        !token ||
-        event.returnValues._beneficiary !== accounts.data[0] ||
-        token.ID !== event.returnValues._tokenID
-      )
-        return
-      fetchToken(event.returnValues._tokenID)
-    })
-    arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-
-      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
-    })
-    arbitratorEvents.events.AppealPossible((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-
-      const { latestRequest } = token
-      if (
-        latestRequest.disputed &&
-        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-          latestRequest.appealDisputeID ===
-            Number(event.returnValues._disputeID))
-      )
-        fetchToken(tokenID)
-    })
-    arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-
-      if (token.addr === event.returnValues._address) fetchToken(tokenID)
-    })
-    arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
-    })
-    arbitrableTokenListEvents.events.Evidence(async (err, e) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-      const { latestRequest } = token
-      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-        return
-
-      const evidence = await (await fetch(
-        `${IPFS_URL}${e.returnValues._evidence}`
-      )).json()
-      /* eslint-disable unicorn/number-literal-case */
-      const calculatedMultihash = archon.utils.multihashFile(
-        evidence,
-        0x1b // keccak-256
-      )
-
-      if (
-        !(await Archon.utils.validateFileFromURI(
-          `${IPFS_URL}${e.returnValues._evidence}`,
-          { hash: calculatedMultihash }
-        ))
-      ) {
-        console.warn('Invalid evidence', evidence)
-        return
-      }
-
-      const { evidences } = this.state
-      const mimeType = mime.lookup(evidence.fileTypeExtension)
-      evidence.icon = getFileIcon(mimeType)
-      this.setState({
-        evidences: {
-          ...evidences,
-          [e.transactionHash]: evidence
-        }
-      })
-    })
-  }
-
   withdrawFunds = () => {
     const { withdrawTokenFunds, token, openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
@@ -297,16 +167,150 @@ class TokenDetails extends PureComponent {
   }
 
   async componentDidUpdate() {
-    const { match } = this.props
+    if (!this.context || !this.context.arbitrableTokenListView) return
+    const { match, fetchToken, accounts } = this.props
+    const {
+      arbitrableTokenListView,
+      T2CR_BLOCK,
+      arbitrableTokenListEvents,
+      arbitrableAddressListEvents,
+      arbitratorEvents,
+      archon
+    } = this.context
+
     const { token, fetching, evidenceListenerSet } = this.state
+    if (fetching || (token && evidenceListenerSet)) return
+
     const { tokenID } = match.params
-    if (!token) return
+    if (!token && !fetching) {
+      fetchToken(tokenID)
+      return
+    }
+
+    if (!token && fetching) return
     if (token && token.ID !== tokenID && !fetching) window.location.reload(true)
     if (evidenceListenerSet) return
 
     const { latestRequest } = token
 
     if (token && !evidenceListenerSet) {
+      arbitrableTokenListEvents.events.Ruling((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (!token) return
+        const { latestRequest } = token
+        if (
+          latestRequest.disputed &&
+          (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+            latestRequest.appealDisputeID ===
+              Number(event.returnValues._disputeID))
+        )
+          fetchToken(tokenID)
+      })
+      arbitrableTokenListEvents.events.RewardWithdrawal((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (
+          !token ||
+          event.returnValues._beneficiary !== accounts.data[0] ||
+          token.ID !== event.returnValues._tokenID
+        )
+          return
+        fetchToken(event.returnValues._tokenID)
+      })
+      arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (!token) return
+
+        if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
+      })
+      arbitratorEvents.events.AppealPossible((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (!token) return
+
+        const { latestRequest } = token
+        if (
+          latestRequest.disputed &&
+          (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+            latestRequest.appealDisputeID ===
+              Number(event.returnValues._disputeID))
+        )
+          fetchToken(tokenID)
+      })
+      arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (!token) return
+
+        if (token.addr === event.returnValues._address) fetchToken(tokenID)
+      })
+      arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (!token) return
+        if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
+      })
+      arbitrableTokenListEvents.events.Evidence(async (err, e) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { token } = this.state
+        if (!token) return
+        const { latestRequest } = token
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+          return
+
+        const evidence = await (await fetch(
+          `${IPFS_URL}${e.returnValues._evidence}`
+        )).json()
+        /* eslint-disable unicorn/number-literal-case */
+        const calculatedMultihash = archon.utils.multihashFile(
+          evidence,
+          0x1b // keccak-256
+        )
+
+        if (
+          !(await Archon.utils.validateFileFromURI(
+            `${IPFS_URL}${e.returnValues._evidence}`,
+            { hash: calculatedMultihash }
+          ))
+        ) {
+          console.warn('Invalid evidence', evidence)
+          return
+        }
+
+        const { evidences } = this.state
+        const mimeType = mime.lookup(evidence.fileTypeExtension)
+        evidence.icon = getFileIcon(mimeType)
+        this.setState({
+          evidences: {
+            ...evidences,
+            [e.transactionHash]: evidence
+          }
+        })
+      })
+
       await Promise.all(
         (await arbitrableTokenListView.getPastEvents('Evidence', {
           filter: {
@@ -369,8 +373,15 @@ class TokenDetails extends PureComponent {
       filter,
       match,
       arbitrableTokenListData,
-      badges
+      badges,
+      envObjects
     } = this.props
+
+    if (!envObjects) return null
+
+    const {
+      data: { FILE_BASE_URL }
+    } = envObjects
     const { filters } = filter
     const { tokenID } = match.params
 
@@ -523,7 +534,7 @@ class TokenDetails extends PureComponent {
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <h4 style={{ marginLeft: 0 }}>Token Details</h4>
-          {token.withdrawable.gt(viewWeb3.utils.toBN(0)) && (
+          {token.withdrawable.gt(web3Utils.toBN(0)) && (
             <>
               <div className="TokenDetails-divider" />
               <h5
@@ -532,7 +543,7 @@ class TokenDetails extends PureComponent {
               >
                 <span className="TokenDetails-withdraw-value">
                   {Number(
-                    viewWeb3.utils.fromWei(token.withdrawable.toString())
+                    web3Utils.fromWei(token.withdrawable.toString())
                   ).toFixed(4)}{' '}
                   ETH{' '}
                 </span>
@@ -923,7 +934,7 @@ class TokenDetails extends PureComponent {
                   className="TokenDetails-icon TokenDetails-meta--aligned"
                   src={EtherScanLogo}
                 />
-                {token.addr ? viewWeb3.utils.toChecksumAddress(token.addr) : ''}
+                {token.addr ? web3Utils.toChecksumAddress(token.addr) : ''}
               </a>
               {(token.badge.status ===
                 tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
@@ -1115,7 +1126,8 @@ export default connect(
     badges: state.badges.data.items,
     accounts: state.wallet.accounts,
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
-    filter: state.filter
+    filter: state.filter,
+    envObjects: state.envObjects
   }),
   {
     fetchToken: tokenActions.fetchToken,

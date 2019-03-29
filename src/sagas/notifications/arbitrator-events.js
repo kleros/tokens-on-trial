@@ -1,12 +1,5 @@
 import memoizeOne from 'memoize-one'
 
-import {
-  arbitratorView,
-  arbitrableAddressListView,
-  arbitrableTokenListView,
-  viewWeb3
-} from '../../bootstrap/dapp-api'
-
 /* eslint-disable valid-jsdoc */
 
 const ZERO_ID = `0x0000000000000000000000000000000000000000000000000000000000000000`
@@ -22,7 +15,7 @@ const filter = [
 ]
 
 // Helpers
-const getBlockDate = memoizeOne(blockHash =>
+const getBlockDate = memoizeOne((blockHash, viewWeb3) =>
   viewWeb3.eth
     .getBlock(blockHash)
     .then(block => new Date(block.timestamp * 1000))
@@ -31,7 +24,17 @@ const getBlockDate = memoizeOne(blockHash =>
 /**
  * Arbitrator event notification handler
  */
-const emitArbitratorNotifications = async (account, emit, events) => {
+const emitArbitratorNotifications = async (
+  account,
+  emit,
+  events,
+  {
+    arbitratorView,
+    arbitrableAddressListView,
+    arbitrableTokenListView,
+    viewWeb3
+  }
+) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
 
@@ -61,7 +64,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
       } token.`
       emit({
         ID: tokenID,
-        date: await getBlockDate(event.blockHash),
+        date: await getBlockDate(event.blockHash, viewWeb3),
         message,
         clientStatus: 4
       })
@@ -112,7 +115,7 @@ const emitArbitratorNotifications = async (account, emit, events) => {
         ID: tokenAddress,
         addr: tokenAddress,
         badgeAddr: arbitrableAddressListView._address,
-        date: await getBlockDate(event.blockHash),
+        date: await getBlockDate(event.blockHash, viewWeb3),
         message,
         clientStatus: 4
       })

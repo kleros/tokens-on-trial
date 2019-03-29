@@ -168,7 +168,8 @@ export default withRouter(
       badges: state.badges,
       tokens: state.tokens,
       filter: state.filter,
-      accounts: state.wallet.accounts.data
+      accounts: state.wallet.accounts.data,
+      envObjects: state.envObjects.data
     }),
     {
       fetchArbitrableAddressListData:
