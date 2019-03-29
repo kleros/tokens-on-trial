@@ -5,7 +5,6 @@ import { sanitize } from '../utils/ui'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
-import * as envObjectSelectors from '../reducers/env-objects'
 import readFile from '../utils/read-file'
 import { web3Utils } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
@@ -107,9 +106,7 @@ function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
     fileTypeExtension
   }
 
-  const { arbitrableTokenList, archon } = yield select(
-    envObjectSelectors.getEnvObjects
-  )
+  const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
 
   /* eslint-disable unicorn/number-literal-case */
   const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256

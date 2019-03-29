@@ -6,7 +6,6 @@ import { sanitize } from '../utils/ui'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
-import * as envObjectSelectors from '../reducers/env-objects'
 import { web3Utils } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 
@@ -86,9 +85,7 @@ export function* fetchArbitrableAddressListData() {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
-  const { arbitrableAddressList, archon } = yield select(
-    envObjectSelectors.getEnvObjects
-  )
+  const { arbitrableAddressList, archon } = yield call(instantiateEnvObjects)
 
   let fileURI = ''
   let fileTypeExtension = ''

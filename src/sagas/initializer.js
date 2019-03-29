@@ -2,14 +2,11 @@ import { put, takeLatest, call } from 'redux-saga/effects'
 
 import { INITIALIZE } from '../actions/initialization'
 import { setEnvObjects } from '../actions/env-objects'
-import { fetchTokens } from '../actions/tokens'
-import { fetchBadges } from '../actions/badges'
 // import { APP_VERSION } from '../bootstrap/dapp-api'
 // import { loadState as loadTokensState } from '../actions/tokens'
 // import { loadState as loadBadgesState } from '../actions/badges'
 // import { loadState as loadNotificationsState } from '../actions/notification'
 // import { loadState as loadFiltersState } from '../actions/notification'
-import { fetchAccounts } from '../actions/wallet'
 import { instantiateEnvObjects } from '../utils/tcr'
 
 /**
@@ -21,9 +18,7 @@ function* initialize() {
     FILE_BASE_URL,
     T2CR_BLOCK,
     ETHFINEX_BADGE_BLOCK,
-    ARBITRABLE_ADDRESS_LIST_ADDRESS,
-    arbitrableTokenListEvents,
-    arbitrableAddressListEvents
+    ARBITRABLE_ADDRESS_LIST_ADDRESS
   } = yield call(instantiateEnvObjects)
 
   yield put(
@@ -34,18 +29,6 @@ function* initialize() {
       ARBITRABLE_ADDRESS_LIST_ADDRESS
     })
   )
-
-  if (window.ethereum) {
-    window.ethereum.on('accountsChanged', () => {
-      fetchAccounts()
-    })
-    arbitrableTokenListEvents.events.TokenStatusChange(() => {
-      fetchTokens()
-    })
-    arbitrableAddressListEvents.events.AddressStatusChange(() => {
-      fetchBadges()
-    })
-  }
 
   // const { arbitrableAddressListView, arbitrableTokenListView } = envObjects
 

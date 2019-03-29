@@ -17,15 +17,32 @@ import { ContractsContext } from './contexts'
 
 class ContractsProvider extends Component {
   static propTypes = {
-    children: PropTypes.node.isRequired
+    children: PropTypes.node.isRequired,
+    fetchAccounts: PropTypes.func.isRequired
   }
 
   state = {}
 
   async componentDidMount() {
     const envObjects = await instantiateEnvObjects()
-    console.info('provider mounted', envObjects)
     this.setState({ envObjects })
+  }
+
+  async componentDidUpdate() {
+    const { fetchAccounts } = this.props
+    const { envObjects, accountChangeListener } = this.state
+
+    if (!envObjects || accountChangeListener) return
+
+    if (window.ethereum)
+      this.setState(prevState => {
+        if (prevState.accountChangeListener) return prevState
+        return {
+          accountChangeListener: window.ethereum.on('accountsChanged', () => {
+            fetchAccounts()
+          })
+        }
+      })
   }
 
   render() {
@@ -69,8 +86,8 @@ class Initializer extends PureComponent {
       initialize
     } = this.props
 
-    fetchAccounts()
     initialize()
+    fetchAccounts()
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
     fetchTokens()
@@ -78,10 +95,14 @@ class Initializer extends PureComponent {
   }
 
   render() {
-    const { accounts, children } = this.props
+    const { accounts, children, fetchAccounts } = this.props
     return (
       <RenderIf
-        done={<ContractsProvider>{children}</ContractsProvider>}
+        done={
+          <ContractsProvider fetchAccounts={fetchAccounts}>
+            {children}
+          </ContractsProvider>
+        }
         extraLoadingValues={[
           !accounts.data || (window.ethereum && accounts.data.length === 0)
         ]}

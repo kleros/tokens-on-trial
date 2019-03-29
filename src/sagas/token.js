@@ -609,9 +609,7 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestRegistration({ payload: { token, file, fileData, value } }) {
-  const { web3Utils, archon, arbitrableTokenList } = yield call(
-    instantiateEnvObjects
-  )
+  const { archon, arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   const tokenToSubmit = {
     name: token.name,

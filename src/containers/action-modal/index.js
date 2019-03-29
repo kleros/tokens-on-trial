@@ -19,6 +19,7 @@ import { web3Utils } from '../../bootstrap/dapp-api'
 import Modal from '../../components/modal'
 import asyncReadFile from '../../utils/async-file-reader'
 import ipfsPublish from '../../sagas/api/ipfs-publish'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
@@ -74,6 +75,8 @@ class ActionModal extends PureComponent {
     fundBadgeDispute: PropTypes.func.isRequired,
     fundBadgeAppeal: PropTypes.func.isRequired
   }
+
+  static contextType = ContractsContext
 
   static defaultProps = {
     openActionModal: null,
@@ -209,13 +212,8 @@ class ActionModal extends PureComponent {
   }
 
   handleChallengeClick = async ({ reason }) => {
-    const {
-      challengeRequest,
-      token,
-      arbitrableTokenListData,
-      envObjects
-    } = this.props
-    const { archon } = envObjects
+    const { challengeRequest, token, arbitrableTokenListData } = this.props
+    const { archon } = this.context
     const {
       challengerBaseDeposit,
       arbitrationCost,
@@ -257,10 +255,9 @@ class ActionModal extends PureComponent {
     const {
       challengeBadgeRequest,
       badge,
-      arbitrableAddressListData,
-      envObjects
+      arbitrableAddressListData
     } = this.props
-    const { archon } = envObjects
+    const { archon } = this.context
     const {
       challengerBaseDeposit,
       arbitrationCost,
