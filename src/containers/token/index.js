@@ -154,6 +154,13 @@ class TokenDetails extends PureComponent {
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
+  componentDidMount() {
+    const { match, fetchToken } = this.props
+    const { tokenID } = match.params
+    this.setState({ fetching: true })
+    fetchToken(tokenID)
+  }
+
   componentWillReceiveProps(nextProps) {
     const { token: nextToken } = nextProps
     const { match, fetchToken } = this.props
@@ -171,7 +178,6 @@ class TokenDetails extends PureComponent {
     if (!this.context) return
     const { arbitrableTokenListView } = this.context
     if (!arbitrableTokenListView) return
-
     const { match, fetchToken, accounts } = this.props
     const {
       T2CR_BLOCK,
@@ -182,9 +188,19 @@ class TokenDetails extends PureComponent {
     } = this.context
 
     const { token, fetching, evidenceListenerSet } = this.state
-    if (fetching || (token && evidenceListenerSet)) return
-
     const { tokenID } = match.params
+    if (!fetching && token && evidenceListenerSet && token.ID !== tokenID) {
+      fetchToken(tokenID)
+      this.setState({
+        fetching: true,
+        evidenceListenerSet: false,
+        evidences: null
+      })
+      return
+    }
+    if (fetching || (token && evidenceListenerSet && token.ID === tokenID))
+      return
+
     if (!token && !fetching) {
       fetchToken(tokenID)
       return

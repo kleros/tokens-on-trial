@@ -157,6 +157,13 @@ class BadgeDetails extends PureComponent {
   submitBadgeAction = () =>
     this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
+  componentDidMount() {
+    const { match, fetchBadge } = this.props
+    const { tokenAddr } = match.params
+    this.setState({ fetching: true })
+    fetchBadge(tokenAddr)
+  }
+
   componentWillReceiveProps(nextProps) {
     const { badge: nextBadge } = nextProps
     const { match, fetchBadge } = this.props
@@ -174,7 +181,6 @@ class BadgeDetails extends PureComponent {
     if (!this.context) return
     const { arbitrableAddressListView } = this.context
     if (!arbitrableAddressListView) return
-
     const { match, fetchBadge } = this.props
     const {
       ETHFINEX_BADGE_BLOCK,
@@ -183,9 +189,20 @@ class BadgeDetails extends PureComponent {
       archon
     } = this.context
     const { badge, fetching, evidenceListenerSet } = this.state
-    if (fetching || (badge && evidenceListenerSet)) return
-
     const { tokenAddr } = match.params
+    if (!fetching && badge && evidenceListenerSet && badge.addr !== tokenAddr) {
+      fetchBadge(tokenAddr)
+      this.setState({
+        fetching: true,
+        evidenceListenerSet: false,
+        evidences: null
+      })
+      return
+    }
+
+    if (fetching || (badge && evidenceListenerSet && badge.addr === tokenAddr))
+      return
+
     if (!badge && !fetching) {
       fetchBadge(tokenAddr)
       return
