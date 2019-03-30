@@ -59,7 +59,7 @@ const emitArbitratorNotifications = async (
       )
         continue
 
-      const message = `Jurors gave an appealable ruling on the ${
+      const message = `Jurors gave an appealable ruling on ${
         token.ticker
       } token.`
       emit({

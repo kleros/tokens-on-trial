@@ -67,6 +67,12 @@ function* pushNotificationsListener() {
       // https://ethereum.stackexchange.com/questions/62799/problem-with-multiple-event-listeners-duplicated-event-triggers#
       const txHashes = {}
 
+      console.info(
+        'fdas',
+        localStorage.getItem(
+          `${arbitrableTokenListView.options.address}nextEventsBlockNumber`
+        )
+      )
       // T2CR events
       arbitrableTokenListView
         .getPastEvents('TokenStatusChange', {
@@ -135,7 +141,13 @@ function* pushNotificationsListener() {
             ) || ARBITRATOR_BLOCK
         })
         .then(events => {
-          emitArbitratorNotifications(account, emit, events)
+          emitArbitratorNotifications(account, emit, events, {
+            arbitrableAddressListView,
+            arbitratorView,
+            arbitrableTokenListView,
+            viewWeb3,
+            ETHFINEX_BADGE_BLOCK
+          })
         })
       arbitratorEvents.events.AppealPossible((err, event) => {
         if (err) {

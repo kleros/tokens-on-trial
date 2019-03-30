@@ -40,6 +40,7 @@ const emitTokenNotifications = async (
         toBlock: 'latest'
       }
     )
+    console.info('requests', requests)
 
     const token = await arbitrableTokenListView.methods
       .getTokenInfo(returnValues._tokenID)
@@ -95,8 +96,8 @@ const emitTokenNotifications = async (
         } else {
           message = `${
             isRequester
-              ? `Jurors ruled against you on the ${token.ticker} token.`
-              : `Jurors ruled in your favor on the ${token.ticker} token.`
+              ? `Jurors ruled against you on ${token.ticker} token.`
+              : `Jurors ruled in your favor on ${token.ticker} token.`
           }`
           successMessage = !isRequester
         }
@@ -106,15 +107,15 @@ const emitTokenNotifications = async (
         if (isRegistrationRequest) {
           message = `${
             isRequester
-              ? `Jurors ruled against you on the ${token.ticker} token.`
-              : `Jurors ruled in your favor on the ${token.ticker} token.`
+              ? `Jurors ruled against you on ${token.ticker} token.`
+              : `Jurors ruled in your favor on ${token.ticker} token.`
           }`
           successMessage = !isRequester
         } else {
           message = `${
             isRequester
               ? `${token.ticker} token delisting successful.`
-              : `Jurors ruled against you on the ${token.ticker} token.`
+              : `Jurors ruled against you on ${token.ticker} token.`
           }`
           successMessage = isRequester
         }

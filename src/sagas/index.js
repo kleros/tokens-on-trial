@@ -8,7 +8,7 @@ import arbitrableAddressListSaga from './arbitrable-address-list'
 // import arbitratorSaga from './arbitrator'
 import tokenSaga from './token'
 import badgeSaga from './badge'
-// import notificationSaga from './notifications'
+import notificationSaga from './notifications'
 import tokensSaga from './tokens'
 import badgesSaga from './badges'
 import initializer from './initializer'
@@ -46,7 +46,7 @@ const rootSagas = [
   tokenSaga,
   badgeSaga,
   // arbitratorSaga,
-  // notificationSaga,
+  notificationSaga,
   tokensSaga,
   badgesSaga,
   initializer
