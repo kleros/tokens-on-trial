@@ -5,7 +5,7 @@ import {
   cacheTokens,
   fetchTokensFailed
 } from '../actions/tokens'
-import { web3Utils } from '../bootstrap/dapp-api'
+import { web3Utils, APP_VERSION } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
   instantiateEnvObjects
@@ -19,14 +19,11 @@ const fetchEvents = async (eventName, fromBlock, contract) =>
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
-  const { arbitrableTokenListView, T2CR_BLOCK, APP_VERSION } = yield call(
+  const { arbitrableTokenListView, T2CR_BLOCK } = yield call(
     instantiateEnvObjects
   )
 
   try {
-    // const tokens = JSON.parse(
-    //   JSON.stringify((yield select(tokenSelectors.getTokens)).data)
-    // ) // Deep copy
     let tokens = localStorage.getItem(
       `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
     )
@@ -35,12 +32,12 @@ function* fetchTokens() {
         blockNumber: T2CR_BLOCK,
         statusBlockNumber: T2CR_BLOCK,
         items: {},
-        addressToIDs: {},
-        hasCachedInfo: false
+        addressToIDs: {}
       }
     else {
       tokens = JSON.parse(tokens)
       yield put(cacheTokens(tokens))
+      tokens = JSON.parse(JSON.stringify(tokens)) // Get a deep copy.
     }
 
     const submissionEvents = yield call(
@@ -199,8 +196,6 @@ function* fetchTokens() {
         cachedTokens.addressToIDs[token.address].push(tokenID)
       else cachedTokens.addressToIDs[token.address] = [tokenID]
     })
-
-    cachedTokens.hasCachedInfo = true
 
     localStorage.setItem(
       `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`,
