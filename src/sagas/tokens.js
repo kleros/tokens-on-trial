@@ -1,11 +1,11 @@
-import { put, takeLatest, select, call } from 'redux-saga/effects'
+import { put, takeLatest, call } from 'redux-saga/effects'
 
 import {
   FETCH_TOKENS_CACHE,
   cacheTokens,
   fetchTokensFailed
 } from '../actions/tokens'
-import * as tokenSelectors from '../reducers/tokens'
+import { web3Utils } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
   instantiateEnvObjects
@@ -19,14 +19,29 @@ const fetchEvents = async (eventName, fromBlock, contract) =>
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
-  const { arbitrableTokenListView, viewWeb3, T2CR_BLOCK } = yield call(
+  const { arbitrableTokenListView, T2CR_BLOCK, APP_VERSION } = yield call(
     instantiateEnvObjects
   )
 
   try {
-    const tokens = JSON.parse(
-      JSON.stringify((yield select(tokenSelectors.getTokens)).data)
-    ) // Deep copy
+    // const tokens = JSON.parse(
+    //   JSON.stringify((yield select(tokenSelectors.getTokens)).data)
+    // ) // Deep copy
+    let tokens = localStorage.getItem(
+      `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
+    )
+    if (!tokens)
+      tokens = {
+        blockNumber: T2CR_BLOCK,
+        statusBlockNumber: T2CR_BLOCK,
+        items: {},
+        addressToIDs: {},
+        hasCachedInfo: false
+      }
+    else {
+      tokens = JSON.parse(tokens)
+      yield put(cacheTokens(tokens))
+    }
 
     const submissionEvents = yield call(
       fetchEvents,
@@ -68,7 +83,7 @@ function* fetchTokens() {
           return acc
         }
 
-        const tokenID = viewWeb3.utils.soliditySha3(
+        const tokenID = web3Utils.soliditySha3(
           _name,
           _ticker,
           _address,
@@ -184,6 +199,13 @@ function* fetchTokens() {
         cachedTokens.addressToIDs[token.address].push(tokenID)
       else cachedTokens.addressToIDs[token.address] = [tokenID]
     })
+
+    cachedTokens.hasCachedInfo = true
+
+    localStorage.setItem(
+      `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`,
+      JSON.stringify(cachedTokens)
+    )
 
     yield put(cacheTokens(cachedTokens))
   } catch (err) {

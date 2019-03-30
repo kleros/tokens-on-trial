@@ -67,12 +67,6 @@ function* pushNotificationsListener() {
       // https://ethereum.stackexchange.com/questions/62799/problem-with-multiple-event-listeners-duplicated-event-triggers#
       const txHashes = {}
 
-      console.info(
-        'fdas',
-        localStorage.getItem(
-          `${arbitrableTokenListView.options.address}nextEventsBlockNumber`
-        )
-      )
       // T2CR events
       arbitrableTokenListView
         .getPastEvents('TokenStatusChange', {

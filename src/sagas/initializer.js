@@ -2,8 +2,6 @@ import { put, takeLatest, call } from 'redux-saga/effects'
 
 import { INITIALIZE } from '../actions/initialization'
 import { setEnvObjects } from '../actions/env-objects'
-// import { APP_VERSION } from '../bootstrap/dapp-api'
-// import { loadState as loadTokensState } from '../actions/tokens'
 // import { loadState as loadBadgesState } from '../actions/badges'
 // import { loadState as loadNotificationsState } from '../actions/notification'
 // import { loadState as loadFiltersState } from '../actions/notification'
@@ -30,13 +28,7 @@ function* initialize() {
     })
   )
 
-  // const { arbitrableAddressListView, arbitrableTokenListView } = envObjects
-
   // Load token, badge, filter and notification caches, if any.
-  // const cachedTokens = localStorage.getItem(
-  //   `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
-  // )
-  // if (cachedTokens) yield put(loadTokensState(JSON.parse(cachedTokens)))
 
   // const cachedBadges = localStorage.getItem(
   //   `${arbitrableAddressListView.options.address}badges@${APP_VERSION}`

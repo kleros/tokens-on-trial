@@ -40,7 +40,6 @@ const emitTokenNotifications = async (
         toBlock: 'latest'
       }
     )
-    console.info('requests', requests)
 
     const token = await arbitrableTokenListView.methods
       .getTokenInfo(returnValues._tokenID)
