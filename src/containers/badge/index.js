@@ -86,7 +86,9 @@ class BadgeDetails extends PureComponent {
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
-    toggleFilter(key)
+    const { arbitrableAddressListView } = this.context
+
+    toggleFilter(key, arbitrableAddressListView)
   }
 
   handleActionClick = (action, side) => {

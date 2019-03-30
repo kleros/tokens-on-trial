@@ -6,6 +6,7 @@ import Dropdown from '../dropdown'
 import * as filterConstants from '../../constants/filter'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import './sort-bar.css'
 
@@ -25,9 +26,12 @@ class SortBar extends PureComponent {
     setOldestFirst: PropTypes.func.isRequired
   }
 
+  static contextType = ContractsContext
+
   handleSortChange = oldestFirst => {
     const { setOldestFirst } = this.props
-    setOldestFirst(oldestFirst)
+    const { arbitrableTokenListView } = this.context
+    setOldestFirst(oldestFirst, arbitrableTokenListView)
   }
 
   render() {

@@ -85,7 +85,8 @@ class TokenDetails extends PureComponent {
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
-    toggleFilter(key)
+    const { arbitrableTokenListView } = this.context
+    toggleFilter(key, arbitrableTokenListView)
   }
 
   handleActionClick = (action, side) => {

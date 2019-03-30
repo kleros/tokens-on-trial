@@ -2,10 +2,10 @@ import { put, takeLatest, call } from 'redux-saga/effects'
 
 import { INITIALIZE } from '../actions/initialization'
 import { setEnvObjects } from '../actions/env-objects'
-// import { loadState as loadBadgesState } from '../actions/badges'
 // import { loadState as loadNotificationsState } from '../actions/notification'
-// import { loadState as loadFiltersState } from '../actions/notification'
+import { loadState as loadFiltersState } from '../actions/notification'
 import { instantiateEnvObjects } from '../utils/tcr'
+import { APP_VERSION } from '../bootstrap/dapp-api'
 
 /**
  * Loads cached items and contract instances into redux
@@ -16,7 +16,8 @@ function* initialize() {
     FILE_BASE_URL,
     T2CR_BLOCK,
     ETHFINEX_BADGE_BLOCK,
-    ARBITRABLE_ADDRESS_LIST_ADDRESS
+    ARBITRABLE_ADDRESS_LIST_ADDRESS,
+    arbitrableTokenListView
   } = yield call(instantiateEnvObjects)
 
   yield put(
@@ -28,17 +29,11 @@ function* initialize() {
     })
   )
 
-  // Load token, badge, filter and notification caches, if any.
-
-  // const cachedBadges = localStorage.getItem(
-  //   `${arbitrableAddressListView.options.address}badges@${APP_VERSION}`
-  // )
-  // if (cachedBadges) yield put(loadBadgesState(JSON.parse(cachedBadges)))
-
-  // const cachedFilters = localStorage.getItem(
-  //   `${arbitrableTokenListView.options.address}filter@${APP_VERSION}`
-  // )
-  // if (cachedFilters) yield put(loadFiltersState(JSON.parse(cachedFilters)))
+  // Load filter and notification caches, if any.
+  const cachedFilters = localStorage.getItem(
+    `${arbitrableTokenListView.options.address}filter@${APP_VERSION}`
+  )
+  if (cachedFilters) yield put(loadFiltersState(JSON.parse(cachedFilters)))
 
   // const cachedNotifications = localStorage.getItem(
   //   `${arbitrableTokenListView.options.address$}.

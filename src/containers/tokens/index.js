@@ -10,6 +10,7 @@ import Paging from '../../components/paging'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterActions from '../../actions/filter'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import './tokens.css'
 
@@ -34,11 +35,14 @@ class Tokens extends Component {
     toggleFilter: PropTypes.func.isRequired
   }
 
+  static contextType = ContractsContext
+
   state = { currentPage: 0 }
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
-    toggleFilter(key)
+    const { arbitrableTokenListView } = this.context
+    toggleFilter(key, arbitrableTokenListView)
   }
 
   handleFirstPageClicked = () => {
