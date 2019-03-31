@@ -2,7 +2,6 @@ import { put, takeLatest, call } from 'redux-saga/effects'
 
 import { INITIALIZE } from '../actions/initialization'
 import { setEnvObjects } from '../actions/env-objects'
-// import { loadState as loadNotificationsState } from '../actions/notification'
 import { loadState as loadFiltersState } from '../actions/notification'
 import { instantiateEnvObjects } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
@@ -29,19 +28,11 @@ function* initialize() {
     })
   )
 
-  // Load filter and notification caches, if any.
+  // Load filter cache, if any.
   const cachedFilters = localStorage.getItem(
     `${arbitrableTokenListView.options.address}filter@${APP_VERSION}`
   )
   if (cachedFilters) yield put(loadFiltersState(JSON.parse(cachedFilters)))
-
-  // const cachedNotifications = localStorage.getItem(
-  //   `${arbitrableTokenListView.options.address$}.
-  //    ${arbitrableAddressListView.options.address}
-  //    notifications@${APP_VERSION}`
-  // )
-  // if (cachedNotifications)
-  //   yield put(loadNotificationsState(JSON.parse(cachedNotifications)))
 }
 
 /**

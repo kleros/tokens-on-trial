@@ -20,6 +20,7 @@ import * as arbitrableAddressListActions from '../../actions/arbitrable-address-
 import { lessduxSaga } from '../../utils/saga'
 import { action } from '../../utils/action'
 import { instantiateEnvObjects } from '../../utils/tcr'
+import { APP_VERSION } from '../../bootstrap/dapp-api'
 
 import emitTokenNotifications from './token-events'
 import emitBadgeNotifications from './badge-events'
@@ -41,6 +42,13 @@ function* pushNotificationsListener() {
     arbitrableAddressListEvents,
     arbitrableTokenListEvents
   } = yield call(instantiateEnvObjects)
+
+  // Get cached notifications
+  const cachedNotifications = localStorage.getItem(
+    `${arbitrableTokenListView.options.address}.notifications@${APP_VERSION}`
+  )
+  if (cachedNotifications)
+    yield put(notificationActions.loadState(JSON.parse(cachedNotifications)))
 
   // Start after receiving accounts and data
   yield put(action(arbitrableTokenListActions.arbitrableTokenListData.FETCH))

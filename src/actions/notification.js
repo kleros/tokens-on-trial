@@ -22,5 +22,5 @@ export const deleteNotification = ID => ({
 
 export const loadState = data => ({
   type: LOAD_NOTIFICATIONS_STATE,
-  payload: data
+  payload: { data }
 })

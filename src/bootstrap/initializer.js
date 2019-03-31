@@ -12,20 +12,34 @@ import * as arbitrableAddressListActions from '../actions/arbitrable-address-lis
 import * as tokensActions from '../actions/tokens'
 import * as badgesActions from '../actions/badges'
 import { instantiateEnvObjects } from '../utils/tcr'
+import { APP_VERSION } from '../bootstrap/dapp-api'
 
 import { ContractsContext } from './contexts'
 
 class ContractsProvider extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
-    fetchAccounts: PropTypes.func.isRequired
+    fetchAccounts: PropTypes.func.isRequired,
+    notifications: PropTypes.shape({}).isRequired
   }
 
   state = {}
 
   async componentDidMount() {
     const envObjects = await instantiateEnvObjects()
+    const { arbitrableTokenListView } = envObjects
     this.setState({ envObjects })
+
+    // Save notifications on unload.
+    window.addEventListener('unload', () => {
+      const { notifications } = this.props
+      localStorage.setItem(
+        `${
+          arbitrableTokenListView.options.address
+        }.notifications@${APP_VERSION}`,
+        JSON.stringify(notifications)
+      )
+    })
   }
 
   async componentDidUpdate() {
@@ -95,14 +109,10 @@ class Initializer extends PureComponent {
   }
 
   render() {
-    const { accounts, children, fetchAccounts } = this.props
+    const { accounts, children } = this.props
     return (
       <RenderIf
-        done={
-          <ContractsProvider fetchAccounts={fetchAccounts}>
-            {children}
-          </ContractsProvider>
-        }
+        done={<ContractsProvider {...this.props}>{children}</ContractsProvider>}
         extraLoadingValues={[
           !accounts.data || (window.ethereum && accounts.data.length === 0)
         ]}
@@ -128,7 +138,8 @@ class Initializer extends PureComponent {
 
 export default connect(
   state => ({
-    accounts: state.wallet.accounts
+    accounts: state.wallet.accounts,
+    notifications: state.notification.notifications.data
   }),
   {
     fetchAccounts: walletActions.fetchAccounts,
