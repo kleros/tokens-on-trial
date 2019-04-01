@@ -2,56 +2,21 @@
   publish = "build/"
   command = "yarn build"
 
-# Develop Branch Deploy context: All deploys that are not in
-# an active Deploy Preview will inherit these settings.
-[context.development]
-  [context.development.environment]
+[build.environment]
   NODE_VERSION='9.10.0'
   YARN_FLAGS='--pure-lockfile'
-  REACT_APP_PROD_NETWORK="kovan"
-  REACT_APP_PROD_WS_PROVIDER="wss://kovan.infura.io/ws/v3/8886cb30669f45a19e3c42a0d81d7ebd"
-  REACT_APP_PROD_HTTP_PROVIDER="https://kovan.infura.io/v3/8886cb30669f45a19e3c42a0d81d7ebd"
-  REACT_APP_PROD_ARBITRABLE_TOKEN_LIST_ADDRESS="0x25dd2659a1430cdbd678615c7409164ae486c146"
-  REACT_APP_PROD_ARBITRABLE_ADDRESS_LIST_ADDRESS="0xd58bdd286e8155b6223e2a62932ae3e0a9a75759"
-  REACT_APP_PROD_ARBITRATOR_ADDRESS="0x60b2abfdfad9c0873242f59f2a8c32a3cc682f80"
-  REACT_APP_PROD_T2CR_BLOCK="10452224"
-  REACT_APP_PROD_ETHFINEX_BADGE_BLOCK="10452278"
-  REACT_APP_PROD_ARBITRATOR_BLOCK="10482137"
-  REACT_APP_PROD_FILE_BASE_URL="https://staging-cfs.s3.us-east-2.amazonaws.com"
-  REACT_APP_PROD_FILE_UPLOAD_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/cfs"
-  REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings"
-  REACT_APP_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/QmVzwEBpGsbFY3UgyjA3SxgGXx3r5gFGynNpaoXkp6jenu/Ethfinex%20Court%20Policy.pdf"
-  REACT_APP_IPFS_URL="https://ipfs.kleros.io"
-  REACT_APP_VERSION="$npm_package_version"
-
-# Production context: All deploys to the main
-# repository branch will inherit these settings.
-[context.staging]
-  [context.staging.environment]
-  NODE_VERSION='9.10.0'
-  YARN_FLAGS='--pure-lockfile'
-  REACT_APP_PROD_NETWORK="main"
-  REACT_APP_PROD_WS_PROVIDER="wss://mainnet.infura.io/ws/v3/8886cb30669f45a19e3c42a0d81d7ebd"
-  REACT_APP_PROD_HTTP_PROVIDER="https://mainnet.infura.io/v3/8886cb30669f45a19e3c42a0d81d7ebd"
-  REACT_APP_PROD_ARBITRABLE_TOKEN_LIST_ADDRESS="0xebcf3bca271b26ae4b162ba560e243055af0e679"
-  REACT_APP_PROD_ARBITRABLE_ADDRESS_LIST_ADDRESS="0x916deab80dfbc7030277047cd18b233b3ce5b4ab"
-  REACT_APP_PROD_ARBITRATOR_ADDRESS="0x988b3a538b618c7a603e1c11ab82cd16dbe28069"
-  REACT_APP_PROD_T2CR_BLOCK="7309835"
-  REACT_APP_PROD_ETHFINEX_BADGE_BLOCK="7310129"
-  REACT_APP_PROD_ARBITRATOR_BLOCK="7303700"
-  REACT_APP_PROD_FILE_BASE_URL="https://production-doges-on-trial-doge-images.s3.us-east-2.amazonaws.com/"
-  REACT_APP_PROD_FILE_UPLOAD_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/staging/cfs"
-  REACT_APP_PROD_PATCH_USER_SETTINGS_URL="https://hgyxlve79a.execute-api.us-east-2.amazonaws.com/production/user-settings"
-  REACT_APP_ETHFINEX_CRITERIA_URL="https://ipfs.kleros.io/ipfs/QmVzwEBpGsbFY3UgyjA3SxgGXx3r5gFGynNpaoXkp6jenu/Ethfinex%20Court%20Policy.pdf"
-  REACT_APP_IPFS_URL="https://ipfs.kleros.io"
-  REACT_APP_VERSION="$npm_package_version"
-
-# Production context: All deploys to the main
-# repository branch will inherit these settings.
-[context.production]
-  [context.production.environment]
-  NODE_VERSION='9.10.0'
-  YARN_FLAGS='--pure-lockfile'
+  REACT_APP_DEV_NETWORK="kovan"
+  REACT_APP_DEV_WS_PROVIDER="wss://kovan.infura.io/ws/v3/8886cb30669f45a19e3c42a0d81d7ebd"
+  REACT_APP_DEV_HTTP_PROVIDER="https://kovan.infura.io/v3/8886cb30669f45a19e3c42a0d81d7ebd"
+  REACT_APP_DEV_ARBITRABLE_TOKEN_LIST_ADDRESS="0x25dd2659a1430cdbd678615c7409164ae486c146"
+  REACT_APP_DEV_ARBITRABLE_ADDRESS_LIST_ADDRESS="0xd58bdd286e8155b6223e2a62932ae3e0a9a75759"
+  REACT_APP_DEV_ARBITRATOR_ADDRESS="0x60b2abfdfad9c0873242f59f2a8c32a3cc682f80"
+  REACT_APP_DEV_T2CR_BLOCK="10452224"
+  REACT_APP_DEV_ETHFINEX_BADGE_BLOCK="10452278"
+  REACT_APP_DEV_ARBITRATOR_BLOCK="10482137"
+  REACT_APP_DEV_FILE_BASE_URL="https://staging-cfs.s3.us-east-2.amazonaws.com"
+  REACT_APP_DEV_FILE_UPLOAD_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/cfs"
+  REACT_APP_DEV_PATCH_USER_SETTINGS_URL="https://8aoprv935h.execute-api.us-east-2.amazonaws.com/staging/user-settings"
   REACT_APP_PROD_NETWORK="main"
   REACT_APP_PROD_WS_PROVIDER="wss://mainnet.infura.io/ws/v3/8886cb30669f45a19e3c42a0d81d7ebd"
   REACT_APP_PROD_HTTP_PROVIDER="https://mainnet.infura.io/v3/8886cb30669f45a19e3c42a0d81d7ebd"
