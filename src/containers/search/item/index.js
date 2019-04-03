@@ -4,15 +4,11 @@ import Img from 'react-image'
 import { connect } from 'react-redux'
 
 import { truncateMiddle } from '../../../utils/ui'
-import { web3Utils } from '../../../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../../../bootstrap/dapp-api'
 
 import './item.css'
 
-const SearchItem = ({
-  onClick,
-  item,
-  envObjects: { IPFS_URL, FILE_BASE_URL }
-}) => (
+const SearchItem = ({ onClick, item, FILE_BASE_URL }) => (
   <li onClick={onClick} className="SearchItem">
     <Img
       className="SearchItem-symbol"
@@ -36,13 +32,13 @@ const SearchItem = ({
 
 SearchItem.propTypes = {
   onClick: PropTypes.func.isRequired,
-  envObjects: PropTypes.shape({}).isRequired,
   item: PropTypes.shape({
     name: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
     imgSrc: PropTypes.string.isRequired
-  }).isRequired
+  }).isRequired,
+  FILE_BASE_URL: PropTypes.string.isRequired
 }
 
 export default connect(state => ({

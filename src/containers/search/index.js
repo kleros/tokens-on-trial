@@ -19,7 +19,10 @@ class SearchBar extends Component {
     tokens: PropTypes.shape({
       blockNumber: PropTypes.number.isRequired
     }).isRequired,
-    fetchTokens: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired,
+    envObjects: PropTypes.shape({
+      FILE_BASE_URL: PropTypes.string.isRequired
+    }).isRequired
   }
 
   itemClicked = selection => {
@@ -30,7 +33,8 @@ class SearchBar extends Component {
   itemCompute = item => (item ? item.value : '')
 
   render() {
-    const { tokens } = this.props
+    const { tokens, envObjects } = this.props
+    const { FILE_BASE_URL } = envObjects
     const tokenData = tokens.items
     const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
       const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
@@ -86,6 +90,7 @@ class SearchBar extends Component {
                               index,
                               item
                             })}
+                            FILE_BASE_URL={FILE_BASE_URL}
                           />
                         ))
                     : null}
@@ -102,7 +107,8 @@ class SearchBar extends Component {
 export default withRouter(
   connect(
     state => ({
-      tokens: state.tokens.data
+      tokens: state.tokens.data,
+      envObjects: state.envObjects.data
     }),
     {
       fetchTokens: tokensActions.fetchTokens
