@@ -5,8 +5,10 @@
   background: $mint;
   display: flex;
   flex-wrap: wrap;
+  height: 100vh;
   justify-content: center;
   padding: 42px 60px 52px 73px;
+  width: 100vw;
 
   @media (max-width: 580px) {
     flex-direction: column;
