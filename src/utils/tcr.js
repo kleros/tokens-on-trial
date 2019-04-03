@@ -8,7 +8,7 @@ import Arbitrator from '../assets/contracts/arbitrator'
 import { network as networkPromise } from '../bootstrap/dapp-api'
 
 export const instantiateEnvObjects = async () => {
-  const networkID = await networkPromise
+  const networkID = networkPromise ? await networkPromise : 1
   const env = networkID === 1 ? 'PROD' : 'DEV'
 
   // We have to use 3 different providers:

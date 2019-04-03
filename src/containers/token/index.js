@@ -399,9 +399,7 @@ class TokenDetails extends PureComponent {
 
     if (!envObjects) return null
 
-    const {
-      data: { FILE_BASE_URL }
-    } = envObjects
+    const { FILE_BASE_URL } = envObjects
     const { filters } = filter
     const { tokenID } = match.params
 

@@ -68,7 +68,7 @@ class Tokens extends Component {
 
   render() {
     const { tokens, badges, filter, accounts, envObjects } = this.props
-    const { networkID } = envObjects
+    const networkID = envObjects ? envObjects.networkID : 1
     const tokensData = tokens.data
     const userAccount = accounts[0]
     const { filters } = filter
