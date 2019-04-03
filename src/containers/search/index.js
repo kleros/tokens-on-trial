@@ -34,7 +34,7 @@ class SearchBar extends Component {
 
   render() {
     const { tokens, envObjects } = this.props
-    const { FILE_BASE_URL } = envObjects
+    const FILE_BASE_URL = envObjects ? envObjects.FILE_BASE_URL : null
     const tokenData = tokens.items
     const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
       const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
