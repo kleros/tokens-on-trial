@@ -11,16 +11,10 @@ import Progress from 'react-progressbar'
 import Archon from '@kleros/archon'
 
 import {
-  arbitrableAddressListView,
-  arbitrableAddressListEvents,
-  arbitratorEvents,
-  viewWeb3,
   ETHFINEX_CRITERIA_URL,
-  archon,
-  FILE_BASE_URL,
   IPFS_URL,
   onlyInfura,
-  ETHFINEX_BADGE_BLOCK
+  web3Utils
 } from '../../bootstrap/dapp-api'
 import UnknownToken from '../../assets/images/unknown.svg'
 import Etherscan from '../../assets/images/etherscan.png'
@@ -46,6 +40,7 @@ import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import './badge.css'
 
@@ -57,6 +52,7 @@ class BadgeDetails extends PureComponent {
     arbitrableAddressListData:
       arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
     badge: PropTypes.shape({}),
+    envObjects: PropTypes.shape({}).isRequired,
     match: PropTypes.shape({
       params: PropTypes.shape({
         tokenID: PropTypes.string
@@ -70,6 +66,8 @@ class BadgeDetails extends PureComponent {
     toggleFilter: PropTypes.func.isRequired,
     withdrawBadgeFunds: PropTypes.func.isRequired
   }
+
+  static contextType = ContractsContext
 
   static defaultProps = {
     match: {},
@@ -88,7 +86,9 @@ class BadgeDetails extends PureComponent {
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
-    toggleFilter(key)
+    const { arbitrableAddressListView } = this.context
+
+    toggleFilter(key, arbitrableAddressListView)
   }
 
   handleActionClick = (action, side) => {
@@ -156,101 +156,15 @@ class BadgeDetails extends PureComponent {
     })
   }
 
+  submitBadgeAction = () =>
+    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
+
   componentDidMount() {
     const { match, fetchBadge } = this.props
     const { tokenAddr } = match.params
+    this.setState({ fetching: true })
     fetchBadge(tokenAddr)
-    arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { tokenAddr } = match.params
-      if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
-    })
-    arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { tokenAddr } = match.params
-      if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
-    })
-    arbitratorEvents.events.AppealPossible((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { badge } = this.state
-      if (!badge) return
-      const { latestRequest } = badge
-
-      if (
-        latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-        latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
-      )
-        fetchBadge(tokenAddr)
-    })
-    arbitrableAddressListEvents.events.Ruling((err, event) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { badge } = this.state
-      if (!badge) return
-      const { latestRequest } = badge
-      if (
-        latestRequest.disputed &&
-        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-          latestRequest.appealDisputeID ===
-            Number(event.returnValues._disputeID))
-      )
-        fetchBadge(tokenAddr)
-    })
-    arbitrableAddressListEvents.events.Evidence(async (err, e) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { badge } = this.state
-      if (!badge) return
-      const { latestRequest } = badge
-      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-        return
-
-      const evidence = await (await fetch(
-        `${IPFS_URL}${e.returnValues._evidence}`
-      )).json()
-      /* eslint-disable unicorn/number-literal-case */
-      const calculatedMultihash = archon.utils.multihashFile(
-        evidence,
-        0x1b // keccak-256
-      )
-
-      if (
-        !(await Archon.utils.validateFileFromURI(
-          `${IPFS_URL}${e.returnValues._evidence}`,
-          { hash: calculatedMultihash }
-        ))
-      ) {
-        console.warn('Invalid evidence', evidence)
-        return
-      }
-
-      const { evidences } = this.state
-      const mimeType = mime.lookup(evidence.fileTypeExtension)
-      evidence.icon = getFileIcon(mimeType)
-      this.setState({
-        evidences: {
-          ...evidences,
-          [e.transactionHash]: evidence
-        }
-      })
-    })
   }
-
-  submitBadgeAction = () =>
-    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
 
   componentWillReceiveProps(nextProps) {
     const { badge: nextBadge } = nextProps
@@ -266,63 +180,177 @@ class BadgeDetails extends PureComponent {
   }
 
   async componentDidUpdate() {
-    const { match } = this.props
+    if (!this.context) return
+    const { arbitrableAddressListView } = this.context
+    if (!arbitrableAddressListView) return
+    const { match, fetchBadge } = this.props
+    const {
+      ETHFINEX_BADGE_BLOCK,
+      arbitrableAddressListEvents,
+      arbitratorEvents,
+      archon
+    } = this.context
     const { badge, fetching, evidenceListenerSet } = this.state
     const { tokenAddr } = match.params
-    if (!badge) return
+    if (!fetching && badge && evidenceListenerSet && badge.addr !== tokenAddr) {
+      fetchBadge(tokenAddr)
+      this.setState({
+        fetching: true,
+        evidenceListenerSet: false,
+        evidences: null
+      })
+      return
+    }
 
+    if (fetching || (badge && evidenceListenerSet && badge.addr === tokenAddr))
+      return
+
+    if (!badge && !fetching) {
+      fetchBadge(tokenAddr)
+      return
+    }
+
+    if (!badge && fetching) return
     if (badge && badge.addr !== tokenAddr && !fetching)
       window.location.reload(true)
-
     if (evidenceListenerSet) return
 
     const { latestRequest } = badge
 
     if (badge && !evidenceListenerSet) {
-      await Promise.all(
-        (await arbitrableAddressListView.getPastEvents('Evidence', {
-          filter: {
-            _evidenceGroupID: badge.latestRequest.evidenceGroupID
-          },
-          fromBlock: ETHFINEX_BADGE_BLOCK,
-          toBlock: 'latest'
-        })).map(async e => {
-          if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-            return
+      arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { tokenAddr } = match.params
+        if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
+      })
+      arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { tokenAddr } = match.params
+        if (tokenAddr === event.returnValues._address) fetchBadge(tokenAddr)
+      })
+      arbitratorEvents.events.AppealPossible((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { badge } = this.state
+        if (!badge) return
+        const { latestRequest } = badge
 
-          const evidence = await (await fetch(
-            `${IPFS_URL}${e.returnValues._evidence}`
-          )).json()
-          /* eslint-disable unicorn/number-literal-case */
-          const calculatedMultihash = archon.utils.multihashFile(
-            evidence,
-            0x1b // keccak-256
-          )
+        if (
+          latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID)
+        )
+          fetchBadge(tokenAddr)
+      })
+      arbitrableAddressListEvents.events.Ruling((err, event) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { badge } = this.state
+        if (!badge) return
+        const { latestRequest } = badge
+        if (
+          latestRequest.disputed &&
+          (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+            latestRequest.appealDisputeID ===
+              Number(event.returnValues._disputeID))
+        )
+          fetchBadge(tokenAddr)
+      })
+      arbitrableAddressListEvents.events.Evidence(async (err, e) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        const { badge } = this.state
+        if (!badge) return
+        const { latestRequest } = badge
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+          return
 
-          if (
-            !(await Archon.utils.validateFileFromURI(
-              `${IPFS_URL}${e.returnValues._evidence}`,
-              { hash: calculatedMultihash }
-            ))
-          ) {
-            console.warn('Invalid evidence', evidence)
-            return
+        const evidence = await (await fetch(
+          `${IPFS_URL}${e.returnValues._evidence}`
+        )).json()
+        /* eslint-disable unicorn/number-literal-case */
+        const calculatedMultihash = archon.utils.multihashFile(
+          evidence,
+          0x1b // keccak-256
+        )
+
+        if (
+          !(await Archon.utils.validateFileFromURI(
+            `${IPFS_URL}${e.returnValues._evidence}`,
+            { hash: calculatedMultihash }
+          ))
+        ) {
+          console.warn('Invalid evidence', evidence)
+          return
+        }
+
+        const { evidences } = this.state
+        const mimeType = mime.lookup(evidence.fileTypeExtension)
+        evidence.icon = getFileIcon(mimeType)
+        this.setState({
+          evidences: {
+            ...evidences,
+            [e.transactionHash]: evidence
           }
-
-          const { evidences } = this.state
-          const mimeType = mime.lookup(evidence.fileTypeExtension)
-          evidence.icon = getFileIcon(mimeType)
-          this.setState({
-            evidences: {
-              ...evidences,
-              [e.transactionHash]: evidence
-            }
-          })
         })
-      )
-
-      this.setState({ evidenceListenerSet: true })
+      })
     }
+
+    await Promise.all(
+      (await arbitrableAddressListView.getPastEvents('Evidence', {
+        filter: {
+          _evidenceGroupID: badge.latestRequest.evidenceGroupID
+        },
+        fromBlock: ETHFINEX_BADGE_BLOCK,
+        toBlock: 'latest'
+      })).map(async e => {
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+          return
+
+        const evidence = await (await fetch(
+          `${IPFS_URL}${e.returnValues._evidence}`
+        )).json()
+        /* eslint-disable unicorn/number-literal-case */
+        const calculatedMultihash = archon.utils.multihashFile(
+          evidence,
+          0x1b // keccak-256
+        )
+
+        if (
+          !(await Archon.utils.validateFileFromURI(
+            `${IPFS_URL}${e.returnValues._evidence}`,
+            { hash: calculatedMultihash }
+          ))
+        ) {
+          console.warn('Invalid evidence', evidence)
+          return
+        }
+
+        const { evidences } = this.state
+        const mimeType = mime.lookup(evidence.fileTypeExtension)
+        evidence.icon = getFileIcon(mimeType)
+        this.setState({
+          evidences: {
+            ...evidences,
+            [e.transactionHash]: evidence
+          }
+        })
+      })
+    )
+
+    this.setState({ evidenceListenerSet: true })
   }
 
   render() {
@@ -336,7 +364,14 @@ class BadgeDetails extends PureComponent {
       evidencePeriodEnded
     } = this.state
 
-    const { accounts, filter, match, arbitrableAddressListData } = this.props
+    const {
+      accounts,
+      filter,
+      match,
+      arbitrableAddressListData,
+      envObjects
+    } = this.props
+    const { FILE_BASE_URL } = envObjects
     const { filters } = filter
     const { tokenAddr } = match.params
 
@@ -522,7 +557,7 @@ class BadgeDetails extends PureComponent {
               <h4 className="BadgeDetails-label-name">Unknown Token</h4>
             </div>
           )}
-          {badge.withdrawable.gt(viewWeb3.utils.toBN(0)) && (
+          {badge.withdrawable.gt(web3Utils.toBN(0)) && (
             <>
               <div className="TokenDetails-divider" />
               <h5
@@ -531,7 +566,7 @@ class BadgeDetails extends PureComponent {
               >
                 <span className="TokenDetails-withdraw-value">
                   {Number(
-                    viewWeb3.utils.fromWei(badge.withdrawable.toString())
+                    web3Utils.fromWei(badge.withdrawable.toString())
                   ).toFixed(4)}{' '}
                   ETH{' '}
                 </span>
@@ -934,9 +969,7 @@ class BadgeDetails extends PureComponent {
                         src={Etherscan}
                       />
                       <div style={{ marginRight: '14px' }}>
-                        {truncateMiddle(
-                          viewWeb3.utils.toChecksumAddress(tokenAddr)
-                        )}
+                        {truncateMiddle(web3Utils.toChecksumAddress(tokenAddr))}
                       </div>
                     </div>
                   </a>
@@ -1117,7 +1150,8 @@ export default connect(
     accounts: state.wallet.accounts,
     arbitrableAddressListData:
       state.arbitrableAddressList.arbitrableAddressListData,
-    filter: state.filter
+    filter: state.filter,
+    envObjects: state.envObjects.data
   }),
   {
     openActionModal: modalActions.openActionModal,

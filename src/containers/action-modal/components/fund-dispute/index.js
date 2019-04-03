@@ -4,7 +4,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3 } from '../../../../bootstrap/dapp-api'
+import { web3Utils } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
 import './fund-dispute.css'
@@ -24,12 +24,12 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
       <strong>
         {`${truncateETHValue(
           String(
-            web3.utils.fromWei(
+            web3Utils.fromWei(
               String(
-                web3.utils
+                web3Utils
                   .toBN(tcr.data.arbitrationCost)
-                  .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                  .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                  .mul(web3Utils.toBN(tcr.data.sharedStakeMultiplier))
+                  .div(web3Utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
               )
             )
           )
@@ -41,9 +41,7 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
       <strong>
         {`${truncateETHValue(
           String(
-            web3.utils.fromWei(
-              String(web3.utils.toBN(tcr.data.arbitrationCost))
-            )
+            web3Utils.fromWei(String(web3Utils.toBN(tcr.data.arbitrationCost)))
           )
         )} ETH`}
       </strong>
@@ -54,16 +52,16 @@ const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
       <strong className="FundDispute-total-value">
         {`${truncateETHValue(
           String(
-            web3.utils.fromWei(
+            web3Utils.fromWei(
               String(
-                web3.utils
+                web3Utils
                   .toBN(
-                    web3.utils
+                    web3Utils
                       .toBN(tcr.data.arbitrationCost)
-                      .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                      .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                      .mul(web3Utils.toBN(tcr.data.sharedStakeMultiplier))
+                      .div(web3Utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
                   )
-                  .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                  .add(web3Utils.toBN(tcr.data.arbitrationCost))
               )
             )
           )

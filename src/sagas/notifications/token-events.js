@@ -2,16 +2,11 @@ import memoizeOne from 'memoize-one'
 
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
-import {
-  arbitrableTokenListView,
-  viewWeb3,
-  T2CR_BLOCK
-} from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
 
 // Helpers
-const getBlockDate = memoizeOne(blockHash =>
+const getBlockDate = memoizeOne((blockHash, viewWeb3) =>
   viewWeb3.eth
     .getBlock(blockHash)
     .then(block => new Date(block.timestamp * 1000))
@@ -24,7 +19,8 @@ const emitTokenNotifications = async (
   account,
   timeToChallenge,
   emit,
-  events
+  events,
+  { arbitrableTokenListView, T2CR_BLOCK, viewWeb3 }
 ) => {
   const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
@@ -99,8 +95,8 @@ const emitTokenNotifications = async (
         } else {
           message = `${
             isRequester
-              ? `Jurors ruled against you on the ${token.ticker} token.`
-              : `Jurors ruled in your favor on the ${token.ticker} token.`
+              ? `Jurors ruled against you on ${token.ticker} token.`
+              : `Jurors ruled in your favor on ${token.ticker} token.`
           }`
           successMessage = !isRequester
         }
@@ -110,15 +106,15 @@ const emitTokenNotifications = async (
         if (isRegistrationRequest) {
           message = `${
             isRequester
-              ? `Jurors ruled against you on the ${token.ticker} token.`
-              : `Jurors ruled in your favor on the ${token.ticker} token.`
+              ? `Jurors ruled against you on ${token.ticker} token.`
+              : `Jurors ruled in your favor on ${token.ticker} token.`
           }`
           successMessage = !isRequester
         } else {
           message = `${
             isRequester
               ? `${token.ticker} token delisting successful.`
-              : `Jurors ruled against you on the ${token.ticker} token.`
+              : `Jurors ruled against you on ${token.ticker} token.`
           }`
           successMessage = isRequester
         }
@@ -149,7 +145,7 @@ const emitTokenNotifications = async (
 
       emit({
         ID: returnValues._tokenID,
-        date: await getBlockDate(event.blockHash),
+        date: await getBlockDate(event.blockHash, viewWeb3),
         message,
         clientStatus,
         successMessage
@@ -163,7 +159,8 @@ const emitTokenNotifications = async (
       'disputed'
   ) {
     const date = await getBlockDate(
-      oldestNonDisputedSubmittedStatusEvent.blockHash
+      oldestNonDisputedSubmittedStatusEvent.blockHash,
+      viewWeb3
     )
     if (timeToChallenge && Date.now() - date > timeToChallenge)
       emit({

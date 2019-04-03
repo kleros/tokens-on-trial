@@ -7,7 +7,7 @@ import * as tokenSelectors from '../../../../reducers/token'
 import * as tcrConstants from '../../../../constants/tcr'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3 } from '../../../../bootstrap/dapp-api'
+import { web3Utils } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
 
@@ -56,7 +56,7 @@ const FundAppeal = ({
       <span>Appeal Cost</span>
       {`${item.latestRequest.latestRound.appealCost &&
         truncateETHValue(
-          String(web3.utils.fromWei(item.latestRequest.latestRound.appealCost))
+          String(web3Utils.fromWei(item.latestRequest.latestRound.appealCost))
         )} ETH`}
     </div>
     <div className="Appeal-cost">
@@ -64,12 +64,12 @@ const FundAppeal = ({
       {`${truncateETHValue(
         String(
           item.latestRequest.latestRound.appealCost &&
-            web3.utils.fromWei(
+            web3Utils.fromWei(
               String(
-                web3.utils
+                web3Utils
                   .toBN(String(item.latestRequest.latestRound.appealCost))
                   .mul(
-                    web3.utils.toBN(
+                    web3Utils.toBN(
                       !decisiveRuling(item)
                         ? String(tcr.data.sharedStakeMultiplier)
                         : isLosingSide(item, side)
@@ -77,7 +77,7 @@ const FundAppeal = ({
                         : String(tcr.data.winnerStakeMultiplier)
                     )
                   )
-                  .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
+                  .div(web3Utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
               )
             )
         )
@@ -88,15 +88,15 @@ const FundAppeal = ({
       {`${truncateETHValue(
         String(
           item.latestRequest.latestRound.appealCost &&
-            web3.utils.fromWei(
+            web3Utils.fromWei(
               String(
-                web3.utils
+                web3Utils
                   .toBN(String(item.latestRequest.latestRound.appealCost))
                   .add(
-                    web3.utils
+                    web3Utils
                       .toBN(String(item.latestRequest.latestRound.appealCost))
                       .mul(
-                        web3.utils.toBN(
+                        web3Utils.toBN(
                           !decisiveRuling(item)
                             ? String(tcr.data.sharedStakeMultiplier)
                             : isLosingSide(item, side)
@@ -104,7 +104,7 @@ const FundAppeal = ({
                             : String(tcr.data.winnerStakeMultiplier)
                         )
                       )
-                      .div(web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
+                      .div(web3Utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR)))
                   )
               )
             )
@@ -115,9 +115,9 @@ const FundAppeal = ({
       <span>Amount Paid:</span>
       {`${truncateETHValue(
         String(
-          web3.utils.fromWei(
+          web3Utils.fromWei(
             String(
-              web3.utils.toBN(
+              web3Utils.toBN(
                 String(item.latestRequest.latestRound.paidFees[side])
               )
             )
@@ -132,15 +132,15 @@ const FundAppeal = ({
         {`${truncateETHValue(
           String(
             item.latestRequest.latestRound.appealCost &&
-              web3.utils.fromWei(
+              web3Utils.fromWei(
                 String(
-                  web3.utils
+                  web3Utils
                     .toBN(String(item.latestRequest.latestRound.appealCost))
                     .add(
-                      web3.utils
+                      web3Utils
                         .toBN(String(item.latestRequest.latestRound.appealCost))
                         .mul(
-                          web3.utils.toBN(
+                          web3Utils.toBN(
                             !decisiveRuling(item)
                               ? String(tcr.data.sharedStakeMultiplier)
                               : isLosingSide(item, side)
@@ -149,11 +149,11 @@ const FundAppeal = ({
                           )
                         )
                         .div(
-                          web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR))
+                          web3Utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR))
                         )
                     )
                     .sub(
-                      web3.utils.toBN(
+                      web3Utils.toBN(
                         String(item.latestRequest.latestRound.paidFees[side])
                       )
                     )
@@ -170,18 +170,18 @@ const FundAppeal = ({
         amount: !item.latestRequest.latestRound.appealCost
           ? 0
           : truncateETHValue(
-              web3.utils
+              web3Utils
                 .fromWei(
                   String(
-                    web3.utils
+                    web3Utils
                       .toBN(String(item.latestRequest.latestRound.appealCost))
                       .add(
-                        web3.utils
+                        web3Utils
                           .toBN(
                             String(item.latestRequest.latestRound.appealCost)
                           )
                           .mul(
-                            web3.utils.toBN(
+                            web3Utils.toBN(
                               !decisiveRuling(item)
                                 ? String(tcr.data.sharedStakeMultiplier)
                                 : isLosingSide(item, side)
@@ -190,11 +190,11 @@ const FundAppeal = ({
                             )
                           )
                           .div(
-                            web3.utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR))
+                            web3Utils.toBN(String(tcr.data.MULTIPLIER_DIVISOR))
                           )
                       )
                       .sub(
-                        web3.utils.toBN(
+                        web3Utils.toBN(
                           String(item.latestRequest.latestRound.paidFees[side])
                         )
                       )

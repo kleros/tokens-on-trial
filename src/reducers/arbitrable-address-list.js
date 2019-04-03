@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
 
-import { web3 } from '../bootstrap/dapp-api'
+import { web3Utils } from '../bootstrap/dapp-api'
 import * as itemConstants from '../constants/tcr'
 
 // Shapes
@@ -37,7 +37,7 @@ export default createReducer({
 // Selectors
 export const getSubmitCost = state =>
   state.arbitrableAddressList.arbitrableAddressListData.data &&
-  web3.utils.toBN(
+  web3Utils.toBN(
     state.arbitrableAddressList.arbitrableAddressListData.data
       .requesterBaseDeposit
   )

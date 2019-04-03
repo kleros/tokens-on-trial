@@ -4,11 +4,6 @@ import ReactDOM from 'react-dom'
 import configureStore from './bootstrap/configure-store'
 import App from './bootstrap/app'
 import registerServiceWorker from './bootstrap/register-service-worker'
-import {
-  arbitrableTokenList,
-  arbitrableAddressList,
-  APP_VERSION
-} from './bootstrap/dapp-api'
 
 const { store, history } = configureStore()
 export default store
@@ -23,28 +18,9 @@ const render = Component => {
     document.getElementById('root')
   )
 }
+
 render(App)
 registerServiceWorker()
-
-window.addEventListener('unload', () => {
-  localStorage.setItem(
-    `${arbitrableTokenList.options.address +
-      arbitrableAddressList.options.address}notifications`,
-    JSON.stringify(store.getState().notification.notifications.data)
-  )
-  localStorage.setItem(
-    `${arbitrableTokenList.options.address}filter`,
-    JSON.stringify(store.getState().filter)
-  )
-  localStorage.setItem(
-    `${arbitrableTokenList.options.address}tokens@${APP_VERSION}`,
-    JSON.stringify(store.getState().tokens)
-  )
-  localStorage.setItem(
-    `${arbitrableAddressList.options.address}badges@${APP_VERSION}`,
-    JSON.stringify(store.getState().badges)
-  )
-})
 
 if (module.hot)
   module.hot.accept('./bootstrap/app', () => {

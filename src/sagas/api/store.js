@@ -1,12 +1,7 @@
 import statusHelper from '../../utils/api-status-helper'
-import {
-  FILE_BASE_URL,
-  FILE_UPLOAD_URL,
-  archon
-} from '../../bootstrap/dapp-api'
 
 const storeApi = {
-  postJSONFile(file) {
+  postJSONFile(file, url, archon) {
     const stringified = JSON.stringify(file)
     const base64EncodedData = `data:application/json;base64,${btoa(
       stringified
@@ -24,7 +19,7 @@ const storeApi = {
       }
     })
 
-    return fetch(FILE_UPLOAD_URL, {
+    return fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -36,8 +31,8 @@ const storeApi = {
       .catch(err => err)
       .then(data => data)
   },
-  postEncodedFile(file, fileName, contentType) {
-    return fetch(FILE_UPLOAD_URL, {
+  postEncodedFile(file, fileName, contentType, url) {
+    return fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': contentType
@@ -54,8 +49,9 @@ const storeApi = {
       .catch(err => err)
       .then(data => data)
   },
-  getFile(ID) {
-    return fetch(`${FILE_BASE_URL}/${ID}.json`)
+
+  getFile(ID, url) {
+    return fetch(`${url}/${ID}.json`)
       .then(statusHelper)
       .then(response => response.json())
       .catch(err => err)

@@ -3,20 +3,15 @@ import { all, call, select, takeLatest } from 'redux-saga/effects'
 import { lessduxSaga } from '../utils/saga'
 import readFile from '../utils/read-file'
 import { sanitize } from '../utils/ui'
-import {
-  arbitrableAddressList,
-  arbitrableAddressListView,
-  arbitratorView,
-  archon,
-  viewWeb3
-} from '../bootstrap/dapp-api'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
+import { web3Utils } from '../bootstrap/dapp-api'
+import { instantiateEnvObjects } from '../utils/tcr'
 
 import ipfsPublish from './api/ipfs-publish'
 
-const { toBN } = viewWeb3.utils
+const { toBN } = web3Utils
 
 /**
  * Fetches the arbitrable address list's data.
@@ -24,6 +19,10 @@ const { toBN } = viewWeb3.utils
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitrableAddressListData() {
+  const { arbitrableAddressListView, arbitratorView } = yield call(
+    instantiateEnvObjects
+  )
+
   const d = yield all({
     arbitrator: call(arbitrableAddressListView.methods.arbitrator().call),
     requesterBaseDeposit: call(
@@ -86,6 +85,8 @@ export function* fetchArbitrableAddressListData() {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
+  const { arbitrableAddressList, archon } = yield call(instantiateEnvObjects)
+
   let fileURI = ''
   let fileTypeExtension = ''
   const multihash = ''

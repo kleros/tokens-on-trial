@@ -4,6 +4,7 @@ import { createActions } from 'lessdux'
 
 // Notifications
 export const notifications = createActions('NOTIFICATIONS')
+export const LOAD_NOTIFICATIONS_STATE = 'LOAD_NOTIFICATIONS_STATE'
 
 // Notification
 export const notification = createActions('NOTIFICATION', {
@@ -17,4 +18,9 @@ export const notification = createActions('NOTIFICATION', {
 export const deleteNotification = ID => ({
   type: notification.DELETE,
   payload: { ID }
+})
+
+export const loadState = data => ({
+  type: LOAD_NOTIFICATIONS_STATE,
+  payload: { data }
 })

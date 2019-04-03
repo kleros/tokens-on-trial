@@ -2,17 +2,11 @@ import memoizeOne from 'memoize-one'
 
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
-import {
-  arbitrableAddressListView,
-  arbitrableTokenListView,
-  viewWeb3,
-  ETHFINEX_BADGE_BLOCK
-} from '../../bootstrap/dapp-api'
 
 /* eslint-disable valid-jsdoc */
 
 // Helpers
-const getBlockDate = memoizeOne(blockHash =>
+const getBlockDate = memoizeOne((blockHash, viewWeb3) =>
   viewWeb3.eth
     .getBlock(blockHash)
     .then(block => new Date(block.timestamp * 1000))
@@ -37,7 +31,13 @@ const emitBadgeNotifications = async (
   account,
   timeToChallenge,
   emit,
-  events
+  events,
+  {
+    arbitrableAddressListView,
+    arbitrableTokenListView,
+    viewWeb3,
+    ETHFINEX_BADGE_BLOCK
+  }
 ) => {
   const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
@@ -195,7 +195,7 @@ const emitBadgeNotifications = async (
         ID: returnValues._address,
         addr: returnValues._address,
         badgeAddr: arbitrableAddressListView._address,
-        date: await getBlockDate(event.blockHash),
+        date: await getBlockDate(event.blockHash, viewWeb3),
         message,
         clientStatus,
         successMessage
@@ -209,7 +209,8 @@ const emitBadgeNotifications = async (
       `disputed`
   ) {
     const date = await getBlockDate(
-      oldestNonDisputedSubmittedStatusEvent.blockHash
+      oldestNonDisputedSubmittedStatusEvent.blockHash,
+      viewWeb3
     )
     if (timeToChallenge && Date.now() - date > timeToChallenge)
       emit({

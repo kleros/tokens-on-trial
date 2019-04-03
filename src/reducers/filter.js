@@ -4,7 +4,7 @@ import createReducer from 'lessdux'
 import * as filterActions from '../actions/filter'
 import * as filterConstants from '../constants/filter'
 import { defaultFilter } from '../utils/filter'
-import { arbitrableTokenListView } from '../bootstrap/dapp-api'
+import { APP_VERSION } from '../bootstrap/dapp-api'
 
 // Shapes
 const filterShape = PropTypes.shape({
@@ -23,33 +23,43 @@ const filterShape = PropTypes.shape({
 export { filterShape }
 
 // Reducer
-const cachedFilters = localStorage.getItem(
-  `${arbitrableTokenListView.options.address}filter`
-)
-const parsedFilters =
-  cachedFilters && cachedFilters !== 'undefined'
-    ? JSON.parse(cachedFilters)
-    : undefined
-
 export default createReducer(
   {
-    oldestFirst: parsedFilters ? parsedFilters.oldestFirst : 0,
-    filters: parsedFilters ? parsedFilters.filters : defaultFilter()
+    oldestFirst: 0,
+    filters: defaultFilter()
   },
   {
     [filterActions.SET_OLDEST_FIRST]: (
       state,
-      { payload: { oldestFirst } }
-    ) => ({
-      ...state,
-      oldestFirst
-    }),
-    [filterActions.TOGGLE_FILTER]: (state, { payload: { key } }) => ({
-      ...state,
-      filters: {
-        ...state.filters,
-        [key]: !state.filters[key]
+      { payload: { oldestFirst, tcr } }
+    ) => {
+      const newState = {
+        ...state,
+        oldestFirst
       }
+      localStorage.setItem(
+        `${tcr.options.address}filter@${APP_VERSION}`,
+        JSON.stringify(newState)
+      )
+      return newState
+    },
+    [filterActions.TOGGLE_FILTER]: (state, { payload: { key, tcr } }) => {
+      const newState = {
+        ...state,
+        filters: {
+          ...state.filters,
+          [key]: !state.filters[key]
+        }
+      }
+      localStorage.setItem(
+        `${tcr.options.address}filter@${APP_VERSION}`,
+        JSON.stringify(newState)
+      )
+      return newState
+    },
+    [filterActions.LOAD_FILTERS_STATE]: (state, { payload: { data } }) => ({
+      ...state,
+      data
     })
   }
 )

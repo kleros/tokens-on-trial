@@ -1,36 +1,52 @@
-import { put, takeLatest, select, call } from 'redux-saga/effects'
+import { put, takeLatest, call } from 'redux-saga/effects'
 
 import {
   FETCH_BADGES_CACHE,
   cacheBadges,
   fetchBadgesFailed
 } from '../actions/badges'
-import * as badgesSelectors from '../reducers/badges'
 import {
-  arbitrableAddressListView,
-  ETHFINEX_BADGE_BLOCK
-} from '../bootstrap/dapp-api'
-import { contractStatusToClientStatus } from '../utils/tcr'
+  contractStatusToClientStatus,
+  instantiateEnvObjects
+} from '../utils/tcr'
+import { APP_VERSION } from '../bootstrap/dapp-api'
 
-const fetchEvents = async (eventName, fromBlock) =>
-  arbitrableAddressListView.getPastEvents(eventName, { fromBlock })
+const fetchEvents = async (eventName, fromBlock, contract) =>
+  contract.getPastEvents(eventName, { fromBlock })
 
 /**
- * Fetches a paginatable list of badges.
+ * Fetches a paginable list of badges.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchBadges() {
+  const { arbitrableAddressListView, ETHFINEX_BADGE_BLOCK } = yield call(
+    instantiateEnvObjects
+  )
+
   try {
-    // Get the lastest status change for every token.
+    // Get the lastest status change for every badge.
     let statusBlockNumber = ETHFINEX_BADGE_BLOCK
     const latestStatusChanges = {}
-    const badges = JSON.parse(
-      JSON.stringify((yield select(badgesSelectors.getBadges)).data)
-    ) // Deep copy.
+    let badges = localStorage.getItem(
+      `${arbitrableAddressListView.options.address}badges@${APP_VERSION}`
+    )
+    if (!badges)
+      badges = {
+        statusBlockNumber: ETHFINEX_BADGE_BLOCK,
+        items: {},
+        addressToIDs: {}
+      }
+    else {
+      badges = JSON.parse(badges)
+      yield put(cacheBadges(badges))
+      badges = JSON.parse(JSON.stringify(badges)) // Get a deep copy.
+    }
+
     const statusChanges = yield call(
       fetchEvents,
       'AddressStatusChange',
-      badges.statusBlockNumber
+      badges.statusBlockNumber,
+      arbitrableAddressListView
     )
 
     statusChanges.forEach(event => {
@@ -85,6 +101,11 @@ function* fetchBadges() {
         cachedBadges.items[address].status.disputed
       )
     })
+
+    localStorage.setItem(
+      `${arbitrableAddressListView.options.address}badges@${APP_VERSION}`,
+      JSON.stringify(cachedBadges)
+    )
 
     yield put(cacheBadges(cachedBadges))
   } catch (err) {

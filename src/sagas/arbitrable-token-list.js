@@ -2,21 +2,16 @@ import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import { sanitize } from '../utils/ui'
-import {
-  arbitrableTokenList,
-  arbitrableTokenListView,
-  arbitratorView,
-  archon,
-  viewWeb3
-} from '../bootstrap/dapp-api'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import readFile from '../utils/read-file'
+import { web3Utils } from '../bootstrap/dapp-api'
+import { instantiateEnvObjects } from '../utils/tcr'
 
 import ipfsPublish from './api/ipfs-publish'
 
-const { toBN } = viewWeb3.utils
+const { toBN } = web3Utils
 
 /**
  * Fetches the arbitrable token list's data.
@@ -24,6 +19,10 @@ const { toBN } = viewWeb3.utils
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitrableTokenListData() {
+  const { arbitrableTokenListView, arbitratorView } = yield call(
+    instantiateEnvObjects
+  )
+
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
     requesterBaseDeposit: call(
@@ -106,6 +105,8 @@ function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
     fileURI,
     fileTypeExtension
   }
+
+  const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
 
   /* eslint-disable unicorn/number-literal-case */
   const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256

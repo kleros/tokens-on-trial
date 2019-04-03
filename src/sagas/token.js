@@ -3,18 +3,10 @@ import { all, call, select, takeLatest } from 'redux-saga/effects'
 import readFile from '../utils/read-file'
 import { lessduxSaga } from '../utils/saga'
 import {
-  arbitrableTokenList,
-  arbitrableTokenListView,
-  arbitrableAddressListView,
-  arbitratorView,
-  archon,
-  ARBITRATOR_ADDRESS,
-  viewWeb3
-} from '../bootstrap/dapp-api'
-import {
   contractStatusToClientStatus,
   hasPendingRequest,
-  convertFromString
+  convertFromString,
+  instantiateEnvObjects
 } from '../utils/tcr'
 import * as tokenActions from '../actions/token'
 import * as walletSelectors from '../reducers/wallet'
@@ -22,10 +14,11 @@ import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list
 import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
+import { web3Utils } from '../bootstrap/dapp-api'
 
 import ipfsPublish from './api/ipfs-publish'
 
-const { toBN } = viewWeb3.utils
+const { toBN } = web3Utils
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
@@ -38,6 +31,7 @@ const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
   // Token count and stats
   if (cursor === '') cursor = ZERO_ID
+  const { arbitrableTokenListView } = yield call(instantiateEnvObjects)
 
   const totalCount = Number(
     yield call(arbitrableTokenListView.methods.tokenCount().call, {
@@ -192,10 +186,17 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
  * @returns {object} - The fetched token.
  */
 export function* fetchToken({ payload: { ID } }) {
+  const {
+    arbitrableTokenListView,
+    arbitrableAddressListView,
+    arbitratorView,
+    ARBITRATOR_ADDRESS
+  } = yield call(instantiateEnvObjects)
+
   let token = yield call(arbitrableTokenListView.methods.getTokenInfo(ID).call)
   const account = yield select(walletSelectors.getAccount)
 
-  // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
+  // web3js returns null if a string value in the smart contract is "0x".
   if (token.name === null || token['0'] === null) {
     token.name = '0x'
     token['0'] = '0x'
@@ -216,13 +217,13 @@ export function* fetchToken({ payload: { ID } }) {
     if (token.latestRequest.arbitratorExtraData === null)
       token.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-    token.latestRequest.evidenceGroupID = viewWeb3.utils
-      .toBN(viewWeb3.utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
+    token.latestRequest.evidenceGroupID = web3Utils
+      .toBN(web3Utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
       .toString()
 
     // Calculate amount withdrawable
     let i
-    token.withdrawable = viewWeb3.utils.toBN(0)
+    token.withdrawable = web3Utils.toBN(0)
     if (token.latestRequest.resolved) i = token.numberOfRequests - 1
     // Start from the last round.
     else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
@@ -231,7 +232,7 @@ export function* fetchToken({ payload: { ID } }) {
       const amount = yield call(
         arbitrableTokenListView.methods.amountWithdrawable(ID, account, i).call
       )
-      token.withdrawable = token.withdrawable.add(viewWeb3.utils.toBN(amount))
+      token.withdrawable = token.withdrawable.add(web3Utils.toBN(amount))
       i--
     }
 
@@ -379,10 +380,8 @@ export function* fetchToken({ payload: { ID } }) {
       if (badge.latestRequest.arbitratorExtraData === null)
         badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-      badge.latestRequest.evidenceGroupID = viewWeb3.utils
-        .toBN(
-          viewWeb3.utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1)
-        )
+      badge.latestRequest.evidenceGroupID = web3Utils
+        .toBN(web3Utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
         .toString()
 
       badge.latestRequest.latestRound = yield call(
@@ -529,8 +528,8 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
-          requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
+          paidFees: new Array(3).fill(web3Utils.toBN(0)),
+          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
         }
       }
 
@@ -558,8 +557,8 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
-          requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
+          paidFees: new Array(3).fill(web3Utils.toBN(0)),
+          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
         }
       },
       badge: {
@@ -577,8 +576,8 @@ export function* fetchToken({ payload: { ID } }) {
           parties: [],
           latestRound: {
             appealed: false,
-            paidFees: new Array(3).fill(viewWeb3.utils.toBN(0)),
-            requiredForSide: new Array(3).fill(viewWeb3.utils.toBN(0))
+            paidFees: new Array(3).fill(web3Utils.toBN(0)),
+            requiredForSide: new Array(3).fill(web3Utils.toBN(0))
           }
         }
       },
@@ -610,10 +609,12 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestRegistration({ payload: { token, file, fileData, value } }) {
+  const { archon, arbitrableTokenList } = yield call(instantiateEnvObjects)
+
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: viewWeb3.utils.toChecksumAddress(token.addr),
+    addr: web3Utils.toChecksumAddress(token.addr),
     symbolMultihash: token.symbolMultihash
   }
 
@@ -636,7 +637,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = viewWeb3.utils.soliditySha3(
+  const ID = web3Utils.soliditySha3(
     name || '',
     ticker || '',
     addr,
@@ -672,10 +673,12 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (isInvalid(token.ID) && isInvalid(token.addr))
     throw new Error('Missing address on token submit', token)
 
+  const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
+
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: viewWeb3.utils.toChecksumAddress(token.addr),
+    addr: web3Utils.toChecksumAddress(token.addr),
     symbolMultihash: token.symbolMultihash
   }
 
@@ -698,7 +701,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
-  const ID = viewWeb3.utils.soliditySha3(
+  const ID = web3Utils.soliditySha3(
     name || '',
     ticker || '',
     addr,
@@ -736,6 +739,8 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* challengeRequest({ payload: { ID, value, evidence } }) {
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
+
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
   if (!hasPendingRequest(token))
@@ -755,6 +760,8 @@ function* challengeRequest({ payload: { ID, value, evidence } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* fundDispute({ payload: { ID, value, side } }) {
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
+
   // Add to contract if absent
   const token = yield call(fetchToken, { payload: { ID } })
   if (!hasPendingRequest(token))
@@ -774,6 +781,8 @@ function* fundDispute({ payload: { ID, value, side } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* fundAppeal({ payload: { ID, side, value } }) {
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
+
   yield call(arbitrableTokenList.methods.fundAppeal(ID, side).send, {
     from: yield select(walletSelectors.getAccount),
     value
@@ -789,6 +798,7 @@ function* fundAppeal({ payload: { ID, side, value } }) {
  */
 function* executeRequest({ payload: { ID } }) {
   const status = Number((yield call(fetchToken, { payload: { ID } })).status)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
   if (
     status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.RegistrationRequested &&
     status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.ClearingRequested
@@ -808,6 +818,8 @@ function* executeRequest({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the token.
  */
 function* feeTimeout({ payload: { token } }) {
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
+
   yield call(arbitrableTokenList.methods.executeRequest(token.ID).send, {
     from: yield select(walletSelectors.getAccount)
   })
@@ -823,6 +835,7 @@ function* feeTimeout({ payload: { token } }) {
 function* withdrawTokenFunds({ payload: { ID, item } }) {
   let count = 0
   if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   yield call(
     arbitrableTokenList.methods.batchRequestWithdraw(

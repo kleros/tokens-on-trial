@@ -10,6 +10,7 @@ import Paging from '../../components/paging'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterActions from '../../actions/filter'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import './tokens.css'
 
@@ -29,16 +30,22 @@ class Tokens extends Component {
     }).isRequired,
     accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
     filter: PropTypes.shape({}).isRequired,
+    envObjects: PropTypes.shape({
+      networkID: PropTypes.number.isRequired
+    }).isRequired,
 
     // Dispatchers
     toggleFilter: PropTypes.func.isRequired
   }
 
+  static contextType = ContractsContext
+
   state = { currentPage: 0 }
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
-    toggleFilter(key)
+    const { arbitrableTokenListView } = this.context
+    toggleFilter(key, arbitrableTokenListView)
   }
 
   handleFirstPageClicked = () => {
@@ -60,7 +67,8 @@ class Tokens extends Component {
   }
 
   render() {
-    const { tokens, badges, filter, accounts } = this.props
+    const { tokens, badges, filter, accounts, envObjects } = this.props
+    const { networkID } = envObjects
     const tokensData = tokens.data
     const userAccount = accounts[0]
     const { filters } = filter
@@ -87,6 +95,21 @@ class Tokens extends Component {
 
         return false
       })
+      .filter(
+        token =>
+          // These tokens have disputes (on the kovan testnet) with an AutoAppealableArbitrator
+          // as the arbitrator, which is currently not supported by the UI.
+          // Hide them from the list.
+          networkID !== 42 ||
+          (token.ID !==
+            '0x94dd28a2ced5d59541f0aaedc4192cd32f8e8c15ea752ae4f9fc8fee6cac0a9a' &&
+            token.ID !==
+              '0xac31c437ede12028c57a8112d4df4566f28051c6447ed2a2e2dcc4f88d8a6865' &&
+            token.ID !==
+              '0x488db20cbe8d6b36dbf9e1db8e4fbda80692074330a2391cb67859b314034b67' &&
+            token.ID !==
+              '0xf69ce03f1e563398463cf2672ca220da670d9af3d27843e8d5c5069c455ea3de')
+      )
       .sort((a, b) => {
         const { oldestFirst } = filter
         if (oldestFirst) return a.blockNumber < b.blockNumber ? -1 : 1
@@ -167,7 +190,8 @@ export default withRouter(
       tokens: state.tokens,
       badges: state.badges,
       filter: state.filter,
-      accounts: state.wallet.accounts.data
+      accounts: state.wallet.accounts.data,
+      envObjects: state.envObjects.data
     }),
     {
       toggleFilter: filterActions.toggleFilter

@@ -13,6 +13,7 @@ import * as arbitrableAddressListActions from '../../actions/arbitrable-address-
 import * as badgeActions from '../../actions/badge'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
+import { ContractsContext } from '../../bootstrap/contexts'
 
 import './badges.css'
 
@@ -37,11 +38,14 @@ class Badges extends Component {
     toggleFilter: PropTypes.func.isRequired
   }
 
+  static contextType = ContractsContext
+
   state = { currentPage: 0 }
 
   handleFilterChange = key => {
     const { toggleFilter } = this.props
-    toggleFilter(key)
+    const { arbitrableTokenListView } = this.context
+    toggleFilter(key, arbitrableTokenListView)
   }
 
   handleFirstPageClicked = () => {
@@ -168,7 +172,8 @@ export default withRouter(
       badges: state.badges,
       tokens: state.tokens,
       filter: state.filter,
-      accounts: state.wallet.accounts.data
+      accounts: state.wallet.accounts.data,
+      envObjects: state.envObjects.data
     }),
     {
       fetchArbitrableAddressListData:

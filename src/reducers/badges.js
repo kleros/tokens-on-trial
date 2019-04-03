@@ -1,27 +1,17 @@
 import {
   CACHE_BADGES,
   FETCH_BADGES_CACHE,
-  FETCH_BADGES_FAILED
+  FETCH_BADGES_FAILED,
+  LOAD_BADGES_STATE
 } from '../actions/badges'
-import {
-  arbitrableAddressListView,
-  APP_VERSION,
-  ETHFINEX_BADGE_BLOCK
-} from '../bootstrap/dapp-api'
 
-const cachedBadges = localStorage.getItem(
-  `${arbitrableAddressListView.options.address}badges@${APP_VERSION}`
-)
-
-const initialState = cachedBadges
-  ? JSON.parse(cachedBadges)
-  : {
-      loading: false,
-      data: {
-        statusBlockNumber: ETHFINEX_BADGE_BLOCK,
-        items: {}
-      }
-    }
+const initialState = {
+  loading: false,
+  data: {
+    statusBlockNumber: 0,
+    items: {}
+  }
+}
 
 const badges = (state = initialState, action) => {
   switch (action.type) {
@@ -43,6 +33,13 @@ const badges = (state = initialState, action) => {
       return {
         data: { ...badges },
         loading: false
+      }
+    }
+    case LOAD_BADGES_STATE: {
+      const { data } = action.payload
+      return {
+        ...state,
+        data
       }
     }
     default:

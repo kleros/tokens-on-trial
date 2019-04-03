@@ -5,7 +5,10 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3, ETHFINEX_CRITERIA_URL } from '../../../../bootstrap/dapp-api'
+import {
+  web3Utils,
+  ETHFINEX_CRITERIA_URL
+} from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
@@ -123,17 +126,17 @@ const Submit = ({
           <strong>
             {truncateETHValue(
               String(
-                web3.utils.fromWei(
+                web3Utils.fromWei(
                   String(
-                    web3.utils
+                    web3Utils
                       .toBN(tcr.data.requesterBaseDeposit)
                       .add(
-                        web3.utils
+                        web3Utils
                           .toBN(tcr.data.arbitrationCost)
-                          .mul(web3.utils.toBN(tcr.data.sharedStakeMultiplier))
-                          .div(web3.utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                          .mul(web3Utils.toBN(tcr.data.sharedStakeMultiplier))
+                          .div(web3Utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
                       )
-                      .add(web3.utils.toBN(tcr.data.arbitrationCost))
+                      .add(web3Utils.toBN(tcr.data.arbitrationCost))
                   )
                 )
               )

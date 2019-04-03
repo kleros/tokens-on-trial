@@ -16,13 +16,9 @@ import ActionModal from '../containers/action-modal'
 import Identicon from '../components/identicon'
 import * as modalConstants from '../constants/modal'
 import * as modalActions from '../actions/modal'
-import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
-import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as walletSelectors from '../reducers/wallet'
 import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
-import * as tokensActions from '../actions/tokens'
-import * as badgesActions from '../actions/badges'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
@@ -30,11 +26,7 @@ import TelegramButton from '../components/telegram-button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
-import {
-  onlyInfura,
-  arbitrableTokenListEvents,
-  arbitrableAddressListEvents
-} from './dapp-api'
+import { onlyInfura } from './dapp-api'
 import './fontawesome'
 import './app.css'
 
@@ -52,11 +44,7 @@ class _ConnectedNavBar extends Component {
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,
     deleteNotification: PropTypes.func.isRequired,
-    closeNotificationsModal: PropTypes.func.isRequired,
-    fetchArbitrableTokenListData: PropTypes.func.isRequired,
-    fetchArbitrableAddressListData: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired
+    closeNotificationsModal: PropTypes.func.isRequired
   }
 
   handleSubmitTokenClick = () => {
@@ -80,25 +68,6 @@ class _ConnectedNavBar extends Component {
     const { history, closeNotificationsModal } = this.props
     closeNotificationsModal()
     history.push(`/notifications`)
-  }
-
-  componentDidMount() {
-    const {
-      fetchArbitrableAddressListData,
-      fetchArbitrableTokenListData,
-      fetchTokens,
-      fetchBadges
-    } = this.props
-    fetchArbitrableTokenListData()
-    fetchArbitrableAddressListData()
-    fetchTokens()
-    fetchBadges()
-    arbitrableTokenListEvents.events.TokenStatusChange(() => {
-      fetchTokens()
-    })
-    arbitrableAddressListEvents.events.AddressStatusChange(() => {
-      fetchBadges()
-    })
   }
 
   render() {
@@ -158,12 +127,12 @@ class _ConnectedNavBar extends Component {
                 extraStyle: 'NavBar-route-title'
               },
               {
-                title: 'Ethfinex Guide',
+                title: 'Ethfinex Badge',
                 to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
                 extraStyle: 'NavBar-route-title'
               },
               {
-                title: 'Crowdfunding Guide',
+                title: 'Appeal Fees Crowdfunding',
                 to:
                   'https://blog.kleros.io/kleros-decentralized-token-listing-appeal-fees/',
                 extraStyle: 'NavBar-route-title'
@@ -186,13 +155,7 @@ const ConnectedNavBar = withRouter(
     {
       deleteNotification: notificationActions.deleteNotification,
       openActionModal: modalActions.openActionModal,
-      closeNotificationsModal: modalActions.closeNotificationsModal,
-      fetchArbitrableAddressListData:
-        arbitrableAddressListActions.fetchArbitrableAddressListData,
-      fetchArbitrableTokenListData:
-        arbitrableTokenListActions.fetchArbitrableTokenListData,
-      fetchTokens: tokensActions.fetchTokens,
-      fetchBadges: badgesActions.fetchBadges
+      closeNotificationsModal: modalActions.closeNotificationsModal
     }
   )(_ConnectedNavBar)
 )
