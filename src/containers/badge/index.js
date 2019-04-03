@@ -371,7 +371,8 @@ class BadgeDetails extends PureComponent {
       arbitrableAddressListData,
       envObjects
     } = this.props
-    const { FILE_BASE_URL } = envObjects
+
+    const FILE_BASE_URL = envObjects ? envObjects.FILE_BASE_URL : null
     const { filters } = filter
     const { tokenAddr } = match.params
 
