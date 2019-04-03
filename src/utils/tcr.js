@@ -113,7 +113,8 @@ export const instantiateEnvObjects = async () => {
     ARBITRABLE_TOKEN_LIST_ADDRESS,
     web3,
     viewWeb3,
-    eventsWeb3
+    eventsWeb3,
+    networkID
   }
 }
 

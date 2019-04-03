@@ -16,7 +16,8 @@ function* initialize() {
     T2CR_BLOCK,
     ETHFINEX_BADGE_BLOCK,
     ARBITRABLE_ADDRESS_LIST_ADDRESS,
-    arbitrableTokenListView
+    arbitrableTokenListView,
+    networkID
   } = yield call(instantiateEnvObjects)
 
   yield put(
@@ -24,7 +25,8 @@ function* initialize() {
       FILE_BASE_URL,
       T2CR_BLOCK,
       ETHFINEX_BADGE_BLOCK,
-      ARBITRABLE_ADDRESS_LIST_ADDRESS
+      ARBITRABLE_ADDRESS_LIST_ADDRESS,
+      networkID
     })
   )
 
