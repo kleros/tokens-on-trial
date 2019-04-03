@@ -11,6 +11,7 @@ import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tokensActions from '../actions/tokens'
 import * as badgesActions from '../actions/badges'
+import IncorrectNetwork from '../components/incorrect-network'
 import { instantiateEnvObjects } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
 
@@ -20,7 +21,10 @@ class ContractsProvider extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     fetchAccounts: PropTypes.func.isRequired,
-    notifications: PropTypes.shape({}).isRequired
+    notifications: PropTypes.shape({}).isRequired,
+    envObjects: PropTypes.shape({
+      networkID: PropTypes.number.isRequired
+    }).isRequired
   }
 
   state = {}
@@ -87,7 +91,10 @@ class Initializer extends PureComponent {
     children: PropTypes.oneOfType([
       PropTypes.element,
       PropTypes.arrayOf(PropTypes.element.isRequired)
-    ]).isRequired
+    ]).isRequired,
+    envObjects: PropTypes.shape({
+      networkID: PropTypes.number.isRequired
+    }).isRequired
   }
 
   async componentDidMount() {
@@ -109,7 +116,11 @@ class Initializer extends PureComponent {
   }
 
   render() {
-    const { accounts, children } = this.props
+    const { accounts, children, envObjects } = this.props
+
+    if (envObjects && envObjects.networkID !== 1 && envObjects.networkID !== 42)
+      return <IncorrectNetwork />
+
     return (
       <RenderIf
         done={<ContractsProvider {...this.props}>{children}</ContractsProvider>}
@@ -139,7 +150,8 @@ class Initializer extends PureComponent {
 export default connect(
   state => ({
     accounts: state.wallet.accounts,
-    notifications: state.notification.notifications.data
+    notifications: state.notification.notifications.data,
+    envObjects: state.envObjects.data
   }),
   {
     fetchAccounts: walletActions.fetchAccounts,

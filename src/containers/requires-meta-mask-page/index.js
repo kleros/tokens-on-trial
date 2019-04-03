@@ -1,7 +1,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-import RequiresMetaMask from '../../components/requires-meta-mask'
+import RequiresMetaMask from '../../components/incorrect-network'
 import Button from '../../components/button'
 
 import './requires-meta-mask-page.css'
