@@ -80,7 +80,7 @@ class NotificationBadge extends PureComponent {
                   ? notifications.data.slice(0, maxShown)
                   : notifications.data
                 )
-                  .sort((a, b) => b.date - a.date)
+                  .sort((a, b) => new Date(b.date) - new Date(a.date))
                   .map((n, i /* eslint-disable react/jsx-no-bind */) => (
                     <div
                       className="NotificationBadge-notifications-notification"

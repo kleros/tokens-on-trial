@@ -130,7 +130,12 @@ function* pushNotificationsListener() {
         }
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
-          emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event])
+          emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event], {
+            arbitrableAddressListView,
+            arbitrableTokenListView,
+            viewWeb3,
+            ETHFINEX_BADGE_BLOCK
+          })
         }
       })
 
@@ -158,7 +163,13 @@ function* pushNotificationsListener() {
         }
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
-          emitArbitratorNotifications(account, emit, [event])
+          emitArbitratorNotifications(account, emit, [event], {
+            arbitrableAddressListView,
+            arbitratorView,
+            arbitrableTokenListView,
+            viewWeb3,
+            ETHFINEX_BADGE_BLOCK
+          })
         }
       })
       return () => {} // Unsubscribe function
