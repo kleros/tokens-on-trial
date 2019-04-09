@@ -57,9 +57,6 @@ export default createReducer(
       )
       return newState
     },
-    [filterActions.LOAD_FILTERS_STATE]: (state, { payload: { data } }) => ({
-      ...state,
-      data
-    })
+    [filterActions.LOAD_FILTERS_STATE]: (_, { payload: { data } }) => data
   }
 )

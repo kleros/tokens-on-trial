@@ -14,5 +14,5 @@ export const toggleFilter = (key, tcr) => ({
 })
 export const loadState = data => ({
   type: LOAD_FILTERS_STATE,
-  payload: data
+  payload: { data }
 })
