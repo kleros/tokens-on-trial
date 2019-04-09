@@ -47,28 +47,32 @@ function* fetchTokens() {
       arbitrableTokenListView
     )
 
+    // Find the block number of the lastest token submission event.
     const blockNumber = submissionEvents.reduce((acc, event) => {
       const { blockNumber } = event
       return blockNumber > acc ? blockNumber : acc
     }, tokens.blockNumber)
 
+    // Web3js does not handle the string "0x" well and returns null
+    // or an empty string (depending on the web3 js version). This can
+    // be a problem for the case of the ZRX token (previously, 0x), where a
+    // party may submit it as either the name or the ticker.
+    //
+    // Additionaly, there is another bug with the web3.utils.soliditySha3 which
+    // also does not parse string "0x" correctly as a parameter and such cannot be
+    // used to calculate the token ID (which is the sha3 of it's data).
+    //
+    // We handle these cases by adding such submissions to the missingTokens array
+    // and then manually by merging results from TokenSubmission
+    // and TokenStatusChange events.
     const missingTokens = []
+
+    // Build an object with the token submission events
     const receivedTokens = submissionEvents.reduce(
       (acc, event) => {
         const { returnValues } = event
         const { _name, _ticker, _symbolMultihash, _address } = returnValues
 
-        // Web3js does not handle the string "0x" well and returns null
-        // or an empty string (depending on the web3 js version). This can
-        // be a problem for the case of the ZRX token (previously, 0x), where a
-        // party may submit it as either the name or the ticker.
-        //
-        // Additionaly, there is another bug with the web3.utils.soliditySha3 which
-        // also does not parse string "0x" correctly as a paramter and calculates the
-        // incorrect token ID.
-        //
-        // We handle these cases manually by merging results from TokenSubmission
-        // and TokenStatusChange events.
         if (!_name || !_ticker) {
           missingTokens.push({
             name: _name,
@@ -92,17 +96,21 @@ function* fetchTokens() {
           ticker: _ticker,
           address: _address,
           symbolMultihash: _symbolMultihash,
-          blockNumber: event.blockNumber,
           ID: tokenID,
-          status: { blockNumber: T2CR_BLOCK }
+          status: {
+            blockNumber: event.blockNumber,
+            statusBlockNumber: event.blockNumber
+          }
         }
         return acc
       },
       { ...tokens.items }
     )
 
-    // Get the lastest status change for every token.
+    // Save the last token status change.
     let statusBlockNumber = T2CR_BLOCK
+
+    // Get the lastest status change for every token.
     const latestStatusChanges = {}
     const statusChanges = yield call(
       fetchEvents,
@@ -110,6 +118,7 @@ function* fetchTokens() {
       tokens.statusBlockNumber,
       arbitrableTokenListView
     )
+
     statusChanges.forEach(event => {
       const { returnValues } = event
       const { _tokenID } = returnValues
@@ -125,10 +134,7 @@ function* fetchTokens() {
     })
 
     const cachedTokens = {
-      items: {
-        ...tokens.items,
-        ...receivedTokens
-      },
+      items: receivedTokens,
       addressToIDs: {},
       blockNumber,
       statusBlockNumber
@@ -139,7 +145,7 @@ function* fetchTokens() {
     )
 
     for (const event of statusEvents) {
-      const { returnValues, blockNumber } = event
+      const { returnValues, blockNumber: statusBlockNumber } = event
       const {
         _tokenID,
         _status,
@@ -174,9 +180,13 @@ function* fetchTokens() {
         continue
       }
 
-      if (blockNumber >= cachedTokens.items[_tokenID].status.blockNumber)
+      if (
+        statusBlockNumber >=
+        cachedTokens.items[_tokenID].status.statusBlockNumber
+      )
         cachedTokens.items[_tokenID].status = {
-          blockNumber,
+          ...cachedTokens.items[_tokenID].status,
+          statusBlockNumber,
           status: Number(_status),
           disputed: Boolean(Number(_disputed)),
           requester: _requester,
