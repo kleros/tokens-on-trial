@@ -14,7 +14,7 @@ import { ContractsContext } from '../../bootstrap/contexts'
 
 import './tokens.css'
 
-const ITEMS_PER_PAGE = 40
+const ITEMS_PER_PAGE = 48
 
 class Tokens extends Component {
   static propTypes = {
@@ -112,10 +112,22 @@ class Tokens extends Component {
       )
       .sort((a, b) => {
         const { oldestFirst } = filter
-        if (oldestFirst) return a.blockNumber < b.blockNumber ? -1 : 1
-        else return a.blockNumber > b.blockNumber ? -1 : 1
+        if (oldestFirst)
+          return a.status.statusBlockNumber - b.status.statusBlockNumber
+        else return b.status.statusBlockNumber - a.status.statusBlockNumber
       })
       .sort((a, b) => {
+        // Status of both items are within the same category
+        // (not pending, pending, challenged), don't sort.
+        if (
+          (a.clientStatus === 0 && b.clientStatus === 1) ||
+          (a.clientStatus === 2 && b.clientStatus === 3) ||
+          (a.clientStatus === 4 && b.clientStatus === 5) ||
+          (a.clientStatus === 1 && b.clientStatus === 0) ||
+          (a.clientStatus === 3 && b.clientStatus === 2) ||
+          (a.clientStatus === 5 && b.clientStatus === 4)
+        )
+          return 0
         if (a.clientStatus > b.clientStatus) return -1
         if (b.clientStatus > a.clientStatus) return 1
         return 0
