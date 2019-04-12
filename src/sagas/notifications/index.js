@@ -32,14 +32,14 @@ import emitArbitratorNotifications from './arbitrator-events'
 function* pushNotificationsListener() {
   const {
     arbitrableTokenListView,
-    arbitrableAddressListView,
+    badgeViewContracts,
     arbitratorView,
     T2CR_BLOCK,
     viewWeb3,
     ETHFINEX_BADGE_BLOCK,
     ARBITRATOR_BLOCK,
     arbitratorEvents,
-    arbitrableAddressListEvents,
+    badgeEventsContracts,
     arbitrableTokenListEvents
   } = yield call(instantiateEnvObjects)
 
@@ -47,8 +47,13 @@ function* pushNotificationsListener() {
   const cachedNotifications = localStorage.getItem(
     `${arbitrableTokenListView.options.address}.notifications@${APP_VERSION}`
   )
-  if (cachedNotifications)
-    yield put(notificationActions.loadState(JSON.parse(cachedNotifications)))
+  if (cachedNotifications) {
+    const parsedCache = JSON.parse(cachedNotifications).map(n => ({
+      ...n,
+      date: new Date(n.date)
+    })) // Convert date strings into date objects.
+    yield put(notificationActions.loadState(parsedCache))
+  }
 
   // Start after receiving accounts and data
   yield put(action(arbitrableTokenListActions.arbitrableTokenListData.FETCH))
@@ -105,38 +110,54 @@ function* pushNotificationsListener() {
         }
       })
 
-      // Badge events
-      arbitrableAddressListView
-        .getPastEvents('AddressStatusChange', {
-          fromBlock:
-            localStorage.getItem(
-              `${
-                arbitrableAddressListView.options.address
-              }nextEventsBlockNumber`
-            ) || ETHFINEX_BADGE_BLOCK
-        })
-        .then(events => {
-          emitBadgeNotifications(account, badgeTimeToChallenge, emit, events, {
-            arbitrableAddressListView,
-            arbitrableTokenListView,
-            viewWeb3,
-            ETHFINEX_BADGE_BLOCK
+      // Badge contracts events
+      Object.keys(badgeViewContracts).forEach(address => {
+        badgeViewContracts[address]
+          .getPastEvents('AddressStatusChange', {
+            fromBlock:
+              localStorage.getItem(
+                `${
+                  badgeViewContracts[address].options.address
+                }nextEventsBlockNumber`
+              ) || ETHFINEX_BADGE_BLOCK
           })
-        })
-      arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        if (!txHashes[event.transactionHash]) {
-          txHashes[event.transactionHash] = true
-          emitBadgeNotifications(account, badgeTimeToChallenge, emit, [event], {
-            arbitrableAddressListView,
-            arbitrableTokenListView,
-            viewWeb3,
-            ETHFINEX_BADGE_BLOCK
+          .then(events => {
+            emitBadgeNotifications(
+              account,
+              badgeTimeToChallenge,
+              emit,
+              events,
+              {
+                arbitrableAddressListView: badgeViewContracts[address],
+                arbitrableTokenListView,
+                viewWeb3,
+                ETHFINEX_BADGE_BLOCK
+              }
+            )
           })
-        }
+        badgeEventsContracts[address].events.AddressStatusChange(
+          (err, event) => {
+            if (err) {
+              console.error(err)
+              return
+            }
+            if (!txHashes[event.transactionHash]) {
+              txHashes[event.transactionHash] = true
+              emitBadgeNotifications(
+                account,
+                badgeTimeToChallenge,
+                emit,
+                [event],
+                {
+                  arbitrableAddressListView: badgeViewContracts[address],
+                  arbitrableTokenListView,
+                  viewWeb3,
+                  ETHFINEX_BADGE_BLOCK
+                }
+              )
+            }
+          }
+        )
       })
 
       // Arbitator events
@@ -149,8 +170,8 @@ function* pushNotificationsListener() {
         })
         .then(events => {
           emitArbitratorNotifications(account, emit, events, {
-            arbitrableAddressListView,
             arbitratorView,
+            badgeViewContracts,
             arbitrableTokenListView,
             viewWeb3,
             ETHFINEX_BADGE_BLOCK
@@ -164,8 +185,8 @@ function* pushNotificationsListener() {
         if (!txHashes[event.transactionHash]) {
           txHashes[event.transactionHash] = true
           emitArbitratorNotifications(account, emit, [event], {
-            arbitrableAddressListView,
             arbitratorView,
+            badgeViewContracts,
             arbitrableTokenListView,
             viewWeb3,
             ETHFINEX_BADGE_BLOCK
@@ -183,20 +204,13 @@ function* pushNotificationsListener() {
       badgeTimeToChallenge ===
         (yield select(arbitrableAddressListSelectors.getTimeToChallenge))
     ) {
-      const [
-        notification,
-        accounts,
-        arbitrableTokenListData,
-        arbitrableAddressListData
-      ] = yield race([
+      const [notification, accounts, arbitrableTokenListData] = yield race([
         take(channel), // New notification
         take(walletActions.accounts.RECEIVE), // Accounts refetch
-        take(arbitrableTokenListActions.arbitrableTokenListData.RECEIVE), // T2CR data refetch
-        take(arbitrableAddressListActions.arbitrableAddressListData.RECEIVE) // Badge TCR data refetch
+        take(arbitrableTokenListActions.arbitrableTokenListData.RECEIVE) // T2CR data refetch
       ])
 
-      if (accounts || arbitrableTokenListData || arbitrableAddressListData)
-        continue
+      if (accounts || arbitrableTokenListData) continue
 
       // Put new notification
       yield put(

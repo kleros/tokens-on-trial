@@ -4,8 +4,11 @@ import Archon from '@kleros/archon'
 import * as tcrConstants from '../constants/tcr'
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list'
 import ArbitrableAddressList from '../assets/contracts/arbitrable-address-list'
+import badgeTCRs from '../assets/badge-addresses.json'
 import Arbitrator from '../assets/contracts/arbitrator'
-import { network as networkPromise } from '../bootstrap/dapp-api'
+import { network as networkPromise, web3Utils } from '../bootstrap/dapp-api'
+
+const { toBN } = web3Utils
 
 export const instantiateEnvObjects = async () => {
   const networkID = networkPromise ? await networkPromise : 1
@@ -45,7 +48,7 @@ export const instantiateEnvObjects = async () => {
   let viewWeb3 = new Web3(httpProvider)
 
   let arbitrableTokenList
-  let arbitrableAddressList
+  let badgeContracts
   let arbitrator
   let web3
   if (window.ethereum) {
@@ -59,10 +62,14 @@ export const instantiateEnvObjects = async () => {
       ArbitrableTokenList.abi,
       ARBITRABLE_TOKEN_LIST_ADDRESS
     )
-    arbitrableAddressList = new web3.eth.Contract(
-      ArbitrableAddressList.abi,
-      ARBITRABLE_ADDRESS_LIST_ADDRESS
-    )
+    badgeContracts = badgeTCRs[networkID]
+      .map(
+        address => new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+      )
+      .reduce((acc, contract) => {
+        acc[contract.options.address] = contract
+        return acc
+      }, {})
     arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
   }
 
@@ -70,37 +77,45 @@ export const instantiateEnvObjects = async () => {
     ArbitrableTokenList.abi,
     ARBITRABLE_TOKEN_LIST_ADDRESS
   )
-  const arbitrableAddressListView = new viewWeb3.eth.Contract(
-    ArbitrableAddressList.abi,
-    ARBITRABLE_ADDRESS_LIST_ADDRESS
-  )
   const arbitratorView = new viewWeb3.eth.Contract(
     Arbitrator.abi,
     ARBITRATOR_ADDRESS
   )
+  const badgeViewContracts = badgeTCRs[networkID]
+    .map(
+      address => new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+    )
+    .reduce((acc, contract) => {
+      acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
+      return acc
+    }, {})
 
   const arbitrableTokenListEvents = new eventsWeb3.eth.Contract(
     ArbitrableTokenList.abi,
     ARBITRABLE_TOKEN_LIST_ADDRESS
   )
-  const arbitrableAddressListEvents = new eventsWeb3.eth.Contract(
-    ArbitrableAddressList.abi,
-    ARBITRABLE_ADDRESS_LIST_ADDRESS
-  )
   const arbitratorEvents = new eventsWeb3.eth.Contract(
     Arbitrator.abi,
     ARBITRATOR_ADDRESS
   )
+  const badgeEventsContracts = badgeTCRs[networkID]
+    .map(
+      address => new eventsWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+    )
+    .reduce((acc, contract) => {
+      acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
+      return acc
+    }, {})
 
   return {
     arbitrableTokenList,
-    arbitrableAddressList,
+    badgeContracts,
     arbitrator,
     arbitrableTokenListView,
-    arbitrableAddressListView,
+    badgeViewContracts,
     arbitratorView,
     arbitrableTokenListEvents,
-    arbitrableAddressListEvents,
+    badgeEventsContracts,
     arbitratorEvents,
     FILE_UPLOAD_URL,
     FILE_BASE_URL,
@@ -114,7 +129,8 @@ export const instantiateEnvObjects = async () => {
     web3,
     viewWeb3,
     eventsWeb3,
-    networkID
+    networkID,
+    badgeTCRs: badgeTCRs[networkID]
   }
 }
 
@@ -176,8 +192,21 @@ export const convertFromString = item => {
       ? Number(latestRequest.appealDisputeID)
       : 0
 
-  if (latestRequest.dispute)
+  if (latestRequest.dispute) {
     latestRequest.dispute.ruling = Number(latestRequest.dispute.ruling)
+    latestRequest.dispute.status = Number(latestRequest.dispute.status)
+    latestRequest.dispute.period = Number(latestRequest.dispute.period)
+    latestRequest.dispute.court.timesPerPeriod[0] =
+      Number(latestRequest.dispute.court.timesPerPeriod[0]) * 1000
+    latestRequest.dispute.court.timesPerPeriod[1] =
+      Number(latestRequest.dispute.court.timesPerPeriod[1]) * 1000
+    latestRequest.dispute.court.timesPerPeriod[2] =
+      Number(latestRequest.dispute.court.timesPerPeriod[2]) * 1000
+    latestRequest.dispute.court.timesPerPeriod[3] =
+      Number(latestRequest.dispute.court.timesPerPeriod[3]) * 1000
+    latestRequest.dispute.lastPeriodChange =
+      Number(latestRequest.dispute.lastPeriodChange) * 1000
+  }
 
   const { latestRound } = latestRequest
   if (
@@ -188,6 +217,10 @@ export const convertFromString = item => {
   ) {
     latestRound.appealPeriod[0] = Number(latestRound.appealPeriod[0]) * 1000
     latestRound.appealPeriod[1] = Number(latestRound.appealPeriod[1]) * 1000
+
+    latestRound.paidFees[0] = toBN(latestRound.paidFees[0])
+    latestRound.paidFees[1] = toBN(latestRound.paidFees[1])
+    latestRound.paidFees[2] = toBN(latestRound.paidFees[2])
   }
 
   item.latestRound = latestRound

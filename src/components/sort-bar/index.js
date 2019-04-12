@@ -7,6 +7,7 @@ import * as filterConstants from '../../constants/filter'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
+import { cacheItemShape } from '../../reducers/generic-shapes'
 
 import './sort-bar.css'
 
@@ -15,7 +16,7 @@ class SortBar extends PureComponent {
     // Redux State
     items: PropTypes.shape({
       data: PropTypes.shape({
-        items: PropTypes.arrayOf(PropTypes.shape({})).isRequired
+        items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired
       }).isRequired
     }).isRequired,
     filter: filterSelectors.filterShape.isRequired,

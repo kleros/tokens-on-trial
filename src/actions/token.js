@@ -91,25 +91,25 @@ export const clearBadge = ({ tokenData, value }) => ({
   type: token.CLEAR_BADGE,
   payload: { token: tokenData, value }
 })
-export const fundBadgeDispute = ({ addr, ID, side, value }) => ({
+export const fundBadgeDispute = ({ address, ID, side, value }) => ({
   type: token.FUND_DISPUTE_BADGE,
-  payload: { addr, side, ID, value }
+  payload: { address, side, ID, value }
 })
-export const challengeBadgeRequest = ({ addr, value, evidence }) => ({
+export const challengeBadgeRequest = ({ address, value, evidence }) => ({
   type: token.CHALLENGE_REQUEST_BADGE,
-  payload: { addr, value, evidence }
+  payload: { address, value, evidence }
 })
 export const badgeTimeout = tokenData => ({
   type: token.EXECUTE_BADGE,
   payload: { token: tokenData }
 })
-export const fetchBadge = addr => ({
+export const fetchBadge = address => ({
   type: token.FETCH_BADGE,
-  payload: { addr }
+  payload: { address }
 })
-export const fundBadgeAppeal = (addr, side, value, ID) => ({
+export const fundBadgeAppeal = (address, side, value, ID) => ({
   type: token.FUND_APPEAL_BADGE,
-  payload: { addr, ID, side, value }
+  payload: { address, ID, side, value }
 })
 export const feesTimeoutBadge = tokenData => ({
   type: token.FEES_TIMEOUT_BADGE,

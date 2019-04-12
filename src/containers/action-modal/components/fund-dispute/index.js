@@ -10,7 +10,7 @@ import { truncateETHValue } from '../../../../utils/ui'
 import './fund-dispute.css'
 
 const FundDispute = ({ tcr, closeActionModal, fundDispute }) => (
-  <div>
+  <div className="ActionModal">
     <h3 className="Modal-title">
       <FontAwesomeIcon className="FundDispute-icon" icon="gavel" />
       Fund Dispute

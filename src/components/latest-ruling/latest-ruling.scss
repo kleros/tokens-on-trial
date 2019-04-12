@@ -1,0 +1,48 @@
+@import '../../styles/_colors.scss';
+
+/* @define LatestRuling */
+.LatestRuling {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 15px 0;
+
+  @media (min-width: 840px) {
+    flex-direction: row;
+  }
+
+  @media (max-width: 839px) {
+    flex-direction: column;
+  }
+
+  &-meta {
+    align-items: flex-start;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    margin: 17px 0;
+    margin-right: 17px;
+    vertical-align: middle;
+
+    @media (max-width: 839px) {
+      margin: 0 26px;
+    }
+
+    &-item {
+      display: flex;
+      margin: 7px 0;
+      vertical-align: middle;
+    }
+  }
+
+  &-icon {
+    margin-right: 14px;
+  }
+
+  &-timer {
+    color: $darkerRed;
+    display: flex;
+    font-size: 14px;
+  }
+}

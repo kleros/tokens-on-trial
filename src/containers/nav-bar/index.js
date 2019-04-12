@@ -27,7 +27,7 @@ export default class NavBar extends PureComponent {
   }
 
   state = {
-    isMobile: document.body.clientWidth < 1010,
+    isMobile: document.body.clientWidth < 950,
     isOpen: false
   }
 
@@ -41,7 +41,7 @@ export default class NavBar extends PureComponent {
   }
 
   handleWindowResize = debounce(({ currentTarget: { innerWidth } }) =>
-    this.setState({ isMobile: innerWidth < 1010 })
+    this.setState({ isMobile: innerWidth < 950 })
   )
 
   handleStateChange(state) {

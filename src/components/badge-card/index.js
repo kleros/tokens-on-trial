@@ -6,10 +6,11 @@ import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { BeatLoader } from 'react-spinners'
 
-import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import UnknownToken from '../../assets/images/unknown.svg'
-import * as tcrConstants from '../../constants/tcr'
-import { IPFS_URL } from '../../bootstrap/dapp-api'
+import { IPFS_URL, web3Utils } from '../../bootstrap/dapp-api'
+import { cacheItemShape } from '../../reducers/generic-shapes'
+import { arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
+import * as tokenSelectors from '../../reducers/token'
 
 import './badge-card.css'
 
@@ -27,8 +28,18 @@ const getBadgeHeaderText = badge => {
   return 'Pending'
 }
 
-const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
+const BadgeCard = ({
+  badge,
+  tokens,
+  displayTokenInfo,
+  envObjects,
+  arbitrableAddressListData
+}) => {
   // Link to the oldest, registered token submission for this address.
+  const badgeContractData = arbitrableAddressListData[badge.badgeContractAddr]
+  const {
+    variables: { symbolURI, title }
+  } = badgeContractData
   const tokenData = tokens.data
   let tokenSubmissions = []
   if (!badge) return <BeatLoader color="#3d464d" />
@@ -46,7 +57,7 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
     )
   }
   const token = displayTokenInfo ? tokenSubmissions[0] : null
-  const { FILE_BASE_URL, ARBITRABLE_ADDRESS_LIST_ADDRESS } = envObjects
+  const { FILE_BASE_URL } = envObjects
 
   return (
     <div className="BadgeCard">
@@ -64,7 +75,9 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
       </div>
       <Link
         className="BadgeCard-content"
-        to={`/badge/${ARBITRABLE_ADDRESS_LIST_ADDRESS}/${badge.address}`}
+        to={`/badge/${web3Utils.toChecksumAddress(badge.badgeContractAddr)}/${
+          badge.address
+        }`}
       >
         {displayTokenInfo ? (
           !tokens.loading || token ? (
@@ -86,7 +99,7 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
           <Img
             alt="Badge List Submission"
             className="BadgeCard-image"
-            src={EthfinexLogo}
+            src={`${IPFS_URL}${symbolURI}`}
           />
         )}
       </Link>
@@ -104,9 +117,7 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
               : 'Loading...'}
           </h5>
         ) : (
-          <h5 className="BadgeCard-footer-text">
-            Compliant with Ethfinex listing criterion
-          </h5>
+          <h5 className="BadgeCard-footer-text">Compliant with {title}</h5>
         )}
       </div>
     </div>
@@ -114,18 +125,11 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
 }
 
 BadgeCard.propTypes = {
-  token: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    symbolMultihash: PropTypes.string.isRequired,
-    ticker: PropTypes.string.isRequired,
-    addr: PropTypes.string.isRequired,
-    status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
-      .isRequired
-  }).isRequired,
-  tokens: PropTypes.shape({}).isRequired,
-  badge: PropTypes.shape({}).isRequired,
+  tokens: tokenSelectors.tokensShape.isRequired,
+  badge: cacheItemShape.isRequired,
   envObjects: PropTypes.shape({}).isRequired,
-  displayTokenInfo: PropTypes.bool
+  displayTokenInfo: PropTypes.bool,
+  arbitrableAddressListData: arbitrableAddressListDataShape.isRequired
 }
 
 BadgeCard.defaultProps = {
@@ -135,5 +139,7 @@ BadgeCard.defaultProps = {
 export default connect(state => ({
   tokens: state.tokens,
   badges: state.badges,
-  envObjects: state.envObjects.data
+  envObjects: state.envObjects.data,
+  arbitrableAddressListData:
+    state.arbitrableAddressList.arbitrableAddressListData.data
 }))(BadgeCard)

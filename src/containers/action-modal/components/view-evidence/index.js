@@ -10,7 +10,7 @@ const downloadClick = url => async () => {
 }
 
 const ViewEvidence = ({ closeActionModal, evidence }) => (
-  <div className="ViewEvidence">
+  <div className="ActionModal ViewEvidence">
     <h3 className="Modal-title">Evidence</h3>
     <hr />
     <div className="ViewEvidence-information">

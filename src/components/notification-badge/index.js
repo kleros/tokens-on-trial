@@ -84,12 +84,12 @@ class NotificationBadge extends PureComponent {
                   .map((n, i /* eslint-disable react/jsx-no-bind */) => (
                     <div
                       className="NotificationBadge-notifications-notification"
-                      id={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
-                      key={n.ID ? `${n.ID}${i}` : `${n.addr}${i}`}
+                      id={n.ID ? `${n.ID}${i}` : `${n.address}${i}`}
+                      key={n.ID ? `${n.ID}${i}` : `${n.address}${i}`}
                       onClick={() =>
                         onNotificationClick({
                           ID: n.ID,
-                          addr: n.addr,
+                          address: n.address,
                           badgeAddr: n.badgeAddr
                         })
                       }

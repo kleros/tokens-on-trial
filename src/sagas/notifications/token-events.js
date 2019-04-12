@@ -44,6 +44,7 @@ const emitTokenNotifications = async (
     const token = await arbitrableTokenListView.methods
       .getTokenInfo(returnValues._tokenID)
       .call()
+    token.address = token.addr
 
     const isRegistrationRequest =
       requests[requests.length - 1].returnValues._registrationRequest

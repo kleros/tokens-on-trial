@@ -1,0 +1,243 @@
+@import '../../../styles/_colors.scss';
+
+/* @define TokenDetailsCard */
+.TokenDetailsCard {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 15px 0;
+
+  @media (min-width: 840px) {
+    flex-direction: row;
+  }
+
+  @media (max-width: 839px) {
+    flex-direction: column;
+  }
+
+  &-img {
+    align-self: flex-start;
+    height: 98px;
+    margin: 0 26px 26px 0;
+    object-fit: contain;
+    width: 98px;
+
+    @media (max-width: 839px) {
+      align-self: unset;
+      margin: 0 0 26px 0;
+    }
+  }
+
+  &-card {
+    align-items: stretch;
+    background: $card;
+    border: 1px solid $border;
+    border-radius: 3px;
+    box-shadow: 0 3px 6px $shadow;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    justify-content: space-between;
+    width: 100%;
+
+    &-info {
+      padding: 17px 0;
+    }
+
+    &-content {
+      display: flex;
+      min-height: 102px;
+
+      @media (min-width: 840px) {
+        flex-direction: row;
+      }
+
+      @media (max-width: 839px) {
+        flex-direction: column;
+        margin-top: 26px;
+      }
+    }
+  }
+
+  &-footer {
+    align-items: center;
+    background-color: $action;
+    display: flex;
+    flex-direction: row;
+    font-size: 14px;
+    height: 48px;
+    padding-left: 30px;
+
+    @media (max-width: 839px) {
+      &-badge {
+        display: none;
+      }
+    }
+
+    @media (max-width: 839px) {
+      padding: 0 26px;
+    }
+  }
+
+  &-label {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 21px;
+    justify-content: center;
+    margin: 0 26px;
+    min-width: 100px;
+
+    @media (min-width: 840px) {
+      align-items: flex-start;
+    }
+
+    @media (max-width: 839px) {
+      flex-direction: row;
+    }
+
+    &-name {
+      color: $darkGrey;
+      font-weight: 500;
+      margin-right: 6px;
+    }
+
+    &-ticker {
+      color: $lightGrey;
+      font-weight: 400;
+    }
+  }
+
+  &-divider {
+    border-left: 1px solid $border;
+    margin: 17px;
+
+    @media (max-width: 839px) {
+      border-top: 1px solid $border;
+    }
+  }
+
+  &--link {
+    color: $darkGrey;
+    display: flex;
+    overflow-x: auto;
+    text-decoration: none;
+
+    :visited {
+      color: $darkGrey;
+      text-decoration: none;
+    }
+  }
+
+  &-meta {
+    align-items: flex-start;
+    align-self: center;
+    display: flex;
+    flex-direction: column;
+    font-size: 14px;
+    margin: 17px 0;
+    margin-right: 17px;
+    vertical-align: middle;
+
+    @media (max-width: 839px) {
+      margin: 0 26px;
+
+      &-crowdfunding {
+        margin-top: 17px;
+      }
+    }
+
+    &--aligned {
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    &-item {
+      display: flex;
+      margin: 7px 0;
+      vertical-align: middle;
+    }
+  }
+
+  &-icon {
+    margin-right: 14px;
+
+    &-badge {
+      background-image: url('../../../assets/images/badge.svg');
+      background-repeat: no-repeat;
+      color: $white;
+      font-size: 14px;
+      font-weight: 500;
+      height: 25px;
+      margin-right: 8px;
+      padding-top: 4px;
+      text-align: center;
+      width: 25px;
+    }
+  }
+
+  &-action {
+    align-items: center;
+    background: $action;
+    display: flex;
+    margin-left: auto;
+    padding-left: 36px;
+    padding-right: 36px;
+    position: relative;
+
+    @media (max-width: 839px) {
+      flex-direction: column;
+      margin: 0;
+      margin-top: 17px;
+      padding: 26px;
+    }
+
+    &-decor {
+      @media (min-width: 840px) {
+        &::after {
+          border-bottom: 50px solid transparent;
+          border-left: 20px solid $white;
+          border-top: 50px solid transparent;
+          content: "";
+          height: 0;
+          left: 0;
+          position: absolute;
+        }
+      }
+    }
+  }
+
+  &-timer {
+    color: $orange;
+  }
+
+  &-withdraw {
+    color: $primary;
+    cursor: pointer;
+    margin-left: 14px;
+
+    &-value {
+      color: $darkGrey;
+    }
+  }
+
+  &-crowdfundingBar {
+    width: 180px;
+
+    @media (max-width: 1000px) {
+      width: 120px;
+    }
+
+    @media (max-width: 839px) {
+      width: 250px;
+    }
+
+    @media (max-width: 450px) {
+      width: 200px;
+    }
+
+    @media (max-width: 330px) {
+      width: 140px;
+    }
+  }
+}

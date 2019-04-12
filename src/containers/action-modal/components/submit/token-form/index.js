@@ -15,7 +15,7 @@ export const {
     validate: [required],
     props: { placeholder: 'Name' }
   },
-  addr: {
+  address: {
     type: 'text',
     validate: [required, ETHAddress, notEmptyAddress],
     props: { placeholder: 'Address' }

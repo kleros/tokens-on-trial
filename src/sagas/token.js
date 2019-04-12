@@ -1,4 +1,4 @@
-import { all, call, select, takeLatest } from 'redux-saga/effects'
+import { call, select, takeLatest } from 'redux-saga/effects'
 
 import readFile from '../utils/read-file'
 import { lessduxSaga } from '../utils/saga'
@@ -11,7 +11,6 @@ import {
 import * as tokenActions from '../actions/token'
 import * as walletSelectors from '../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
-import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 import { web3Utils } from '../bootstrap/dapp-api'
@@ -19,166 +18,6 @@ import { web3Utils } from '../bootstrap/dapp-api'
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
-const ZERO_ID =
-  '0x0000000000000000000000000000000000000000000000000000000000000000'
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
-
-/**
- * Fetches a paginatable list of tokens.
- * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
- * @returns {object[]} - The fetched tokens.
- */
-function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
-  // Token count and stats
-  if (cursor === '') cursor = ZERO_ID
-  const { arbitrableTokenListView } = yield call(instantiateEnvObjects)
-
-  const totalCount = Number(
-    yield call(arbitrableTokenListView.methods.tokenCount().call, {
-      from: yield select(walletSelectors.getAccount)
-    })
-  )
-  const totalPages =
-    totalCount <= count
-      ? 1
-      : totalCount % count === 0
-      ? totalCount / count
-      : Math.floor(totalCount / count) + 1
-
-  let countByStatus = yield call(
-    arbitrableTokenListView.methods.countByStatus().call,
-    {
-      from: yield select(walletSelectors.getAccount)
-    }
-  )
-
-  countByStatus = {
-    '0': Number(countByStatus['0']),
-    '1': Number(countByStatus['1']),
-    '2': Number(countByStatus['2']),
-    '3': Number(countByStatus['3']),
-    '4': Number(countByStatus['4']),
-    '5': Number(countByStatus['5']),
-    absent: Number(countByStatus['absent']),
-    challengedClearingRequest: Number(
-      countByStatus['challengedClearingRequest']
-    ),
-    challengedRegistrationRequest: Number(
-      countByStatus['challengedRegistrationRequest']
-    ),
-    clearingRequest: Number(countByStatus['clearingRequest']),
-    registered: Number(countByStatus['registered']),
-    registrationRequest: Number(countByStatus['registrationRequest'])
-  }
-
-  // Fetch first and last tokens
-  let firstToken = ZERO_ID
-  let lastToken = ZERO_ID
-  if (totalCount > 0) {
-    firstToken = yield call(
-      arbitrableTokenListView.methods.tokensList(0).call,
-      {
-        from: yield select(walletSelectors.getAccount)
-      }
-    )
-    lastToken = yield call(
-      arbitrableTokenListView.methods.tokensList(totalCount - 1).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )
-  }
-
-  // Get last page
-  let lastPage
-  /* eslint-disable no-unused-vars */
-  try {
-    const lastTokens = yield call(
-      arbitrableTokenListView.methods.queryTokens(
-        lastToken,
-        count,
-        filterValue,
-        false,
-        ZERO_ADDR
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )
-    lastPage = lastTokens.values.filter(ID => ID !== ZERO_ID)[
-      lastTokens.values.length - 1
-    ]
-  } catch (err) {
-    lastPage = '' // No op. There are no further tokens.
-  }
-  /* eslint-enable */
-
-  // Get current page
-  let currentPage = 1
-  if (cursor !== firstToken && cursor !== ZERO_ID) {
-    const itemsBefore = (yield call(
-      arbitrableTokenListView.methods.queryTokens(
-        cursor === firstToken ? ZERO_ID : cursor,
-        100,
-        filterValue,
-        false,
-        ZERO_ADDR
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )).values.filter(ID => ID !== ZERO_ID).length
-
-    currentPage =
-      itemsBefore <= count
-        ? 2
-        : itemsBefore % count === 0
-        ? itemsBefore / count + 1
-        : Math.floor(itemsBefore / count) + 2
-  }
-
-  // Fetch tokens
-  const data = yield call(
-    arbitrableTokenListView.methods.queryTokens(
-      cursor === firstToken ? ZERO_ID : cursor,
-      count,
-      filterValue,
-      sortValue,
-      ZERO_ADDR
-    ).call,
-    { from: yield select(walletSelectors.getAccount) }
-  )
-
-  const tokenIDs = data.values.filter(ID => ID !== ZERO_ID)
-  const tokens = yield all(
-    tokenIDs.map(ID => call(fetchToken, { payload: { ID } }))
-  )
-
-  // Fetch previous page token ID
-  /* eslint-disable no-unused-vars */
-  let previousPage
-  try {
-    const previousTokens = yield call(
-      arbitrableTokenListView.methods.queryTokens(
-        tokenIDs[0],
-        count + 1,
-        filterValue,
-        !sortValue,
-        ZERO_ADDR
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )
-    previousPage = previousTokens.values.filter(ID => ID !== ZERO_ID)[
-      previousTokens.values.length - 1
-    ]
-  } catch (err) {
-    previousPage = '' // No op. There are no previous tokens.
-  }
-  /* eslint-enable */
-
-  tokens.hasMore = data.hasMore
-  tokens.totalCount = totalCount
-  tokens.countByStatus = countByStatus
-  tokens.previousPage = previousPage
-  tokens.lastPage = lastPage
-  tokens.totalPages = totalPages
-  tokens.currentPage = currentPage
-  return tokens
-}
 
 /**
  * Fetches a token from the list.
@@ -186,14 +25,12 @@ function* fetchTokens({ payload: { cursor, count, filterValue, sortValue } }) {
  * @returns {object} - The fetched token.
  */
 export function* fetchToken({ payload: { ID } }) {
-  const {
-    arbitrableTokenListView,
-    arbitrableAddressListView,
-    arbitratorView,
-    ARBITRATOR_ADDRESS
-  } = yield call(instantiateEnvObjects)
+  const { arbitrableTokenListView, arbitratorView } = yield call(
+    instantiateEnvObjects
+  )
 
   let token = yield call(arbitrableTokenListView.methods.getTokenInfo(ID).call)
+  token.address = token.addr
   const account = yield select(walletSelectors.getAccount)
 
   // web3js returns null if a string value in the smart contract is "0x".
@@ -244,6 +81,9 @@ export function* fetchToken({ payload: { ID } }) {
       ).call
     )
 
+    token.latestRequest.latestRound.paidFees[0] = toBN(
+      token.latestRequest.latestRound.paidFees[0]
+    )
     token.latestRequest.latestRound.paidFees[1] = toBN(
       token.latestRequest.latestRound.paidFees[1]
     )
@@ -365,183 +205,6 @@ export function* fetchToken({ payload: { ID } }) {
       }
     }
 
-    const { addr } = token
-    let badge = yield call(
-      arbitrableAddressListView.methods.getAddressInfo(addr).call
-    )
-
-    if (Number(badge.numberOfRequests > 0)) {
-      badge.latestRequest = yield call(
-        arbitrableAddressListView.methods.getRequestInfo(
-          addr,
-          Number(badge.numberOfRequests) - 1
-        ).call
-      )
-      if (badge.latestRequest.arbitratorExtraData === null)
-        badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
-
-      badge.latestRequest.evidenceGroupID = web3Utils
-        .toBN(web3Utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
-        .toString()
-
-      badge.latestRequest.latestRound = yield call(
-        arbitrableAddressListView.methods.getRoundInfo(
-          addr,
-          Number(badge.numberOfRequests) - 1,
-          Number(badge.latestRequest.numberOfRounds) - 1
-        ).call
-      )
-
-      badge.latestRequest.latestRound.paidFees[1] = toBN(
-        badge.latestRequest.latestRound.paidFees[1]
-      )
-      badge.latestRequest.latestRound.paidFees[2] = toBN(
-        badge.latestRequest.latestRound.paidFees[2]
-      )
-
-      if (badge.latestRequest.disputed) {
-        // Fetch dispute data.
-        arbitratorView.options.address = badge.latestRequest.arbitrator
-        badge.latestRequest.dispute = yield call(
-          arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
-        )
-        badge.latestRequest.dispute.court = yield call(
-          arbitratorView.methods.getSubcourt(
-            badge.latestRequest.dispute.subcourtID
-          ).call
-        )
-        badge.latestRequest.dispute.status = yield call(
-          arbitratorView.methods.disputeStatus(badge.latestRequest.disputeID)
-            .call
-        )
-
-        // Fetch appeal disputeID, if there was an appeal.
-        if (Number(badge.latestRequest.numberOfRounds) > 2) {
-          badge.latestRequest.appealDisputeID = badge.latestRequest.disputeID
-          badge.latestRequest.dispute.appealStatus =
-            badge.latestRequest.dispute.status
-        } else badge.latestRequest.appealDisputeID = 0
-
-        // Fetch appeal period and cost if in appeal period.
-        if (
-          badge.latestRequest.dispute.status ===
-            tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
-          !badge.latestRequest.latestRound.appealed
-        ) {
-          badge.latestRequest.dispute.ruling = yield call(
-            arbitratorView.methods.currentRuling(badge.latestRequest.disputeID)
-              .call
-          )
-          badge.latestRequest.latestRound.appealCost = yield call(
-            arbitratorView.methods.appealCost(
-              badge.latestRequest.disputeID,
-              badge.latestRequest.arbitratorExtraData
-            ).call
-          )
-
-          const winnerStakeMultiplier = yield select(
-            arbitrableAddressListSelectors.getWinnerStakeMultiplier
-          )
-          const loserStakeMultiplier = yield select(
-            arbitrableAddressListSelectors.getLoserStakeMultiplier
-          )
-          const sharedStakeMultiplier = yield select(
-            arbitrableAddressListSelectors.getSharedStakeMultiplier
-          )
-          const MULTIPLIER_DIVISOR = yield call(
-            arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
-          )
-          badge.latestRequest.latestRound.requiredForSide = [0]
-
-          const ruling = Number(badge.latestRequest.dispute.ruling)
-          if (ruling === 0) {
-            badge.latestRequest.latestRound.requiredForSide.push(
-              toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost)
-                  .mul(toBN(sharedStakeMultiplier))
-                  .div(toBN(MULTIPLIER_DIVISOR))
-              )
-            )
-            badge.latestRequest.latestRound.requiredForSide.push(
-              toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost)
-                  .mul(toBN(sharedStakeMultiplier))
-                  .div(toBN(MULTIPLIER_DIVISOR))
-              )
-            )
-          } else if (ruling === 1) {
-            badge.latestRequest.latestRound.requiredForSide.push(
-              toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost)
-                  .mul(toBN(winnerStakeMultiplier))
-                  .div(toBN(MULTIPLIER_DIVISOR))
-              )
-            )
-            badge.latestRequest.latestRound.requiredForSide.push(
-              toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost)
-                  .mul(toBN(loserStakeMultiplier))
-                  .div(toBN(MULTIPLIER_DIVISOR))
-              )
-            )
-          } else {
-            badge.latestRequest.latestRound.requiredForSide.push(
-              toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost)
-                  .mul(toBN(loserStakeMultiplier))
-                  .div(toBN(MULTIPLIER_DIVISOR))
-              )
-            )
-            badge.latestRequest.latestRound.requiredForSide.push(
-              toBN(badge.latestRequest.latestRound.appealCost).add(
-                toBN(badge.latestRequest.latestRound.appealCost)
-                  .mul(toBN(winnerStakeMultiplier))
-                  .div(toBN(MULTIPLIER_DIVISOR))
-              )
-            )
-          }
-
-          if (typeof arbitratorView.methods.appealPeriod === 'function')
-            badge.latestRequest.latestRound.appealPeriod = yield call(
-              arbitratorView.methods.appealPeriod(badge.latestRequest.disputeID)
-                .call
-            )
-          else
-            badge.latestRequest.latestRound.appealPeriod = [
-              1549163380,
-              1643771380
-            ]
-        }
-      }
-
-      badge = convertFromString(badge)
-    } else
-      badge.latestRequest = {
-        disputed: false,
-        disputeID: 0,
-        appealDisputeID: 0,
-        dispute: null,
-        submissionTime: 0,
-        feeRewards: 0,
-        pot: [],
-        resolved: false,
-        parties: [],
-        latestRound: {
-          appealed: false,
-          paidFees: new Array(3).fill(web3Utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
-        }
-      }
-
-    token.badge = {
-      ...badge,
-      status: Number(badge.status),
-      clientStatus: contractStatusToClientStatus(
-        badge.status,
-        badge.latestRequest.disputed
-      )
-    }
-
     token = convertFromString(token)
   } else
     token = {
@@ -561,36 +224,8 @@ export function* fetchToken({ payload: { ID } }) {
           requiredForSide: new Array(3).fill(web3Utils.toBN(0))
         }
       },
-      badge: {
-        status: 0,
-        numberOfRequests: 0,
-        latestRequest: {
-          disputed: false,
-          disputeID: 0,
-          appealDisputeID: 0,
-          dispute: null,
-          submissionTime: 0,
-          feeRewards: 0,
-          pot: [],
-          resolved: false,
-          parties: [],
-          latestRound: {
-            appealed: false,
-            paidFees: new Array(3).fill(web3Utils.toBN(0)),
-            requiredForSide: new Array(3).fill(web3Utils.toBN(0))
-          }
-        }
-      },
       numberOfRequests: 0
     }
-
-  if (!token.badge || !token.badge.status)
-    token.badge = {
-      status: 0,
-      latestRequest: { disputed: false }
-    }
-
-  arbitratorView.options.address = ARBITRATOR_ADDRESS
 
   return {
     ...token,
@@ -614,7 +249,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: web3Utils.toChecksumAddress(token.addr),
+    address: web3Utils.toChecksumAddress(token.address),
     symbolMultihash: token.symbolMultihash
   }
 
@@ -632,7 +267,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     }
   }
 
-  const { name, ticker, addr, symbolMultihash } = tokenToSubmit
+  const { name, ticker, address, symbolMultihash } = tokenToSubmit
 
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
@@ -640,7 +275,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
   const ID = web3Utils.soliditySha3(
     name || '',
     ticker || '',
-    addr,
+    address,
     symbolMultihash
   )
   const recentToken = yield call(fetchToken, { payload: { ID } })
@@ -652,7 +287,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     arbitrableTokenList.methods.requestStatusChange(
       tokenToSubmit.name,
       tokenToSubmit.ticker,
-      tokenToSubmit.addr,
+      tokenToSubmit.address,
       tokenToSubmit.symbolMultihash
     ).send,
     {
@@ -670,7 +305,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestStatusChange({ payload: { token, file, fileData, value } }) {
-  if (isInvalid(token.ID) && isInvalid(token.addr))
+  if (isInvalid(token.ID) && isInvalid(token.address))
     throw new Error('Missing address on token submit', token)
 
   const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
@@ -678,7 +313,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
-    addr: web3Utils.toChecksumAddress(token.addr),
+    address: web3Utils.toChecksumAddress(token.address),
     symbolMultihash: token.symbolMultihash
   }
 
@@ -696,7 +331,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     }
   }
 
-  const { name, ticker, addr, symbolMultihash } = tokenToSubmit
+  const { name, ticker, address, symbolMultihash } = tokenToSubmit
 
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
@@ -704,7 +339,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   const ID = web3Utils.soliditySha3(
     name || '',
     ticker || '',
-    addr,
+    address,
     symbolMultihash
   )
   const recentToken = yield call(fetchToken, { payload: { ID } })
@@ -721,7 +356,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     arbitrableTokenList.methods.requestStatusChange(
       tokenToSubmit.name,
       tokenToSubmit.ticker,
-      tokenToSubmit.addr,
+      tokenToSubmit.address,
       tokenToSubmit.symbolMultihash
     ).send,
     {
@@ -873,15 +508,6 @@ const updateTokensCollectionModFlow = {
  * The root of the token saga.
  */
 export default function* tokenSaga() {
-  // Tokens
-  yield takeLatest(
-    tokenActions.tokens.FETCH,
-    lessduxSaga,
-    'fetch',
-    tokenActions.tokens,
-    fetchTokens
-  )
-
   // Token
   yield takeLatest(
     tokenActions.token.FETCH,

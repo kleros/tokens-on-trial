@@ -69,10 +69,12 @@ const emitBadgeNotifications = async (
       .call()).values.filter(ID => ID !== ZERO_ID)
 
     let token
-    if (tokenIDs && tokenIDs.length > 0)
+    if (tokenIDs && tokenIDs.length > 0) {
       token = await arbitrableTokenListView.methods
         .getTokenInfo(tokenIDs[0])
         .call()
+      token.address = token.addr
+    }
 
     const isRegistrationRequest =
       requests[requests.length - 1].returnValues._registrationRequest
@@ -193,7 +195,7 @@ const emitBadgeNotifications = async (
 
       emit({
         ID: returnValues._address,
-        addr: returnValues._address,
+        address: returnValues._address,
         badgeAddr: arbitrableAddressListView._address,
         date: await getBlockDate(event.blockHash, viewWeb3),
         message,
@@ -215,7 +217,7 @@ const emitBadgeNotifications = async (
     if (timeToChallenge && Date.now() - date > timeToChallenge)
       emit({
         ID: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
-        addr: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
+        address: oldestNonDisputedSubmittedStatusEvent.returnValues._address,
         date,
         badgeAddr: arbitrableAddressListView._address,
         message: `Badge request pending execution.`,

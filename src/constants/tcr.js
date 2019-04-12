@@ -8,7 +8,15 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
   'ClearingRequested' // The item is registered, but someone has requested to remove it.
 ])
 
-export const PERIOD_STRINGS = createEnum([
+export const COURT_PERIOD = createEnum([
+  'Evidence',
+  'Commit',
+  'Vote',
+  'Appeal',
+  'Execution'
+])
+
+export const COURT_PERIOD_STRINGS = createEnum([
   'Evidence period ends in ',
   'Jurors are voting ',
   'Jurors are voting ',

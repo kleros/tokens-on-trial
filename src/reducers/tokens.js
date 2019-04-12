@@ -7,7 +7,7 @@ import {
 
 const initialState = {
   loading: false,
-  loadingFailed: false,
+  failedLoading: false,
   data: {
     blockNumber: 0,
     statusBlockNumber: 0,
@@ -28,14 +28,15 @@ const tokens = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        loadingFailed: true
+        failedLoading: true
       }
     }
     case CACHE_TOKENS: {
       const { tokens } = action.payload
       return {
         data: { ...tokens },
-        loading: false
+        loading: false,
+        failedLoading: false
       }
     }
     case LOAD_TOKENS_STATE: {

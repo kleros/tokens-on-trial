@@ -8,7 +8,7 @@ export const _notificationShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
   date: PropTypes.instanceOf(Date).isRequired,
   message: PropTypes.string.isRequired,
-  clientStatus: PropTypes.string.isRequired
+  clientStatus: PropTypes.number.isRequired
 })
 export const _notificationsShape = PropTypes.arrayOf(
   _notificationShape.isRequired

@@ -15,7 +15,7 @@ const SubmitEvidence = ({
   submitEvidenceForm,
   file
 }) => (
-  <div className="SubmitEvidence">
+  <div className="ActionModal SubmitEvidence">
     <h3 className="Modal-title">Submit Evidence</h3>
     <br />
     <EvidenceForm className="SubmitEvidence-form" onSubmit={submitEvidence} />

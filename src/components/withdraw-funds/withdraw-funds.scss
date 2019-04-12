@@ -1,0 +1,36 @@
+@import '../../styles/_colors.scss';
+
+/* @define WithdrawFunds */
+.WithdrawFunds {
+  align-items: center;
+  display: flex;
+  justify-content: center;
+  padding: 15px 0;
+
+  @media (min-width: 840px) {
+    flex-direction: row;
+  }
+
+  @media (max-width: 839px) {
+    flex-direction: column;
+  }
+
+  &-divider {
+    border-left: 1px solid $border;
+    margin: 17px;
+
+    @media (max-width: 839px) {
+      border-top: 1px solid $border;
+    }
+  }
+
+  &-withdraw {
+    color: $primary;
+    cursor: pointer;
+    margin-left: 14px;
+
+    &-value {
+      color: $darkGrey;
+    }
+  }
+}

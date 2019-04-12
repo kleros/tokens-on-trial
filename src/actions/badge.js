@@ -31,33 +31,38 @@ export const fetchBadges = (
   type: badges.FETCH,
   payload: { cursor, count, filterValue, sortValue, requestedPage }
 })
-export const createBadge = ({ badgeData, value }) => ({
+export const createBadge = ({ badgeContractAddr, tokenAddr, value }) => ({
   type: badge.CREATE,
-  payload: { badge: badgeData, value }
+  payload: { badgeContractAddr, tokenAddr, value }
 })
-export const clearBadge = ({ badgeData, value }) => ({
+export const clearBadge = ({ badgeContractAddr, tokenAddr, value }) => ({
   type: badge.CLEAR,
-  payload: { badge: badgeData, value }
+  payload: { badgeContractAddr, tokenAddr, value }
 })
-export const fundDispute = ({ addr, value, side }) => ({
+export const fundDispute = ({ tokenAddr, badgeContractAddr, value, side }) => ({
   type: badge.FUND_DISPUTE,
-  payload: { addr, value, side }
+  payload: { tokenAddr, badgeContractAddr, value, side }
 })
-export const challengeRequest = ({ addr, value, evidence }) => ({
+export const challengeRequest = ({
+  tokenAddr,
+  badgeContractAddr,
+  value,
+  evidence
+}) => ({
   type: badge.CHALLENGE_REQUEST,
-  payload: { addr, value, evidence }
+  payload: { tokenAddr, badgeContractAddr, value, evidence }
 })
-export const timeout = addr => ({
+export const timeout = ({ badgeContractAddr, tokenAddr }) => ({
   type: badge.EXECUTE,
-  payload: { addr }
+  payload: { badgeContractAddr, tokenAddr }
 })
-export const fetchBadge = addr => ({
+export const fetchBadge = (tokenAddress, badgeContractAddr) => ({
   type: badge.FETCH,
-  payload: { addr }
+  payload: { tokenAddress, badgeContractAddr }
 })
-export const fundAppeal = (addr, side, value) => ({
+export const fundAppeal = (tokenAddr, badgeContractAddr, side, value) => ({
   type: badge.FUND_APPEAL,
-  payload: { addr, side, value }
+  payload: { tokenAddr, badgeContractAddr, side, value }
 })
 export const feesTimeout = badgeData => ({
   type: badge.FEES_TIMEOUT,
@@ -67,7 +72,7 @@ export const resubmitBadge = ({ badgeData, value }) => ({
   type: badge.RESUBMIT,
   payload: { badge: badgeData, value }
 })
-export const withdrawBadgeFunds = ({ address, item }) => ({
+export const withdrawBadgeFunds = ({ tokenAddr, badgeContractAddr, item }) => ({
   type: badge.WITHDRAW_FUNDS,
-  payload: { address, item }
+  payload: { tokenAddr, badgeContractAddr, item }
 })

@@ -15,20 +15,19 @@ const getActionButton = ({
   item,
   userAccount,
   tcr,
-  countdownCompleted,
   handleActionClick,
   handleExecuteRequestClick,
-  isBadge,
+  badgeContractAddr,
   decisiveRuling,
   loserPercent,
-  loserCountdownCompleted
+  loserTimedOut
 }) => {
   let method
   let disabled = true
   let label = 'Loading...'
   let icon = 'spinner'
 
-  if (!item || !tcr.data || item.creating || item.updating)
+  if (!item || !tcr || item.creating || item.updating)
     return (
       <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
         <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
@@ -36,7 +35,7 @@ const getActionButton = ({
       </Button>
     )
 
-  if (decisiveRuling && loserPercent < 100 && loserCountdownCompleted)
+  if (decisiveRuling && loserPercent < 100 && loserTimedOut)
     return (
       <Button disabled style={{ cursor: 'not-allowed' }} type="primary">
         <FontAwesomeIcon className="TokenDetails-icon" icon="gavel" />
@@ -44,7 +43,7 @@ const getActionButton = ({
       </Button>
     )
 
-  const challengePeriodDuration = Number(tcr.data.challengePeriodDuration)
+  const { challengePeriodDuration } = tcr
   const { latestRequest } = item
   const { latestRound } = latestRequest
   let submitterFees = toBN(0)
@@ -60,18 +59,18 @@ const getActionButton = ({
       disabled = true
       label = 'Awaiting Arbitration'
       if (
-        Number(latestRequest.dispute.status) ===
+        latestRequest.dispute.status ===
           tcrConstants.DISPUTE_STATUS.Appealable &&
         !latestRound.appealed
-      )
+      ) {
+        const appealPeriodStart = latestRequest.latestRound.appealPeriod[0]
+        const appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
+        const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
+        const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
         if (
           userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
           userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
         ) {
-          const appealPeriodStart = latestRequest.latestRound.appealPeriod[0]
-          const appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
-          const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
-          const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
           if (Date.now() < appealPeriodEnd) {
             const SIDE =
               userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
@@ -104,7 +103,7 @@ const getActionButton = ({
                 method = () =>
                   handleActionClick(
                     modalConstants.ACTION_MODAL_ENUM[
-                      `FundAppeal${isBadge ? 'Badge' : ''}`
+                      `FundAppeal${badgeContractAddr ? 'Badge' : ''}`
                     ],
                     SIDE
                   )
@@ -114,14 +113,15 @@ const getActionButton = ({
                 method = () =>
                   handleActionClick(
                     modalConstants.ACTION_MODAL_ENUM[
-                      `FundAppeal${isBadge ? 'Badge' : ''}`
+                      `FundAppeal${badgeContractAddr ? 'Badge' : ''}`
                     ],
                     SIDE
                   )
               }
             } else label = 'Waiting For Opponent'
           } else if (Date.now() > appealPeriodEnd) label = 'Waiting Enforcement'
-        } else if (!countdownCompleted) label = 'Waiting Appeals'
+        } else if (Date.now() < appealPeriodEnd) label = 'Waiting Appeals'
+      }
     } else if (
       submitterFees.gt(toBN(0)) &&
       challengerFees.gt(toBN(0)) > 0 &&
@@ -133,8 +133,8 @@ const getActionButton = ({
       if (submitterFees.gt(challengerFees)) label = 'Timeout Challenger'
       else label = 'Timeout Submitter'
     } else if (
-      Date.now() >= latestRequest.submissionTime + challengePeriodDuration ||
-      countdownCompleted
+      Date.now() >=
+      latestRequest.submissionTime + challengePeriodDuration
     ) {
       method = handleExecuteRequestClick
       icon = 'check'
@@ -155,8 +155,9 @@ const getActionButton = ({
         method = () =>
           handleActionClick(
             modalConstants.ACTION_MODAL_ENUM[
-              `FundRequester${isBadge ? 'Badge' : ''}`
-            ]
+              `FundRequester${badgeContractAddr ? 'Badge' : ''}`
+            ],
+            badgeContractAddr
           )
       else if (
         submitterFees.gt(challengerFees) &&
@@ -165,8 +166,9 @@ const getActionButton = ({
         method = () =>
           handleActionClick(
             modalConstants.ACTION_MODAL_ENUM[
-              `FundChallenger${isBadge ? 'Badge' : ''}`
-            ]
+              `FundChallenger${badgeContractAddr ? 'Badge' : ''}`
+            ],
+            badgeContractAddr
           )
       else {
         icon = 'hourglass-half'
@@ -184,27 +186,38 @@ const getActionButton = ({
       disabled = false
       method = () =>
         handleActionClick(
-          modalConstants.ACTION_MODAL_ENUM[`Challenge${isBadge ? 'Badge' : ''}`]
+          modalConstants.ACTION_MODAL_ENUM[
+            `Challenge${badgeContractAddr ? 'Badge' : ''}`
+          ],
+          badgeContractAddr
         )
       if (isRegistrationRequest(item.status))
-        label = isBadge ? 'Challenge Addition' : 'Challenge Registration'
-      else label = isBadge ? 'Challenge Removal' : 'Challenge Removal'
+        label = badgeContractAddr
+          ? 'Challenge Addition'
+          : 'Challenge Registration'
+      else label = badgeContractAddr ? 'Challenge Removal' : 'Challenge Removal'
     }
   else {
     disabled = false
     if (item.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
       method = () =>
         handleActionClick(
-          modalConstants.ACTION_MODAL_ENUM[`Clear${isBadge ? 'Badge' : ''}`]
+          modalConstants.ACTION_MODAL_ENUM[
+            `Clear${badgeContractAddr ? 'Badge' : ''}`
+          ],
+          badgeContractAddr
         )
-      label = isBadge ? 'Remove Badge' : 'Remove Token'
+      label = badgeContractAddr ? 'Remove Badge' : 'Remove Token'
       icon = 'times-circle'
     } else {
-      label = isBadge ? 'Add Badge' : 'Resubmit Token'
+      label = badgeContractAddr ? 'Add Badge' : 'Resubmit Token'
       icon = 'plus'
       method = () =>
         handleActionClick(
-          modalConstants.ACTION_MODAL_ENUM[`Resubmit${isBadge ? 'Badge' : ''}`]
+          modalConstants.ACTION_MODAL_ENUM[
+            `Resubmit${badgeContractAddr ? 'Badge' : ''}`
+          ],
+          badgeContractAddr
         )
     }
   }

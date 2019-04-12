@@ -5,10 +5,7 @@ import { connect } from 'react-redux'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import {
-  web3Utils,
-  ETHFINEX_CRITERIA_URL
-} from '../../../../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
 
@@ -21,20 +18,20 @@ import {
 import './challenge.css'
 
 const Challenge = ({
-  tcr,
+  tcrData,
   closeActionModal,
   fundDispute,
   challengeFormIsInvalid,
   submitChallengeForm,
-  badge
+  badgeContractAddr
 }) => (
-  <div>
+  <div className="ActionModal">
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Challenge-icon" icon="gavel" />
       Challenge
     </h3>
     <hr />
-    {badge && (
+    {badgeContractAddr && (
       <>
         <p>
           See the{' '}
@@ -42,11 +39,12 @@ const Challenge = ({
             className="TokenDetails-withdraw"
             target="_blank"
             rel="noopener noreferrer"
-            href={ETHFINEX_CRITERIA_URL}
+            href={`${IPFS_URL}${tcrData.fileURI}`}
             style={{ margin: 0, textDecoration: 'underline' }}
           >
-            listing criteria.
+            listing criteria
           </a>
+          .
         </p>
       </>
     )}
@@ -65,14 +63,14 @@ const Challenge = ({
                 web3Utils.fromWei(
                   String(
                     web3Utils
-                      .toBN(tcr.data.challengerBaseDeposit)
+                      .toBN(tcrData.challengerBaseDeposit)
                       .add(
                         web3Utils
-                          .toBN(tcr.data.arbitrationCost)
-                          .mul(web3Utils.toBN(tcr.data.sharedStakeMultiplier))
-                          .div(web3Utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                          .toBN(tcrData.arbitrationCost)
+                          .mul(web3Utils.toBN(tcrData.sharedStakeMultiplier))
+                          .div(web3Utils.toBN(tcrData.MULTIPLIER_DIVISOR))
                       )
-                      .add(web3Utils.toBN(tcr.data.arbitrationCost))
+                      .add(web3Utils.toBN(tcrData.arbitrationCost))
                   )
                 )
               )
@@ -116,12 +114,12 @@ const Challenge = ({
 
 Challenge.propTypes = {
   // State
-  tcr: PropTypes.oneOfType([
+  tcrData: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
   challengeFormIsInvalid: PropTypes.bool.isRequired,
-  badge: PropTypes.shape({}),
+  badgeContractAddr: PropTypes.shape({}),
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
@@ -130,7 +128,7 @@ Challenge.propTypes = {
 }
 
 Challenge.defaultProps = {
-  badge: null
+  badgeContractAddr: null
 }
 
 export default connect(

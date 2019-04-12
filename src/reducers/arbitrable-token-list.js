@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
 
-import { web3Utils } from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
 
 // Shapes
@@ -11,14 +10,13 @@ const {
 } = createResource(
   PropTypes.shape({
     arbitrator: PropTypes.string.isRequired,
-    governor: PropTypes.string.isRequired,
-    requesterBaseDeposit: PropTypes.number.isRequired,
-    challengerBaseDeposit: PropTypes.number.isRequired,
+    requesterBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
+    challengerBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
     challengePeriodDuration: PropTypes.number.isRequired,
-    arbitrationCost: PropTypes.number.isRequired,
-    winnerStakeMultiplier: PropTypes.number.isRequired,
-    loserStakeMultiplier: PropTypes.number.isRequired,
-    sharedStakeMultiplier: PropTypes.number.isRequired,
+    arbitrationCost: PropTypes.shape({}).isRequired, // BigNumber
+    winnerStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+    loserStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+    sharedStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
     countByStatus: PropTypes.shape(
       tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
         acc[value] = PropTypes.number.isRequired
@@ -50,11 +48,6 @@ export const getSharedStakeMultiplier = state =>
     .sharedStakeMultiplier
 
 // Selectors
-export const getSubmitCost = state =>
-  state.arbitrableTokenList.arbitrableTokenListData.data &&
-  web3Utils.toBN(
-    state.arbitrableTokenList.arbitrableTokenListData.data.requesterBaseDeposit
-  )
 
 export const getTimeToChallenge = state =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&

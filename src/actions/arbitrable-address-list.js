@@ -14,7 +14,12 @@ export const fetchArbitrableAddressListData = () => ({
 export const badgeEvidence = {
   ...createActions('BADGE_EVIDENCE', { withCreate: true })
 }
-export const submitBadgeEvidence = ({ file, evidenceData, addr }) => ({
+export const submitBadgeEvidence = ({
+  file,
+  evidenceData,
+  address,
+  contractAddr
+}) => ({
   type: badgeEvidence.CREATE,
-  payload: { file, evidenceData, addr }
+  payload: { file, evidenceData, address, contractAddr }
 })

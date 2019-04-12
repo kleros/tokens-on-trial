@@ -89,8 +89,8 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    max-width: 100%;
     min-height: 102px;
+    width: 100%;
 
     &-info {
       padding: 17px 0;

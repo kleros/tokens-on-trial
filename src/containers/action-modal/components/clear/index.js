@@ -4,16 +4,14 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import {
-  web3Utils,
-  ETHFINEX_CRITERIA_URL
-} from '../../../../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
+
 import './clear.css'
 
-const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
-  <div>
+const Clear = ({ tcrData, closeActionModal, clearItem, item, badge }) => (
+  <div className="ActionModal">
     <h3 className="Modal-title">
       {!badge ? `Remove ${item.name}` : 'Remove Badge'}
     </h3>
@@ -26,11 +24,12 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
             className="TokenDetails-withdraw"
             target="_blank"
             rel="noopener noreferrer"
-            href={ETHFINEX_CRITERIA_URL}
+            href={`${IPFS_URL}${tcrData.fileURI}`}
             style={{ margin: 0, textDecoration: 'underline' }}
           >
-            listing criteria.
+            listing criteria
           </a>
+          .
         </p>
         <br />
       </>
@@ -47,14 +46,14 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
                 web3Utils.fromWei(
                   String(
                     web3Utils
-                      .toBN(tcr.data.requesterBaseDeposit)
+                      .toBN(tcrData.requesterBaseDeposit)
                       .add(
                         web3Utils
-                          .toBN(tcr.data.arbitrationCost)
-                          .mul(web3Utils.toBN(tcr.data.sharedStakeMultiplier))
-                          .div(web3Utils.toBN(tcr.data.MULTIPLIER_DIVISOR))
+                          .toBN(tcrData.arbitrationCost)
+                          .mul(web3Utils.toBN(tcrData.sharedStakeMultiplier))
+                          .div(web3Utils.toBN(tcrData.MULTIPLIER_DIVISOR))
                       )
-                      .add(web3Utils.toBN(tcr.data.arbitrationCost))
+                      .add(web3Utils.toBN(tcrData.arbitrationCost))
                   )
                 )
               )
@@ -100,7 +99,7 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
 Clear.propTypes = {
   // State
   item: PropTypes.shape({ name: PropTypes.string.isRequired }),
-  tcr: PropTypes.oneOfType([
+  tcrData: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,

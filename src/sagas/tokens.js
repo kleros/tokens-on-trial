@@ -43,7 +43,7 @@ function* fetchTokens() {
     const submissionEvents = yield call(
       fetchEvents,
       'TokenSubmitted',
-      tokens.blockNumber,
+      tokens.blockNumber === T2CR_BLOCK ? T2CR_BLOCK : tokens.blockNumber + 1,
       arbitrableTokenListView
     )
 
@@ -160,9 +160,10 @@ function* fetchTokens() {
           const tokenInfo = yield call(
             arbitrableTokenListView.methods.getTokenInfo(_tokenID).call
           )
+          tokenInfo.address = tokenInfo.addr
           if (
             (tokenInfo.name === null || tokenInfo.ticker === null) &&
-            tokenInfo.addr === missingToken.address &&
+            tokenInfo.address === missingToken.address &&
             tokenInfo.symbolMultihash === missingToken.symbolMultihash
           )
             cachedTokens.items[_tokenID] = {

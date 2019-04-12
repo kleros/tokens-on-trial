@@ -11,6 +11,7 @@ import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterActions from '../../actions/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
+import { envObjectsShape } from '../../reducers/generic-shapes'
 
 import './tokens.css'
 
@@ -25,14 +26,9 @@ class Tokens extends Component {
 
     // Redux State
     tokens: tokenSelectors.tokensShape.isRequired,
-    badges: PropTypes.shape({
-      statusBlockNumber: PropTypes.number.isRequired
-    }).isRequired,
     accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
     filter: PropTypes.shape({}).isRequired,
-    envObjects: PropTypes.shape({
-      networkID: PropTypes.number.isRequired
-    }).isRequired,
+    envObjects: envObjectsShape.isRequired,
 
     // Dispatchers
     toggleFilter: PropTypes.func.isRequired
@@ -67,7 +63,7 @@ class Tokens extends Component {
   }
 
   render() {
-    const { tokens, badges, filter, accounts, envObjects } = this.props
+    const { tokens, filter, accounts, envObjects } = this.props
     const networkID = envObjects ? envObjects.networkID : 1
     const tokensData = tokens.data
     const userAccount = accounts[0]
@@ -108,7 +104,9 @@ class Tokens extends Component {
             token.ID !==
               '0x488db20cbe8d6b36dbf9e1db8e4fbda80692074330a2391cb67859b314034b67' &&
             token.ID !==
-              '0xf69ce03f1e563398463cf2672ca220da670d9af3d27843e8d5c5069c455ea3de')
+              '0xf69ce03f1e563398463cf2672ca220da670d9af3d27843e8d5c5069c455ea3de' &&
+            token.ID !==
+              '0xd59474afe43d05cef80bdd606dfdaf8e0a931a604dc25d782f8d19710c1810fe')
       )
       .sort((a, b) => {
         const { oldestFirst } = filter
@@ -171,7 +169,7 @@ class Tokens extends Component {
                     <TokenCard
                       token={token}
                       key={token.ID}
-                      badge={badges.data.items[token.address]}
+                      envObjects={envObjects}
                     />
                   ))
                 ) : (
@@ -200,7 +198,6 @@ export default withRouter(
   connect(
     state => ({
       tokens: state.tokens,
-      badges: state.badges,
       filter: state.filter,
       accounts: state.wallet.accounts.data,
       envObjects: state.envObjects.data

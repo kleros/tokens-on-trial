@@ -3,31 +3,15 @@ import createReducer, { createResource } from 'lessdux'
 
 import * as tcrConstants from '../constants/tcr'
 
+import { requestShape } from './generic-shapes'
+
 // Common Shapes
 export const _badgeShape = PropTypes.shape({
   address: PropTypes.string.isRequired,
   numberOfRequests: PropTypes.number.isRequired,
   status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
-  latestRequest: PropTypes.shape({
-    disputed: PropTypes.bool.isRequired,
-    disputeID: PropTypes.number.isRequired,
-    submissionTime: PropTypes.number.isRequired,
-    numberOfRounds: PropTypes.number.isRequired,
-    parties: PropTypes.arrayOf(PropTypes.string).isRequired,
-    dispute: PropTypes.shape({
-      arbitrated: PropTypes.string.isRequired,
-      choices: PropTypes.string.isRequired,
-      fee: PropTypes.string.isRequired,
-      ruling: PropTypes.string.isRequired,
-      status: PropTypes.string.isRequired
-    }),
-    latestRound: PropTypes.shape({
-      appealed: PropTypes.bool.isRequired,
-      hasPaid: PropTypes.arrayOf(PropTypes.bool).isRequired,
-      paidFees: PropTypes.arrayOf(PropTypes.string).isRequired
-    })
-  }).isRequired
+  latestRequest: requestShape.isRequired
 })
 export const _badgesShape = PropTypes.arrayOf(_badgeShape.isRequired)
 

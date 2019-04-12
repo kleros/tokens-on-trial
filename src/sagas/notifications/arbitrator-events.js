@@ -28,12 +28,7 @@ const emitArbitratorNotifications = async (
   account,
   emit,
   events,
-  {
-    arbitratorView,
-    arbitrableAddressListView,
-    arbitrableTokenListView,
-    viewWeb3
-  }
+  { arbitratorView, badgeViewContracts, arbitrableTokenListView, viewWeb3 }
 ) => {
   for (const event of events.reverse()) {
     const { returnValues } = event
@@ -49,6 +44,8 @@ const emitArbitratorNotifications = async (
       const token = await arbitrableTokenListView.methods
         .getTokenInfo(tokenID)
         .call()
+      token.address = token.addr
+
       const latestRequest = await arbitrableTokenListView.methods
         .getRequestInfo(tokenID, Number(token.numberOfRequests) - 1)
         .call()
@@ -68,9 +65,9 @@ const emitArbitratorNotifications = async (
         message,
         clientStatus: 4
       })
-    } else if (
-      returnValues._arbitrable === arbitrableAddressListView._address
-    ) {
+    } else if (badgeViewContracts[returnValues._arbitrable]) {
+      const arbitrableAddressListView =
+        badgeViewContracts[returnValues._arbitrable]
       const tokenAddress = await arbitrableAddressListView.methods
         .arbitratorDisputeIDToAddress(
           arbitratorView._address,
@@ -102,10 +99,12 @@ const emitArbitratorNotifications = async (
         .call()).values.filter(ID => ID !== ZERO_ID)
 
       let token
-      if (tokenIDs && tokenIDs.length > 0)
+      if (tokenIDs && tokenIDs.length > 0) {
         token = await arbitrableTokenListView.methods
           .getTokenInfo(tokenIDs[0])
           .call()
+        token.address = token.addr
+      }
 
       const message = `Jurors gave an appealable ruling on disputed badge for ${
         token ? `the ${token.ticker}` : 'a'
@@ -113,7 +112,7 @@ const emitArbitratorNotifications = async (
 
       emit({
         ID: tokenAddress,
-        addr: tokenAddress,
+        address: tokenAddress,
         badgeAddr: arbitrableAddressListView._address,
         date: await getBlockDate(event.blockHash, viewWeb3),
         message,

@@ -2,29 +2,17 @@ import React, { PureComponent } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import Img from 'react-image'
 import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
-import Countdown from 'react-countdown-now'
-import Progress from 'react-progressbar'
 import Archon from '@kleros/archon'
 
-import { IPFS_URL, onlyInfura, web3Utils } from '../../bootstrap/dapp-api'
-import EtherScanLogo from '../../assets/images/etherscan.png'
+import { IPFS_URL, onlyInfura } from '../../bootstrap/dapp-api'
 import Button from '../../components/button'
-import BadgeCard from '../../components/badge-card'
 import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
-import CountdownRenderer from '../../components/countdown-renderer'
-import { hasPendingRequest } from '../../utils/tcr'
-import {
-  getRemainingTime,
-  getBadgeStyle,
-  rulingMessage,
-  userFriendlyLabel
-} from '../../utils/ui'
+import WithdrawFundsButton from '../../components/withdraw-funds'
+import { getRemainingTime } from '../../utils/ui'
 import { getFileIcon } from '../../utils/evidence'
-import getActionButton from '../../components/action-button'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
@@ -34,6 +22,10 @@ import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import { ContractsContext } from '../../bootstrap/contexts'
+import Evidence from '../../components/evidence'
+
+import Badges from './badges'
+import TokenDetailsCard from './token-details-card'
 
 import './token.css'
 
@@ -47,7 +39,7 @@ class TokenDetails extends PureComponent {
     token: PropTypes.shape({
       name: PropTypes.string,
       ticker: PropTypes.string,
-      addr: PropTypes.string,
+      address: PropTypes.string,
       URI: PropTypes.string
     }),
     match: PropTypes.shape({
@@ -55,7 +47,6 @@ class TokenDetails extends PureComponent {
         tokenID: PropTypes.string
       })
     }),
-    badges: PropTypes.shape({}).isRequired,
     envObjects: PropTypes.shape({}).isRequired,
 
     // Functions
@@ -153,7 +144,7 @@ class TokenDetails extends PureComponent {
   }
 
   submitBadgeAction = () =>
-    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.SubmitBadge)
+    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.AddBadge)
 
   componentDidMount() {
     const { match, fetchToken } = this.props
@@ -183,7 +174,6 @@ class TokenDetails extends PureComponent {
     const {
       T2CR_BLOCK,
       arbitrableTokenListEvents,
-      arbitrableAddressListEvents,
       arbitratorEvents,
       archon
     } = this.context
@@ -271,16 +261,6 @@ class TokenDetails extends PureComponent {
         )
           fetchToken(tokenID)
       })
-      arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (!token) return
-
-        if (token.addr === event.returnValues._address) fetchToken(tokenID)
-      })
       arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
         if (err) {
           console.error(err)
@@ -326,7 +306,10 @@ class TokenDetails extends PureComponent {
         this.setState({
           evidences: {
             ...evidences,
-            [e.transactionHash]: evidence
+            [e.transactionHash]: {
+              ...evidence,
+              blockNumber: e.blockNumber
+            }
           }
         })
       })
@@ -367,7 +350,10 @@ class TokenDetails extends PureComponent {
           this.setState({
             evidences: {
               ...evidences,
-              [e.transactionHash]: evidence
+              [e.transactionHash]: {
+                ...evidence,
+                blockNumber: e.blockNumber
+              }
             }
           })
         })
@@ -380,12 +366,9 @@ class TokenDetails extends PureComponent {
   render() {
     const {
       evidences,
-      countdownCompleted,
       appealModalOpen,
       loserCountdownCompleted,
-      winnerCountdownCompleted,
-      token,
-      evidencePeriodEnded
+      token
     } = this.state
 
     const {
@@ -393,13 +376,12 @@ class TokenDetails extends PureComponent {
       filter,
       match,
       arbitrableTokenListData,
-      badges,
       envObjects
     } = this.props
 
     if (!envObjects) return null
 
-    const { FILE_BASE_URL } = envObjects
+    const { FILE_BASE_URL } = envObjects.data
     const { filters } = filter
     const { tokenID } = match.params
 
@@ -424,37 +406,17 @@ class TokenDetails extends PureComponent {
         </div>
       )
 
-    let userIsLoser
     let decisiveRuling
     let requesterIsLoser
     let challengerIsLoser
-    const userAccount = accounts.data[0]
     const { latestRequest } = token
-
-    const SIDE =
-      userAccount === latestRequest.parties[tcrConstants.SIDE.Requester]
-        ? tcrConstants.SIDE.Requester
-        : userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
-        ? tcrConstants.SIDE.Challenger
-        : tcrConstants.SIDE.None
 
     if (
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
       !latestRequest.latestRound.appealed
-    ) {
-      if (
-        userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] &&
-        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
-      )
-        userIsLoser = true
-      else if (
-        userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger] &&
-        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
-      )
-        userIsLoser = true
-
+    )
       if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None) {
         decisiveRuling = true
         requesterIsLoser =
@@ -462,29 +424,12 @@ class TokenDetails extends PureComponent {
         challengerIsLoser =
           latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
       }
-    }
-
-    const time = getRemainingTime(
-      token,
-      arbitrableTokenListData,
-      tcrConstants,
-      userIsLoser,
-      decisiveRuling
-    )
 
     const loserRemainingTime = getRemainingTime(
       token,
       arbitrableTokenListData,
       tcrConstants,
       true,
-      decisiveRuling
-    )
-
-    const winnerRemainingTime = getRemainingTime(
-      token,
-      arbitrableTokenListData,
-      tcrConstants,
-      false,
       decisiveRuling
     )
 
@@ -523,26 +468,6 @@ class TokenDetails extends PureComponent {
       }
     }
 
-    let periodRemainingTime = 0
-    if (latestRequest.dispute)
-      if (latestRequest.dispute.period.toString() === '1') {
-        periodRemainingTime =
-          Number(latestRequest.dispute.lastPeriodChange) * 1000 +
-          Number(latestRequest.dispute.court.timesPerPeriod[1]) * 1000 +
-          Number(latestRequest.dispute.court.timesPerPeriod[2]) * 1000 -
-          Date.now()
-      } else {
-        periodRemainingTime =
-          Number(latestRequest.dispute.lastPeriodChange) * 1000 +
-          Number(
-            latestRequest.dispute.court.timesPerPeriod[
-              latestRequest.dispute.period
-            ]
-          ) *
-            1000 -
-          Date.now()
-      }
-
     /* eslint-disable react/jsx-no-bind */
     return (
       <div className="Page">
@@ -552,518 +477,29 @@ class TokenDetails extends PureComponent {
         />
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <h4 style={{ marginLeft: 0 }}>Token Details</h4>
-          {token.withdrawable.gt(web3Utils.toBN(0)) && (
-            <>
-              <div className="TokenDetails-divider" />
-              <h5
-                className="TokenDetails-withdraw"
-                onClick={this.withdrawFunds}
-              >
-                <span className="TokenDetails-withdraw-value">
-                  {Number(
-                    web3Utils.fromWei(token.withdrawable.toString())
-                  ).toFixed(4)}{' '}
-                  ETH{' '}
-                </span>
-                Withdraw Funds
-              </h5>
-            </>
-          )}
+          <WithdrawFundsButton
+            onWithdrawFundsClick={this.withdrawFunds}
+            item={token}
+          />
         </div>
         <hr className="TokenDescription-separator" />
-        <div className="TokenDetails">
-          <img
-            alt="Token Symbol"
-            className="TokenDetails-img"
-            src={`${
-              token.symbolMultihash && token.symbolMultihash[0] === '/'
-                ? `${IPFS_URL}`
-                : `${FILE_BASE_URL}/`
-            }${token.symbolMultihash}`}
-          />
-          <div className="TokenDetails-card">
-            <div className="TokenDetails-card-content">
-              <div className="TokenDetails-label">
-                <span className="TokenDetails-label-name">{token.name}</span>
-                <span className="TokenDetails-label-ticker">
-                  {token.ticker}
-                </span>
-              </div>
-              <div className="TokenDetails-divider" />
-              <div className="TokenDetails-meta">
-                <span className="TokenDetails-meta-item">
-                  <FontAwesomeIcon
-                    className="TokenDetails-icon"
-                    color={tcrConstants.STATUS_COLOR_ENUM[token.clientStatus]}
-                    icon={tcrConstants.STATUS_ICON_ENUM[token.clientStatus]}
-                  />
-                  <div>
-                    {this.toSentenceCase(
-                      userFriendlyLabel[
-                        tcrConstants.STATUS_ENUM[token.clientStatus]
-                      ]
-                    )}
-                  </div>
-                </span>
-                {latestRequest.dispute &&
-                  Number(latestRequest.dispute.status) ===
-                    tcrConstants.DISPUTE_STATUS.Appealable &&
-                  !latestRound.appealed && (
-                    <span
-                      className="BadgeDetails-timer TokenDetails-meta-item"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#3d464d'
-                      }}
-                      data-tip={
-                        latestRequest.dispute.ruling.toString() !== '0'
-                          ? ''
-                          : `If the requester does not fully fund, the token will ${
-                              token.status.toString() === '2'
-                                ? 'not be added'
-                                : 'not be removed'
-                            } and parties will be reimbursed.`
-                      }
-                    >
-                      <FontAwesomeIcon
-                        className="TokenDetails-icon"
-                        color={tcrConstants.STATUS_COLOR_ENUM[5]}
-                        icon="balance-scale"
-                        style={{ marginRight: '10px' }}
-                      />
-                      {latestRequest.dispute.ruling.toString() !== '0'
-                        ? rulingMessage(
-                            decisiveRuling,
-                            SIDE !== tcrConstants.SIDE.None,
-                            userIsLoser,
-                            latestRequest.dispute.ruling.toString()
-                          )
-                        : 'Jurors did not rule.'}
-                    </span>
-                  )}
-                {latestRequest.dispute &&
-                  Number(latestRequest.dispute.period) <= 2 && (
-                    <span
-                      className="TokenDetails-meta-item"
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        color: '#f60c36'
-                      }}
-                    >
-                      <div className="BadgeDetails-timer">
-                        <FontAwesomeIcon
-                          className="TokenDetails-icon"
-                          color="#f60c36"
-                          icon="clock"
-                        />
-                        {evidencePeriodEnded ? (
-                          'Waiting Next Period'
-                        ) : (
-                          <>
-                            <span style={{ marginRight: '6px' }}>
-                              {
-                                tcrConstants.PERIOD_STRINGS[
-                                  latestRequest.dispute.period
-                                ]
-                              }
-                            </span>
-                            <Countdown
-                              date={Date.now() + periodRemainingTime}
-                              renderer={CountdownRenderer}
-                              onStart={() =>
-                                this.onEvidenceCountdownComplete(
-                                  periodRemainingTime
-                                )
-                              }
-                              onComplete={this.onEvidenceCountdownComplete}
-                            />
-                          </>
-                        )}
-                      </div>
-                    </span>
-                  )}
-                {!(
-                  token.clientStatus <= 1 ||
-                  (hasPendingRequest(token.status, latestRequest) &&
-                    latestRequest.dispute &&
-                    latestRequest.dispute.status !==
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString())
-                ) &&
-                  (!latestRequest.dispute ||
-                    latestRequest.dispute.status ===
-                      tcrConstants.DISPUTE_STATUS.Appealable.toString()) && (
-                    <>
-                      {!latestRequest.disputed && !latestRequest.dispute ? (
-                        <>
-                          {!countdownCompleted && (
-                            <span
-                              className="TokenDetails-meta-item"
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                color: '#f60c36'
-                              }}
-                            >
-                              <div className="BadgeDetails-timer">
-                                <FontAwesomeIcon
-                                  className="TokenDetails-icon"
-                                  color="#f60c36"
-                                  icon="clock"
-                                />
-                                <div>
-                                  {'Challenge Deadline '}
-                                  <Countdown
-                                    style={{ marginLeft: '6px' }}
-                                    date={Date.now() + time}
-                                    renderer={CountdownRenderer}
-                                    onComplete={this.onCountdownComplete}
-                                    onStart={() =>
-                                      this.onCountdownComplete(time)
-                                    }
-                                  />
-                                </div>
-                              </div>
-                            </span>
-                          )}
-                        </>
-                      ) : (
-                        <>
-                          {latestRequest.dispute.status ===
-                            tcrConstants.DISPUTE_STATUS.Appealable.toString() && (
-                            <>
-                              {!decisiveRuling && !countdownCompleted ? (
-                                <span
-                                  className="TokenDetails-meta-item"
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    color: '#f60c36'
-                                  }}
-                                >
-                                  <div className="BadgeDetails-timer">
-                                    <FontAwesomeIcon
-                                      className="TokenDetails-icon"
-                                      color="#f60c36"
-                                      icon="clock"
-                                    />
-                                    <div>
-                                      {'Appeal Deadline '}
-                                      <Countdown
-                                        date={Date.now() + time}
-                                        renderer={CountdownRenderer}
-                                        onComplete={this.onCountdownComplete}
-                                        onStart={() =>
-                                          this.onCountdownComplete(time)
-                                        }
-                                      />
-                                    </div>
-                                  </div>
-                                </span>
-                              ) : (
-                                <>
-                                  {!loserTimedOut && (
-                                    <>
-                                      <span
-                                        className="TokenDetails-meta-item"
-                                        style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          color: '#f60c36'
-                                        }}
-                                      >
-                                        <div className="BadgeDetails-timer">
-                                          <FontAwesomeIcon
-                                            className="TokenDetails-icon"
-                                            color="#f60c36"
-                                            icon="clock"
-                                          />
-                                          <span style={{ marginRight: '6px' }}>
-                                            {'Winner Deadline '}
-                                          </span>
-                                          <Countdown
-                                            date={
-                                              Date.now() + winnerRemainingTime
-                                            }
-                                            renderer={CountdownRenderer}
-                                            onComplete={
-                                              this.onWinnerCountdownComplete
-                                            }
-                                            onStart={() =>
-                                              this.onWinnerCountdownComplete(
-                                                winnerRemainingTime
-                                              )
-                                            }
-                                          />
-                                        </div>
-                                      </span>
-                                      <span
-                                        className="TokenDetails-meta-item"
-                                        style={{
-                                          display: 'flex',
-                                          alignItems: 'center',
-                                          color: '#f60c36'
-                                        }}
-                                      >
-                                        <div className="BadgeDetails-timer">
-                                          <FontAwesomeIcon
-                                            className="TokenDetails-icon"
-                                            color="#f60c36"
-                                            icon="clock"
-                                          />
-                                          <span style={{ marginRight: '6px' }}>
-                                            {'Loser Deadline '}
-                                          </span>
-                                          <Countdown
-                                            date={
-                                              Date.now() + loserRemainingTime
-                                            }
-                                            renderer={CountdownRenderer}
-                                            onComplete={
-                                              this.onLoserCoundownComplete
-                                            }
-                                            onStart={() => {
-                                              this.onLoserCountdownComplete(
-                                                loserRemainingTime
-                                              )
-                                            }}
-                                          />
-                                        </div>
-                                      </span>
-                                    </>
-                                  )}
-                                </>
-                              )}
-                            </>
-                          )}
-                        </>
-                      )}
-                    </>
-                  )}
-              </div>
-              {Number(token.status) > 1 &&
-                latestRequest.dispute &&
-                Number(latestRequest.dispute.status) ===
-                  tcrConstants.DISPUTE_STATUS.Appealable &&
-                latestRequest.numberOfRounds > 1 &&
-                (!decisiveRuling || !loserTimedOut) && (
-                  <div
-                    className="TokenDetails-meta TokenDetails-meta-crowdfunding"
-                    data-tip="If the party that lost the previous round is fully funded but the winner is not, the loser will win the dispute."
-                  >
-                    <span style={{ color: '#009aff', marginBottom: '7px' }}>
-                      <FontAwesomeIcon
-                        color="#009aff"
-                        icon="coins"
-                        style={{ marginRight: '14px' }}
-                      />
-                      <strong>Fee Crowdfunding:</strong>
-                    </span>
-                    <span>Requester</span>
-                    <Progress
-                      className="TokenDetails-meta-item TokenDetails-crowdfundingBar"
-                      completed={requesterFeesPercent}
-                      height="5px"
-                      color={
-                        requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff'
-                      }
-                      style={{
-                        border: '1px solid #009aff',
-                        borderColor:
-                          requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
-                        borderRadius: '3px',
-                        marginLeft: 0
-                      }}
-                    />
-                    <span>Challenger</span>
-                    <Progress
-                      className="TokenDetails-meta-item TokenDetails-crowdfundingBar"
-                      completed={challengerFeesPercent}
-                      height="5px"
-                      color={
-                        challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
-                      }
-                      style={{
-                        border: '1px solid #009aff',
-                        borderColor:
-                          challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
-                        borderRadius: '3px',
-                        marginLeft: 0
-                      }}
-                    />
-                  </div>
-                )}
-              <div className="TokenDetails-action">
-                {Number(token.status) > 1 &&
-                latestRequest.dispute &&
-                Number(latestRequest.dispute.status) ===
-                  tcrConstants.DISPUTE_STATUS.Appealable &&
-                latestRequest.numberOfRounds > 1 &&
-                SIDE === tcrConstants.SIDE.None ? (
-                  <Button
-                    type="primary"
-                    onClick={this.fundAppeal}
-                    tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-                    disabled={
-                      onlyInfura ||
-                      (decisiveRuling
-                        ? (winnerCountdownCompleted &&
-                            loserCountdownCompleted) ||
-                          loserTimedOut
-                        : countdownCompleted)
-                    }
-                  >
-                    <FontAwesomeIcon
-                      className="TokenDetails-icon"
-                      icon="coins"
-                    />
-                    {(decisiveRuling
-                    ? (!winnerCountdownCompleted || !loserCountdownCompleted) &&
-                      !loserTimedOut
-                    : !countdownCompleted)
-                      ? 'Fund Appeal'
-                      : 'Waiting Enforcement'}
-                  </Button>
-                ) : (
-                  getActionButton({
-                    item: token,
-                    userAccount,
-                    tcr: arbitrableTokenListData,
-                    countdownCompleted,
-                    handleActionClick: this.handleActionClick,
-                    handleExecuteRequestClick: this.handleExecuteRequestClick,
-                    decisiveRuling,
-                    loserPercent,
-                    loserCountdownCompleted
-                  })
-                )}
-              </div>
-            </div>
-            <div className="TokenDetails-footer">
-              <a
-                className="TokenDetails--link"
-                style={{ marginRight: '14px' }}
-                href={`https://etherscan.io/token/${token.addr}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Img
-                  className="TokenDetails-icon TokenDetails-meta--aligned"
-                  src={EtherScanLogo}
-                />
-                {token.addr ? web3Utils.toChecksumAddress(token.addr) : ''}
-              </a>
-              {(token.badge.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
-                token.badge.status ===
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] ||
-                token.badge.status ===
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM[
-                    'RegistrationRequested'
-                  ]) &&
-                token.status !==
-                  tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
-                token.badge && (
-                  <span className="TokenDetails-footer-badge">
-                    <span
-                      className="TokenDetails-icon-badge TokenDetails-meta--aligned"
-                      style={getBadgeStyle(token.badge, tcrConstants)}
-                    >
-                      1
-                    </span>
-                    Badge
-                  </span>
-                )}
-            </div>
-          </div>
-        </div>
-        {latestRequest && !latestRequest.resolved && (
-          <div className="TokenDescription">
-            <hr className="TokenDescription-separator" />
-            <h3>Evidence</h3>
-            <div className="TokenDescription-evidence">
-              <div className="TokenDescription-evidence--list">
-                {evidences ? (
-                  <>
-                    {Object.keys(evidences).map(key => (
-                      <div
-                        className="TokenDescription-evidence--item"
-                        key={key}
-                        onClick={this.handleViewEvidenceClick(evidences[key])}
-                      >
-                        <FontAwesomeIcon icon={evidences[key].icon} size="2x" />
-                      </div>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    {latestRequest.disputed && (
-                      <div>
-                        <BeatLoader color="#3d464d" />
-                        <small>
-                          <i>
-                            Evidence can take some time to load. Thanks for the
-                            patience
-                          </i>
-                        </small>
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-              <Button
-                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-                disabled={onlyInfura}
-                onClick={this.handleOpenEvidenceModal}
-                type="secondary"
-              >
-                Submit Evidence
-              </Button>
-            </div>
-          </div>
-        )}
+        <TokenDetailsCard
+          token={token}
+          FILE_BASE_URL={FILE_BASE_URL}
+          userAccount={accounts.data[0]}
+          arbitrableTokenListData={arbitrableTokenListData.data}
+          handleActionClick={this.handleActionClick}
+          handleExecuteRequestClick={this.handleExecuteRequestClick}
+          fundAppeal={this.fundAppeal}
+        />
+        <Evidence
+          item={token}
+          evidences={evidences}
+          handleOpenEvidenceModal={this.handleOpenEvidenceModal}
+          handleViewEvidenceClick={this.handleViewEvidenceClick}
+        />
         <br />
-        <div className="TokenDescription">
-          <hr className="TokenDescription-separator" />
-          <div className="TokenDescription-badge-header">
-            <h3 style={{ marginTop: 0 }}>Badges</h3>
-            {(token.status ===
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
-              token.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) &&
-              token.badge.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-                <Button
-                  tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-                  disabled={onlyInfura}
-                  onClick={this.submitBadgeAction}
-                  type="secondary"
-                  style={{ width: '117px' }}
-                >
-                  Add Badge
-                </Button>
-              )}
-            {token.status !==
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] &&
-              token.status !==
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] &&
-              token.badge.status ===
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-                <span className="TokenDescription-info">
-                  Tokens must be registered to receive badges.
-                </span>
-              )}
-          </div>
-          <div className="TokenDescription-evidence">
-            {token.badge.status !==
-              tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] &&
-              token.status !==
-                tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
-                <BadgeCard badge={badges[token.addr]} />
-              )}
-          </div>
-        </div>
+        <Badges token={token} submitBadgeAction={this.submitBadgeAction} />
         {/* eslint-disable react/jsx-no-bind */}
         {(!decisiveRuling || !loserTimedOut) && (
           <Modal
@@ -1141,7 +577,6 @@ class TokenDetails extends PureComponent {
 export default connect(
   state => ({
     token: state.token.token.data,
-    badges: state.badges.data.items,
     accounts: state.wallet.accounts,
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
     filter: state.filter,

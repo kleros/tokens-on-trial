@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types'
+
 import {
   CACHE_BADGES,
   FETCH_BADGES_CACHE,
@@ -5,12 +7,20 @@ import {
   LOAD_BADGES_STATE
 } from '../actions/badges'
 
+import { cacheItemShape } from './generic-shapes'
+
+export const badgesShape = PropTypes.shape({
+  loading: PropTypes.bool.isRequired,
+  data: PropTypes.objectOf({
+    badgeContractAddr: PropTypes.string.isRequired,
+    items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired,
+    statusBlockNumber: PropTypes.number.isRequired
+  }).isRequired
+})
+
 const initialState = {
   loading: false,
-  data: {
-    statusBlockNumber: 0,
-    items: {}
-  }
+  data: {}
 }
 
 const badges = (state = initialState, action) => {
@@ -25,7 +35,7 @@ const badges = (state = initialState, action) => {
       return {
         ...state,
         loading: false,
-        loadingFailed: true
+        failedLoading: true
       }
     }
     case CACHE_BADGES: {

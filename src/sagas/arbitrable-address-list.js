@@ -6,22 +6,41 @@ import { sanitize } from '../utils/ui'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
-import { web3Utils } from '../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
+import Arbitrator from '../assets/contracts/arbitrator'
 
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
 
+const fetchEvents = async (eventName, contract) =>
+  contract.getPastEvents(eventName, { fromBlock: 0 }) // Web3js returns an empty array if fromBlock is not set.
+
 /**
- * Fetches the arbitrable address list's data.
- * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * Fetches the arbitrable address list data.
+ * @param { object } arbitrableAddressListView - The contract.
+ * @param { object } viewWeb3 - Web3 object for instantiating an arbitrator.
  * @returns {object} - The fetched data.
  */
-export function* fetchArbitrableAddressListData() {
-  const { arbitrableAddressListView, arbitratorView } = yield call(
-    instantiateEnvObjects
-  )
+export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
+  // Fetch the contract deployment block number. We use the first meta evidence
+  // events emitted when the constructor is run.
+  const metaEvidenceEvents = (yield call(
+    fetchEvents,
+    'MetaEvidence',
+    arbitrableAddressListView
+  )).sort((a, b) => a.blockNumber - b.blockNumber)
+  const blockNumber = metaEvidenceEvents[0].blockNumber
+
+  // Fetch tcr information from the latest meta evidence event
+  const metaEvidencePath = `${IPFS_URL}${
+    metaEvidenceEvents[metaEvidenceEvents.length - 1].returnValues._evidence
+  }`
+  const { variables, fileURI } = yield (yield call(
+    fetch,
+    metaEvidencePath
+  )).json()
 
   const d = yield all({
     arbitrator: call(arbitrableAddressListView.methods.arbitrator().call),
@@ -34,7 +53,6 @@ export function* fetchArbitrableAddressListData() {
     challengePeriodDuration: call(
       arbitrableAddressListView.methods.challengePeriodDuration().call
     ),
-    governor: call(arbitrableAddressListView.methods.governor().call),
     winnerStakeMultiplier: call(
       arbitrableAddressListView.methods.winnerStakeMultiplier().call
     ),
@@ -53,12 +71,16 @@ export function* fetchArbitrableAddressListData() {
     countByStatus: call(arbitrableAddressListView.methods.countByStatus().call)
   })
 
-  arbitratorView.options.address = d.arbitrator
+  const arbitratorView = new viewWeb3.eth.Contract(Arbitrator.abi, d.arbitrator)
   const arbitrationCost = yield call(
     arbitratorView.methods.arbitrationCost(d.arbitratorExtraData).call
   )
 
   return {
+    blockNumber,
+    variables,
+    fileURI,
+    badgeContractAddr: arbitrableAddressListView.options.address,
     arbitrator: d.arbitrator,
     governor: d.governor,
     requesterBaseDeposit: toBN(d.requesterBaseDeposit),
@@ -80,11 +102,31 @@ export function* fetchArbitrableAddressListData() {
 }
 
 /**
+ * Fetches the badge contract data for every badge contract.
+ * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
+ * @returns {object} - The fetched data.
+ */
+export function* fetchArbitrableAddressListData() {
+  const { badgeViewContracts, viewWeb3 } = yield call(instantiateEnvObjects)
+
+  const badgeContractsData = (yield all(
+    Object.keys(badgeViewContracts).map(address =>
+      call(fetchBadgeContractData, badgeViewContracts[address], viewWeb3)
+    )
+  )).reduce((acc, curr) => {
+    acc[curr.badgeContractAddr] = curr
+    return acc
+  }, {})
+
+  return badgeContractsData
+}
+
+/**
  * Submits evidence for a dispute
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
+function* submitBadgeEvidence({ payload: { evidenceData, file, address } }) {
   const { arbitrableAddressList, archon } = yield call(instantiateEnvObjects)
 
   let fileURI = ''
@@ -124,7 +166,7 @@ function* submitBadgeEvidence({ payload: { evidenceData, file, addr } }) {
 
   yield call(
     arbitrableAddressList.methods.submitEvidence(
-      addr,
+      address,
       `/ipfs/${ipfsHashEvidence}`
     ).send,
     {

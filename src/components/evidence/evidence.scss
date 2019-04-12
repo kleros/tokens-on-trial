@@ -1,0 +1,38 @@
+@import '../../styles/_colors.scss';
+
+/* @define Evidence */
+.Evidence {
+  display: flex;
+  flex-direction: column;
+
+  &-separator {
+    border-color: $darkerGrey;
+    border-width: 1px;
+    width: 100%;
+  }
+
+  &-header {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-evidence {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    &--list {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 26px;
+    }
+
+    &--item {
+      color: $badgeBlue;
+      cursor: pointer;
+      margin: 6px;
+    }
+  }
+}

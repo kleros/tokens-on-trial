@@ -1,8 +1,173 @@
 import RegisteredBadge from '../assets/images/badges/badge-registered.svg'
 import ChallengedBadge from '../assets/images/badges/badge-challenged.svg'
 import WaitingBadge from '../assets/images/badges/badge-waiting.svg'
+import * as tcrConstants from '../constants/tcr'
 
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
+
+export const getUserSide = (item, userAccount) => {
+  const { latestRequest } = item
+  const { parties } = latestRequest
+  return userAccount === parties[tcrConstants.SIDE.Requester]
+    ? tcrConstants.SIDE.Requester
+    : userAccount === parties[tcrConstants.SIDE.Challenger]
+    ? tcrConstants.SIDE.Challenger
+    : tcrConstants.SIDE.None
+}
+
+export const isDecisiveRuling = item => {
+  const { latestRequest } = item
+  const { dispute, disputed, resolved } = latestRequest
+  if (!disputed || (disputed && resolved)) return false
+
+  const { ruling } = dispute
+  return ruling !== tcrConstants.RULING_OPTIONS.None
+}
+
+export const isUserLoser = (item, userAccount) => {
+  const { latestRequest } = item
+  const { dispute, latestRound, parties } = latestRequest
+  const { appealed } = latestRound
+  if (!dispute) return false
+  const { status, ruling } = dispute
+
+  if (status !== tcrConstants.DISPUTE_STATUS.Appealable && appealed)
+    return false
+
+  return (
+    (userAccount === parties[tcrConstants.SIDE.Requester] &&
+      ruling === tcrConstants.RULING_OPTIONS.Refuse) ||
+    (userAccount === parties[tcrConstants.SIDE.Challenger] &&
+      ruling === tcrConstants.RULING_OPTIONS.Accept)
+  )
+}
+
+export const getCrowdfundingInfo = item => {
+  const { status, latestRequest } = item
+  const { dispute, latestRound } = latestRequest
+  const { appealed, hasPaid, paidFees, requiredForSide } = latestRound
+
+  if (
+    status <= 1 ||
+    !dispute ||
+    Number(dispute.status) !== tcrConstants.DISPUTE_STATUS.Appealable ||
+    !isDecisiveRuling(item) ||
+    appealed
+  )
+    return null
+
+  const { ruling } = dispute
+
+  let requesterFeesPercent = 0
+  let challengerFeesPercent = 0
+  let loserPercent = 0
+
+  if (!hasPaid[tcrConstants.SIDE.Requester])
+    requesterFeesPercent =
+      (Number(paidFees[tcrConstants.SIDE.Requester]) /
+        Number(requiredForSide[tcrConstants.SIDE.Requester])) *
+      100
+  else requesterFeesPercent = 100
+
+  if (!hasPaid[tcrConstants.SIDE.Challenger])
+    challengerFeesPercent =
+      (Number(paidFees[tcrConstants.SIDE.Challenger]) /
+        Number(requiredForSide[tcrConstants.SIDE.Challenger])) *
+      100
+  else challengerFeesPercent = 100
+
+  if (ruling === tcrConstants.RULING_OPTIONS.Accept)
+    loserPercent = challengerFeesPercent
+  else loserPercent = requesterFeesPercent
+
+  return {
+    loserPercent,
+    requesterFeesPercent,
+    challengerFeesPercent
+  }
+}
+
+export const loserHasPaid = ({
+  latestRequest: {
+    latestRound: { ruling, hasPaid }
+  }
+}) => {
+  let loserSide
+  if (ruling === tcrConstants.RULING_OPTIONS.Accept)
+    loserSide = tcrConstants.SIDE.Requester
+  else if (ruling === tcrConstants.RULING_OPTIONS.Refuse)
+    loserSide = tcrConstants.SIDE.Requester
+  else return null
+
+  return hasPaid[loserSide]
+}
+
+export const didLoserTimeout = item => {
+  const { status, latestRequest } = item
+  const { dispute, latestRound } = latestRequest
+  if (status <= 1 || !dispute) return false
+
+  const {
+    appealed,
+    hasPaid,
+    paidFees,
+    requiredForSide,
+    appealPeriod
+  } = latestRound
+
+  if (
+    status <= 1 ||
+    !dispute ||
+    Number(dispute.status) !== tcrConstants.DISPUTE_STATUS.Appealable ||
+    !isDecisiveRuling(item) ||
+    appealed
+  )
+    return false
+
+  const { ruling } = dispute
+
+  let requesterFeesPercent = 0
+  let challengerFeesPercent = 0
+  let loserPercent = 0
+  let loserTimedOut
+
+  if (!hasPaid[tcrConstants.SIDE.Requester])
+    requesterFeesPercent =
+      (Number(paidFees[tcrConstants.SIDE.Requester]) /
+        Number(requiredForSide[tcrConstants.SIDE.Requester])) *
+      100
+  else requesterFeesPercent = 100
+
+  if (!hasPaid[tcrConstants.SIDE.Challenger])
+    challengerFeesPercent =
+      (Number(paidFees[tcrConstants.SIDE.Challenger]) /
+        Number(requiredForSide[tcrConstants.SIDE.Challenger])) *
+      100
+  else challengerFeesPercent = 100
+
+  if (ruling === tcrConstants.RULING_OPTIONS.Accept)
+    loserPercent = challengerFeesPercent
+  else loserPercent = requesterFeesPercent
+
+  const appealPeriodStart = appealPeriod[0]
+  let appealPeriodEnd = appealPeriod[1]
+  const appealPeriodDuration = (appealPeriodEnd - appealPeriodStart) / 2
+  appealPeriodEnd = appealPeriodStart + appealPeriodDuration
+  const time = appealPeriodEnd - Date.now()
+
+  if (loserPercent < 100 && time <= 0) loserTimedOut = true
+
+  return loserTimedOut
+}
+
+export const getItemInformation = (item, userAccount) => ({
+  userSide: getUserSide(item, userAccount),
+  userIsLoser: isUserLoser(item, userAccount),
+  decisiveRuling: isDecisiveRuling(item),
+  loserTimedOut: didLoserTimeout(item),
+  loserHasPaid: loserHasPaid(item),
+  ...getCrowdfundingInfo(item)
+})
 
 export const getBadgeStyle = badge => {
   if (badge.status.status === 1)
@@ -10,6 +175,11 @@ export const getBadgeStyle = badge => {
   if (badge.status.disputed && badge.status.status > 1)
     return { backgroundImage: `url(${ChallengedBadge})` }
   return { backgroundImage: `url(${WaitingBadge})`, color: '#656565' }
+}
+
+export const toSentenceCase = input => {
+  input = input ? input.toLowerCase() : ''
+  return input.charAt(0).toUpperCase() + input.slice(1)
 }
 
 export const capitalizeFirst = s =>
@@ -30,7 +200,7 @@ export const getRemainingTime = (
   const { latestRequest } = item
   const { latestRound } = latestRequest
 
-  if (!tcr.data) {
+  if (!tcr) {
     console.warn('No tcr data passed to getRemainingTime.')
     return 0
   }
@@ -38,9 +208,7 @@ export const getRemainingTime = (
   let time
   if (latestRequest.parties[2] === ZERO_ADDR)
     time =
-      latestRequest.submissionTime +
-      tcr.data.challengePeriodDuration -
-      currentTime
+      latestRequest.submissionTime + tcr.challengePeriodDuration - currentTime
   else if (
     latestRequest.dispute.status ===
     tcrConstants.DISPUTE_STATUS.Appealable.toString()
@@ -69,7 +237,7 @@ export const userFriendlyLabel = {
   Registered: 'Registered',
   'Registration Requests': 'Submissions',
   'Challenged Registration Requests': 'Challenged Submissions',
-  Absent: 'Removed',
+  Absent: 'Rejected',
   'Clearing Requests': 'Removal Requests',
   'Challenged Clearing Requests': 'Challenged Removal Requests',
   'My Submissions': 'My Requests',

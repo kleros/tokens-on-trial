@@ -52,14 +52,14 @@ class _ConnectedNavBar extends Component {
     openActionModal(modalConstants.ACTION_MODAL_ENUM.Submit)
   }
 
-  handleNotificationClick = ({ ID, addr, badgeAddr }) => {
+  handleNotificationClick = ({ ID, address, badgeAddr }) => {
     const { deleteNotification, history, closeNotificationsModal } = this.props
     if (!badgeAddr) {
       deleteNotification(ID)
       history.push(`/token/${ID}`)
     } else {
-      deleteNotification(addr)
-      history.push(`/badge/${badgeAddr}/${addr}`)
+      deleteNotification(address)
+      history.push(`/badge/${badgeAddr}/${address}`)
     }
     closeNotificationsModal()
   }

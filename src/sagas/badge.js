@@ -16,7 +16,6 @@ const { toBN } = web3Utils
 
 const ZERO_ID =
   '0x0000000000000000000000000000000000000000000000000000000000000000'
-const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 const filter = [
   false, // Do not include tokens which are not on the TCR.
   true, // Include registered tokens.
@@ -29,260 +28,29 @@ const filter = [
 ]
 
 /**
- * Fetches a paginable list of tokens with badges.
- * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
- * @returns {object[]} - The fetched tokens with badges.
- */
-function* fetchBadges({ payload: { cursor, count, filterValue, sortValue } }) {
-  // Token count and stats
-  if (cursor === '') cursor = ZERO_ADDR
-
-  const { arbitrableAddressListView, arbitrableTokenListView } = yield call(
-    instantiateEnvObjects
-  )
-
-  const totalCount = Number(
-    yield call(arbitrableAddressListView.methods.addressCount().call, {
-      from: yield select(walletSelectors.getAccount)
-    })
-  )
-  const totalPages =
-    totalCount <= count
-      ? 1
-      : totalCount % count === 0
-      ? totalCount / count
-      : Math.floor(totalCount / count) + 1
-
-  let countByStatus = yield call(
-    arbitrableAddressListView.methods.countByStatus().call,
-    {
-      from: yield select(walletSelectors.getAccount)
-    }
-  )
-
-  countByStatus = {
-    '0': Number(countByStatus['0']),
-    '1': Number(countByStatus['1']),
-    '2': Number(countByStatus['2']),
-    '3': Number(countByStatus['3']),
-    '4': Number(countByStatus['4']),
-    '5': Number(countByStatus['5']),
-    absent: Number(countByStatus['absent']),
-    challengedClearingRequest: Number(
-      countByStatus['challengedClearingRequest']
-    ),
-    challengedRegistrationRequest: Number(
-      countByStatus['challengedRegistrationRequest']
-    ),
-    clearingRequest: Number(countByStatus['clearingRequest']),
-    registered: Number(countByStatus['registered']),
-    registrationRequest: Number(countByStatus['registrationRequest'])
-  }
-
-  // Fetch first and last addresses
-  let firstToken = ZERO_ADDR
-  let lastToken = ZERO_ADDR
-  if (totalCount > 0) {
-    firstToken = yield call(
-      arbitrableAddressListView.methods.addressList(0).call,
-      {
-        from: yield select(walletSelectors.getAccount)
-      }
-    )
-    lastToken = yield call(
-      arbitrableAddressListView.methods.addressList(totalCount - 1).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )
-  }
-
-  // Get last page
-  let lastPage
-  /* eslint-disable no-unused-vars */
-  try {
-    const lastTokens = yield call(
-      arbitrableAddressListView.methods.queryAddresses(
-        lastToken,
-        count,
-        filterValue,
-        false
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )
-    lastPage = lastTokens.values.filter(addr => addr !== ZERO_ADDR)[
-      lastTokens.values.length - 1
-    ]
-  } catch (err) {
-    lastPage = '' // No op. There are no further tokens.
-  }
-  /* eslint-enable */
-
-  // Get current page
-  let currentPage = 1
-  if (cursor !== firstToken && cursor !== ZERO_ADDR) {
-    const itemsBefore = (yield call(
-      arbitrableAddressListView.methods.queryAddresses(
-        cursor === firstToken ? ZERO_ADDR : cursor,
-        100,
-        filterValue,
-        false
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )).values.filter(ID => ID !== ZERO_ADDR).length
-
-    currentPage =
-      itemsBefore <= count
-        ? 2
-        : itemsBefore % count === 0
-        ? itemsBefore / count + 1
-        : Math.floor(itemsBefore / count) + 2
-  }
-
-  // Fetch tokens
-  const data = yield call(
-    arbitrableAddressListView.methods.queryAddresses(
-      cursor === firstToken ? ZERO_ADDR : cursor,
-      count,
-      filterValue,
-      sortValue
-    ).call,
-    { from: yield select(walletSelectors.getAccount) }
-  )
-
-  const tokenAddresses = data.values.filter(addr => addr !== ZERO_ADDR)
-  const tokens = []
-  for (const addr of tokenAddresses) {
-    const submissionIDs = (yield call(
-      arbitrableTokenListView.methods.queryTokens(
-        ZERO_ID,
-        count,
-        [true, true, true, true, true, true, true, true],
-        true,
-        addr
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )).values.filter(ID => ID !== ZERO_ID)
-
-    let submissions = []
-    for (const submissionID of submissionIDs)
-      submissions.push({
-        ...(yield call(
-          arbitrableTokenListView.methods.getTokenInfo(submissionID).call
-        )),
-        ID: submissionID
-      })
-
-    submissions = submissions.filter(
-      submission => Number(submission.status) !== 0
-    )
-    submissions = submissions.sort((a, b) => {
-      a.status = Number(a.status)
-      b.status = Number(b.status)
-      if (a.status === 1 && b.status !== 1) return -1
-      if (a.status !== 1 && b.status === 1) return 1
-      if (a.status === 3 && b.status === 2) return -1
-      if (a.status === 2 && b.status === 3) return 1
-      return 0
-    })
-
-    let submission
-    if (submissions.length > 0) {
-      submission = {
-        ...submissions[0],
-        status: Number(submissions[0].status)
-      }
-      submission.latestRequest = yield call(
-        arbitrableTokenListView.methods.getRequestInfo(
-          submission.ID,
-          Number(submission.numberOfRequests) - 1
-        ).call
-      )
-      if (submission.latestRequest.arbitratorExtraData === null)
-        submission.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
-
-      submission.clientStatus = contractStatusToClientStatus(
-        submission.status,
-        submission.latestRequest.disputed
-      )
-    }
-
-    const badge = {
-      ...(yield call(
-        arbitrableAddressListView.methods.getAddressInfo(addr).call
-      )),
-      addr
-    }
-
-    badge.status = Number(badge.status)
-
-    badge.latestRequest = yield call(
-      arbitrableAddressListView.methods.getRequestInfo(
-        addr,
-        Number(badge.numberOfRequests) - 1
-      ).call
-    )
-    if (badge.latestRequest.arbitratorExtraData === null)
-      badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
-
-    tokens.push({
-      ...submission,
-      badge,
-      addr
-    })
-  }
-
-  // Fetch previous page token ID
-  /* eslint-disable no-unused-vars */
-  let previousPage
-  try {
-    const previousTokens = yield call(
-      arbitrableAddressListView.methods.queryAddresses(
-        tokenAddresses[0],
-        count + 1,
-        filterValue,
-        !sortValue
-      ).call,
-      { from: yield select(walletSelectors.getAccount) }
-    )
-    previousPage = previousTokens.values.filter(ID => ID !== ZERO_ID)[
-      previousTokens.values.length - 1
-    ]
-  } catch (err) {
-    previousPage = '' // No op. There are no previous tokens.
-  }
-  /* eslint-enable */
-
-  tokens.hasMore = data.hasMore
-  tokens.totalCount = totalCount
-  tokens.countByStatus = countByStatus
-  tokens.previousPage = previousPage
-  tokens.lastPage = lastPage
-  tokens.totalPages = totalPages
-  tokens.currentPage = currentPage
-  return tokens
-}
-
-/**
  * Fetches a badge from the list.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The fetched badge.
  */
-export function* fetchBadge({ payload: { addr } }) {
+export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
   const account = yield select(walletSelectors.getAccount)
   const {
-    arbitrableAddressListView,
+    badgeViewContracts,
     arbitrableTokenListView,
-    arbitratorView,
-    ARBITRATOR_ADDRESS
+    arbitratorView
   } = yield call(instantiateEnvObjects)
 
+  badgeContractAddr = web3Utils.toChecksumAddress(badgeContractAddr)
+  const arbitrableAddressListView = badgeViewContracts[badgeContractAddr]
+
   let badge = yield call(
-    arbitrableAddressListView.methods.getAddressInfo(addr).call
+    arbitrableAddressListView.methods.getAddressInfo(tokenAddress).call
   )
 
   if (Number(badge.numberOfRequests > 0)) {
     badge.latestRequest = yield call(
       arbitrableAddressListView.methods.getRequestInfo(
-        addr,
+        tokenAddress,
         Number(badge.numberOfRequests) - 1
       ).call
     )
@@ -290,7 +58,9 @@ export function* fetchBadge({ payload: { addr } }) {
       badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
     badge.latestRequest.evidenceGroupID = web3Utils
-      .toBN(web3Utils.soliditySha3(addr, Number(badge.numberOfRequests) - 1))
+      .toBN(
+        web3Utils.soliditySha3(tokenAddress, Number(badge.numberOfRequests) - 1)
+      )
       .toString()
 
     // Calculate amount withdrawable
@@ -302,8 +72,11 @@ export function* fetchBadge({ payload: { addr } }) {
 
     while (i >= 0) {
       const amount = yield call(
-        arbitrableAddressListView.methods.amountWithdrawable(addr, account, i)
-          .call
+        arbitrableAddressListView.methods.amountWithdrawable(
+          tokenAddress,
+          account,
+          i
+        ).call
       )
       badge.withdrawable = badge.withdrawable.add(web3Utils.toBN(amount))
       i--
@@ -311,10 +84,13 @@ export function* fetchBadge({ payload: { addr } }) {
 
     badge.latestRequest.latestRound = yield call(
       arbitrableAddressListView.methods.getRoundInfo(
-        addr,
+        tokenAddress,
         Number(badge.numberOfRequests) - 1,
         Number(badge.latestRequest.numberOfRounds) - 1
       ).call
+    )
+    badge.latestRequest.latestRound.paidFees[0] = toBN(
+      badge.latestRequest.latestRound.paidFees[0]
     )
     badge.latestRequest.latestRound.paidFees[1] = toBN(
       badge.latestRequest.latestRound.paidFees[1]
@@ -325,7 +101,7 @@ export function* fetchBadge({ payload: { addr } }) {
 
     if (badge.latestRequest.disputed) {
       // Fetch dispute data.
-      arbitratorView.options.address = badge.latestRequest.arbitrator
+      arbitratorView.options.tokenAddress = badge.latestRequest.arbitrator
       badge.latestRequest.dispute = yield call(
         arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
       )
@@ -366,13 +142,16 @@ export function* fetchBadge({ payload: { addr } }) {
         )
 
         const winnerStakeMultiplier = yield select(
-          arbitrableAddressListSelectors.getWinnerStakeMultiplier
+          arbitrableAddressListSelectors.getWinnerStakeMultiplier,
+          badgeContractAddr
         )
         const loserStakeMultiplier = yield select(
-          arbitrableAddressListSelectors.getLoserStakeMultiplier
+          arbitrableAddressListSelectors.getLoserStakeMultiplier,
+          badgeContractAddr
         )
         const sharedStakeMultiplier = yield select(
-          arbitrableAddressListSelectors.getSharedStakeMultiplier
+          arbitrableAddressListSelectors.getSharedStakeMultiplier,
+          badgeContractAddr
         )
         badge.latestRequest.latestRound.requiredForSide = [0]
 
@@ -443,7 +222,7 @@ export function* fetchBadge({ payload: { addr } }) {
         100, // Number of items to return at once.
         filter,
         true, // Return oldest first.
-        addr // The token address for which to return the submissions.
+        tokenAddress // The token address for which to return the submissions.
       ).call
     )).values.filter(ID => ID !== ZERO_ID)
 
@@ -494,11 +273,9 @@ export function* fetchBadge({ payload: { addr } }) {
       }
     }
 
-  arbitratorView.options.address = ARBITRATOR_ADDRESS
-
   return {
     ...badge,
-    addr,
+    tokenAddress,
     status: Number(badge.status),
     clientStatus: contractStatusToClientStatus(
       badge.status,
@@ -515,22 +292,24 @@ export function* fetchBadge({ payload: { addr } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* requestStatusChangeBadge({ payload: { badge, value } }) {
-  if (isInvalid(badge.addr))
-    throw new Error('Missing address on badge submit', badge)
+function* requestStatusChangeBadge({
+  payload: { badgeContractAddr, tokenAddr, value }
+}) {
+  if (isInvalid(tokenAddr))
+    throw new Error('Missing address on badge submit', tokenAddr)
 
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
 
   yield call(
-    arbitrableAddressList.methods.requestStatusChange(badge.addr).send,
+    arbitrableAddressList.methods.requestStatusChange(tokenAddr).send,
     {
       from: yield select(walletSelectors.getAccount),
       value
     }
   )
 
-  const { addr } = badge
-  return yield call(fetchBadge, { payload: { addr } })
+  return yield call(fetchBadge, { payload: { tokenAddr, badgeContractAddr } })
 }
 
 /**
@@ -538,16 +317,20 @@ function* requestStatusChangeBadge({ payload: { badge, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* challengeBadgeRequest({ payload: { addr, value, evidence } }) {
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+function* challengeBadgeRequest({
+  payload: { tokenAddr, badgeContractAddr, value, evidence }
+}) {
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
+
   yield call(
-    arbitrableAddressList.methods.challengeRequest(addr, evidence).send,
+    arbitrableAddressList.methods.challengeRequest(tokenAddr, evidence).send,
     {
       from: yield select(walletSelectors.getAccount),
       value
     }
   )
-  return yield call(fetchBadge, { payload: { addr } })
+  return yield call(fetchBadge, { payload: { tokenAddr, badgeContractAddr } })
 }
 
 /**
@@ -555,14 +338,17 @@ function* challengeBadgeRequest({ payload: { addr, value, evidence } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* fundBadgeDispute({ payload: { addr, side, value } }) {
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+function* fundBadgeDispute({
+  payload: { tokenAddr, badgeContractAddr, side, value }
+}) {
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
 
-  yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
+  yield call(arbitrableAddressList.methods.fundAppeal(tokenAddr, side).send, {
     from: yield select(walletSelectors.getAccount),
     value
   })
-  return yield call(fetchBadge, { payload: { addr } })
+  return yield call(fetchBadge, { payload: { tokenAddr, badgeContractAddr } })
 }
 
 /**
@@ -570,13 +356,17 @@ function* fundBadgeDispute({ payload: { addr, side, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* fundBadgeAppeal({ payload: { addr, side, value } }) {
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
-  yield call(arbitrableAddressList.methods.fundAppeal(addr, side).send, {
+function* fundBadgeAppeal({
+  payload: { tokenAddr, badgeContractAddr, side, value }
+}) {
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
+
+  yield call(arbitrableAddressList.methods.fundAppeal(tokenAddr, side).send, {
     from: yield select(walletSelectors.getAccount),
     value
   })
-  return yield call(fetchBadge, { payload: { addr } })
+  return yield call(fetchBadge, { payload: { tokenAddr, badgeContractAddr } })
 }
 
 /**
@@ -584,12 +374,14 @@ function* fundBadgeAppeal({ payload: { addr, side, value } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* badgeTimeout({ payload: { addr } }) {
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
-  yield call(arbitrableAddressList.methods.executeRequest(addr).send, {
+function* badgeTimeout({ payload: { badgeContractAddr, tokenAddr } }) {
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
+
+  yield call(arbitrableAddressList.methods.executeRequest(tokenAddr).send, {
     from: yield select(walletSelectors.getAccount)
   })
-  return yield call(fetchBadge, { payload: { addr } })
+  return yield call(fetchBadge, { payload: { badgeContractAddr, tokenAddr } })
 }
 
 /**
@@ -597,13 +389,15 @@ function* badgeTimeout({ payload: { addr } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of badges.
  */
-function* feeTimeoutBadge({ payload: { badge } }) {
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
-  yield call(arbitrableAddressList.methods.executeRequest(badge.addr).send, {
+function* feeTimeoutBadge({ payload: { tokenAddr, badgeContractAddr } }) {
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
+
+  yield call(arbitrableAddressList.methods.executeRequest(tokenAddr).send, {
     from: yield select(walletSelectors.getAccount)
   })
-  const { addr } = badge
-  return yield call(fetchBadge, { payload: { addr } })
+
+  return yield call(fetchBadge, { payload: { tokenAddr, badgeContractAddr } })
 }
 
 /**
@@ -611,14 +405,18 @@ function* feeTimeoutBadge({ payload: { badge } }) {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the badge object.
  */
-function* withdrawBadgeFunds({ payload: { address, item } }) {
+function* withdrawBadgeFunds({
+  payload: { tokenAddr, badgeContractAddr, item }
+}) {
   let count = 0
   if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
-  const { arbitrableAddressList } = yield call(instantiateEnvObjects)
+  const { badgeContracts } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
+
   yield call(
     arbitrableAddressList.methods.batchRequestWithdraw(
       yield select(walletSelectors.getAccount),
-      address,
+      tokenAddr,
       0,
       count,
       0,
@@ -626,7 +424,7 @@ function* withdrawBadgeFunds({ payload: { address, item } }) {
     ).send,
     { from: yield select(walletSelectors.getAccount) }
   )
-  return yield call(fetchBadge, { payload: { address } })
+  return yield call(fetchBadge, { payload: { tokenAddr, badgeContractAddr } })
 }
 
 /**
@@ -642,23 +440,14 @@ function isInvalid(str) {
 const updateBadgesCollectionModFlow = {
   flow: 'update',
   collection: badgeActions.badges.self,
-  updating: ({ payload: { addr } }) => addr,
-  find: ({ payload: { addr } }) => d => d.addr === addr
+  updating: ({ payload: { address } }) => address,
+  find: ({ payload: { address } }) => d => d.address === address
 }
 
 /**
  * The root of the badge saga.
  */
 export default function* badgeSaga() {
-  // Tokens
-  yield takeLatest(
-    badgeActions.badges.FETCH,
-    lessduxSaga,
-    'fetch',
-    badgeActions.badges,
-    fetchBadges
-  )
-
   // Badge
   yield takeLatest(
     badgeActions.badge.FETCH,

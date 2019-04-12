@@ -8,7 +8,6 @@ import BadgeCard from '../../components/badge-card'
 import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
-import * as badgeSelectors from '../../reducers/badge'
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as badgeActions from '../../actions/badge'
 import * as filterActions from '../../actions/filter'
@@ -30,7 +29,11 @@ class Badges extends Component {
     }).isRequired,
 
     // Redux State
-    badges: badgeSelectors.badgesShape.isRequired,
+    badges: PropTypes.shape({
+      data: PropTypes.shape({
+        statusBlockNumber: PropTypes.number.isRequired
+      })
+    }).isRequired,
     filter: filterSelectors.filterShape.isRequired,
     accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
 
@@ -69,11 +72,19 @@ class Badges extends Component {
   render() {
     const { badges, filter, accounts } = this.props
     const userAccount = accounts[0]
-    const badgesData = badges.data
+
+    // Merge badges from all contracts
+    const badgesData = Object.keys(badges)
+      .map(badgeContractAddr => badges[badgeContractAddr])
+      .reduce(
+        (acc, curr) =>
+          acc.concat(Object.keys(curr.items).map(addr => curr.items[addr])),
+        []
+      )
+
     const { filters } = filter
 
-    const filteredBadges = Object.keys(badgesData.items)
-      .map(address => badgesData.items[address])
+    const filteredBadges = badgesData
       .filter(badge => {
         if (userAccount === badge.status.requester && filter['My Submissions'])
           return true
@@ -169,7 +180,7 @@ class Badges extends Component {
 export default withRouter(
   connect(
     state => ({
-      badges: state.badges,
+      badges: state.badges.data,
       tokens: state.tokens,
       filter: state.filter,
       accounts: state.wallet.accounts.data,

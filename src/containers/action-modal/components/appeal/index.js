@@ -43,7 +43,7 @@ const FundAppeal = ({
   appealFormIsInvalid,
   submitAppealForm
 }) => (
-  <>
+  <div className="ActionModal">
     <h3 className="Modal-title">
       <FontAwesomeIcon className="Appeal-icon" icon="gavel" />
       Appeal
@@ -235,7 +235,7 @@ const FundAppeal = ({
         Fund Appeal
       </Button>
     </div>
-  </>
+  </div>
 )
 
 FundAppeal.propTypes = {

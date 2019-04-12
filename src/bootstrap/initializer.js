@@ -14,6 +14,7 @@ import * as badgesActions from '../actions/badges'
 import IncorrectNetwork from '../components/incorrect-network'
 import { instantiateEnvObjects } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
+import { notificationsShape } from '../reducers/notification'
 
 import { ContractsContext } from './contexts'
 
@@ -21,7 +22,7 @@ class ContractsProvider extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     fetchAccounts: PropTypes.func.isRequired,
-    notifications: PropTypes.shape({}).isRequired,
+    notifications: notificationsShape.isRequired,
     envObjects: PropTypes.shape({
       networkID: PropTypes.number.isRequired
     }).isRequired
@@ -36,12 +37,14 @@ class ContractsProvider extends Component {
 
     // Save notifications on unload.
     window.addEventListener('unload', () => {
-      const { notifications } = this.props
+      const {
+        notifications: { data }
+      } = this.props
       localStorage.setItem(
         `${
           arbitrableTokenListView.options.address
         }.notifications@${APP_VERSION}`,
-        JSON.stringify(notifications)
+        JSON.stringify(data)
       )
     })
   }
@@ -94,7 +97,11 @@ class Initializer extends PureComponent {
     ]).isRequired,
     envObjects: PropTypes.shape({
       networkID: PropTypes.number.isRequired
-    }).isRequired
+    })
+  }
+
+  static defaultProps = {
+    envObjects: null
   }
 
   async componentDidMount() {
@@ -117,6 +124,8 @@ class Initializer extends PureComponent {
 
   render() {
     const { accounts, children, envObjects } = this.props
+
+    if (!envObjects) return null
 
     if (envObjects && envObjects.networkID !== 1 && envObjects.networkID !== 42)
       return <IncorrectNetwork />
@@ -150,7 +159,7 @@ class Initializer extends PureComponent {
 export default connect(
   state => ({
     accounts: state.wallet.accounts,
-    notifications: state.notification.notifications.data,
+    notifications: state.notification.notifications,
     envObjects: state.envObjects.data
   }),
   {

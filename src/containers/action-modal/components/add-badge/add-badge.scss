@@ -1,0 +1,152 @@
+@import '../../../../styles/_colors';
+
+/* @define AddBadge */
+.AddBadge {
+  &-header {
+    align-items: center;
+    background-color: $klerosPurpleLight;
+    display: flex;
+    flex-direction: column;
+    height: 65px;
+    justify-content: center;
+
+    &-title {
+      color: $invertedText;
+      font-size: 24px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: normal;
+      text-align: center;
+    }
+
+    &-badge {
+      align-self: flex-start;
+      height: 38px;
+      margin-left: 16px;
+      position: absolute;
+      width: 38px;
+    }
+  }
+
+  &-options {
+    display: flex;
+    flex-direction: column;
+
+    &-item {
+      border-bottom: 1px solid $border;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      &:hover {
+        background-color: $darkWhite;
+      }
+
+      &-logo {
+        height: 50px;
+        margin: 30px;
+        object-fit: contain;
+        width: 50px;
+      }
+
+      &-desc {
+        align-items: flex-start;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        width: 100%;
+
+        &-text {
+          color: $darkGrey;
+          font-size: 18px;
+          font-style: normal;
+          font-weight: 500;
+          line-height: normal;
+          margin-bottom: 10px;
+        }
+      }
+
+      &-radio {
+        align-content: center;
+        align-items: center;
+        display: flex;
+        height: 50px;
+        justify-content: center;
+        margin: 30px;
+        width: 50px;
+
+        &-input {
+          opacity: 0;
+          position: absolute;
+        }
+
+        &-bg {
+          border: 2px solid $darkGrey;
+          border-radius: 50%;
+          cursor: pointer;
+          height: 30px;
+          position: absolute;
+          width: 30px;
+
+          &:hover {
+            background-color: $darkerGrey;
+          }
+        }
+
+        &-marked {
+          background-color: $primaryBlue;
+          border-radius: 50%;
+          height: 15px;
+          position: absolute;
+          width: 15px;
+        }
+      }
+    }
+  }
+
+  &-footer {
+    align-items: flex-end;
+    display: flex;
+    flex-direction: column;
+    padding: 41px 33px;
+
+    &-deposit {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 26px;
+      width: 250px;
+
+      &-label {
+        color: $darkGrey;
+        font-size: 14px;
+        font-style: normal;
+        font-weight: normal;
+        line-height: normal;
+      }
+
+      &-value {
+        color: $darkGrey;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: normal;
+        text-align: right;
+      }
+    }
+
+    &-actions {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+
+      &-action {
+        margin-left: 16px;
+        width: 250px;
+      }
+
+      &-return {
+        width: 119px;
+      }
+    }
+  }
+}
