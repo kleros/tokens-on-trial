@@ -23,14 +23,16 @@ const EvidenceSection = ({
       <hr className="Evidence-separator" />
       <div className="Evidence-header">
         <h3>Evidence</h3>
-        <Button
-          tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-          disabled={onlyInfura}
-          onClick={handleOpenEvidenceModal}
-          type="secondary"
-        >
-          Submit Evidence
-        </Button>
+        {!resolved && (
+          <Button
+            tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+            disabled={onlyInfura}
+            onClick={handleOpenEvidenceModal}
+            type="secondary"
+          >
+            Submit Evidence
+          </Button>
+        )}
       </div>
       <div className="Evidence-evidence">
         <div className="Evidence-evidence--list">
