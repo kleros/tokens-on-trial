@@ -9,7 +9,6 @@ import {
 import * as badgeActions from '../actions/badge'
 import * as walletSelectors from '../reducers/wallet'
 import * as tcrConstants from '../constants/tcr'
-import * as arbitrableAddressListSelectors from '../reducers/arbitrable-address-list'
 import { web3Utils } from '../bootstrap/dapp-api'
 
 const { toBN } = web3Utils
@@ -113,6 +112,9 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
       badge.latestRequest.dispute.status = yield call(
         arbitratorView.methods.disputeStatus(badge.latestRequest.disputeID).call
       )
+      badge.latestRequest.dispute.ruling = yield call(
+        arbitratorView.methods.currentRuling(badge.latestRequest.disputeID).call
+      )
 
       // Fetch appeal disputeID, if there was an appeal.
       if (Number(badge.latestRequest.numberOfRounds) > 2) {
@@ -127,10 +129,6 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
           tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
         !badge.latestRequest.latestRound.appealed
       ) {
-        badge.latestRequest.dispute.ruling = yield call(
-          arbitratorView.methods.currentRuling(badge.latestRequest.disputeID)
-            .call
-        )
         badge.latestRequest.latestRound.appealCost = yield call(
           arbitratorView.methods.appealCost(
             badge.latestRequest.disputeID,
@@ -140,20 +138,16 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
         const MULTIPLIER_DIVISOR = yield call(
           arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
         )
-
-        const winnerStakeMultiplier = yield select(
-          arbitrableAddressListSelectors.getWinnerStakeMultiplier,
-          badgeContractAddr
+        const winnerStakeMultiplier = yield call(
+          arbitrableAddressListView.methods.winnerStakeMultiplier().call
         )
-        const loserStakeMultiplier = yield select(
-          arbitrableAddressListSelectors.getLoserStakeMultiplier,
-          badgeContractAddr
+        const loserStakeMultiplier = yield call(
+          arbitrableAddressListView.methods.loserStakeMultiplier().call
         )
-        const sharedStakeMultiplier = yield select(
-          arbitrableAddressListSelectors.getSharedStakeMultiplier,
-          badgeContractAddr
+        const sharedStakeMultiplier = yield call(
+          arbitrableAddressListView.methods.sharedStakeMultiplier().call
         )
-        badge.latestRequest.latestRound.requiredForSide = [0]
+        badge.latestRequest.latestRound.requiredForSide = []
 
         const ruling = Number(badge.latestRequest.dispute.ruling)
         if (ruling === 0) {

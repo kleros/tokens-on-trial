@@ -224,7 +224,7 @@
 
     &-short {
       font-size: 14px;
-      min-width: 238px;
+      min-width: 212px;
       text-align: center;
       white-space: pre-line;
 
@@ -239,7 +239,7 @@
       &-divider {
         border-left: 1px solid $border;
         height: 100%;
-        margin: 10px 13px 10px 0;
+        margin: 10px 13px 10px 26px;
       }
     }
   }

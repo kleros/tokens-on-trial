@@ -11,12 +11,10 @@ import './latest-ruling.css'
 const LatestRuling = ({ item, userAccount }) => {
   const { latestRequest } = item
   const { dispute, latestRound } = latestRequest
-  const { appealed } = latestRound
-  const disputeStatus = dispute ? dispute.status : null
+  const { appealed, ruled } = latestRound
   const ruling = dispute ? dispute.ruling : null
 
-  if (disputeStatus !== tcrConstants.DISPUTE_STATUS.Appealable || appealed)
-    return null
+  if (!ruled || appealed) return null
 
   const { userSide, userIsLoser, decisiveRuling } = getItemInformation(
     item,

@@ -10,7 +10,6 @@ import {
 } from '../utils/tcr'
 import * as tokenActions from '../actions/token'
 import * as walletSelectors from '../reducers/wallet'
-import * as arbitrableTokenListSelectors from '../reducers/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 import { web3Utils } from '../bootstrap/dapp-api'
@@ -105,6 +104,9 @@ export function* fetchToken({ payload: { ID } }) {
       token.latestRequest.dispute.status = yield call(
         arbitratorView.methods.disputeStatus(token.latestRequest.disputeID).call
       )
+      token.latestRequest.dispute.ruling = yield call(
+        arbitratorView.methods.currentRuling(token.latestRequest.disputeID).call
+      )
 
       // Fetch appeal disputeID, if there was an appeal.
       if (Number(token.latestRequest.numberOfRounds) > 2) {
@@ -119,10 +121,6 @@ export function* fetchToken({ payload: { ID } }) {
           tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
         !token.latestRequest.latestRound.appealed
       ) {
-        token.latestRequest.dispute.ruling = yield call(
-          arbitratorView.methods.currentRuling(token.latestRequest.disputeID)
-            .call
-        )
         token.latestRequest.latestRound.appealCost = yield call(
           arbitratorView.methods.appealCost(
             token.latestRequest.disputeID,
@@ -132,17 +130,16 @@ export function* fetchToken({ payload: { ID } }) {
         const MULTIPLIER_DIVISOR = yield call(
           arbitrableTokenListView.methods.MULTIPLIER_DIVISOR().call
         )
-
-        const winnerStakeMultiplier = yield select(
-          arbitrableTokenListSelectors.getWinnerStakeMultiplier
+        const winnerStakeMultiplier = yield call(
+          arbitrableTokenListView.methods.winnerStakeMultiplier().call
         )
-        const loserStakeMultiplier = yield select(
-          arbitrableTokenListSelectors.getLoserStakeMultiplier
+        const loserStakeMultiplier = yield call(
+          arbitrableTokenListView.methods.loserStakeMultiplier().call
         )
-        const sharedStakeMultiplier = yield select(
-          arbitrableTokenListSelectors.getSharedStakeMultiplier
+        const sharedStakeMultiplier = yield call(
+          arbitrableTokenListView.methods.sharedStakeMultiplier().call
         )
-        token.latestRequest.latestRound.requiredForSide = [0]
+        token.latestRequest.latestRound.requiredForSide = []
 
         const ruling = Number(token.latestRequest.dispute.ruling)
         if (ruling === 0) {
