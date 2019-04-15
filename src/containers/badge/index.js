@@ -1026,7 +1026,7 @@ class BadgeDetails extends PureComponent {
           </div>
         </div>
         <br />
-        {badge.latestRequest && !latestRequest.resolved && (
+        {badge.latestRequest && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
             <h3>Evidence</h3>
@@ -1060,14 +1060,16 @@ class BadgeDetails extends PureComponent {
                   </>
                 )}
               </div>
-              <Button
-                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-                disabled={onlyInfura}
-                onClick={this.handleOpenEvidenceModal}
-                type="secondary"
-              >
-                Submit Evidence
-              </Button>
+              {!badge.latestRequest.resolved && (
+                <Button
+                  tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+                  disabled={onlyInfura}
+                  onClick={this.handleOpenEvidenceModal}
+                  type="secondary"
+                >
+                  Submit Evidence
+                </Button>
+              )}
             </div>
           </div>
         )}

@@ -69,7 +69,7 @@ export const userFriendlyLabel = {
   Registered: 'Registered',
   'Registration Requests': 'Submissions',
   'Challenged Registration Requests': 'Challenged Submissions',
-  Absent: 'Removed',
+  Absent: 'Rejected',
   'Clearing Requests': 'Removal Requests',
   'Challenged Clearing Requests': 'Challenged Removal Requests',
   'My Submissions': 'My Requests',
@@ -81,7 +81,9 @@ export const userFriendlyLabel = {
   Added: 'Added',
   'Addition Requested': 'Addition Requested',
   'Addition Challenged': 'Addition Challenged',
-  'Removal Challenged': 'Removal Challenged'
+  'Removal Challenged': 'Removal Challenged',
+  Challenged: 'Challenged',
+  Pending: 'Pending'
 }
 
 export const rulingMessage = (

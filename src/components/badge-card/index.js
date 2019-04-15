@@ -10,6 +10,7 @@ import EthfinexLogo from '../../assets/images/ethfinex.svg'
 import UnknownToken from '../../assets/images/unknown.svg'
 import * as tcrConstants from '../../constants/tcr'
 import { IPFS_URL } from '../../bootstrap/dapp-api'
+import { userFriendlyLabel } from '../../utils/ui'
 
 import './badge-card.css'
 
@@ -55,7 +56,9 @@ const BadgeCard = ({ badge, tokens, displayTokenInfo, envObjects }) => {
         style={{ backgroundColor: getBadgeColor(badge) }}
       >
         <FontAwesomeIcon color="white" icon="check" />
-        <h5 style={{ color: 'white' }}>{getBadgeHeaderText(badge)}</h5>
+        <h5 style={{ color: 'white' }}>
+          {userFriendlyLabel[getBadgeHeaderText(badge)]}
+        </h5>
         <FontAwesomeIcon
           color="white"
           icon="check"

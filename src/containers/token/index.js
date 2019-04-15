@@ -978,7 +978,7 @@ class TokenDetails extends PureComponent {
             </div>
           </div>
         </div>
-        {latestRequest && !latestRequest.resolved && (
+        {latestRequest && (
           <div className="TokenDescription">
             <hr className="TokenDescription-separator" />
             <h3>Evidence</h3>
@@ -1012,14 +1012,16 @@ class TokenDetails extends PureComponent {
                   </>
                 )}
               </div>
-              <Button
-                tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-                disabled={onlyInfura}
-                onClick={this.handleOpenEvidenceModal}
-                type="secondary"
-              >
-                Submit Evidence
-              </Button>
+              {!latestRequest.resolved && (
+                <Button
+                  tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+                  disabled={onlyInfura}
+                  onClick={this.handleOpenEvidenceModal}
+                  type="secondary"
+                >
+                  Submit Evidence
+                </Button>
+              )}
             </div>
           </div>
         )}
