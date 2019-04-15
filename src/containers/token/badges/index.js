@@ -2,17 +2,19 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 
-import * as tcrConstants from '../../../constants/tcr'
 import { onlyInfura } from '../../../bootstrap/dapp-api'
 import Button from '../../../components/button'
 import BadgeCard from '../../../components/badge-card'
 import { itemShape, cacheItemShape } from '../../../reducers/generic-shapes'
+import * as tcrConstants from '../../../constants/tcr'
+import * as modalActions from '../../../actions/modal'
+import * as modalConstants from '../../../constants/modal'
 
 import './badges.css'
 
 const BadgesSection = ({
   token: { status, address },
-  submitBadgeAction,
+  openActionModal,
   badges
 }) => {
   const displayedBadges = Object.keys(badges)
@@ -21,6 +23,8 @@ const BadgesSection = ({
     .map(badgeContractData => badgeContractData.items[address])
     .filter(badge => badge.clientStatus !== tcrConstants.STATUS_ENUM['Absent'])
 
+  /* eslint-disable react/jsx-no-bind */
+
   return (
     <div className="TokenDescription">
       <hr className="Badges-separator" />
@@ -28,17 +32,23 @@ const BadgesSection = ({
         <h3 style={{ marginTop: 0 }}>Badges</h3>
         {(status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||
           status ===
-            tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) && (
-          <Button
-            tooltip={onlyInfura ? 'Please install MetaMask.' : null}
-            disabled={onlyInfura}
-            onClick={submitBadgeAction}
-            type="secondary"
-            style={{ width: '117px' }}
-          >
-            Add Badge
-          </Button>
-        )}
+            tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested']) &&
+          displayedBadges.length < Object.keys(badges).length && (
+            <Button
+              tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+              disabled={onlyInfura}
+              onClick={() =>
+                openActionModal(
+                  modalConstants.ACTION_MODAL_ENUM.AddBadge,
+                  displayedBadges.map(b => b.badgeContractAddr)
+                )
+              }
+              type="secondary"
+              style={{ width: '117px' }}
+            >
+              Add Badge
+            </Button>
+          )}
         {status !== tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] &&
           status !==
             tcrConstants.IN_CONTRACT_STATUS_ENUM['ClearingRequested'] && (
@@ -63,10 +73,15 @@ const BadgesSection = ({
 
 BadgesSection.propTypes = {
   token: itemShape.isRequired,
-  submitBadgeAction: PropTypes.func.isRequired,
+  openActionModal: PropTypes.func.isRequired,
   badges: PropTypes.objectOf(cacheItemShape.isRequired).isRequired
 }
 
-export default connect(state => ({
-  badges: state.badges.data
-}))(BadgesSection)
+export default connect(
+  state => ({
+    badges: state.badges.data
+  }),
+  {
+    openActionModal: modalActions.openActionModal
+  }
+)(BadgesSection)

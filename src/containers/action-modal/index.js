@@ -560,6 +560,7 @@ class ActionModal extends PureComponent {
                   submitItem={this.handleSubmitBadgeClick}
                   closeActionModal={closeActionModal}
                   tokenAddr={token.data.address}
+                  unavailable={actionModalParam}
                 />
               )
             case modalConstants.ACTION_MODAL_ENUM.SubmitBadge:
@@ -569,7 +570,7 @@ class ActionModal extends PureComponent {
                   arbitrableAddressListData={arbitrableAddressListData}
                   submitItem={this.handleSubmitBadgeClick}
                   closeActionModal={closeActionModal}
-                  tokenAddr={badge.data.token.addr}
+                  tokenAddr={badge.data.token && badge.data.token.addr}
                   badgeContractAddr={actionModalParam}
                 />
               )

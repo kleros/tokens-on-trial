@@ -143,9 +143,6 @@ class TokenDetails extends PureComponent {
     this.setState({ evidencePeriodEnded: true })
   }
 
-  submitBadgeAction = () =>
-    this.handleActionClick(modalConstants.ACTION_MODAL_ENUM.AddBadge)
-
   componentDidMount() {
     const { match, fetchToken } = this.props
     const { tokenID } = match.params
@@ -499,7 +496,7 @@ class TokenDetails extends PureComponent {
           handleViewEvidenceClick={this.handleViewEvidenceClick}
         />
         <br />
-        <Badges token={token} submitBadgeAction={this.submitBadgeAction} />
+        <Badges token={token} />
         {/* eslint-disable react/jsx-no-bind */}
         {(!decisiveRuling || !loserTimedOut) && (
           <Modal

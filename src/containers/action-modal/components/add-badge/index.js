@@ -14,11 +14,19 @@ const AddBadge = ({
   closeActionModal,
   submitItem,
   arbitrableAddressListData,
-  tokenAddr
+  tokenAddr,
+  unavailable
 }) => {
   const badgeContracts = Object.keys(arbitrableAddressListData)
     .map(badgeContractAddr => arbitrableAddressListData[badgeContractAddr])
     .filter(badgeContract => badgeContract.variables)
+    .filter(
+      badgeContract =>
+        !unavailable.reduce((acc, curr) => {
+          acc[curr] = true
+          return acc
+        }, {})[badgeContract.badgeContractAddr]
+    )
 
   const [option, setOption] = useState()
 
@@ -145,7 +153,8 @@ AddBadge.propTypes = {
   closeActionModal: PropTypes.func.isRequired,
   submitItem: PropTypes.func.isRequired,
   tokenAddr: PropTypes.string.isRequired,
-  arbitrableAddressListData: arbitrableAddressListDataShape.isRequired
+  arbitrableAddressListData: arbitrableAddressListDataShape.isRequired,
+  unavailable: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired
 }
 
 export default connect(state => ({
