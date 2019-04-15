@@ -69,7 +69,7 @@ const TokenDetailsCard = ({
             <UserActionCountdown
               item={token}
               userAccount={userAccount}
-              tcr={arbitrableTokenListData}
+              tcrData={arbitrableTokenListData}
               onAppealPeriodEnd={setAppealPeriodEnded}
               onLoserTimedout={setLoserTimedOut}
               onChallengePeriodEnd={setChallengePeriodCompleted}

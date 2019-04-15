@@ -11,19 +11,18 @@ import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 const UserActionCountdown = ({
   item,
   userAccount,
-  tcr,
+  tcrData,
   onAppealPeriodEnd,
   onLoserTimedout,
   onChallengePeriodEnd
 }) => {
   const { latestRequest } = item
   const { dispute, parties } = latestRequest
-
   const { userIsLoser, decisiveRuling } = getItemInformation(item, userAccount)
 
   const remainingTime = getRemainingTime(
     item,
-    tcr,
+    tcrData,
     tcrConstants,
     false,
     decisiveRuling
@@ -31,7 +30,7 @@ const UserActionCountdown = ({
 
   const remainingLoserTime = getRemainingTime(
     item,
-    tcr,
+    tcrData,
     tcrConstants,
     true,
     decisiveRuling
@@ -165,7 +164,7 @@ const UserActionCountdown = ({
 UserActionCountdown.propTypes = {
   item: itemShape.isRequired,
   userAccount: PropTypes.string.isRequired,
-  tcr: tcrShape.isRequired,
+  tcrData: tcrShape.isRequired,
   onAppealPeriodEnd: PropTypes.func.isRequired,
   onLoserTimedout: PropTypes.func.isRequired,
   onChallengePeriodEnd: PropTypes.func.isRequired

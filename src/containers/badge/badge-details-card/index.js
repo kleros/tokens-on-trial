@@ -65,11 +65,11 @@ const BadgeDetailsCard = ({
             </div>
             <div className="BadgeDetails-description-status">
               <LatestRuling item={badge} userAccount={userAccount} />
-              <PeriodCountdown item={badge} tcr={tcr} />
+              <PeriodCountdown item={badge} />
               <UserActionCountdown
                 item={badge}
                 userAccount={userAccount}
-                tcr={tcr}
+                tcrData={tcrData}
                 onAppealPeriodEnd={setAppealPeriodEnded}
                 onLoserTimedout={setLoserTimedOut}
                 onChallengePeriodEnd={setChallengePeriodCompleted}
