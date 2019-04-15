@@ -106,7 +106,7 @@ const BadgeCard = ({
       <div className="BadgeCard-footer">
         {displayTokenInfo ? (
           <h5 className="BadgeCard-footer-text">
-            {(!tokens.loading || token) && `Ethfinex Compliant`}
+            {(!tokens.loading || token) && `${title} Compliant`}
             <br />
             {!tokens.loading || token
               ? token
