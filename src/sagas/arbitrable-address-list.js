@@ -37,10 +37,22 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
   const metaEvidencePath = `${IPFS_URL}${
     metaEvidenceEvents[metaEvidenceEvents.length - 1].returnValues._evidence
   }`
-  const { variables, fileURI } = yield (yield call(
-    fetch,
-    metaEvidencePath
-  )).json()
+  const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
+
+  const { fileURI } = metaEvidence
+  let { variables } = metaEvidence
+
+  // TODO: Remove this once the meta evidence has been updated on the ethfinex contract.
+  if (!variables)
+    variables = {
+      title: 'Ethfinex Listing',
+      symbolURI:
+        '/ipfs/QmW3JLmpHnf7qNT4FYaguAF1Awma8adk81jUTuFWY1HVge/ethfinex.svg',
+      description:
+        'Tokens compliant with the Ethfinex Listing Criteria are eligible to participate in the Ethfinex Community Vote and become traded on the Ethfinex platform.',
+      criteriaDescription:
+        "To be eligible to receive the badge, the project and it's associated token must comply with the Ethfinex Listing Criteria."
+    }
 
   const d = yield all({
     arbitrator: call(arbitrableAddressListView.methods.arbitrator().call),

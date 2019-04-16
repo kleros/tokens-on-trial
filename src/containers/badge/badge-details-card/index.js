@@ -56,7 +56,7 @@ const BadgeDetailsCard = ({
   const [challengePeriodCompleted, setChallengePeriodCompleted] = useState(
     false
   )
-  const [appealPeriodEnded, setAppealPeriodEnded] = useState(false)
+  const [appealPeriodEnded, setAppealPeriodEnded] = useState(remainingTime <= 0)
   const [loserTimedOut, setLoserTimedOut] = useState(
     remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
   )
@@ -104,7 +104,11 @@ const BadgeDetailsCard = ({
               />
             </div>
           </div>
-          <CrowdfundingProgress item={badge} userAccount={userAccount} />
+          <CrowdfundingProgress
+            item={badge}
+            userAccount={userAccount}
+            appealPeriodEnded={appealPeriodEnded}
+          />
         </div>
         <div className="BadgeDetails-footer">
           <div className="BadgeDetails-footer-short">

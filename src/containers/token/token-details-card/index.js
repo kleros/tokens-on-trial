@@ -16,6 +16,7 @@ import WaitingBadge from '../../../assets/images/badges/badge-waiting.svg'
 import { tcrShape } from '../../../reducers/generic-shapes'
 import { badgesShape } from '../../../reducers/badge'
 import * as tokenSelectors from '../../../reducers/token'
+import { getItemInformation, getRemainingTime } from '../../../utils/ui'
 
 import './token-details-card.css'
 
@@ -29,11 +30,34 @@ const TokenDetailsCard = ({
   fundAppeal,
   badges
 }) => {
-  const [challengePeriodCompleted, setChallengePeriodCompleted] = useState(
-    false
+  const { decisiveRuling, loserHasPaid } = getItemInformation(
+    token,
+    userAccount
   )
-  const [appealPeriodEnded, setAppealPeriodEnded] = useState(false)
-  const [loserTimedOut, setLoserTimedOut] = useState(false)
+
+  const remainingTime = getRemainingTime(
+    token,
+    arbitrableTokenListData,
+    tcrConstants,
+    false,
+    decisiveRuling
+  )
+
+  const remainingLoserTime = getRemainingTime(
+    token,
+    arbitrableTokenListData,
+    tcrConstants,
+    true,
+    decisiveRuling
+  )
+
+  const [challengePeriodCompleted, setChallengePeriodCompleted] = useState(
+    remainingTime <= 0
+  )
+  const [appealPeriodEnded, setAppealPeriodEnded] = useState(remainingTime <= 0)
+  const [loserTimedOut, setLoserTimedOut] = useState(
+    remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
+  )
 
   const badgesCount = Object.keys(badges)
     .map(badgeContractAddr => badges[badgeContractAddr])
@@ -71,11 +95,15 @@ const TokenDetailsCard = ({
               userAccount={userAccount}
               tcrData={arbitrableTokenListData}
               onAppealPeriodEnd={setAppealPeriodEnded}
-              onLoserTimedout={setLoserTimedOut}
+              onLoserTimedOut={setLoserTimedOut}
               onChallengePeriodEnd={setChallengePeriodCompleted}
             />
           </div>
-          <CrowdfundingProgress item={token} userAccount={userAccount} />
+          <CrowdfundingProgress
+            item={token}
+            userAccount={userAccount}
+            appealPeriodEnded={appealPeriodEnded}
+          />
           <ItemActionButton
             item={token}
             userAccount={userAccount}

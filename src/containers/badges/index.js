@@ -13,6 +13,7 @@ import * as badgeActions from '../../actions/badge'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
+import { tcrShape } from '../../reducers/generic-shapes'
 
 import './badges.css'
 
@@ -36,6 +37,7 @@ class Badges extends Component {
     }).isRequired,
     filter: filterSelectors.filterShape.isRequired,
     accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
+    arbitrableAddressListData: tcrShape.isRequired,
 
     // Action Dispatchers
     toggleFilter: PropTypes.func.isRequired
@@ -70,7 +72,7 @@ class Badges extends Component {
   }
 
   render() {
-    const { badges, filter, accounts } = this.props
+    const { badges, filter, accounts, arbitrableAddressListData } = this.props
     const userAccount = accounts[0]
 
     // Merge badges from all contracts
@@ -147,11 +149,14 @@ class Badges extends Component {
               </p>
             ) : (
               <>
-                {displayedBadges.length > 0 || !badges.loading ? (
+                {(displayedBadges.length > 0 || !badges.loading) &&
+                !arbitrableAddressListData.loading &&
+                arbitrableAddressListData.data ? (
                   displayedBadges.map(badge => (
                     <BadgeCard
                       badge={badge}
                       key={badge.address}
+                      arbitrableAddressListData={arbitrableAddressListData.data}
                       displayTokenInfo
                     />
                   ))
@@ -184,7 +189,9 @@ export default withRouter(
       tokens: state.tokens,
       filter: state.filter,
       accounts: state.wallet.accounts.data,
-      envObjects: state.envObjects.data
+      envObjects: state.envObjects.data,
+      arbitrableAddressListData:
+        state.arbitrableAddressList.arbitrableAddressListData
     }),
     {
       fetchArbitrableAddressListData:
