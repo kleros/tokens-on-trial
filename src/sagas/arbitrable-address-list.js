@@ -126,8 +126,11 @@ export function* fetchArbitrableAddressListData() {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitBadgeEvidence({ payload: { evidenceData, file, address } }) {
-  const { arbitrableAddressList, archon } = yield call(instantiateEnvObjects)
+function* submitBadgeEvidence({
+  payload: { evidenceData, file, tokenAddress, badgeContractAddr }
+}) {
+  const { badgeContracts, archon } = yield call(instantiateEnvObjects)
+  const arbitrableAddressList = badgeContracts[badgeContractAddr]
 
   let fileURI = ''
   let fileTypeExtension = ''
@@ -166,7 +169,7 @@ function* submitBadgeEvidence({ payload: { evidenceData, file, address } }) {
 
   yield call(
     arbitrableAddressList.methods.submitEvidence(
-      address,
+      tokenAddress,
       `/ipfs/${ipfsHashEvidence}`
     ).send,
     {

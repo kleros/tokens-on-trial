@@ -270,6 +270,7 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
   return {
     ...badge,
     tokenAddress,
+    badgeContractAddr,
     status: Number(badge.status),
     clientStatus: contractStatusToClientStatus(
       badge.status,

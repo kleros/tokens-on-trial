@@ -205,11 +205,17 @@ class ActionModal extends PureComponent {
       submitBadgeEvidence,
       closeActionModal,
       badge: {
-        data: { address }
-      }
+        data: { tokenAddress }
+      },
+      actionModalParam: badgeContractAddr
     } = this.props
     const { file } = this.state
-    submitBadgeEvidence({ file, evidenceData: evidence, address })
+    submitBadgeEvidence({
+      file,
+      evidenceData: evidence,
+      tokenAddress,
+      badgeContractAddr
+    })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
   }

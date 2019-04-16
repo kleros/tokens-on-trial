@@ -17,9 +17,9 @@ export const badgeEvidence = {
 export const submitBadgeEvidence = ({
   file,
   evidenceData,
-  address,
-  contractAddr
+  tokenAddress,
+  badgeContractAddr
 }) => ({
   type: badgeEvidence.CREATE,
-  payload: { file, evidenceData, address, contractAddr }
+  payload: { file, evidenceData, tokenAddress, badgeContractAddr }
 })

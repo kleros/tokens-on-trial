@@ -12,7 +12,8 @@ import './evidence.css'
 const EvidenceSection = ({
   item: {
     latestRequest: { resolved, disputed },
-    clientStatus
+    clientStatus,
+    badgeContractAddr
   },
   evidences,
   handleOpenEvidenceModal,
@@ -22,12 +23,13 @@ const EvidenceSection = ({
     <div className="Evidence">
       <hr className="Evidence-separator" />
       <div className="Evidence-header">
+        {/* eslint-disable react/jsx-no-bind */}
         <h3>Evidence</h3>
         {!resolved && (
           <Button
             tooltip={onlyInfura ? 'Please install MetaMask.' : null}
             disabled={onlyInfura}
-            onClick={handleOpenEvidenceModal}
+            onClick={() => handleOpenEvidenceModal(badgeContractAddr)}
             type="secondary"
           >
             Submit Evidence
