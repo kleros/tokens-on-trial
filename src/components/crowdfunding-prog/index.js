@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 import * as tcrConstants from '../../constants/tcr'
 import { getItemInformation } from '../../utils/ui'
 
-const CrowdfundingProgress = ({ item, userAccount }) => {
+const CrowdfundingProgress = ({ item, userAccount, appealPeriodEnded }) => {
   const { status, latestRequest } = item
   const { dispute, latestRound, disputed, resolved } = latestRequest
   if (!disputed || (disputed && resolved)) return null
@@ -17,12 +17,14 @@ const CrowdfundingProgress = ({ item, userAccount }) => {
     requesterFeesPercent,
     challengerFeesPercent
   } = getItemInformation(item, userAccount)
+
   if (
     status <= 1 ||
     !dispute ||
     dispute.status !== tcrConstants.DISPUTE_STATUS.Appealable ||
     loserTimedOut ||
-    !decisiveRuling
+    !decisiveRuling ||
+    appealPeriodEnded
   )
     return null
 
@@ -84,7 +86,8 @@ CrowdfundingProgress.propTypes = {
       }).isRequired
     }).isRequired
   }).isRequired,
-  userAccount: PropTypes.string.isRequired
+  userAccount: PropTypes.string.isRequired,
+  appealPeriodEnded: PropTypes.bool.isRequired
 }
 
 export default CrowdfundingProgress
