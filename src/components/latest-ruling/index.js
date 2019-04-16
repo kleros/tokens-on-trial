@@ -14,7 +14,7 @@ const LatestRuling = ({ item, userAccount }) => {
   const { appealed, ruled } = latestRound
   const ruling = dispute ? dispute.ruling : null
 
-  if (!ruled || appealed) return null
+  if (!latestRound.appealPeriod || appealed || ruled) return null
 
   const { userSide, userIsLoser, decisiveRuling } = getItemInformation(
     item,
