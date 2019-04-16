@@ -211,8 +211,7 @@ export const convertFromString = item => {
   const { latestRound } = latestRequest
   if (
     latestRequest.dispute &&
-    latestRequest.dispute.status ===
-      tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
+    latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Appealable &&
     !latestRequest.latestRound.appealed
   ) {
     latestRound.appealPeriod[0] = Number(latestRound.appealPeriod[0]) * 1000

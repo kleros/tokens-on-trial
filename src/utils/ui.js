@@ -87,14 +87,18 @@ export const getCrowdfundingInfo = item => {
   }
 }
 
-export const loserHasPaid = ({
-  latestRequest: {
-    latestRound: { ruling, hasPaid }
-  }
-}) => {
+export const loserHasPaid = ({ latestRequest }) => {
+  const {
+    latestRound: { hasPaid }
+  } = latestRequest
+  const { dispute } = latestRequest
+  if (!dispute) return null
+
+  const { ruling } = dispute
+
   let loserSide
   if (ruling === tcrConstants.RULING_OPTIONS.Accept)
-    loserSide = tcrConstants.SIDE.Requester
+    loserSide = tcrConstants.SIDE.Challenger
   else if (ruling === tcrConstants.RULING_OPTIONS.Refuse)
     loserSide = tcrConstants.SIDE.Requester
   else return null
@@ -149,8 +153,8 @@ export const didLoserTimeout = item => {
     loserPercent = challengerFeesPercent
   else loserPercent = requesterFeesPercent
 
-  const appealPeriodStart = appealPeriod[0]
-  let appealPeriodEnd = appealPeriod[1]
+  const appealPeriodStart = Number(appealPeriod[0])
+  let appealPeriodEnd = Number(appealPeriod[1])
   const appealPeriodDuration = (appealPeriodEnd - appealPeriodStart) / 2
   appealPeriodEnd = appealPeriodStart + appealPeriodDuration
   const time = appealPeriodEnd - Date.now()
@@ -207,11 +211,10 @@ export const getRemainingTime = (
 
   let time
   if (latestRequest.parties[2] === ZERO_ADDR)
-    time =
+    time = // Challenge period.
       latestRequest.submissionTime + tcr.challengePeriodDuration - currentTime
   else if (
-    latestRequest.dispute.status ===
-    tcrConstants.DISPUTE_STATUS.Appealable.toString()
+    latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Appealable
   ) {
     if (latestRound.appealPeriod[1] - latestRound.appealPeriod[0] === 94608000)
       return 94608000 // Large value means the arbitrator does not have an appeal period.
@@ -225,7 +228,6 @@ export const getRemainingTime = (
         : appealPeriodDuration
 
     appealPeriodEnd = appealPeriodStart + appealPeriodDuration
-
     time = appealPeriodEnd - currentTime
   }
 

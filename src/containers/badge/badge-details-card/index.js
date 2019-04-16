@@ -10,9 +10,14 @@ import ItemStatus from '../../../components/item-status'
 import PeriodCountdown from '../../../components/period-countdown'
 import UserActionCountdown from '../../../components/user-action-countdown'
 import ItemActionButton from '../../item-action-button'
-import { truncateMiddle } from '../../../utils/ui'
+import {
+  truncateMiddle,
+  getItemInformation,
+  getRemainingTime
+} from '../../../utils/ui'
 import { itemShape, tcrShape } from '../../../reducers/generic-shapes'
 import { arbitrableAddressListDataShape } from '../../../reducers/arbitrable-address-list'
+import * as tcrConstants from '../../../constants/tcr'
 
 const BadgeDetailsCard = ({
   badge,
@@ -27,11 +32,34 @@ const BadgeDetailsCard = ({
     variables: { title, description, symbolURI, criteriaDescription },
     fileURI
   } = tcrData
+  const { decisiveRuling, loserHasPaid } = getItemInformation(
+    badge,
+    userAccount
+  )
+
+  const remainingTime = getRemainingTime(
+    badge,
+    tcrData,
+    tcrConstants,
+    false,
+    decisiveRuling
+  )
+
+  const remainingLoserTime = getRemainingTime(
+    badge,
+    tcrData,
+    tcrConstants,
+    true,
+    decisiveRuling
+  )
+
   const [challengePeriodCompleted, setChallengePeriodCompleted] = useState(
     false
   )
   const [appealPeriodEnded, setAppealPeriodEnded] = useState(false)
-  const [loserTimedOut, setLoserTimedOut] = useState(false)
+  const [loserTimedOut, setLoserTimedOut] = useState(
+    remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
+  )
   const { tokenAddress } = badge
 
   return (
@@ -71,7 +99,7 @@ const BadgeDetailsCard = ({
                 userAccount={userAccount}
                 tcrData={tcrData}
                 onAppealPeriodEnd={setAppealPeriodEnded}
-                onLoserTimedout={setLoserTimedOut}
+                onLoserTimedOut={setLoserTimedOut}
                 onChallengePeriodEnd={setChallengePeriodCompleted}
               />
             </div>
@@ -117,18 +145,20 @@ const BadgeDetailsCard = ({
               </a>
             </span>
           </div>
-          <ItemActionButton
-            item={badge}
-            userAccount={userAccount}
-            tcr={tcrData}
-            fundAppeal={fundAppeal}
-            handleActionClick={handleActionClick}
-            handleExecuteRequestClick={handleExecuteRequestClick}
-            appealPeriodEnded={appealPeriodEnded}
-            challendePeriodEnded={challengePeriodCompleted}
-            loserTimedOut={loserTimedOut}
-            badgeContractAddr={tcr.options.address}
-          />
+          <div style={{ marginLeft: 'auto' }}>
+            <ItemActionButton
+              item={badge}
+              userAccount={userAccount}
+              tcr={tcrData}
+              fundAppeal={fundAppeal}
+              handleActionClick={handleActionClick}
+              handleExecuteRequestClick={handleExecuteRequestClick}
+              appealPeriodEnded={appealPeriodEnded}
+              challendePeriodEnded={challengePeriodCompleted}
+              loserTimedOut={loserTimedOut}
+              badgeContractAddr={tcr.options.address}
+            />
+          </div>
         </div>
       </div>
     </div>
