@@ -36,13 +36,14 @@ const BadgeCard = ({
   arbitrableAddressListData
 }) => {
   // Link to the oldest, registered token submission for this address.
+  if (!badge) return <BeatLoader color="#3d464d" />
+
   const badgeContractData = arbitrableAddressListData[badge.badgeContractAddr]
   const {
     variables: { symbolURI, title }
   } = badgeContractData
   const tokenData = tokens.data
   let tokenSubmissions = []
-  if (!badge) return <BeatLoader color="#3d464d" />
   if (tokenData.addressToIDs[badge.address]) {
     tokenData.addressToIDs[badge.address].forEach(tokenID => {
       if (
@@ -139,7 +140,5 @@ BadgeCard.defaultProps = {
 export default connect(state => ({
   tokens: state.tokens,
   badges: state.badges,
-  envObjects: state.envObjects.data,
-  arbitrableAddressListData:
-    state.arbitrableAddressList.arbitrableAddressListData.data
+  envObjects: state.envObjects.data
 }))(BadgeCard)
