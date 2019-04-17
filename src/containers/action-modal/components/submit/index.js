@@ -30,17 +30,18 @@ const Submit = ({
         {item ? 'Resubmit token' : 'Submit a token'}
       </h3>
     </div>
+    <hr />
+    <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
+      See the{' '}
+      {/* TODO: Swap hardcoded URL for URI provided in the fileURI of the latest meta evidence, once it goes live. */}
+      <a href="https://ipfs.kleros.io/ipfs/QmWqmVkjigLjcmZ4fZdsKKLhKEViUoKce9HK3Z2mUxDZgE/blockchain-non-technical.pdf">
+        listing criteria
+      </a>
+      {!item && ', complete the information below'} and submit.
+    </h5>
     {!item && (
       <>
-        <hr />
-        <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
-          Complete the information below and submit.
-        </h5>
         <br />
-      </>
-    )}
-    {!item && (
-      <>
         <TokenForm className="Submit-form" onSubmit={submitItem} />
         <FilePicker
           file={file}
