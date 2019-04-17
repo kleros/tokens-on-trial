@@ -14,7 +14,7 @@ const ItemStatus = ({ item: { clientStatus } }) => (
       color={tcrConstants.STATUS_COLOR_ENUM[clientStatus]}
       icon={tcrConstants.STATUS_ICON_ENUM[clientStatus]}
     />
-    <div>
+    <div style={{ fontSize: '14px' }}>
       {toSentenceCase(
         userFriendlyLabel[tcrConstants.STATUS_ENUM[clientStatus]]
       )}
