@@ -181,12 +181,11 @@ class BadgeDetails extends PureComponent {
 
     const { match } = this.props
     const { tokenAddr, badgeAddr } = match.params
-    const {
-      fetchBadge,
-      arbitrableAddressListData: { data: badgeTCRs }
-    } = this.props
-    const badgeContractBlockNumber = badgeTCRs[badgeAddr].blockNumber
+    const { fetchBadge, arbitrableAddressListData } = this.props
+    const { data: badgeTCRs } = arbitrableAddressListData
+    if (arbitrableAddressListData.loading || !badgeTCRs) return null
 
+    const badgeContractBlockNumber = badgeTCRs[badgeAddr].blockNumber
     const arbitrableAddressListEvents = badgeEventsContracts[badgeAddr]
     const arbitrableAddressListView = badgeViewContracts[badgeAddr]
     const { badge, fetching, evidenceListenerSet } = this.state
