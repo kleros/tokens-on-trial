@@ -172,16 +172,21 @@ class BadgeDetails extends PureComponent {
   async componentDidUpdate() {
     if (!this.context) return
 
-    const { match, fetchBadge } = this.props
     const {
-      ETHFINEX_BADGE_BLOCK,
       arbitratorEvents,
       archon,
       badgeEventsContracts,
       badgeViewContracts
     } = this.context
 
+    const { match } = this.props
     const { tokenAddr, badgeAddr } = match.params
+    const {
+      fetchBadge,
+      arbitrableAddressListData: { data: badgeTCRs }
+    } = this.props
+    const badgeContractBlockNumber = badgeTCRs[badgeAddr].blockNumber
+
     const arbitrableAddressListEvents = badgeEventsContracts[badgeAddr]
     const arbitrableAddressListView = badgeViewContracts[badgeAddr]
     const { badge, fetching, evidenceListenerSet } = this.state
@@ -320,7 +325,7 @@ class BadgeDetails extends PureComponent {
         filter: {
           _evidenceGroupID: badge.latestRequest.evidenceGroupID
         },
-        fromBlock: ETHFINEX_BADGE_BLOCK,
+        fromBlock: badgeContractBlockNumber,
         toBlock: 'latest'
       })).map(async e => {
         if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
