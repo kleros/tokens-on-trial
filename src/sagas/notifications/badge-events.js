@@ -49,14 +49,22 @@ const emitBadgeNotifications = async (
     const isRequester = account === returnValues._requester
     if (!isRequester && account !== returnValues._challenger) continue
 
-    const requests = await arbitrableAddressListView.getPastEvents(
-      `RequestSubmitted`,
-      {
-        filter: { _address: returnValues._address },
-        fromBlock: ETHFINEX_BADGE_BLOCK,
-        toBlock: `latest`
-      }
-    )
+    let requests = []
+    try {
+      requests = await arbitrableAddressListView.getPastEvents(
+        `RequestSubmitted`,
+        {
+          filter: { _address: returnValues._address },
+          fromBlock: ETHFINEX_BADGE_BLOCK,
+          toBlock: `latest`
+        }
+      )
+    } catch (err) {
+      console.error(err)
+      continue
+    }
+
+    if (requests.length === 0) continue
 
     const tokenIDs = (await arbitrableTokenListView.methods
       .queryTokens(

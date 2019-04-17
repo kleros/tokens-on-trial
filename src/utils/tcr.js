@@ -28,15 +28,11 @@ export const instantiateEnvObjects = async () => {
   const HTTP_PROVIDER = process.env[`REACT_APP_${env}_HTTP_PROVIDER`]
   const ARBITRABLE_TOKEN_LIST_ADDRESS =
     process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
-  const ARBITRABLE_ADDRESS_LIST_ADDRESS =
-    process.env[`REACT_APP_${env}_ARBITRABLE_ADDRESS_LIST_ADDRESS`]
   const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
   const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
   const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
   const T2CR_BLOCK = process.env[`REACT_APP_${env}_T2CR_BLOCK`]
   const ARBITRATOR_BLOCK = process.env[`REACT_APP_${env}_ARBITRATOR_BLOCK`]
-  const ETHFINEX_BADGE_BLOCK =
-    process.env[`REACT_APP_${env}_ETHFINEX_BADGE_BLOCK`]
   const archon = new Archon(HTTP_PROVIDER, 'https://ipfs.kleros.io')
 
   const httpProvider = new Web3.providers.HttpProvider(HTTP_PROVIDER)
@@ -121,10 +117,8 @@ export const instantiateEnvObjects = async () => {
     FILE_BASE_URL,
     T2CR_BLOCK,
     ARBITRATOR_BLOCK,
-    ETHFINEX_BADGE_BLOCK,
     archon,
     ARBITRATOR_ADDRESS,
-    ARBITRABLE_ADDRESS_LIST_ADDRESS,
     ARBITRABLE_TOKEN_LIST_ADDRESS,
     web3,
     viewWeb3,

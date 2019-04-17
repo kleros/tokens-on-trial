@@ -47,16 +47,6 @@ export const challengeRequest = ({ ID, value, evidence }) => ({
   type: token.CHALLENGE_REQUEST,
   payload: { ID, value, evidence }
 })
-export const fetchTokens = (
-  cursor,
-  count,
-  filterValue,
-  sortValue,
-  requestedPage
-) => ({
-  type: tokens.FETCH,
-  payload: { cursor, count, filterValue, sortValue, requestedPage }
-})
 export const timeout = ID => ({
   type: token.EXECUTE,
   payload: { ID }

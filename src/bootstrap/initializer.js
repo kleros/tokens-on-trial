@@ -22,6 +22,8 @@ class ContractsProvider extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     fetchAccounts: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired,
+    fetchBadges: PropTypes.func.isRequired,
     notifications: notificationsShape.isRequired,
     envObjects: PropTypes.shape({
       networkID: PropTypes.number.isRequired
@@ -31,8 +33,13 @@ class ContractsProvider extends Component {
   state = {}
 
   async componentDidMount() {
+    const { fetchBadges, fetchTokens } = this.props
     const envObjects = await instantiateEnvObjects()
-    const { arbitrableTokenListView } = envObjects
+    const {
+      arbitrableTokenListView,
+      arbitrableTokenListEvents,
+      badgeEventsContracts
+    } = envObjects
     this.setState({ envObjects })
 
     // Save notifications on unload.
@@ -47,6 +54,20 @@ class ContractsProvider extends Component {
         JSON.stringify(data)
       )
     })
+
+    arbitrableTokenListEvents.events.TokenStatusChange(err => {
+      if (err) return
+      fetchTokens()
+    })
+
+    Object.keys(badgeEventsContracts).map(badgeContractAddr =>
+      badgeEventsContracts[badgeContractAddr].events.AddressStatusChange(
+        err => {
+          if (err) return
+          fetchBadges()
+        }
+      )
+    )
   }
 
   async componentDidUpdate() {

@@ -21,16 +21,6 @@ export const badge = {
 }
 
 /* Badge TCR Action Creators */
-export const fetchBadges = (
-  cursor,
-  count,
-  filterValue,
-  sortValue,
-  requestedPage
-) => ({
-  type: badges.FETCH,
-  payload: { cursor, count, filterValue, sortValue, requestedPage }
-})
 export const createBadge = ({ badgeContractAddr, tokenAddr, value }) => ({
   type: badge.CREATE,
   payload: { badgeContractAddr, tokenAddr, value }

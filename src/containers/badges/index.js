@@ -9,7 +9,6 @@ import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
-import * as badgeActions from '../../actions/badge'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
@@ -196,7 +195,6 @@ export default withRouter(
     {
       fetchArbitrableAddressListData:
         arbitrableAddressListActions.fetchArbitrableAddressListData,
-      fetchBadges: badgeActions.fetchBadges,
       toggleFilter: filterActions.toggleFilter
     }
   )(Badges)
