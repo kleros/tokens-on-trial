@@ -147,7 +147,7 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
         const sharedStakeMultiplier = yield call(
           arbitrableAddressListView.methods.sharedStakeMultiplier().call
         )
-        badge.latestRequest.latestRound.requiredForSide = []
+        badge.latestRequest.latestRound.requiredForSide = [toBN(0)]
 
         const ruling = Number(badge.latestRequest.dispute.ruling)
         if (ruling === 0) {

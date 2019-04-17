@@ -139,7 +139,7 @@ export function* fetchToken({ payload: { ID } }) {
         const sharedStakeMultiplier = yield call(
           arbitrableTokenListView.methods.sharedStakeMultiplier().call
         )
-        token.latestRequest.latestRound.requiredForSide = []
+        token.latestRequest.latestRound.requiredForSide = [toBN(0)]
 
         const ruling = Number(token.latestRequest.dispute.ruling)
         if (ruling === 0) {
