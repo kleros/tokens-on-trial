@@ -44,7 +44,7 @@ const LatestRuling = ({ item, userAccount }) => {
         style={{ marginRight: '10px' }}
       />
       {ruling.toString() === '0'
-        ? 'Jurors did not rule.'
+        ? 'Jurors did not rule'
         : rulingMessage(
             decisiveRuling,
             userSide !== tcrConstants.SIDE.None,
