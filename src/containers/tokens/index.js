@@ -106,7 +106,9 @@ class Tokens extends Component {
             token.ID !==
               '0xf69ce03f1e563398463cf2672ca220da670d9af3d27843e8d5c5069c455ea3de' &&
             token.ID !==
-              '0xd59474afe43d05cef80bdd606dfdaf8e0a931a604dc25d782f8d19710c1810fe')
+              '0xd59474afe43d05cef80bdd606dfdaf8e0a931a604dc25d782f8d19710c1810fe' &&
+            token.ID !==
+              '0x0e3df498950442a1dac9780861e7ab0760278e081f0068d94580b00832de5aca')
       )
       .sort((a, b) => {
         const { oldestFirst } = filter
