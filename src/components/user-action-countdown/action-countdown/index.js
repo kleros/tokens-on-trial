@@ -8,14 +8,7 @@ import CountdownRenderer from '../../countdown-renderer'
 import './action-countdown.css'
 
 const ActionCountdown = ({ text, icon, endTime, onComplete }) => (
-  <span
-    className="ActionCountdown-meta-item"
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      color: '#f60c36'
-    }}
-  >
+  <span className="ActionCountdown-meta-item">
     <div className="ActionCountdown-timer">
       <FontAwesomeIcon
         className="ActionCountdown-icon"

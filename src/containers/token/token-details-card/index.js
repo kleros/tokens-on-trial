@@ -104,18 +104,19 @@ const TokenDetailsCard = ({
             userAccount={userAccount}
             appealPeriodEnded={appealPeriodEnded}
           />
-          <ItemActionButton
-            item={token}
-            userAccount={userAccount}
-            tcr={arbitrableTokenListData}
-            fundAppeal={fundAppeal}
-            handleActionClick={handleActionClick}
-            handleExecuteRequestClick={handleExecuteRequestClick}
-            appealPeriodEnded={appealPeriodEnded}
-            challendePeriodEnded={challengePeriodCompleted}
-            loserTimedOut={loserTimedOut}
-            extraClass="TokenDetailsCard-action-decor"
-          />
+          <div className="TokenDetailsCard-actionWrapper">
+            <ItemActionButton
+              item={token}
+              userAccount={userAccount}
+              tcr={arbitrableTokenListData}
+              fundAppeal={fundAppeal}
+              handleActionClick={handleActionClick}
+              handleExecuteRequestClick={handleExecuteRequestClick}
+              appealPeriodEnded={appealPeriodEnded}
+              challendePeriodEnded={challengePeriodCompleted}
+              loserTimedOut={loserTimedOut}
+            />
+          </div>
         </div>
         <div className="TokenDetailsCard-footer">
           <a

@@ -177,6 +177,25 @@
     }
   }
 
+  &-actionWrapper {
+    background: rgb(248, 248, 248);
+    display: flex;
+    margin-left: 26px;
+    min-width: 200px;
+    padding-right: 26px;
+
+    @media (min-width: 840px) {
+      &::before {
+        border-bottom: 50px solid transparent;
+        border-left: 20px solid #fff;
+        border-top: 50px solid transparent;
+        content: "";
+        height: 0;
+        margin-right: 26px;
+      }
+    }
+  }
+
   &-action {
     align-items: center;
     background: $action;
@@ -190,20 +209,6 @@
       margin: 0;
       margin-top: 17px;
       padding: 26px;
-    }
-
-    &-decor {
-      @media (min-width: 840px) {
-        &::after {
-          border-bottom: 50px solid transparent;
-          border-left: 20px solid $white;
-          border-top: 50px solid transparent;
-          content: "";
-          height: 0;
-          left: 0;
-          position: absolute;
-        }
-      }
     }
   }
 
