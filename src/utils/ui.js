@@ -51,7 +51,6 @@ export const getCrowdfundingInfo = item => {
     status <= 1 ||
     !dispute ||
     Number(dispute.status) !== tcrConstants.DISPUTE_STATUS.Appealable ||
-    !isDecisiveRuling(item) ||
     appealed
   )
     return null
