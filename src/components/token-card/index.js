@@ -74,7 +74,7 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
         const badge = badges[badgeContrAddr].items[token.address]
         return (
           badge &&
-          badge.status.clientStatus !== 0 && (
+          badge.clientStatus !== 0 && (
             <span
               key={badgeContrAddr}
               className="TokenCard-footer-badge"
