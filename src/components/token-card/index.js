@@ -76,6 +76,7 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
           badge &&
           badge.status.clientStatus !== 0 && (
             <span
+              key={badgeContrAddr}
               className="TokenCard-footer-badge"
               style={getBadgeStyle(badge)}
             />
