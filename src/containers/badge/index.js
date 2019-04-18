@@ -591,7 +591,7 @@ class BadgeDetails extends PureComponent {
                   this.handleActionClick(
                     modalConstants.ACTION_MODAL_ENUM['FundAppealBadge'],
                     {
-                      side: tcrConstants.SIDE.Requester,
+                      side: tcrConstants.SIDE.Challenger,
                       badgeContractAddr: badgeAddr
                     }
                   )
