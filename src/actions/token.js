@@ -97,10 +97,6 @@ export const fetchBadge = address => ({
   type: token.FETCH_BADGE,
   payload: { address }
 })
-export const fundBadgeAppeal = (address, side, value, ID) => ({
-  type: token.FUND_APPEAL_BADGE,
-  payload: { address, ID, side, value }
-})
 export const feesTimeoutBadge = tokenData => ({
   type: token.FEES_TIMEOUT_BADGE,
   payload: { token: tokenData }

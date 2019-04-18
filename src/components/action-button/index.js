@@ -105,7 +105,7 @@ const getActionButton = ({
                     modalConstants.ACTION_MODAL_ENUM[
                       `FundAppeal${badgeContractAddr ? 'Badge' : ''}`
                     ],
-                    SIDE
+                    badgeContractAddr ? { badgeContractAddr, side: SIDE } : SIDE
                   )
               } else if (Date.now() < endOfFirstHalf) {
                 label = 'Fund Appeal'
@@ -115,7 +115,7 @@ const getActionButton = ({
                     modalConstants.ACTION_MODAL_ENUM[
                       `FundAppeal${badgeContractAddr ? 'Badge' : ''}`
                     ],
-                    SIDE
+                    badgeContractAddr ? { badgeContractAddr, side: SIDE } : SIDE
                   )
               }
             } else label = 'Waiting For Opponent'
@@ -157,7 +157,7 @@ const getActionButton = ({
             modalConstants.ACTION_MODAL_ENUM[
               `FundRequester${badgeContractAddr ? 'Badge' : ''}`
             ],
-            badgeContractAddr
+            { badgeContractAddr }
           )
       else if (
         submitterFees.gt(challengerFees) &&
@@ -168,7 +168,7 @@ const getActionButton = ({
             modalConstants.ACTION_MODAL_ENUM[
               `FundChallenger${badgeContractAddr ? 'Badge' : ''}`
             ],
-            badgeContractAddr
+            { badgeContractAddr }
           )
       else {
         icon = 'hourglass-half'
@@ -189,7 +189,7 @@ const getActionButton = ({
           modalConstants.ACTION_MODAL_ENUM[
             `Challenge${badgeContractAddr ? 'Badge' : ''}`
           ],
-          badgeContractAddr
+          { badgeContractAddr }
         )
       if (isRegistrationRequest(item.status))
         label = badgeContractAddr
@@ -205,7 +205,7 @@ const getActionButton = ({
           modalConstants.ACTION_MODAL_ENUM[
             `Clear${badgeContractAddr ? 'Badge' : ''}`
           ],
-          badgeContractAddr
+          { badgeContractAddr }
         )
       label = badgeContractAddr ? 'Remove Badge' : 'Remove Token'
       icon = 'times-circle'
@@ -217,7 +217,7 @@ const getActionButton = ({
           modalConstants.ACTION_MODAL_ENUM[
             `Resubmit${badgeContractAddr ? 'Badge' : ''}`
           ],
-          badgeContractAddr
+          { badgeContractAddr }
         )
     }
   }

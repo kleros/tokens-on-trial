@@ -28,6 +28,8 @@ const BadgeDetailsCard = ({
   handleExecuteRequestClick,
   fundAppeal
 }) => {
+  if (!tcrData) return null
+
   const {
     variables: { title, description, symbolURI, criteriaDescription },
     fileURI

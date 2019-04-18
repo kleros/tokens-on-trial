@@ -138,7 +138,7 @@ class ActionModal extends PureComponent {
     clearToken({ tokenData: token.data, value })
   }
 
-  handleClearBadgeClick = badgeContractAddr => {
+  handleClearBadgeClick = ({ badgeContractAddr }) => {
     const { clearBadge, badge, badgeContracts } = this.props
     const arbitrableAddressListData = badgeContracts[badgeContractAddr]
     const {
@@ -207,7 +207,7 @@ class ActionModal extends PureComponent {
       badge: {
         data: { tokenAddress }
       },
-      actionModalParam: badgeContractAddr
+      actionModalParam: { badgeContractAddr }
     } = this.props
     const { file } = this.state
     submitBadgeEvidence({
@@ -265,7 +265,7 @@ class ActionModal extends PureComponent {
       challengeBadgeRequest,
       badge,
       badgeContracts,
-      actionModalParam: badgeContractAddr
+      actionModalParam: { badgeContractAddr }
     } = this.props
 
     const arbitrableAddressListData = badgeContracts[badgeContractAddr]
@@ -370,11 +370,19 @@ class ActionModal extends PureComponent {
   }
 
   handleFundAppealBadgeClick = ({ amount }) => {
-    const { fundBadgeAppeal, badge, actionModalParam } = this.props
-    const SIDE = actionModalParam
+    const {
+      fundBadgeAppeal,
+      badge,
+      actionModalParam: { side, badgeContractAddr }
+    } = this.props
     const value = web3Utils.toWei(amount)
 
-    fundBadgeAppeal(badge.data.address, SIDE, value)
+    fundBadgeAppeal({
+      tokenAddr: badge.data.tokenAddress,
+      badgeContractAddr,
+      side,
+      value
+    })
   }
 
   handleSubmitBadgeClick = (badgeContractAddr, tokenAddr) => {
@@ -460,7 +468,8 @@ class ActionModal extends PureComponent {
 
     let arbitrableAddressListData
     if (actionModalParam)
-      arbitrableAddressListData = badgeContracts[actionModalParam]
+      arbitrableAddressListData =
+        badgeContracts[actionModalParam.badgeContractAddr]
 
     /* eslint-disable react/jsx-no-bind */
 
@@ -577,7 +586,7 @@ class ActionModal extends PureComponent {
                   submitItem={this.handleSubmitBadgeClick}
                   closeActionModal={closeActionModal}
                   tokenAddr={badge.data.token && badge.data.token.addr}
-                  badgeContractAddr={actionModalParam}
+                  badgeContractAddr={actionModalParam.badgeContractAddr}
                 />
               )
             case modalConstants.ACTION_MODAL_ENUM.ClearBadge:
@@ -622,12 +631,12 @@ class ActionModal extends PureComponent {
             case modalConstants.ACTION_MODAL_ENUM.FundAppealBadge: {
               return (
                 <FundAppeal
-                  tcr={arbitrableAddressListData}
+                  tcr={{ data: arbitrableAddressListData }}
                   closeActionModal={closeActionModal}
                   item={badge.data}
                   badge
                   fundAppeal={this.handleFundAppealBadgeClick}
-                  side={actionModalParam}
+                  side={actionModalParam.side}
                 />
               )
             }

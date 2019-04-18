@@ -138,10 +138,12 @@ class BadgeDetails extends PureComponent {
   }
 
   withdrawFunds = async () => {
-    const { withdrawBadgeFunds, badge, openActionModal } = this.props
+    const { withdrawBadgeFunds, badge, openActionModal, match } = this.props
+    const { badgeAddr, tokenAddr } = match.params
     openActionModal(modalConstants.ACTION_MODAL_ENUM.TxPending)
     withdrawBadgeFunds({
-      address: badge.tokenAddress,
+      badgeContractAddr: badgeAddr,
+      tokenAddr,
       item: badge
     })
   }
@@ -183,7 +185,12 @@ class BadgeDetails extends PureComponent {
     const { tokenAddr, badgeAddr } = match.params
     const { fetchBadge, arbitrableAddressListData } = this.props
     const { data: badgeTCRs } = arbitrableAddressListData
-    if (arbitrableAddressListData.loading || !badgeTCRs) return null
+    if (
+      arbitrableAddressListData.loading ||
+      !badgeTCRs ||
+      !badgeTCRs[badgeAddr]
+    )
+      return
 
     const badgeContractBlockNumber = badgeTCRs[badgeAddr].blockNumber
     const arbitrableAddressListEvents = badgeEventsContracts[badgeAddr]
@@ -401,7 +408,12 @@ class BadgeDetails extends PureComponent {
     const FILE_BASE_URL = envObjects ? envObjects.FILE_BASE_URL : null
     const { filters } = filter
 
-    if (badge.numberOfRequests === 0)
+    const missingTCRdata =
+      !arbitrableAddressListData ||
+      !arbitrableAddressListData.data ||
+      !arbitrableAddressListData.data[badgeAddr]
+
+    if (badge.numberOfRequests === 0 || missingTCRdata)
       return (
         <div className="PageNotFound">
           <div className="PageNotFound-message">
@@ -554,7 +566,10 @@ class BadgeDetails extends PureComponent {
                   this.setState({ appealModalOpen: false })
                   this.handleActionClick(
                     modalConstants.ACTION_MODAL_ENUM['FundAppealBadge'],
-                    tcrConstants.SIDE.Requester
+                    {
+                      side: tcrConstants.SIDE.Requester,
+                      badgeContractAddr: badgeAddr
+                    }
                   )
                 }}
               >
@@ -575,7 +590,10 @@ class BadgeDetails extends PureComponent {
                   this.setState({ appealModalOpen: false })
                   this.handleActionClick(
                     modalConstants.ACTION_MODAL_ENUM['FundAppealBadge'],
-                    tcrConstants.SIDE.Challenger
+                    {
+                      side: tcrConstants.SIDE.Requester,
+                      badgeContractAddr: badgeAddr
+                    }
                   )
                 }}
               >

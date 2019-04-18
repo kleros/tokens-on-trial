@@ -50,7 +50,7 @@ export const fetchBadge = (tokenAddress, badgeContractAddr) => ({
   type: badge.FETCH,
   payload: { tokenAddress, badgeContractAddr }
 })
-export const fundAppeal = (tokenAddr, badgeContractAddr, side, value) => ({
+export const fundAppeal = ({ tokenAddr, badgeContractAddr, side, value }) => ({
   type: badge.FUND_APPEAL,
   payload: { tokenAddr, badgeContractAddr, side, value }
 })
