@@ -55,7 +55,8 @@ const UserActionCountdown = ({
 
   if (
     userAccount !== parties[tcrConstants.SIDE['Requester']] &&
-    userAccount !== parties[tcrConstants.SIDE['Challenger']]
+    userAccount !== parties[tcrConstants.SIDE['Challenger']] &&
+    decisiveRuling
   )
     return (
       <>
