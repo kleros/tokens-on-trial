@@ -154,7 +154,7 @@ class Badges extends Component {
                   displayedBadges.map(badge => (
                     <BadgeCard
                       badge={badge}
-                      key={badge.address}
+                      key={`${badge.address}.${badge.badgeContractAddr}`}
                       arbitrableAddressListData={arbitrableAddressListData.data}
                       displayTokenInfo
                     />
