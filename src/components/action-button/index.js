@@ -67,9 +67,14 @@ const getActionButton = ({
         const appealPeriodEnd = latestRequest.latestRound.appealPeriod[1]
         const appealPeriodDuration = appealPeriodEnd - appealPeriodStart
         const endOfFirstHalf = appealPeriodStart + appealPeriodDuration / 2
+        const { appealCost } = latestRound
+        const payableValue =
+          !appealCost || (appealCost && appealCost.length < 25) // Contract can return unpayable value to denote that a ruling is not appealable.
         if (
-          userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
-          userAccount === latestRequest.parties[tcrConstants.SIDE.Challenger]
+          (userAccount === latestRequest.parties[tcrConstants.SIDE.Requester] ||
+            userAccount ===
+              latestRequest.parties[tcrConstants.SIDE.Challenger]) &&
+          payableValue
         ) {
           if (Date.now() < appealPeriodEnd) {
             const SIDE =
@@ -97,7 +102,7 @@ const getActionButton = ({
               )
                 losingSide = true
 
-              if (!losingSide) {
+              if (!losingSide && payableValue) {
                 label = 'Fund Appeal'
                 disabled = false
                 method = () =>
@@ -107,7 +112,7 @@ const getActionButton = ({
                     ],
                     badgeContractAddr ? { badgeContractAddr, side: SIDE } : SIDE
                   )
-              } else if (Date.now() < endOfFirstHalf) {
+              } else if (Date.now() < endOfFirstHalf && payableValue) {
                 label = 'Fund Appeal'
                 disabled = false
                 method = () =>
@@ -120,7 +125,8 @@ const getActionButton = ({
               }
             } else label = 'Waiting For Opponent'
           } else if (Date.now() > appealPeriodEnd) label = 'Waiting Enforcement'
-        } else if (Date.now() < appealPeriodEnd) label = 'Waiting Appeals'
+        } else if (!payableValue) label = 'Waiting Enforcement'
+        else if (Date.now() < appealPeriodEnd) label = 'Waiting Appeals'
       }
     } else if (
       submitterFees.gt(toBN(0)) &&

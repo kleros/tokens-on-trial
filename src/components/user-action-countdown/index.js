@@ -17,10 +17,12 @@ const UserActionCountdown = ({
 }) => {
   const { latestRequest } = item
   const { dispute, parties } = latestRequest
-  const { userIsLoser, decisiveRuling, loserHasPaid } = getItemInformation(
-    item,
-    userAccount
-  )
+  const {
+    userIsLoser,
+    decisiveRuling,
+    loserHasPaid,
+    payableValue
+  } = getItemInformation(item, userAccount)
 
   const remainingTime = getRemainingTime(
     item,
@@ -52,6 +54,8 @@ const UserActionCountdown = ({
         onComplete={() => onChallengePeriodEnd(true)}
       />
     )
+
+  if (!payableValue) return null
 
   if (
     userAccount !== parties[tcrConstants.SIDE['Requester']] &&

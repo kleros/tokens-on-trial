@@ -45,7 +45,14 @@ export const isUserLoser = (item, userAccount) => {
 export const getCrowdfundingInfo = item => {
   const { status, latestRequest } = item
   const { dispute, latestRound } = latestRequest
-  const { appealed, hasPaid, paidFees, requiredForSide } = latestRound
+  const {
+    appealed,
+    hasPaid,
+    paidFees,
+    requiredForSide,
+    appealCost
+  } = latestRound
+  const payableValue = !appealCost || (appealCost && appealCost.length < 25) // Contract can return unpayable value to denote that a ruling is not appealable.
 
   if (
     status <= 1 ||
@@ -82,7 +89,8 @@ export const getCrowdfundingInfo = item => {
   return {
     loserPercent,
     requesterFeesPercent,
-    challengerFeesPercent
+    challengerFeesPercent,
+    payableValue
   }
 }
 

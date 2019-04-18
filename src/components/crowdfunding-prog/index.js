@@ -14,7 +14,8 @@ const CrowdfundingProgress = ({ item, userAccount, appealPeriodEnded }) => {
   const {
     loserTimedOut,
     requesterFeesPercent,
-    challengerFeesPercent
+    challengerFeesPercent,
+    payableValue
   } = getItemInformation(item, userAccount)
 
   if (
@@ -22,7 +23,8 @@ const CrowdfundingProgress = ({ item, userAccount, appealPeriodEnded }) => {
     !dispute ||
     dispute.status !== tcrConstants.DISPUTE_STATUS.Appealable ||
     loserTimedOut ||
-    appealPeriodEnded
+    appealPeriodEnded ||
+    !payableValue
   )
     return null
 
