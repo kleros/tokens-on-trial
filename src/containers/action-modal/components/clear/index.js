@@ -77,7 +77,10 @@ const Clear = ({ tcrData, closeActionModal, clearItem, item, badge }) => (
     >
       <FontAwesomeIcon icon="info-circle" />
       <div style={{ marginLeft: '5px' }}>
-        <i>Note: This is a deposit and will be refunded if you are correct.</i>
+        <i>
+          Note: This is a deposit and will be refunded if the removal is
+          successful.
+        </i>
       </div>
     </div>
     <br />

@@ -89,7 +89,10 @@ const SubmitBadge = ({
     >
       <FontAwesomeIcon icon="info-circle" />
       <div style={{ marginLeft: '5px' }}>
-        <i>Note: This is a deposit and will be refunded if you are correct.</i>
+        <i>
+          Note: This is a deposit and will be reimbursed if the submission is
+          accepted.
+        </i>
       </div>
     </div>
     <br />
