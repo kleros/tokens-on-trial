@@ -1,3 +1,5 @@
+import piexif from 'piexifjs'
+
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
@@ -9,6 +11,7 @@ import * as walletSelectors from '../reducers/wallet'
 import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import Arbitrator from '../assets/contracts/arbitrator'
+import asyncReadFile from '../utils/async-file-reader'
 
 import ipfsPublish from './api/ipfs-publish'
 
@@ -151,7 +154,13 @@ function* submitBadgeEvidence({
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
     fileTypeExtension = file.name.split('.')[1]
-    const data = yield call(readFile, file.preview)
+    let data = yield call(readFile, file.preview)
+    if (fileTypeExtension === 'jpg' || fileTypeExtension === 'jpeg') {
+      // Strip exif data.
+      const blob = yield (yield call(fetch, file.preview)).blob()
+      const newDataString = piexif.remove((yield call(asyncReadFile, blob))[0])
+      data = yield call(readFile, newDataString)
+    }
     const ipfsFileObj = yield call(ipfsPublish, sanitize(file.name), data)
     fileURI = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
   }
