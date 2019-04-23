@@ -1,4 +1,4 @@
-import { put, takeLatest, call } from 'redux-saga/effects'
+import { put, takeLatest, call, all } from 'redux-saga/effects'
 
 import {
   FETCH_TOKENS_CACHE,
@@ -11,17 +11,19 @@ import {
   instantiateEnvObjects
 } from '../utils/tcr'
 
-const fetchEvents = async (eventName, fromBlock, contract) =>
-  contract.getPastEvents(eventName, { fromBlock })
+import { fetchAppealable, fetchEvents } from './utils'
 
 /**
- * Fetches a paginatable list of tokens.
+ * Fetches token and status information by events.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
-  const { arbitrableTokenListView, T2CR_BLOCK } = yield call(
-    instantiateEnvObjects
-  )
+  const {
+    arbitrableTokenListView,
+    arbitratorView,
+    T2CR_BLOCK,
+    ARBITRATOR_BLOCK
+  } = yield call(instantiateEnvObjects)
 
   try {
     let tokens = localStorage.getItem(
@@ -206,6 +208,30 @@ function* fetchTokens() {
       if (cachedTokens.addressToIDs[token.address])
         cachedTokens.addressToIDs[token.address].push(tokenID)
       else cachedTokens.addressToIDs[token.address] = [tokenID]
+    })
+
+    // Mark items in appeal period.
+    // Fetch token disputes in appeal period.
+    const disputesInAppealPeriod = yield call(
+      fetchAppealable,
+      arbitratorView,
+      ARBITRATOR_BLOCK,
+      arbitrableTokenListView
+    )
+
+    const tokenIDsInAppealPeriod = yield all(
+      disputesInAppealPeriod.map(disputeID =>
+        call(
+          arbitrableTokenListView.methods.arbitratorDisputeIDToTokenID(
+            arbitratorView._address,
+            disputeID
+          ).call
+        )
+      )
+    )
+
+    tokenIDsInAppealPeriod.forEach(tokenID => {
+      cachedTokens.items[tokenID].inAppealPeriod = true
     })
 
     localStorage.setItem(

@@ -11,6 +11,8 @@ import {
 } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
 
+import { fetchAppealable } from './utils'
+
 const fetchEvents = async ({ eventName, fromBlock, contract }) =>
   contract.getPastEvents(eventName, { fromBlock })
 
@@ -22,7 +24,9 @@ const fetchEvents = async ({ eventName, fromBlock, contract }) =>
 function* fetchItems({
   arbitrableAddressListView,
   blockNumber: tcrBlockNumber,
-  badges
+  badges,
+  arbitratorView,
+  ARBITRATOR_BLOCK
 }) {
   // Get the lastest status change for every badge.
 
@@ -89,6 +93,30 @@ function* fetchItems({
     )
   })
 
+  // Mark items in appeal period.
+  // Fetch token disputes in appeal period.
+  const disputesInAppealPeriod = yield call(
+    fetchAppealable,
+    arbitratorView,
+    ARBITRATOR_BLOCK,
+    arbitrableAddressListView
+  )
+
+  const addressesInAppealPeriod = yield all(
+    disputesInAppealPeriod.map(disputeID =>
+      call(
+        arbitrableAddressListView.methods.arbitratorDisputeIDToAddress(
+          arbitratorView._address,
+          disputeID
+        ).call
+      )
+    )
+  )
+
+  addressesInAppealPeriod.forEach(address => {
+    badges.items[address].inAppealPeriod = true
+  })
+
   return cachedBadges
 }
 
@@ -121,7 +149,9 @@ function* fetchBadges() {
     badgeViewContracts,
     arbitrableTokenListView: {
       options: { address: t2crAddr }
-    }
+    },
+    arbitratorView,
+    ARBITRATOR_BLOCK
   } = yield call(instantiateEnvObjects)
 
   const blockNumbers = (yield all(
@@ -148,7 +178,9 @@ function* fetchBadges() {
                   badgeContractAddr: address,
                   statusBlockNumber: blockNumbers[address], // Use contract block number by default
                   items: {}
-                }
+                },
+          arbitratorView,
+          ARBITRATOR_BLOCK
         })
       )
     )).reduce((acc, curr) => {
