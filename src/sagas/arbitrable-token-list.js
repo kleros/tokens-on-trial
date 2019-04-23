@@ -45,12 +45,7 @@ export function* fetchArbitrableTokenListData() {
   }`
   const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
 
-  let { fileURI } = metaEvidence
-
-  // TODO: Remove this once the meta evidence has been updated on the t2cr contract.
-  if (!fileURI)
-    fileURI =
-      '/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf'
+  const { fileURI } = metaEvidence
 
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
