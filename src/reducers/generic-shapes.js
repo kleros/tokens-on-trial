@@ -25,9 +25,7 @@ export const tcrShape = PropTypes.shape({
 
 export const envObjectsShape = PropTypes.shape({
   FILE_BASE_URL: PropTypes.string.isRequired,
-  T2CR_BLOCK: PropTypes.string.isRequired,
-  ETHFINEX_BADGE_BLOCK: PropTypes.string.isRequired,
-  ARBITRABLE_ADDRESS_LIST_ADDRESS: PropTypes.string.isRequired
+  T2CR_BLOCK: PropTypes.string.isRequired
 })
 
 export const courtShape = PropTypes.shape({
