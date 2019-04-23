@@ -16,24 +16,20 @@ const Clear = ({ tcrData, closeActionModal, clearItem, item, badge }) => (
       {!badge ? `Remove ${item.name}` : 'Remove Badge'}
     </h3>
     <hr />
-    {badge && (
-      <>
-        <p>
-          See the{' '}
-          <a
-            className="TokenDetails-withdraw"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`${IPFS_URL}${tcrData.fileURI}`}
-            style={{ margin: 0, textDecoration: 'underline' }}
-          >
-            listing criteria
-          </a>
-          .
-        </p>
-        <br />
-      </>
-    )}
+    <p>
+      See the{' '}
+      <a
+        className="TokenDetails-withdraw"
+        target="_blank"
+        rel="noopener noreferrer"
+        href={`${IPFS_URL}${tcrData.fileURI}`}
+        style={{ margin: 0, textDecoration: 'underline' }}
+      >
+        listing criteria
+      </a>
+      .
+    </p>
+    <br />
     <div className="Challenge-fees">
       <div>
         <p className="Challenge-fees-line">Total Deposit:</p>

@@ -4,7 +4,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
-import { web3Utils } from '../../../../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { TokenForm } from '../../components/submit/token-form'
 import FilePicker from '../../../../components/file-picker'
@@ -33,8 +33,11 @@ const Submit = ({
     <hr />
     <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
       See the{' '}
-      {/* TODO: Swap hardcoded URL for URI provided in the fileURI of the latest meta evidence, once it goes live. */}
-      <a href="https://ipfs.kleros.io/ipfs/QmWqmVkjigLjcmZ4fZdsKKLhKEViUoKce9HK3Z2mUxDZgE/blockchain-non-technical.pdf">
+      <a
+        href={`${IPFS_URL}${tcr.data.fileURI}`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         listing criteria
       </a>
       {!item && ', complete the information below'} and submit.

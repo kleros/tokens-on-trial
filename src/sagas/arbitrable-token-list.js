@@ -9,13 +9,16 @@ import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import readFile from '../utils/read-file'
-import { web3Utils } from '../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import asyncReadFile from '../utils/async-file-reader'
 
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
+
+const fetchEvents = async (eventName, contract) =>
+  contract.getPastEvents(eventName, { fromBlock: 0 }) // Web3js returns an empty array if fromBlock is not set.
 
 /**
  * Fetches the arbitrable token list's data.
@@ -26,6 +29,28 @@ export function* fetchArbitrableTokenListData() {
   const { arbitrableTokenListView, arbitratorView } = yield call(
     instantiateEnvObjects
   )
+
+  // Fetch the contract deployment block number. We use the first meta evidence
+  // events emitted when the constructor is run.
+  const metaEvidenceEvents = (yield call(
+    fetchEvents,
+    'MetaEvidence',
+    arbitrableTokenListView
+  )).sort((a, b) => a.blockNumber - b.blockNumber)
+  const blockNumber = metaEvidenceEvents[0].blockNumber
+
+  // Fetch tcr information from the latest meta evidence event
+  const metaEvidencePath = `${IPFS_URL}${
+    metaEvidenceEvents[metaEvidenceEvents.length - 1].returnValues._evidence
+  }`
+  const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
+
+  let { fileURI } = metaEvidence
+
+  // TODO: Remove this once the meta evidence has been updated on the t2cr contract.
+  if (!fileURI)
+    fileURI =
+      '/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf'
 
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
@@ -63,6 +88,8 @@ export function* fetchArbitrableTokenListData() {
   )
 
   return {
+    blockNumber,
+    fileURI,
     arbitrator: d.arbitrator,
     governor: d.governor,
     requesterBaseDeposit: toBN(d.requesterBaseDeposit),
