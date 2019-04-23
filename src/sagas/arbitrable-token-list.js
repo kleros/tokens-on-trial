@@ -1,3 +1,6 @@
+import piexif from 'piexifjs'
+import JSZip from 'jszip'
+
 import { all, call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
@@ -8,6 +11,7 @@ import * as walletSelectors from '../reducers/wallet'
 import readFile from '../utils/read-file'
 import { web3Utils } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
+import asyncReadFile from '../utils/async-file-reader'
 
 import ipfsPublish from './api/ipfs-publish'
 
@@ -93,7 +97,41 @@ function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
   /* eslint-disable unicorn/number-literal-case */
   if (file) {
     fileTypeExtension = file.name.split('.')[1]
-    const data = yield call(readFile, file.preview)
+    let data = yield call(readFile, file.preview)
+    if (fileTypeExtension === 'jpg' || fileTypeExtension === 'jpeg') {
+      // Strip exif data.
+      const blob = yield (yield call(fetch, file.preview)).blob()
+      const newDataString = piexif.remove((yield call(asyncReadFile, blob))[0])
+      data = yield call(readFile, newDataString)
+    } else if (
+      fileTypeExtension === 'docx' ||
+      fileTypeExtension === 'pptx' ||
+      fileTypeExtension === 'xlsx'
+    ) {
+      // Docx files are zip files. We can remove sensitive information from the core.xml file inside docProps.
+      const blob = yield (yield call(fetch, file.preview)).blob()
+      const base64Data = (yield call(asyncReadFile, blob))[0].split(',')[1]
+
+      const zip = yield JSZip.loadAsync(base64Data, { base64: true })
+      const xmlString = yield zip.file('docProps/core.xml').async('text')
+      const xmlObject = new DOMParser().parseFromString(xmlString, 'text/xml')
+
+      xmlObject.getElementsByTagName('dc:creator')[0].childNodes[0].nodeValue =
+        ''
+      xmlObject.getElementsByTagName(
+        'cp:lastModifiedBy'
+      )[0].childNodes[0].nodeValue = ''
+      xmlObject.getElementsByTagName(
+        'cp:lastModifiedBy'
+      )[0].childNodes[0].nodeValue = ''
+
+      const xmlDocString = new XMLSerializer().serializeToString(
+        xmlObject.documentElement
+      )
+      zip.file('docProps/core.xml', xmlDocString)
+      data = yield zip.generateAsync({ type: 'arraybuffer' })
+    }
+
     const ipfsFileObj = yield call(ipfsPublish, sanitize(file.name), data)
     fileURI = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
   }
