@@ -30,8 +30,10 @@ const Submit = ({
         {item ? 'Resubmit token' : 'Submit a token'}
       </h3>
     </div>
-    <hr />
-    <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
+    <h5
+      className="Modal-subtitle"
+      style={{ marginBottom: 0, marginTop: '10px' }}
+    >
       See the{' '}
       <a
         href={`${IPFS_URL}${tcr.data.fileURI}`}
