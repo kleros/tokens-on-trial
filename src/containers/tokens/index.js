@@ -134,6 +134,15 @@ class Tokens extends Component {
         if (b.clientStatus > a.clientStatus) return 1
         return 0
       })
+      .sort((a, b) => {
+        // Display registered tokens before rejected ones.
+        if (
+          (a.clientStatus === 0 && b.clientStatus === 1) ||
+          (a.clientStatus === 1 && a.clientStatus === 1)
+        )
+          return b.clientStatus - a.clientStatus
+        else return 0
+      })
 
     const { currentPage } = this.state
     const totalPages = Math.ceil(filteredTokens.length / ITEMS_PER_PAGE)
