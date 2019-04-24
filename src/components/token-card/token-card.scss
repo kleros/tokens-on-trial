@@ -10,60 +10,41 @@
   display: flex;
   flex-direction: column;
   height: 230px;
+  justify-content: space-between;
   margin: 16px 14px;
-  position: relative;
+  width: 248px;
 
   &-header {
     align-items: center;
+    background-color: #009aff;
     border-bottom: 1px solid #ebebeb;
+    color: white;
     display: flex;
     flex-direction: row;
     height: 35px;
     justify-content: space-between;
     padding: 0 10px;
     padding-top: 3px;
-    text-align: center;
   }
 
   &-content {
     align-items: center;
-    background: aliceblue;
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
     justify-content: center;
-
-    &-statusOverlay {
-      align-items: center;
-      background: $action;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      justify-content: space-evenly;
-      opacity: 0;
-      pointer-events: none;
-      position: absolute;
-      text-align: center;
-      transition: opacity 0.25s ease-in-out;
-      width: 100%;
-
-      &-icon {
-        height: 59px !important;
-        width: 59px !important;
-      }
-
-      .TokenCard:hover & {
-        opacity: 1;
-      }
-    }
+    text-decoration: none;
   }
 
   &-footer {
+    align-content: center;
     align-items: center;
     background-color: #f8f8f8;
     border-radius: 0 0 3px 3px;
     display: flex;
     height: 39px;
-    padding-left: 10px;
+    justify-content: space-between;
+    padding: 0 10px;
 
     &-badge {
       background-repeat: no-repeat;
@@ -76,16 +57,24 @@
       text-align: center;
       width: 25px;
     }
+
+    &-text {
+      font-size: 14px;
+      font-weight: 500;
+      margin: 0;
+      text-align: center;
+      width: 150px;
+    }
   }
 
   &-image {
-    height: 90px;
+    height: 80px;
     object-fit: contain;
-    width: 90px;
+    width: 80px;
   }
 
   &-hidden {
-    display: none;
+    visibility: hidden;
   }
 }
 
@@ -97,13 +86,13 @@
 
 @media (min-width: 570px) {
   .TokenCard {
-    flex: 0 0 calc(45% - 5px);
+    flex: 0 0 calc(45% - 10px);
   }
 }
 
 @media (min-width: 800px) {
   .TokenCard {
-    flex: 0 0 calc(30% - 5px);
+    flex: 0 0 calc(30% - 10px);
   }
 }
 

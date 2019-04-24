@@ -296,3 +296,17 @@ export const sanitize = str => {
     .replace(/^-+/, '') // Trim - from start of text
     .replace(/-+$/, '') // Trim - from end of text
 }
+
+export const getItemStatusColor = item => {
+  if (item.clientStatus === 0) return '#f60c36' // Red.
+  if (item.clientStatus === 1) return '#009aff' // Blue.
+  if (item.clientStatus > 3) return '#ff9900' // Orange.
+  return '#ccc'
+}
+
+export const getItemStatusText = item => {
+  if (item.clientStatus === 0) return 'Absent'
+  if (item.clientStatus === 1) return 'Registered'
+  if (item.clientStatus > 3) return 'Challenged'
+  return 'Pending'
+}

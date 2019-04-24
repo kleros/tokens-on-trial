@@ -11,6 +11,7 @@ import { IPFS_URL, web3Utils } from '../../bootstrap/dapp-api'
 import { cacheItemShape } from '../../reducers/generic-shapes'
 import { arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
 import * as tokenSelectors from '../../reducers/token'
+import * as tcrConstants from '../../constants/tcr'
 
 import './badge-card.css'
 
@@ -66,8 +67,12 @@ const BadgeCard = ({
         className="BadgeCard-header"
         style={{ backgroundColor: getBadgeColor(badge) }}
       >
-        <FontAwesomeIcon color="white" icon="check" />
+        <FontAwesomeIcon
+          color="white"
+          icon={tcrConstants.STATUS_ICON_ENUM[badge.clientStatus]}
+        />
         <h5 style={{ color: 'white' }}>{getBadgeHeaderText(badge)}</h5>
+        {/* Hidden icon used for spacing only. */}
         <FontAwesomeIcon
           color="white"
           icon="check"
