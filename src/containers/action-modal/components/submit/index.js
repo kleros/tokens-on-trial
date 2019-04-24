@@ -47,13 +47,25 @@ const Submit = ({
         />
       )}
     </div>
-    {!badge && !item && (
+    {!badge && (
       <>
-        <hr />
-        <h5 className="Modal-subtitle" style={{ marginBottom: 0 }}>
-          Complete the information below and submit.
+        <h5
+          className="Modal-subtitle"
+          style={{ marginBottom: 0, marginTop: '10px' }}
+        >
+          See the
+          {/* TODO: Swap hardcoded link for version fetched from latest meta evidence in the contract. */}
+          <a
+            className="TokenDetails-withdraw"
+            href="ipfs.kleros.io/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ margin: 0, textDecoration: 'underline' }}
+          >
+            listing criteria
+          </a>
+          {!item && ', complete the information below'} and submit.
         </h5>
-        <br />
       </>
     )}
     {badge && (
@@ -78,6 +90,7 @@ const Submit = ({
     )}
     {!badge && !item && (
       <>
+        <br />
         <TokenForm className="Submit-form" onSubmit={submitItem} />
         <FilePicker
           file={file}

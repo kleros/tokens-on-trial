@@ -35,6 +35,24 @@ const Clear = ({ tcr, closeActionModal, clearItem, item, badge }) => (
         <br />
       </>
     )}
+    {!badge && (
+      <>
+        <p>
+          See the{' '}
+          {/* TODO: Swap hardcoded link for version fetched from latest meta evidence in the contract. */}
+          <a
+            className="TokenDetails-withdraw"
+            target="_blank"
+            rel="noopener noreferrer"
+            href="ipfs.kleros.io/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf"
+            style={{ margin: 0, textDecoration: 'underline' }}
+          >
+            listing criteria.
+          </a>
+        </p>
+        <br />
+      </>
+    )}
     <div className="Challenge-fees">
       <div>
         <p className="Challenge-fees-line">Total Deposit:</p>
