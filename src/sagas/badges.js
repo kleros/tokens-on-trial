@@ -10,6 +10,7 @@ import {
   instantiateEnvObjects
 } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
+import * as tcrConstants from '../constants/tcr'
 
 import { fetchAppealable } from './utils'
 
@@ -102,20 +103,76 @@ function* fetchItems({
     arbitrableAddressListView
   )
 
-  const addressesInAppealPeriod = yield all(
-    disputesInAppealPeriod.map(disputeID =>
-      call(
-        arbitrableAddressListView.methods.arbitratorDisputeIDToAddress(
-          arbitratorView._address,
-          disputeID
-        ).call
-      )
-    )
-  )
+  // The appeal period can also be over if the arbitrators gave
+  // a decisive ruling (did not refuse or failed to rule) and the
+  // loser of the previous round did not get fully funded in within
+  // the first half of the appeal period.
+  // Remove items that fall under that category.
+  const addressesInAppealPeriod = {}
+  for (const disputeID of Object.keys(disputesInAppealPeriod)) {
+    // To do this we must:
+    // 1- Find out which side lost the previous round.
+    // 2- Find out if the loser received enough arbitration fees.
 
-  addressesInAppealPeriod.forEach(address => {
-    badges.items[address].inAppealPeriod = true
-  })
+    // 1- Find out which party lost the previous round.
+    const currentRuling = yield call(
+      arbitratorView.methods.currentRuling(disputeID).call
+    )
+    const address = yield call(
+      arbitrableAddressListView.methods.arbitratorDisputeIDToTokenID(
+        arbitratorView._address,
+        disputeID
+      ).call
+    )
+
+    // If there was no decisive ruling, there is no loser and the rule does not apply.
+    if (currentRuling.toString() === tcrConstants.RULING_OPTIONS.None) {
+      addressesInAppealPeriod[address] = true
+      continue
+    }
+
+    const loser =
+      currentRuling.toString() === tcrConstants.RULING_OPTIONS.Accept
+        ? tcrConstants.SIDE.Challenger
+        : tcrConstants.SIDE.Requester
+
+    // 2- We start by fetching information on the latest round.
+    const numberOfRequests = Number(
+      (yield call(
+        arbitrableAddressListView.methods.getAddressInfo(address).call
+      )).numberOfRequests
+    )
+    const numberOfRounds = Number(
+      (yield call(
+        arbitrableAddressListView.methods.getRequestInfo(
+          address,
+          numberOfRequests - 1
+        ).call
+      )).numberOfRounds
+    )
+    const latestRound = yield call(
+      arbitrableAddressListView.methods.getRoundInfo(
+        address,
+        numberOfRequests - 1,
+        numberOfRounds - 1
+      ).call
+    )
+    const loserPaid = latestRound.hasPaid[loser]
+    const appealPeriodStart = disputesInAppealPeriod[disputeID][0]
+    const appealPeriodEnd = disputesInAppealPeriod[disputeID][1]
+    const endOfHalf =
+      appealPeriodStart + (appealPeriodEnd - appealPeriodStart) / 2
+
+    addressesInAppealPeriod[address] =
+      endOfHalf * 1000 > Date.now() ||
+      (loserPaid && Date.now() < appealPeriodEnd * 1000)
+  }
+
+  // Update appealPeriod state of each item.
+  for (const address of Object.keys(cachedBadges.items))
+    cachedBadges.items[address].inAppealPeriod = !!addressesInAppealPeriod[
+      address
+    ]
 
   return cachedBadges
 }

@@ -143,6 +143,12 @@ class Tokens extends Component {
           return b.clientStatus - a.clientStatus
         else return 0
       })
+      .sort((a, b) => {
+        // Show items crowdfunding state first.
+        if (a.inAppealPeriod && !b.inAppealPeriod) return -1
+        else if (!a.inAppealPeriod && b.inAppealPeriod) return 1
+        else return 0
+      })
 
     const { currentPage } = this.state
     const totalPages = Math.ceil(filteredTokens.length / ITEMS_PER_PAGE)

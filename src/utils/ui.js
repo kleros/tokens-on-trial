@@ -298,6 +298,7 @@ export const sanitize = str => {
 }
 
 export const getItemStatusColor = item => {
+  if (item.inAppealPeriod) return '#4d00b4' // Purple.
   if (item.clientStatus === 0) return '#f60c36' // Red.
   if (item.clientStatus === 1) return '#009aff' // Blue.
   if (item.clientStatus > 3) return '#ff9900' // Orange.
@@ -305,6 +306,7 @@ export const getItemStatusColor = item => {
 }
 
 export const getItemStatusText = item => {
+  if (item.inAppealPeriod) return 'Crowdfunding'
   if (item.clientStatus === 0) return 'Absent'
   if (item.clientStatus === 1) return 'Registered'
   if (item.clientStatus > 3) return 'Challenged'

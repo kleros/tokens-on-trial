@@ -1,4 +1,4 @@
-import { put, takeLatest, call, all } from 'redux-saga/effects'
+import { put, takeLatest, call } from 'redux-saga/effects'
 
 import {
   FETCH_TOKENS_CACHE,
@@ -10,6 +10,7 @@ import {
   contractStatusToClientStatus,
   instantiateEnvObjects
 } from '../utils/tcr'
+import * as tcrConstants from '../constants/tcr'
 
 import { fetchAppealable, fetchEvents } from './utils'
 
@@ -219,20 +220,77 @@ function* fetchTokens() {
       arbitrableTokenListView
     )
 
-    const tokenIDsInAppealPeriod = yield all(
-      disputesInAppealPeriod.map(disputeID =>
-        call(
-          arbitrableTokenListView.methods.arbitratorDisputeIDToTokenID(
-            arbitratorView._address,
-            disputeID
-          ).call
-        )
-      )
-    )
+    // The appeal period can also be over if the arbitrators gave
+    // a decisive ruling (did not refuse or failed to rule) and the
+    // loser of the previous round did not get fully funded in within
+    // the first half of the appeal period.
+    // Remove items that fall under that category.
+    const tokenIDsInAppealPeriod = {}
+    for (const disputeID of Object.keys(disputesInAppealPeriod)) {
+      // To do this we must:
+      // 1- Find out which side lost the previous round.
+      // 2- Find out if the loser received enough arbitration fees.
 
-    tokenIDsInAppealPeriod.forEach(tokenID => {
-      cachedTokens.items[tokenID].inAppealPeriod = true
-    })
+      // 1- Find out which party lost the previous round.
+      const currentRuling = yield call(
+        arbitratorView.methods.currentRuling(disputeID).call
+      )
+      const tokenID = yield call(
+        arbitrableTokenListView.methods.arbitratorDisputeIDToTokenID(
+          arbitratorView._address,
+          disputeID
+        ).call
+      )
+
+      // If there was no decisive ruling, there is no loser and the rule does not apply.
+      if (currentRuling === tcrConstants.RULING_OPTIONS.None.toString()) {
+        tokenIDsInAppealPeriod[tokenID] = true
+        continue
+      }
+
+      const loser =
+        currentRuling.toString() ===
+        tcrConstants.RULING_OPTIONS.Accept.toString()
+          ? tcrConstants.SIDE.Challenger
+          : tcrConstants.SIDE.Requester
+
+      // 2- We start by fetching information on the latest round.
+      const numberOfRequests = Number(
+        (yield call(arbitrableTokenListView.methods.getTokenInfo(tokenID).call))
+          .numberOfRequests
+      )
+      const numberOfRounds = Number(
+        (yield call(
+          arbitrableTokenListView.methods.getRequestInfo(
+            tokenID,
+            numberOfRequests - 1
+          ).call
+        )).numberOfRounds
+      )
+      const latestRound = yield call(
+        arbitrableTokenListView.methods.getRoundInfo(
+          tokenID,
+          numberOfRequests - 1,
+          numberOfRounds - 1
+        ).call
+      )
+
+      const loserPaid = latestRound.hasPaid[loser]
+      const appealPeriodStart = disputesInAppealPeriod[disputeID][0]
+      const appealPeriodEnd = disputesInAppealPeriod[disputeID][1]
+      const endOfHalf =
+        appealPeriodStart + (appealPeriodEnd - appealPeriodStart) / 2
+
+      tokenIDsInAppealPeriod[tokenID] =
+        endOfHalf * 1000 > Date.now() ||
+        (loserPaid && Date.now() < appealPeriodEnd * 1000)
+    }
+
+    // Update appealPeriod state of each item.
+    for (const tokenID of Object.keys(cachedTokens.items))
+      cachedTokens.items[tokenID].inAppealPeriod = !!tokenIDsInAppealPeriod[
+        tokenID
+      ]
 
     localStorage.setItem(
       `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`,
