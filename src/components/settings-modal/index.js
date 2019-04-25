@@ -8,8 +8,14 @@ import * as walletActions from '../../actions/wallet'
 import * as walletSelectors from '../../reducers/wallet'
 import Button from '../../components/button'
 import NavOverlay from '../../components/nav-overlay'
+import { instantiateEnvObjects } from '../../utils/tcr'
+import { onlyInfura } from '../../bootstrap/dapp-api'
 
-import { SettingsForm, submitSettingsForm } from './components/settings-form'
+import {
+  SettingsForm,
+  submitSettingsForm,
+  getSettingsFormIsInvalid
+} from './components/settings-form'
 
 import './settings-modal.css'
 
@@ -21,6 +27,7 @@ class SettingsModal extends PureComponent {
     settings: walletSelectors.settingsShape.isRequired,
     accounts: walletSelectors.accountsShape.isRequired,
     envObjects: PropTypes.shape({}).isRequired,
+    settingsFormIsInvalid: PropTypes.bool.isRequired,
 
     // Handlers
     closeSettingsModal: PropTypes.func.isRequired,
@@ -42,8 +49,8 @@ class SettingsModal extends PureComponent {
   }
 
   handleUpdateSettingsClick = async ({ fullName, email, ...rest }) => {
-    const { accounts, envObjects } = this.props
-    const { web3 } = envObjects
+    const { accounts } = this.props
+    const { web3 } = await instantiateEnvObjects()
     const settings = {
       fullName: { S: fullName },
       email: { S: email },
@@ -83,6 +90,7 @@ class SettingsModal extends PureComponent {
       children,
       isSettingsModalOpen,
       settings,
+      settingsFormIsInvalid,
       submitSettingsForm
     } = this.props
 
@@ -125,6 +133,8 @@ class SettingsModal extends PureComponent {
                     <Button
                       className="SettingsModal-window-submit-button"
                       onClick={submitSettingsForm}
+                      disabled={settingsFormIsInvalid || onlyInfura}
+                      tooltip={onlyInfura ? 'Please install MetaMask.' : null}
                     >
                       Register
                     </Button>
@@ -144,7 +154,8 @@ export default connect(
     accounts: state.wallet.accounts,
     isSettingsModalOpen: state.modal.isSettingsModalOpen,
     settings: state.wallet.settings,
-    envObjects: state.envObjects.data
+    envObjects: state.envObjects.data,
+    settingsFormIsInvalid: getSettingsFormIsInvalid(state)
   }),
   {
     openSettingsModal: modalActions.openSettingsModal,
