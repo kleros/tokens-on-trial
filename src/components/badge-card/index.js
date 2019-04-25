@@ -32,7 +32,6 @@ const getBadgeHeaderText = badge => {
 const BadgeCard = ({
   badge,
   tokens,
-  displayTokenInfo,
   envObjects,
   arbitrableAddressListData
 }) => {
@@ -58,7 +57,7 @@ const BadgeCard = ({
       a.statusBlockNumber < b.statusBlockNumber ? -1 : 1
     )
   }
-  const token = displayTokenInfo ? tokenSubmissions[0] : null
+  const token = tokenSubmissions[0]
   const { FILE_BASE_URL } = envObjects
 
   return (
@@ -79,52 +78,58 @@ const BadgeCard = ({
           style={{ visibility: 'hidden' }}
         />{' '}
       </div>
-      <Link
-        className="BadgeCard-content"
-        to={`/badge/${web3Utils.toChecksumAddress(badge.badgeContractAddr)}/${
-          badge.address
-        }`}
-      >
-        {displayTokenInfo ? (
-          !tokens.loading || token ? (
-            <Img
-              alt="Token List Submission"
-              className="TokenCard-image"
-              src={
-                token
-                  ? token.symbolMultihash[0] === '/'
-                    ? `${IPFS_URL}${token.symbolMultihash}`
-                    : `${FILE_BASE_URL}/${token.symbolMultihash}`
-                  : UnknownToken
-              }
-            />
-          ) : (
-            <BeatLoader color="#3d464d" />
-          )
-        ) : (
+      <div>
+        <Link
+          className="BadgeCard-content"
+          to={`/badge/${web3Utils.toChecksumAddress(badge.badgeContractAddr)}/${
+            badge.address
+          }`}
+          style={{ padding: '15px' }}
+        >
           <Img
             alt="Badge List Submission"
             className="BadgeCard-image"
             src={`${IPFS_URL}${symbolURI}`}
           />
-        )}
-      </Link>
+          <div
+            style={{
+              minHeight: '30px',
+              display: 'flex',
+              alignItems: 'center',
+              marginTop: '12px'
+            }}
+          >
+            <h5
+              style={{
+                margin: 0,
+                textAlign: 'center',
+                maxWidth: '200px'
+              }}
+            >
+              {title} Compliant
+            </h5>
+          </div>
+        </Link>
+      </div>
       <div className="BadgeCard-footer">
-        {displayTokenInfo ? (
-          <h5 className="BadgeCard-footer-text">
-            {(!tokens.loading || token) && `${title} Compliant`}
-            <br />
-            {!tokens.loading || token
-              ? token
-                ? `${token.ticker ? token.ticker : ''}
-                ${token.name && token.ticker ? '-' : ''}
-                ${token.name ? token.name : ''}`
-                : `Unknown Token`
-              : 'Loading...'}
-          </h5>
-        ) : (
-          <h5 className="BadgeCard-footer-text">Compliant with {title}</h5>
-        )}
+        <Img
+          src={
+            token
+              ? token.symbolMultihash[0] === '/'
+                ? `${IPFS_URL}${token.symbolMultihash}`
+                : `${FILE_BASE_URL}/${token.symbolMultihash}`
+              : UnknownToken
+          }
+          style={{ width: '25px' }}
+        />
+        <h5 className="BadgeCard-footer-text">
+          {token ? `${token.name} - ${token.ticker}` : 'Unknown Token'}
+        </h5>
+        {/* Used for spacing only. */}
+        <Img
+          src={UnknownToken}
+          style={{ visibility: 'hidden', width: '17px' }}
+        />
       </div>
     </div>
   )
@@ -134,12 +139,7 @@ BadgeCard.propTypes = {
   tokens: tokenSelectors.tokensShape.isRequired,
   badge: cacheItemShape.isRequired,
   envObjects: PropTypes.shape({}).isRequired,
-  displayTokenInfo: PropTypes.bool,
   arbitrableAddressListData: arbitrableAddressListDataShape.isRequired
-}
-
-BadgeCard.defaultProps = {
-  displayTokenInfo: false
 }
 
 export default connect(state => ({

@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   height: 230px;
+  justify-content: space-between;
   margin: 16px 14px;
   width: 248px;
 
@@ -17,6 +18,7 @@
     align-items: center;
     background-color: #009aff;
     border-bottom: 1px solid #ebebeb;
+    border-radius: 3px 3px 0 0;
     color: white;
     display: flex;
     flex-direction: row;
@@ -29,17 +31,21 @@
   &-content {
     align-items: center;
     display: flex;
+    flex-direction: column;
     flex-grow: 1;
     justify-content: center;
+    text-decoration: none;
   }
 
   &-footer {
     align-content: center;
     align-items: center;
     background-color: #f8f8f8;
+    border-radius: 0 0 3px 3px;
     display: flex;
-    height: 58px;
-    justify-content: center;
+    height: 39px;
+    justify-content: space-between;
+    padding: 0 10px;
 
     &-badge {
       width: 30px;
@@ -55,9 +61,9 @@
   }
 
   &-image {
-    height: 90px;
+    height: 80px;
     object-fit: contain;
-    width: 90px;
+    width: 80px;
   }
 
   &-hidden {
