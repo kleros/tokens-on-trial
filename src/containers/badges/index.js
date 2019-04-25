@@ -75,8 +75,8 @@ class Badges extends Component {
     const userAccount = accounts[0]
 
     // Merge badges from all contracts
-    const badgesData = Object.keys(badges)
-      .map(badgeContractAddr => badges[badgeContractAddr])
+    const badgesData = Object.keys(badges.data)
+      .map(badgeContractAddr => badges.data[badgeContractAddr])
       .reduce(
         (acc, curr) =>
           acc.concat(Object.keys(curr.items).map(addr => curr.items[addr])),
@@ -131,7 +131,7 @@ class Badges extends Component {
         />
         <SortBar
           displayedItemsCount={displayedBadges.length}
-          items={badges}
+          items={badges.data}
           totalFiltered={filteredBadges.length}
         />
         <div className="BadgeGrid">
@@ -148,9 +148,7 @@ class Badges extends Component {
               </p>
             ) : (
               <>
-                {(displayedBadges.length > 0 || !badges.loading) &&
-                !arbitrableAddressListData.loading &&
-                arbitrableAddressListData.data ? (
+                {displayedBadges.length > 0 || !badges.loading ? (
                   displayedBadges.map(badge => (
                     <BadgeCard
                       badge={badge}
@@ -184,7 +182,7 @@ class Badges extends Component {
 export default withRouter(
   connect(
     state => ({
-      badges: state.badges.data,
+      badges: state.badges,
       tokens: state.tokens,
       filter: state.filter,
       accounts: state.wallet.accounts.data,
