@@ -112,21 +112,22 @@ const BadgeCard = ({
         </Link>
       </div>
       <div className="BadgeCard-footer">
-        <Img
-          src={
-            token
-              ? token.symbolMultihash[0] === '/'
-                ? `${IPFS_URL}${token.symbolMultihash}`
-                : `${FILE_BASE_URL}/${token.symbolMultihash}`
-              : UnknownToken
-          }
-          style={{ width: '25px' }}
-        />
+        <Link to={`/token/${token.ID}`} style={{ height: '25px' }}>
+          <Img
+            src={
+              token
+                ? token.symbolMultihash[0] === '/'
+                  ? `${IPFS_URL}${token.symbolMultihash}`
+                  : `${FILE_BASE_URL}/${token.symbolMultihash}`
+                : UnknownToken
+            }
+            style={{ width: '25px' }}
+          />
+        </Link>
         <h5 className="BadgeCard-footer-text">
           {token ? `${token.name} - ${token.ticker}` : 'Unknown Token'}
         </h5>
-        {/* Used for spacing only. */}
-        <Img
+        <Img /* Used for spacing only. */
           src={UnknownToken}
           style={{ visibility: 'hidden', width: '17px' }}
         />
