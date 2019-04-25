@@ -35,8 +35,12 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
         style={{ visibility: 'hidden' }}
       />{' '}
     </div>
-    <div style={{ padding: '15px' }}>
-      <Link className="TokenCard-content" to={`/token/${token.ID}`}>
+    <div>
+      <Link
+        style={{ padding: '15px' }}
+        className="TokenCard-content"
+        to={`/token/${token.ID}`}
+      >
         <Img
           alt="Token List Submission"
           className="TokenCard-image"
@@ -46,7 +50,7 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
               : `${FILE_BASE_URL}/`
           }${token.symbolMultihash}`}
         />
-        <h5 style={{ marginBottom: 0, marginTop: '12px' }}>
+        <h5 style={{ marginBottom: 0, marginTop: '12px', textAlign: 'center' }}>
           {`${token.name} ${token.name && token.ticker ? '-' : ''} ${
             token.ticker
           }`}
