@@ -111,8 +111,11 @@ const BadgeCard = ({
           </div>
         </Link>
       </div>
-      <div className="BadgeCard-footer">
-        <Link to={`/token/${token.ID}`} style={{ height: '25px' }}>
+      <Link
+        to={token ? `/token/${token.ID}` : ''}
+        style={{ pointerEvents: token ? '' : 'none', textDecoration: 'none' }}
+      >
+        <div className="BadgeCard-footer">
           <Img
             src={
               token
@@ -123,15 +126,15 @@ const BadgeCard = ({
             }
             style={{ width: '25px' }}
           />
-        </Link>
-        <h5 className="BadgeCard-footer-text">
-          {token ? `${token.name} - ${token.ticker}` : 'Unknown Token'}
-        </h5>
-        <Img /* Used for spacing only. */
-          src={UnknownToken}
-          style={{ visibility: 'hidden', width: '17px' }}
-        />
-      </div>
+          <h5 className="BadgeCard-footer-text">
+            {token ? `${token.name} - ${token.ticker}` : 'Unknown Token'}
+          </h5>
+          <Img /* Used for spacing only. */
+            src={UnknownToken}
+            style={{ visibility: 'hidden', width: '17px' }}
+          />
+        </div>
+      </Link>
     </div>
   )
 }
