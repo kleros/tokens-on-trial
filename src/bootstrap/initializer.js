@@ -21,6 +21,7 @@ class ContractsProvider extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     fetchAccounts: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired,
     notifications: PropTypes.shape({}).isRequired,
     envObjects: PropTypes.shape({
       networkID: PropTypes.number.isRequired
@@ -31,8 +32,9 @@ class ContractsProvider extends Component {
 
   async componentDidMount() {
     const envObjects = await instantiateEnvObjects()
-    const { arbitrableTokenListView } = envObjects
+    const { arbitrableTokenListView, arbitrableTokenListEvents } = envObjects
     this.setState({ envObjects })
+    const { fetchTokens } = this.props
 
     // Save notifications on unload.
     window.addEventListener('unload', () => {
@@ -43,6 +45,10 @@ class ContractsProvider extends Component {
         }.notifications@${APP_VERSION}`,
         JSON.stringify(notifications)
       )
+    })
+
+    arbitrableTokenListEvents.events.TokenStatusChange(() => {
+      fetchTokens()
     })
   }
 
