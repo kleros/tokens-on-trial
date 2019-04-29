@@ -57,7 +57,7 @@ const Submit = ({
           {/* TODO: Swap hardcoded link for version fetched from latest meta evidence in the contract. */}
           <a
             className="TokenDetails-withdraw"
-            href="ipfs.kleros.io/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf"
+            href="https://ipfs.kleros.io/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf"
             target="_blank"
             rel="noopener noreferrer"
             style={{ margin: 0, textDecoration: 'underline' }}
