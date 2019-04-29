@@ -53,7 +53,7 @@ const Submit = ({
           className="Modal-subtitle"
           style={{ marginBottom: 0, marginTop: '10px' }}
         >
-          See the
+          See the{' '}
           {/* TODO: Swap hardcoded link for version fetched from latest meta evidence in the contract. */}
           <a
             className="TokenDetails-withdraw"
