@@ -32,12 +32,7 @@ const emitBadgeNotifications = async (
   timeToChallenge,
   emit,
   events,
-  {
-    arbitrableAddressListView,
-    arbitrableTokenListView,
-    viewWeb3,
-    ETHFINEX_BADGE_BLOCK
-  }
+  { arbitrableAddressListView, arbitrableTokenListView, viewWeb3, fromBlock }
 ) => {
   const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
@@ -53,7 +48,7 @@ const emitBadgeNotifications = async (
       `RequestSubmitted`,
       {
         filter: { _address: returnValues._address },
-        fromBlock: ETHFINEX_BADGE_BLOCK,
+        fromBlock,
         toBlock: `latest`
       }
     )

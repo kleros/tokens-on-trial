@@ -34,13 +34,11 @@ function* pushNotificationsListener() {
     arbitrableTokenListView,
     arbitrableAddressListView,
     arbitratorView,
-    T2CR_BLOCK,
     viewWeb3,
-    ETHFINEX_BADGE_BLOCK,
-    ARBITRATOR_BLOCK,
     arbitratorEvents,
     arbitrableAddressListEvents,
-    arbitrableTokenListEvents
+    arbitrableTokenListEvents,
+    latestBlock
   } = yield call(instantiateEnvObjects)
 
   // Get cached notifications
@@ -74,19 +72,20 @@ function* pushNotificationsListener() {
       // a dictionary of txHashes and only emit notifications if the event is unique.
       // https://ethereum.stackexchange.com/questions/62799/problem-with-multiple-event-listeners-duplicated-event-triggers#
       const txHashes = {}
+      const fromBlock =
+        localStorage.getItem(
+          `${arbitrableTokenListView.options.address}nextEventsBlockNumber`
+        ) || latestBlock
 
       // T2CR events
       arbitrableTokenListView
         .getPastEvents('TokenStatusChange', {
-          fromBlock:
-            localStorage.getItem(
-              `${arbitrableTokenListView.options.address}nextEventsBlockNumber`
-            ) || T2CR_BLOCK
+          fromBlock
         })
         .then(events => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events, {
             arbitrableTokenListView,
-            T2CR_BLOCK,
+            fromBlock,
             viewWeb3
           })
         })
@@ -99,7 +98,7 @@ function* pushNotificationsListener() {
           txHashes[event.transactionHash] = true
           emitTokenNotifications(account, t2crTimeToChallenge, emit, [event], {
             arbitrableTokenListView,
-            T2CR_BLOCK,
+            fromBlock,
             viewWeb3
           })
         }
@@ -108,19 +107,14 @@ function* pushNotificationsListener() {
       // Badge events
       arbitrableAddressListView
         .getPastEvents('AddressStatusChange', {
-          fromBlock:
-            localStorage.getItem(
-              `${
-                arbitrableAddressListView.options.address
-              }nextEventsBlockNumber`
-            ) || ETHFINEX_BADGE_BLOCK
+          fromBlock
         })
         .then(events => {
           emitBadgeNotifications(account, badgeTimeToChallenge, emit, events, {
             arbitrableAddressListView,
             arbitrableTokenListView,
             viewWeb3,
-            ETHFINEX_BADGE_BLOCK
+            fromBlock
           })
         })
       arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
@@ -134,7 +128,7 @@ function* pushNotificationsListener() {
             arbitrableAddressListView,
             arbitrableTokenListView,
             viewWeb3,
-            ETHFINEX_BADGE_BLOCK
+            fromBlock
           })
         }
       })
@@ -142,18 +136,14 @@ function* pushNotificationsListener() {
       // Arbitator events
       arbitratorView
         .getPastEvents('AppealPossible', {
-          fromBlock:
-            localStorage.getItem(
-              `${arbitratorView.options.address}nextEventsBlockNumber`
-            ) || ARBITRATOR_BLOCK
+          fromBlock
         })
         .then(events => {
           emitArbitratorNotifications(account, emit, events, {
             arbitrableAddressListView,
             arbitratorView,
             arbitrableTokenListView,
-            viewWeb3,
-            ETHFINEX_BADGE_BLOCK
+            viewWeb3
           })
         })
       arbitratorEvents.events.AppealPossible((err, event) => {
@@ -167,8 +157,7 @@ function* pushNotificationsListener() {
             arbitrableAddressListView,
             arbitratorView,
             arbitrableTokenListView,
-            viewWeb3,
-            ETHFINEX_BADGE_BLOCK
+            viewWeb3
           })
         }
       })

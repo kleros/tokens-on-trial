@@ -92,6 +92,8 @@ export const instantiateEnvObjects = async () => {
     ARBITRATOR_ADDRESS
   )
 
+  const latestBlock = (await viewWeb3.eth.getBlock('latest')).number
+
   return {
     arbitrableTokenList,
     arbitrableAddressList,
@@ -114,7 +116,8 @@ export const instantiateEnvObjects = async () => {
     web3,
     viewWeb3,
     eventsWeb3,
-    networkID
+    networkID,
+    latestBlock
   }
 }
 
