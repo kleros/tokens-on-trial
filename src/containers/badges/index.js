@@ -83,7 +83,7 @@ class Badges extends Component {
         []
       )
 
-    const { filters } = filter
+    const { filters, badgeFilters } = filter
 
     const filteredBadges = badgesData
       .filter(badge => {
@@ -104,6 +104,7 @@ class Badges extends Component {
 
         return false
       })
+      .filter(badge => badgeFilters[badge.badgeContractAddr])
       .sort((a, b) => {
         const { oldestFirst } = filter
         if (oldestFirst) return a.blockNumber < b.blockNumber ? -1 : 1
@@ -133,6 +134,7 @@ class Badges extends Component {
           displayedItemsCount={displayedBadges.length}
           items={badges.data}
           totalFiltered={filteredBadges.length}
+          displayBadgeFilters
         />
         <div className="BadgeGrid">
           <div className="BadgeGrid-container">

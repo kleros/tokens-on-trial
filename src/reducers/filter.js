@@ -26,7 +26,8 @@ export { filterShape }
 export default createReducer(
   {
     oldestFirst: 0,
-    filters: defaultFilter()
+    filters: defaultFilter(),
+    badgeFilters: {}
   },
   {
     [filterActions.SET_OLDEST_FIRST]: (
@@ -49,6 +50,20 @@ export default createReducer(
         filters: {
           ...state.filters,
           [key]: !state.filters[key]
+        }
+      }
+      localStorage.setItem(
+        `${tcr.options.address}filter@${APP_VERSION}`,
+        JSON.stringify(newState)
+      )
+      return newState
+    },
+    [filterActions.TOGGLE_BADGE_FILTER]: (state, { payload: { key, tcr } }) => {
+      const newState = {
+        ...state,
+        badgeFilters: {
+          ...state.badgeFilters,
+          [key]: !state.badgeFilters[key]
         }
       }
       localStorage.setItem(

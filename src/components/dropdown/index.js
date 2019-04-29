@@ -82,14 +82,7 @@ class Dropdown extends PureComponent {
         } ${isOpen ? 'is-open' : ''} ${className}`}
       >
         <div className="Dropdown-box" onClick={this.handleBoxClick}>
-          {isCheckbox ? (
-            <span>
-              <FontAwesomeIcon icon="sliders-h" />
-              &nbsp;&nbsp;&nbsp;&nbsp;{label}
-            </span>
-          ) : (
-            options[value]
-          )}
+          {isCheckbox ? <span>&nbsp;&nbsp;{label}</span> : options[value]}
           <FontAwesomeIcon className="Dropdown-box-caret" icon="caret-down" />
         </div>
         {isOpen && (

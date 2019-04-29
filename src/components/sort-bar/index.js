@@ -7,7 +7,7 @@ import * as filterConstants from '../../constants/filter'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
-import { cacheItemShape } from '../../reducers/generic-shapes'
+import { cacheItemShape, tcrShape } from '../../reducers/generic-shapes'
 
 import './sort-bar.css'
 
@@ -22,9 +22,16 @@ class SortBar extends PureComponent {
     filter: filterSelectors.filterShape.isRequired,
     displayedItemsCount: PropTypes.number.isRequired,
     totalFiltered: PropTypes.number.isRequired,
+    displayBadgeFilters: PropTypes.bool,
+    arbitrableAddressListData: tcrShape.isRequired,
 
     // Action Dispatchers
-    setOldestFirst: PropTypes.func.isRequired
+    setOldestFirst: PropTypes.func.isRequired,
+    toggleBadgeFilter: PropTypes.func.isRequired
+  }
+
+  static defaultProps = {
+    displayBadgeFilters: false
   }
 
   static contextType = ContractsContext
@@ -35,9 +42,54 @@ class SortBar extends PureComponent {
     setOldestFirst(oldestFirst, arbitrableTokenListView)
   }
 
+  handleBadgeChange = badgeContractIndexes => {
+    const { arbitrableTokenListView } = this.context
+    const { toggleBadgeFilter, filter, arbitrableAddressListData } = this.props
+    const { badgeFilters } = filter
+
+    Object.keys(arbitrableAddressListData).forEach((addr, i) => {
+      if (!badgeContractIndexes.includes(i) && badgeFilters[addr])
+        // Disabling badge
+        toggleBadgeFilter(addr, arbitrableTokenListView)
+      else if (badgeContractIndexes.includes(i) && !badgeFilters[addr])
+        // Enabling badge
+        toggleBadgeFilter(addr, arbitrableTokenListView)
+    })
+  }
+
+  componentDidUpdate() {
+    const { filter, arbitrableAddressListData, toggleBadgeFilter } = this.props
+    if (!this.context || !arbitrableAddressListData) return
+    const { arbitrableTokenListView } = this.context
+    const { badgeFilters } = filter
+    Object.keys(arbitrableAddressListData).forEach(badgeContractAddr => {
+      if (!(badgeContractAddr in badgeFilters))
+        toggleBadgeFilter(badgeContractAddr, arbitrableTokenListView)
+    })
+  }
+
   render() {
-    const { displayedItemsCount, items, filter, totalFiltered } = this.props
-    const { oldestFirst } = filter
+    const {
+      displayedItemsCount,
+      items,
+      filter,
+      totalFiltered,
+      arbitrableAddressListData,
+      displayBadgeFilters
+    } = this.props
+    const { oldestFirst, badgeFilters } = filter
+    const selectedBadges = []
+
+    Object.keys(badgeFilters).forEach((badgeContractAddr, i) => {
+      if (badgeFilters[badgeContractAddr] === true) selectedBadges.push(i)
+    })
+
+    const badgeContracts = arbitrableAddressListData
+      ? Object.keys(arbitrableAddressListData).map(badgeContractAddr => ({
+          title: arbitrableAddressListData[badgeContractAddr].variables.title,
+          badgeContractAddr
+        }))
+      : []
 
     return (
       <div className="SortBar">
@@ -56,6 +108,16 @@ class SortBar extends PureComponent {
             type="radio"
             value={oldestFirst || 0}
           />
+          {displayBadgeFilters && (
+            <Dropdown
+              value={selectedBadges}
+              label="Badge Type:"
+              type="checkbox"
+              options={badgeContracts.map(badgeContract => badgeContract.title)}
+              onChange={this.handleBadgeChange}
+              className="SortBar-dropdowns-dropdown"
+            />
+          )}
         </div>
       </div>
     )
@@ -64,10 +126,13 @@ class SortBar extends PureComponent {
 
 export default connect(
   state => ({
-    filter: state.filter
+    filter: state.filter,
+    arbitrableAddressListData:
+      state.arbitrableAddressList.arbitrableAddressListData.data
   }),
   {
     setOldestFirst: filterActions.setOldestFirst,
-    toggleFilter: filterActions.toggleFilter
+    toggleFilter: filterActions.toggleFilter,
+    toggleBadgeFilter: filterActions.toggleBadgeFilter
   }
 )(SortBar)

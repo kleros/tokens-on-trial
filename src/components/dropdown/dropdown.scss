@@ -3,7 +3,7 @@
 /* @define Dropdown */
 .Dropdown {
   color: $grey;
-  margin-left: 10px;
+  margin-left: 3px;
   margin-top: -5px;
   position: relative;
   user-select: none;
@@ -18,7 +18,7 @@
     line-height: 25px;
 
     .Dropdown--checkbox & {
-      padding-right: 39px;
+      padding-right: 15px;
     }
 
     .Dropdown--inverted & {
@@ -27,7 +27,7 @@
     }
 
     &-caret {
-      margin-left: 10px;
+      margin-left: 5px;
       position: absolute;
       top: 5px;
       transition: transform 0.25s;
@@ -48,7 +48,7 @@
     left: -25px;
     position: absolute;
     top: 30px;
-    width: 90px;
+    width: 150px;
     z-index: 1;
 
     &-option {
@@ -58,6 +58,7 @@
       &:hover,
       &.is-active {
         background: $mint;
+        border-radius: 4px;
         color: $grey;
       }
 
@@ -70,10 +71,7 @@
         border-radius: 4px;
         display: inline-block;
         height: 12px;
-        left: 10px;
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
+        margin-right: 6px;
         width: 12px;
 
         .Dropdown-options-option.is-active & {
@@ -83,9 +81,8 @@
 
         &-check {
           height: 8px;
-          left: 1px;
-          position: absolute;
-          top: 1px;
+          margin-bottom: 7px;
+          margin-left: 1px;
           width: 8px !important;
         }
       }
