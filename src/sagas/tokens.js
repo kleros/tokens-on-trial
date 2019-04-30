@@ -118,7 +118,9 @@ function* fetchTokens() {
     const statusChanges = yield call(
       fetchEvents,
       'TokenStatusChange',
-      tokens.statusBlockNumber,
+      tokens.statusBlockNumber < blockNumber
+        ? tokens.statusBlockNumber
+        : blockNumber,
       arbitrableTokenListView
     )
 
