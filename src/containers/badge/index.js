@@ -23,6 +23,7 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 import { ContractsContext } from '../../bootstrap/contexts'
 import WithdrawFundsButton from '../../components/withdraw-funds'
+import CrowdfundingCard from '../crowdfunding-card'
 
 import BadgeDetailsCard from './badge-details-card'
 import TokenInfo from './token-info'
@@ -521,6 +522,12 @@ class BadgeDetails extends PureComponent {
           fundAppeal={this.fundAppeal}
         />
         <br />
+        <CrowdfundingCard
+          item={badge}
+          userAccount={accounts.data[0]}
+          tcrData={arbitrableAddressListData.data[badgeAddr]}
+          fundAppeal={this.fundAppeal}
+        />
         <Evidence
           item={badge}
           evidences={evidences}

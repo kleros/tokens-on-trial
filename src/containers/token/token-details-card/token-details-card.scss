@@ -38,7 +38,12 @@
     flex-direction: column;
     flex-grow: 2;
     justify-content: space-between;
+    transition: 0.3s;
     width: 100%;
+
+    &:hover {
+      box-shadow: 0 6px 12px $shadowRaised;
+    }
 
     &-info {
       padding: 17px 0;
@@ -179,6 +184,7 @@
 
   &-actionWrapper {
     background: rgb(248, 248, 248);
+    border-radius: 0 3px 0 0;
     display: flex;
     margin-left: 26px;
     min-width: 200px;

@@ -51,9 +51,6 @@ const TokenDetailsCard = ({
     decisiveRuling
   )
 
-  const [challengePeriodCompleted, setChallengePeriodCompleted] = useState(
-    remainingTime <= 0
-  )
   const [appealPeriodEnded, setAppealPeriodEnded] = useState(remainingTime <= 0)
   const [loserTimedOut, setLoserTimedOut] = useState(
     remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
@@ -96,7 +93,6 @@ const TokenDetailsCard = ({
               tcrData={arbitrableTokenListData}
               onAppealPeriodEnd={setAppealPeriodEnded}
               onLoserTimedOut={setLoserTimedOut}
-              onChallengePeriodEnd={setChallengePeriodCompleted}
             />
           </div>
           <CrowdfundingProgress
@@ -113,7 +109,6 @@ const TokenDetailsCard = ({
               handleActionClick={handleActionClick}
               handleExecuteRequestClick={handleExecuteRequestClick}
               appealPeriodEnded={appealPeriodEnded}
-              challendePeriodEnded={challengePeriodCompleted}
               loserTimedOut={loserTimedOut}
             />
           </div>

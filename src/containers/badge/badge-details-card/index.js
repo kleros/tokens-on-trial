@@ -55,9 +55,6 @@ const BadgeDetailsCard = ({
     decisiveRuling
   )
 
-  const [challengePeriodCompleted, setChallengePeriodCompleted] = useState(
-    false
-  )
   const [appealPeriodEnded, setAppealPeriodEnded] = useState(remainingTime <= 0)
   const [loserTimedOut, setLoserTimedOut] = useState(
     remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
@@ -102,7 +99,6 @@ const BadgeDetailsCard = ({
                 tcrData={tcrData}
                 onAppealPeriodEnd={setAppealPeriodEnded}
                 onLoserTimedOut={setLoserTimedOut}
-                onChallengePeriodEnd={setChallengePeriodCompleted}
               />
             </div>
           </div>
@@ -160,7 +156,6 @@ const BadgeDetailsCard = ({
               handleActionClick={handleActionClick}
               handleExecuteRequestClick={handleExecuteRequestClick}
               appealPeriodEnded={appealPeriodEnded}
-              challendePeriodEnded={challengePeriodCompleted}
               loserTimedOut={loserTimedOut}
               badgeContractAddr={tcr.options.address}
             />

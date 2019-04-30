@@ -1,0 +1,83 @@
+@import '../../styles/_colors.scss';
+
+/* @define CrowdfundingCard */
+.CrowdfundingCard {
+  background: linear-gradient(101.6deg, #4d00b4 48.27%, #6500b4 86.4%);
+  border: 1px solid #d09cff;
+  border-radius: 3px;
+  box-shadow: 0 3px 6px rgba(172, 125, 214, 0.941);
+  color: white;
+  display: flex;
+  height: 200px;
+  margin: 22px 0;
+  transition: 0.3s;
+  width: 100%;
+
+  &:hover {
+    box-shadow: 0 6px 12px rgba(172, 125, 214, 0.74);
+  }
+
+  &-info {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 22px;
+    width: 22%;
+
+    &-title {
+      color: white;
+      font-size: 18px;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 25px;
+      margin: 0;
+      text-align: center;
+    }
+
+    &-paragraph {
+      color: white;
+      font-size: 14px;
+      font-style: normal;
+      font-weight: normal;
+      line-height: 16px;
+      max-width: 90%;
+      text-align: center;
+    }
+  }
+
+  &-status {
+    align-items: center;
+    border-left: 1px solid #d19bfd5c;
+    border-right: 1px solid #d19bfd5c;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    padding: 22px;
+    width: 56%;
+
+    &-parties {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      justify-content: space-evenly;
+    }
+
+    &-outcome {
+      align-items: flex-start;
+      display: flex;
+      flex-direction: row;
+    }
+  }
+
+  &-action {
+    align-items: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 22px;
+    width: 22%;
+  }
+}

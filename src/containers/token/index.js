@@ -23,6 +23,7 @@ import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import { ContractsContext } from '../../bootstrap/contexts'
 import Evidence from '../../components/evidence'
+import CrowdfundingCard from '../crowdfunding-card'
 
 import Badges from './badges'
 import TokenDetailsCard from './token-details-card'
@@ -487,6 +488,12 @@ class TokenDetails extends PureComponent {
           arbitrableTokenListData={arbitrableTokenListData.data}
           handleActionClick={this.handleActionClick}
           handleExecuteRequestClick={this.handleExecuteRequestClick}
+          fundAppeal={this.fundAppeal}
+        />
+        <CrowdfundingCard
+          item={token}
+          userAccount={accounts.data[0]}
+          tcrData={arbitrableTokenListData}
           fundAppeal={this.fundAppeal}
         />
         <Evidence
