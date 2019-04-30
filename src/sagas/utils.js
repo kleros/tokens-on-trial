@@ -36,7 +36,7 @@ export function* fetchAppealable(arbitratorView, ARBITRATOR_BLOCK, tcrView) {
   // In the current version of KlerosLiquid, NewPeriod is not emitted when
   // a dispute enters the evidence period due to an appeal being raised
   // and so it can't be used to reliably to track the latest period of disputes.
-  // We work around this by using the AppealDecision events, which are
+  // We work around this by also using the AppealDecision events, which are
   // emited when an appeal is raised.
   const appealDecisionEvents = (yield call(
     fetchEvents,
@@ -102,11 +102,9 @@ export function* fetchAppealable(arbitratorView, ARBITRATOR_BLOCK, tcrView) {
     ]
 
     if (
-      appealPeriod[1] === 0 ||
-      Date.now() > appealPeriod[1] * 1000 // Convert to milliseconds.
+      !(appealPeriod[1] === 0 || Date.now() > appealPeriod[1] * 1000) // Convert to milliseconds.
     )
-      delete tcrPeriodChangeEvents[disputeID]
-    else returnedItems[disputeID] = appealPeriod
+      returnedItems[disputeID] = appealPeriod
   }
 
   return returnedItems
