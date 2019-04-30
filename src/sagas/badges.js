@@ -95,13 +95,16 @@ function* fetchItems({
   })
 
   // Mark items in appeal period.
-  // Fetch token disputes in appeal period.
+  // Fetch badge disputes in appeal period.
   const disputesInAppealPeriod = yield call(
     fetchAppealable,
     arbitratorView,
     ARBITRATOR_BLOCK,
     arbitrableAddressListView
   )
+
+  console.info('disputes', disputesInAppealPeriod)
+  // 0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab
 
   // The appeal period can also be over if the arbitrators gave
   // a decisive ruling (did not refuse or failed to rule) and the
@@ -119,7 +122,7 @@ function* fetchItems({
       arbitratorView.methods.currentRuling(disputeID).call
     )
     const address = yield call(
-      arbitrableAddressListView.methods.arbitratorDisputeIDToTokenID(
+      arbitrableAddressListView.methods.arbitratorDisputeIDToAddress(
         arbitratorView._address,
         disputeID
       ).call

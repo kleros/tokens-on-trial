@@ -10,24 +10,11 @@ import UnknownToken from '../../assets/images/unknown.svg'
 import { IPFS_URL, web3Utils } from '../../bootstrap/dapp-api'
 import { cacheItemShape } from '../../reducers/generic-shapes'
 import { arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
+import { getItemStatusColor, getItemStatusText } from '../../utils/ui'
 import * as tokenSelectors from '../../reducers/token'
 import * as tcrConstants from '../../constants/tcr'
 
 import './badge-card.css'
-
-const getBadgeColor = badge => {
-  if (badge.clientStatus === 0) return '#f60c36' // red
-  if (badge.clientStatus === 1) return '#009aff' // blue
-  if (badge.clientStatus > 3) return '#ff9900' // orange
-  return '#ccc'
-}
-
-const getBadgeHeaderText = badge => {
-  if (badge.clientStatus === 0) return 'Absent' // red
-  if (badge.clientStatus === 1) return 'Registered'
-  if (badge.clientStatus > 3) return 'Challenged'
-  return 'Pending'
-}
 
 const BadgeCard = ({
   badge,
@@ -64,13 +51,13 @@ const BadgeCard = ({
     <div className="BadgeCard">
       <div
         className="BadgeCard-header"
-        style={{ backgroundColor: getBadgeColor(badge) }}
+        style={{ backgroundColor: getItemStatusColor(badge) }}
       >
         <FontAwesomeIcon
           color="white"
           icon={tcrConstants.STATUS_ICON_ENUM[badge.clientStatus]}
         />
-        <h5 style={{ color: 'white' }}>{getBadgeHeaderText(badge)}</h5>
+        <h5 style={{ color: 'white' }}>{getItemStatusText(badge)}</h5>
         {/* Hidden icon used for spacing only. */}
         <FontAwesomeIcon
           color="white"
