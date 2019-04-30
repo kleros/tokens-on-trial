@@ -12,7 +12,12 @@
   height: 230px;
   justify-content: space-between;
   margin: 16px 14px;
+  transition: 0.3s;
   width: 248px;
+
+  &:hover {
+    box-shadow: 0 6px 12px $shadowRaised;
+  }
 
   &-header {
     align-items: center;
