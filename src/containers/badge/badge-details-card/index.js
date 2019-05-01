@@ -102,43 +102,45 @@ const BadgeDetailsCard = ({
               />
             </div>
           </div>
-          <div
-            style={{
-              width: '435px',
-              margin: '17px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              borderLeft: '1px solid #CCCCCC',
-              padding: '17px',
-              marginRigh: 0,
-              paddingRight: 0,
-              justifyContent: 'center'
-            }}
-          >
-            <FontAwesomeIcon
-              color="#4d00b4"
-              icon="exclamation-triangle"
+          {appealable && (
+            <div
               style={{
-                width: '30px',
-                height: '30px',
-                margin: '15px',
-                marginTop: 0
-              }}
-            />
-            <p
-              style={{
-                color: '#4d00b4',
-                fontSize: '14px',
-                lineHeight: '16px',
-                textAlign: 'center'
+                width: '435px',
+                margin: '17px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                borderLeft: '1px solid #CCCCCC',
+                padding: '17px',
+                marginRigh: 0,
+                paddingRight: 0,
+                justifyContent: 'center'
               }}
             >
-              If the loser complete it’s appeal funding, the winner of the
-              previous round should also fully fund the appeal, in order not to
-              lose the case.
-            </p>
-          </div>
+              <FontAwesomeIcon
+                color="#4d00b4"
+                icon="exclamation-triangle"
+                style={{
+                  width: '30px',
+                  height: '30px',
+                  margin: '15px',
+                  marginTop: 0
+                }}
+              />
+              <p
+                style={{
+                  color: '#4d00b4',
+                  fontSize: '14px',
+                  lineHeight: '16px',
+                  textAlign: 'center'
+                }}
+              >
+                If the loser complete it’s appeal funding, the winner of the
+                previous round should also fully fund the appeal, in order not
+                to lose the case.
+              </p>
+            </div>
+          )}
         </div>
         <div className="BadgeDetails-footer">
           <div className="BadgeDetails-footer-short">
