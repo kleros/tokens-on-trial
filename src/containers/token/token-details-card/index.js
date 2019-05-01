@@ -9,7 +9,6 @@ import LatestRuling from '../../../components/latest-ruling'
 import PeriodCountdown from '../../../components/period-countdown'
 import EtherScanLogo from '../../../assets/images/etherscan.png'
 import UserActionCountdown from '../../../components/user-action-countdown'
-import CrowdfundingProgress from '../../../components/crowdfunding-prog'
 import ItemActionButton from '../../item-action-button'
 import { IPFS_URL, web3Utils } from '../../../bootstrap/dapp-api'
 import WaitingBadge from '../../../assets/images/badges/badge-waiting.svg'
@@ -30,7 +29,7 @@ const TokenDetailsCard = ({
   fundAppeal,
   badges
 }) => {
-  const { decisiveRuling, loserHasPaid } = getItemInformation(
+  const { decisiveRuling, loserHasPaid, appealable } = getItemInformation(
     token,
     userAccount
   )
@@ -95,23 +94,20 @@ const TokenDetailsCard = ({
               onLoserTimedOut={setLoserTimedOut}
             />
           </div>
-          <CrowdfundingProgress
-            item={token}
-            userAccount={userAccount}
-            appealPeriodEnded={appealPeriodEnded}
-          />
-          <div className="TokenDetailsCard-actionWrapper">
-            <ItemActionButton
-              item={token}
-              userAccount={userAccount}
-              tcr={arbitrableTokenListData}
-              fundAppeal={fundAppeal}
-              handleActionClick={handleActionClick}
-              handleExecuteRequestClick={handleExecuteRequestClick}
-              appealPeriodEnded={appealPeriodEnded}
-              loserTimedOut={loserTimedOut}
-            />
-          </div>
+          {!appealable && (
+            <div className="TokenDetailsCard-actionWrapper">
+              <ItemActionButton
+                item={token}
+                userAccount={userAccount}
+                tcr={arbitrableTokenListData}
+                fundAppeal={fundAppeal}
+                handleActionClick={handleActionClick}
+                handleExecuteRequestClick={handleExecuteRequestClick}
+                appealPeriodEnded={appealPeriodEnded}
+                loserTimedOut={loserTimedOut}
+              />
+            </div>
+          )}
         </div>
         <div className="TokenDetailsCard-footer">
           <a

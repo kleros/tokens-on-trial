@@ -67,6 +67,7 @@ export const getCrowdfundingInfo = item => {
   let requesterFeesPercent = 0
   let challengerFeesPercent = 0
   let loserPercent = 0
+  let winnerPercent = 0
 
   if (!hasPaid[tcrConstants.SIDE.Requester])
     requesterFeesPercent =
@@ -82,15 +83,30 @@ export const getCrowdfundingInfo = item => {
       100
   else challengerFeesPercent = 100
 
-  if (ruling === tcrConstants.RULING_OPTIONS.Accept)
+  let winnerSide
+  let loserSide
+  if (ruling === tcrConstants.RULING_OPTIONS.Accept) {
     loserPercent = challengerFeesPercent
-  else loserPercent = requesterFeesPercent
+    winnerPercent = requesterFeesPercent
+    winnerSide = tcrConstants.SIDE.Requester
+    loserSide = tcrConstants.SIDE.Challenger
+  } else {
+    loserPercent = requesterFeesPercent
+    winnerPercent = challengerFeesPercent
+    winnerSide = tcrConstants.SIDE.Challenger
+    loserSide = tcrConstants.SIDE.Requester
+  }
 
   return {
     loserPercent,
+    winnerPercent,
     requesterFeesPercent,
     challengerFeesPercent,
-    payableValue
+    payableValue,
+    winnerSide,
+    loserSide,
+    appealable:
+      Number(dispute.status) === tcrConstants.DISPUTE_STATUS.Appealable
   }
 }
 
@@ -276,9 +292,11 @@ export const rulingMessage = (
   else return 'Jurors ruled in your favor'
 }
 
-export const truncateETHValue = str => {
-  if (str.indexOf('.') === -1) return str
-  return str.substring(0, str.indexOf('.') + 5)
+export const truncateETHValue = (str, digits) => {
+  if (!str) return 0
+  const input = typeof str === 'string' ? str : str.toString()
+  if (input.indexOf('.') === -1) return input
+  return input.substring(0, input.indexOf('.') + (digits || 5))
 }
 
 export const sanitize = str => {

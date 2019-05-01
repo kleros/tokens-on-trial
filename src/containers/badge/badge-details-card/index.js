@@ -3,7 +3,6 @@ import Img from 'react-image'
 import PropTypes from 'prop-types'
 
 import LatestRuling from '../../../components/latest-ruling'
-import CrowdfundingProgress from '../../../components/crowdfunding-prog'
 import { web3Utils, IPFS_URL } from '../../../bootstrap/dapp-api'
 import Etherscan from '../../../assets/images/etherscan.png'
 import ItemStatus from '../../../components/item-status'
@@ -34,7 +33,7 @@ const BadgeDetailsCard = ({
     variables: { title, description, symbolURI, criteriaDescription },
     fileURI
   } = tcrData
-  const { decisiveRuling, loserHasPaid } = getItemInformation(
+  const { decisiveRuling, loserHasPaid, appealable } = getItemInformation(
     badge,
     userAccount
   )
@@ -102,11 +101,6 @@ const BadgeDetailsCard = ({
               />
             </div>
           </div>
-          <CrowdfundingProgress
-            item={badge}
-            userAccount={userAccount}
-            appealPeriodEnded={appealPeriodEnded}
-          />
         </div>
         <div className="BadgeDetails-footer">
           <div className="BadgeDetails-footer-short">
@@ -147,19 +141,21 @@ const BadgeDetailsCard = ({
               </a>
             </span>
           </div>
-          <div style={{ marginLeft: 'auto' }}>
-            <ItemActionButton
-              item={badge}
-              userAccount={userAccount}
-              tcr={tcrData}
-              fundAppeal={fundAppeal}
-              handleActionClick={handleActionClick}
-              handleExecuteRequestClick={handleExecuteRequestClick}
-              appealPeriodEnded={appealPeriodEnded}
-              loserTimedOut={loserTimedOut}
-              badgeContractAddr={tcr.options.address}
-            />
-          </div>
+          {!appealable && (
+            <div style={{ marginLeft: 'auto' }}>
+              <ItemActionButton
+                item={badge}
+                userAccount={userAccount}
+                tcr={tcrData}
+                fundAppeal={fundAppeal}
+                handleActionClick={handleActionClick}
+                handleExecuteRequestClick={handleExecuteRequestClick}
+                appealPeriodEnded={appealPeriodEnded}
+                loserTimedOut={loserTimedOut}
+                badgeContractAddr={tcr.options.address}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

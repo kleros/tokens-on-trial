@@ -4,7 +4,11 @@ import Progress from 'react-progressbar'
 import PropTypes from 'prop-types'
 
 import * as tcrConstants from '../../constants/tcr'
-import { getItemInformation, getRemainingTime } from '../../utils/ui'
+import {
+  getItemInformation,
+  getRemainingTime,
+  truncateETHValue
+} from '../../utils/ui'
 import ItemActionButton from '../../containers/item-action-button'
 import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 
@@ -20,7 +24,8 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
     requesterFeesPercent,
     challengerFeesPercent,
     payableValue,
-    decisiveRuling
+    decisiveRuling,
+    winnerSide
   } = getItemInformation(item, userAccount)
 
   const remainingTime = getRemainingTime(
@@ -69,15 +74,20 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
               style={{ width: '15px', height: '15px', margin: '0 8px' }}
             />
             <div>
-              <p
-                style={{
-                  color: 'white',
-                  fontSize: '14px',
-                  lineHeight: '14px'
-                }}
-              >
-                Previous Round Loser
-              </p>
+              {decisiveRuling && (
+                <p
+                  style={{
+                    color: 'white',
+                    fontSize: '14px',
+                    lineHeight: '14px'
+                  }}
+                >
+                  Previous Round{' '}
+                  {winnerSide === tcrConstants.SIDE.Requester
+                    ? 'Winner'
+                    : 'Looser'}
+                </p>
+              )}
               <p style={{ color: 'white' }}>
                 <strong>Requester</strong>
               </p>
@@ -103,7 +113,9 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
                 lineHeight: '12px'
               }}
             >
-              <strong>{requesterFeesPercent}% Complete</strong>
+              <strong>
+                {truncateETHValue(requesterFeesPercent, 3)}% Complete
+              </strong>
             </p>
           </div>
         </div>
@@ -117,15 +129,20 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
               style={{ width: '15px', height: '15px', margin: '0 8px' }}
             />
             <div>
-              <p
-                style={{
-                  color: 'white',
-                  fontSize: '14px',
-                  lineHeight: '14px'
-                }}
-              >
-                Previous Round Winner
-              </p>
+              {decisiveRuling && (
+                <p
+                  style={{
+                    color: 'white',
+                    fontSize: '14px',
+                    lineHeight: '14px'
+                  }}
+                >
+                  Previous Round{' '}
+                  {winnerSide === tcrConstants.SIDE.Challenger
+                    ? 'Winner'
+                    : 'Looser'}
+                </p>
+              )}
               <p style={{ color: 'white' }}>
                 <strong>Challenger</strong>
               </p>
@@ -152,7 +169,9 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
                 lineHeight: '12px'
               }}
             >
-              <strong>{challengerFeesPercent}% Complete</strong>
+              <strong>
+                {truncateETHValue(challengerFeesPercent, 3)}% Complete
+              </strong>
             </p>
           </div>
         </div>
