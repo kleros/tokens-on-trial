@@ -103,9 +103,6 @@ function* fetchItems({
     arbitrableAddressListView
   )
 
-  console.info('disputes', disputesInAppealPeriod)
-  // 0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab
-
   // The appeal period can also be over if the arbitrators gave
   // a decisive ruling (did not refuse or failed to rule) and the
   // loser of the previous round did not get fully funded in within
