@@ -124,8 +124,7 @@ function* pushNotificationsListener() {
               {
                 arbitrableAddressListView: badgeViewContracts[address],
                 arbitrableTokenListView,
-                viewWeb3,
-                fromBlock
+                viewWeb3
               }
             )
           })
@@ -145,8 +144,7 @@ function* pushNotificationsListener() {
                 {
                   arbitrableAddressListView: badgeViewContracts[address],
                   arbitrableTokenListView,
-                  viewWeb3,
-                  fromBlock
+                  viewWeb3
                 }
               )
             }

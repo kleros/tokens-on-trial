@@ -32,7 +32,7 @@ const emitBadgeNotifications = async (
   timeToChallenge,
   emit,
   events,
-  { arbitrableAddressListView, arbitrableTokenListView, viewWeb3, fromBlock }
+  { arbitrableAddressListView, arbitrableTokenListView, viewWeb3 }
 ) => {
   const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
@@ -48,7 +48,7 @@ const emitBadgeNotifications = async (
       `RequestSubmitted`,
       {
         filter: { _address: returnValues._address },
-        fromBlock,
+        fromBlock: 1000,
         toBlock: `latest`
       }
     )
