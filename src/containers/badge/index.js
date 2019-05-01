@@ -102,10 +102,9 @@ class BadgeDetails extends PureComponent {
 
   handleOpenEvidenceModal = badgeContractAddr => {
     const { openActionModal } = this.props
-    openActionModal(
-      modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge,
+    openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge, {
       badgeContractAddr
-    )
+    })
   }
 
   handleViewEvidenceClick = evidence => () => {
