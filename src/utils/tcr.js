@@ -103,6 +103,8 @@ export const instantiateEnvObjects = async () => {
       return acc
     }, {})
 
+  const latestBlock = (await viewWeb3.eth.getBlock('latest')).number
+
   return {
     arbitrableTokenList,
     badgeContracts,
@@ -124,7 +126,8 @@ export const instantiateEnvObjects = async () => {
     viewWeb3,
     eventsWeb3,
     networkID,
-    badgeTCRs: badgeTCRs[networkID]
+    badgeTCRs: badgeTCRs[networkID],
+    latestBlock
   }
 }
 

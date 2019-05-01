@@ -20,7 +20,7 @@ const emitTokenNotifications = async (
   timeToChallenge,
   emit,
   events,
-  { arbitrableTokenListView, T2CR_BLOCK, viewWeb3 }
+  { arbitrableTokenListView, fromBlock, viewWeb3 }
 ) => {
   const notifiedTxs = {}
   let oldestNonDisputedSubmittedStatusEvent
@@ -36,7 +36,7 @@ const emitTokenNotifications = async (
       'RequestSubmitted',
       {
         filter: { _tokenID: returnValues._tokenID },
-        fromBlock: T2CR_BLOCK,
+        fromBlock,
         toBlock: 'latest'
       }
     )
@@ -47,6 +47,7 @@ const emitTokenNotifications = async (
     token.address = token.addr
 
     const isRegistrationRequest =
+      requests.length > 0 &&
       requests[requests.length - 1].returnValues._registrationRequest
 
     let message

@@ -274,7 +274,9 @@ export const userFriendlyLabel = {
   Added: 'Added',
   'Addition Requested': 'Addition Requested',
   'Addition Challenged': 'Addition Challenged',
-  'Removal Challenged': 'Removal Challenged'
+  'Removal Challenged': 'Removal Challenged',
+  Challenged: 'Challenged',
+  Pending: 'Pending'
 }
 
 export const rulingMessage = (
