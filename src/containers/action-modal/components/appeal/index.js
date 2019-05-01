@@ -235,7 +235,7 @@ const FundAppeal = ({
         disabled={appealFormIsInvalid}
         type="primary"
       >
-        Fund Appeal
+        Contribute Fees
       </Button>
     </div>
   </div>

@@ -543,7 +543,7 @@ class BadgeDetails extends PureComponent {
           >
             <h3 className="Modal-title">
               <FontAwesomeIcon className="Appeal-icon" icon="coins" />
-              Fund Appeal
+              Contribute Fees
             </h3>
             <hr />
             <br />

@@ -103,7 +103,7 @@ const getActionButton = ({
                 losingSide = true
 
               if (!losingSide && payableValue) {
-                label = 'Fund Appeal'
+                label = 'Contribute Fees'
                 disabled = false
                 method = () =>
                   handleActionClick(
@@ -113,7 +113,7 @@ const getActionButton = ({
                     badgeContractAddr ? { badgeContractAddr, side: SIDE } : SIDE
                   )
               } else if (Date.now() < endOfFirstHalf && payableValue) {
-                label = 'Fund Appeal'
+                label = 'Contribute Fees'
                 disabled = false
                 method = () =>
                   handleActionClick(

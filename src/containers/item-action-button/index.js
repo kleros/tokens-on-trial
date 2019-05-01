@@ -51,7 +51,7 @@ const ItemActionButton = ({
           {(decisiveRuling
           ? (!appealPeriodEnded || !loserTimedOut) && !loserTimedOut
           : !countdownCompleted)
-            ? 'Fund Appeal'
+            ? 'Contribute Fees'
             : 'Waiting Enforcement'}
         </Button>
       ) : (
