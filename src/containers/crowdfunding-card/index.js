@@ -99,6 +99,7 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
             height="5px"
             color="#009aff"
             style={{
+              backgroundColor: '#d4edfe',
               border: '1px solid #009aff',
               borderColor: requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
               borderRadius: '3px',
@@ -155,6 +156,7 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
             color="#009aff"
             style={{
               border: '1px solid #009aff',
+              backgroundColor: '#d4edfe',
               borderColor:
                 challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
               borderRadius: '3px',
