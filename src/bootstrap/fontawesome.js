@@ -2,6 +2,7 @@ import { library } from '@fortawesome/fontawesome'
 import faCaretDown from '@fortawesome/fontawesome-free-solid/faCaretDown'
 import faCheck from '@fortawesome/fontawesome-free-solid/faCheck'
 import faExclamationCircle from '@fortawesome/fontawesome-free-solid/faExclamationCircle'
+import faExclamationTriangle from '@fortawesome/fontawesome-free-solid/faExclamationTriangle'
 import faInfoCircle from '@fortawesome/fontawesome-free-solid/faInfoCircle'
 import faQuestion from '@fortawesome/fontawesome-free-solid/faQuestion'
 import faSlidersH from '@fortawesome/fontawesome-free-solid/faSlidersH'
@@ -31,6 +32,7 @@ library.add(
   faCaretDown,
   faCheck,
   faExclamationCircle,
+  faExclamationTriangle,
   faInfoCircle,
   faQuestion,
   faSlidersH,

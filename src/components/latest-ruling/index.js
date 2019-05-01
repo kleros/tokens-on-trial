@@ -27,7 +27,7 @@ const LatestRuling = ({ item, userAccount }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        color: '#3d464d'
+        color: '#4d00b4'
       }}
       data-tip={
         ruling.toString() === '0'
@@ -39,7 +39,7 @@ const LatestRuling = ({ item, userAccount }) => {
     >
       <FontAwesomeIcon
         className="LatestRuling-icon"
-        color={tcrConstants.STATUS_COLOR_ENUM[5]}
+        color="#4d00b4"
         icon="balance-scale"
         style={{ marginRight: '10px' }}
       />

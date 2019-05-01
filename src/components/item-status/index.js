@@ -8,7 +8,10 @@ import { userFriendlyLabel, toSentenceCase } from '../../utils/ui'
 import './item-status.css'
 
 const ItemStatus = ({ item: { clientStatus } }) => (
-  <span className="ItemStatus-meta-item">
+  <span
+    className="ItemStatus-meta-item"
+    style={{ color: tcrConstants.STATUS_COLOR_ENUM[clientStatus] }}
+  >
     <FontAwesomeIcon
       className="ItemStatus-icon"
       color={tcrConstants.STATUS_COLOR_ENUM[clientStatus]}
