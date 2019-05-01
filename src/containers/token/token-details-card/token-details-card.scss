@@ -58,6 +58,7 @@
       }
 
       @media (max-width: 839px) {
+        align-items: center;
         flex-direction: column;
         margin-top: 26px;
       }
@@ -190,6 +191,14 @@
     min-width: 200px;
     padding-right: 26px;
 
+    @media (max-width: 839px) {
+      justify-content: center;
+      margin: 0;
+      margin-top: 16px;
+      padding: 0;
+      width: 100%;
+    }
+
     @media (min-width: 840px) {
       &::before {
         border-bottom: 50px solid transparent;
@@ -249,6 +258,23 @@
 
     @media (max-width: 330px) {
       width: 140px;
+    }
+  }
+
+  &-info {
+    align-items: center;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    margin: 17px;
+    padding: 17px;
+    width: 235px;
+
+    @media (max-width: 889px) {
+      border-left: 0;
+      margin: 10px;
+      padding: 0;
+      width: 70%;
     }
   }
 }

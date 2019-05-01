@@ -94,16 +94,12 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
             </div>
           </div>
           <Progress
-            className="TokenDetails-meta-item TokenDetails-crowdfundingBar"
             completed={requesterFeesPercent}
             height="5px"
             color="#009aff"
+            className="CrowdfundingCard-status-progressBar"
             style={{
-              backgroundColor: '#d4edfe',
-              border: '1px solid #009aff',
-              borderColor: requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
-              borderRadius: '3px',
-              marginLeft: 0
+              borderColor: challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
             }}
           />
           <div>
@@ -120,8 +116,7 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
             </p>
           </div>
         </div>
-
-        <div style={{ borderLeft: '1px solid #6b58b4', height: '90%' }} />
+        <div className="CrowdfundingCard-status-divider" />
         <div className="CrowdfundingCard-status-parties">
           <div className="CrowdfundingCard-status-outcome">
             <FontAwesomeIcon
@@ -150,18 +145,13 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
             </div>
           </div>
           <Progress
-            className="TokenDetails-meta-item TokenDetails-crowdfundingBar"
+            className="CrowdfundingCard-status-progressBar"
+            style={{
+              borderColor: challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+            }}
             completed={challengerFeesPercent}
             height="5px"
             color="#009aff"
-            style={{
-              border: '1px solid #009aff',
-              backgroundColor: '#d4edfe',
-              borderColor:
-                challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
-              borderRadius: '3px',
-              marginLeft: 0
-            }}
           />
           <div>
             <p
@@ -184,16 +174,7 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
           icon="info-circle"
           style={{ width: '30px', height: '30px' }}
         />
-        <p
-          style={{
-            fontStyle: 'normal',
-            fontWeight: 'normal',
-            fontSize: '12px',
-            lineHeight: '14px',
-            textAlign: 'center',
-            color: 'white'
-          }}
-        >
+        <p className="CrowdfundingCard-action-info">
           Contributions to the side that loses the case will be awarded to the
           backers of the winner.
         </p>

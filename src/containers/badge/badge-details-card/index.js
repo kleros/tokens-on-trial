@@ -102,21 +102,8 @@ const BadgeDetailsCard = ({
               />
             </div>
           </div>
-          {appealable && (
-            <div
-              style={{
-                width: '435px',
-                margin: '17px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                borderLeft: '1px solid #CCCCCC',
-                padding: '17px',
-                marginRigh: 0,
-                paddingRight: 0,
-                justifyContent: 'center'
-              }}
-            >
+          {appealable && !loserTimedOut && (
+            <div className="BadgeDetails-info">
               <FontAwesomeIcon
                 color="#4d00b4"
                 icon="exclamation-triangle"
@@ -182,7 +169,7 @@ const BadgeDetailsCard = ({
             </span>
           </div>
           {!appealable && (
-            <div style={{ marginLeft: 'auto' }}>
+            <div className="BadgeDetails-action">
               <ItemActionButton
                 item={badge}
                 userAccount={userAccount}

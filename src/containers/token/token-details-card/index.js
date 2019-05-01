@@ -95,18 +95,8 @@ const TokenDetailsCard = ({
               onLoserTimedOut={setLoserTimedOut}
             />
           </div>
-          {appealable ? (
-            <div
-              style={{
-                width: '235px',
-                margin: '17px',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                borderLeft: '1px solid #CCCCCC',
-                padding: '17px'
-              }}
-            >
+          {appealable && !loserTimedOut ? (
+            <div className="TokenDetailsCard-info">
               <FontAwesomeIcon
                 color="#4d00b4"
                 icon="exclamation-triangle"
