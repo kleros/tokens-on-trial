@@ -28,8 +28,6 @@ const PeriodCountdown = ({ item: { latestRequest, clientStatus } }) => {
 
   const [periodEnded, setPeriodEnded] = useState(periodRemainingTime <= 0)
 
-  if (periodEnded) return null
-
   return (
     <span
       className="PeriodCountdown-meta-item"

@@ -634,7 +634,6 @@ class ActionModal extends PureComponent {
                   tcr={{ data: arbitrableAddressListData }}
                   closeActionModal={closeActionModal}
                   item={badge.data}
-                  badge
                   fundAppeal={this.handleFundAppealBadgeClick}
                   side={actionModalParam.side}
                 />
