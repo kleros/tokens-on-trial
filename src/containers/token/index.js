@@ -495,6 +495,7 @@ class TokenDetails extends PureComponent {
           userAccount={accounts.data[0]}
           tcrData={arbitrableTokenListData}
           fundAppeal={this.fundAppeal}
+          handleActionClick={this.handleActionClick}
         />
         <Evidence
           item={token}

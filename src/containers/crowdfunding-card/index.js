@@ -14,7 +14,14 @@ import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 
 import './crowdfunding-card.css'
 
-const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
+const CrowdfundingCard = ({
+  item,
+  userAccount,
+  tcrData,
+  fundAppeal,
+  handleActionClick,
+  badgeContractAddr
+}) => {
   const { status, latestRequest } = item
   const { dispute, latestRound, disputed, resolved } = latestRequest
   if (!disputed || (disputed && resolved)) return null
@@ -185,6 +192,8 @@ const CrowdfundingCard = ({ item, userAccount, tcrData, fundAppeal }) => {
           fundAppeal={fundAppeal}
           appealPeriodEnded={appealPeriodEnded}
           loserTimedOut={loserTimedOut}
+          handleActionClick={handleActionClick}
+          badgeContractAddr={badgeContractAddr}
         />
       </div>
     </div>
@@ -195,8 +204,14 @@ CrowdfundingCard.propTypes = {
   item: itemShape.isRequired,
   userAccount: PropTypes.string.isRequired,
   tcrData: tcrShape.isRequired,
+  badgeContractAddr: PropTypes.string,
 
-  fundAppeal: PropTypes.func.isRequired
+  fundAppeal: PropTypes.func.isRequired,
+  handleActionClick: PropTypes.func.isRequired
+}
+
+CrowdfundingCard.defaultProps = {
+  badgeContractAddr: null
 }
 
 export default CrowdfundingCard

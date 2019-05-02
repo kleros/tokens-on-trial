@@ -526,6 +526,8 @@ class BadgeDetails extends PureComponent {
           userAccount={accounts.data[0]}
           tcrData={arbitrableAddressListData.data[badgeAddr]}
           fundAppeal={this.fundAppeal}
+          handleActionClick={this.handleActionClick}
+          badgeContractAddr={badgeAddr}
         />
         <Evidence
           item={badge}
