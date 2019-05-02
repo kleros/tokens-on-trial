@@ -90,7 +90,6 @@ function* pushNotificationsListener() {
         .then(events => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events, {
             arbitrableTokenListView,
-            fromBlock,
             viewWeb3
           })
         })
@@ -103,7 +102,6 @@ function* pushNotificationsListener() {
           txHashes[event.transactionHash] = true
           emitTokenNotifications(account, t2crTimeToChallenge, emit, [event], {
             arbitrableTokenListView,
-            fromBlock,
             viewWeb3
           })
         }
