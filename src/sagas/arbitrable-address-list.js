@@ -148,11 +148,7 @@ function* submitBadgeEvidence({
       const blob = yield (yield call(fetch, file.preview)).blob()
       const newDataString = piexif.remove((yield call(asyncReadFile, blob))[0])
       data = yield call(readFile, newDataString)
-    } else if (
-      fileTypeExtension === 'docx' ||
-      fileTypeExtension === 'pptx' ||
-      fileTypeExtension === 'xlsx'
-    ) {
+    } else if (fileTypeExtension === 'docx' || fileTypeExtension === 'xlsx') {
       // Docx files are zip files. We can remove sensitive information from the core.xml file inside docProps.
       const blob = yield (yield call(fetch, file.preview)).blob()
       const base64Data = (yield call(asyncReadFile, blob))[0].split(',')[1]
