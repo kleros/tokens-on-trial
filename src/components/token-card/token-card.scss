@@ -2,7 +2,7 @@
 
 /* @define TokenCard */
 .TokenCard {
-  background: $card;
+  background: #f0f8ff;
   border: 1px solid $border;
   border-radius: 3px;
   box-shadow: 0 3px 6px $shadow;
@@ -45,7 +45,7 @@
   &-footer {
     align-content: center;
     align-items: center;
-    background-color: #f8f8f8;
+    background-color: $card;
     border-radius: 0 0 3px 3px;
     display: flex;
     height: 39px;
