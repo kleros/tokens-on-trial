@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Img from 'react-image'
 import PropTypes from 'prop-types'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 
 import * as tcrConstants from '../../../constants/tcr'
@@ -17,6 +16,7 @@ import { tcrShape } from '../../../reducers/generic-shapes'
 import { badgesShape } from '../../../reducers/badge'
 import * as tokenSelectors from '../../../reducers/token'
 import { getItemInformation, getRemainingTime } from '../../../utils/ui'
+import CrowdfundingMsg from '../../../components/crowdfungind-msg'
 
 import './token-details-card.css'
 
@@ -96,30 +96,7 @@ const TokenDetailsCard = ({
             />
           </div>
           {appealable && !loserTimedOut ? (
-            <div className="TokenDetailsCard-info">
-              <FontAwesomeIcon
-                color="#4d00b4"
-                icon="exclamation-triangle"
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  margin: '15px',
-                  marginTop: 0
-                }}
-              />
-              <p
-                style={{
-                  color: '#4d00b4',
-                  fontSize: '14px',
-                  lineHeight: '16px',
-                  textAlign: 'center'
-                }}
-              >
-                If the loser complete it’s appeal funding, the winner of the
-                previous round should also fully fund the appeal, in order not
-                to lose the case.
-              </p>
-            </div>
+            <CrowdfundingMsg decisiveRuling={decisiveRuling} />
           ) : (
             <div className="TokenDetailsCard-actionWrapper">
               <ItemActionButton

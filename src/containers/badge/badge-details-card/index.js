@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Img from 'react-image'
 import PropTypes from 'prop-types'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import LatestRuling from '../../../components/latest-ruling'
 import { web3Utils, IPFS_URL } from '../../../bootstrap/dapp-api'
@@ -18,6 +17,7 @@ import {
 import { itemShape, tcrShape } from '../../../reducers/generic-shapes'
 import { arbitrableAddressListDataShape } from '../../../reducers/arbitrable-address-list'
 import * as tcrConstants from '../../../constants/tcr'
+import CrowdfundingMsg from '../../../components/crowdfungind-msg'
 
 const BadgeDetailsCard = ({
   badge,
@@ -103,30 +103,7 @@ const BadgeDetailsCard = ({
             </div>
           </div>
           {appealable && !loserTimedOut && (
-            <div className="BadgeDetails-info">
-              <FontAwesomeIcon
-                color="#4d00b4"
-                icon="exclamation-triangle"
-                style={{
-                  width: '30px',
-                  height: '30px',
-                  margin: '15px',
-                  marginTop: 0
-                }}
-              />
-              <p
-                style={{
-                  color: '#4d00b4',
-                  fontSize: '14px',
-                  lineHeight: '16px',
-                  textAlign: 'center'
-                }}
-              >
-                If the loser complete it’s appeal funding, the winner of the
-                previous round should also fully fund the appeal, in order not
-                to lose the case.
-              </p>
-            </div>
+            <CrowdfundingMsg decisiveRuling={decisiveRuling} />
           )}
         </div>
         <div className="BadgeDetails-footer">
