@@ -1,0 +1,44 @@
+@import '../../styles/_colors.scss';
+
+/* @define BadgeCrowdfundingCard */
+.BadgeCrowdfundingCard {
+  &-info {
+    align-items: center;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 17px;
+    margin-right: 0;
+    padding: 17px;
+    padding-right: 0;
+    width: 435px;
+
+    @media (max-width: 889px) {
+      border-left: 0;
+      margin: 10px;
+      padding: 0;
+      width: 100%;
+    }
+  }
+}
+
+/* @define TokenCrowdfundingCard */
+.TokenCrowdfundingCard {
+  &-info {
+    align-items: center;
+    border-left: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    margin: 17px;
+    padding: 17px;
+    width: 235px;
+
+    @media (max-width: 889px) {
+      border-left: 0;
+      margin: 10px;
+      padding: 0;
+      width: 70%;
+    }
+  }
+}

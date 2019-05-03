@@ -2,9 +2,11 @@ import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
-const CrowdfundingMsg = ({ decisiveRuling }) =>
+import './crowdfunding-msg.css'
+
+const CrowdfundingMsg = ({ decisiveRuling, type }) =>
   decisiveRuling ? (
-    <div className="TokenDetailsCard-info">
+    <div className={`${type}CrowdfundingCard-info`}>
       <FontAwesomeIcon
         color="#4d00b4"
         icon="exclamation-triangle"
@@ -28,7 +30,7 @@ const CrowdfundingMsg = ({ decisiveRuling }) =>
       </p>
     </div>
   ) : (
-    <div className="TokenDetailsCard-info">
+    <div className={`${type}CrowdfundingCard-info`}>
       <FontAwesomeIcon
         color="#4d00b4"
         icon="exclamation-triangle"
@@ -56,7 +58,8 @@ const CrowdfundingMsg = ({ decisiveRuling }) =>
   )
 
 CrowdfundingMsg.propTypes = {
-  decisiveRuling: PropTypes.bool.isRequired
+  decisiveRuling: PropTypes.bool.isRequired,
+  type: PropTypes.string.isRequired
 }
 
 export default CrowdfundingMsg

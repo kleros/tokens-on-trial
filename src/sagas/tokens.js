@@ -234,8 +234,8 @@ function* fetchTokens() {
       // 2- Find out if the loser received enough arbitration fees.
 
       // 1- Find out which party lost the previous round.
-      const currentRuling = yield call(
-        arbitratorView.methods.currentRuling(disputeID).call
+      const currentRuling = Number(
+        yield call(arbitratorView.methods.currentRuling(disputeID).call)
       )
       const tokenID = yield call(
         arbitrableTokenListView.methods.arbitratorDisputeIDToTokenID(
@@ -245,14 +245,13 @@ function* fetchTokens() {
       )
 
       // If there was no decisive ruling, there is no loser and the rule does not apply.
-      if (currentRuling === tcrConstants.RULING_OPTIONS.None.toString()) {
+      if (currentRuling === tcrConstants.RULING_OPTIONS.None) {
         tokenIDsInAppealPeriod[tokenID] = true
         continue
       }
 
       const loser =
-        currentRuling.toString() ===
-        tcrConstants.RULING_OPTIONS.Accept.toString()
+        currentRuling === tcrConstants.RULING_OPTIONS.Accept
           ? tcrConstants.SIDE.Challenger
           : tcrConstants.SIDE.Requester
 

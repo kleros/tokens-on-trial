@@ -115,8 +115,8 @@ function* fetchItems({
     // 2- Find out if the loser received enough arbitration fees.
 
     // 1- Find out which party lost the previous round.
-    const currentRuling = yield call(
-      arbitratorView.methods.currentRuling(disputeID).call
+    const currentRuling = Number(
+      yield call(arbitratorView.methods.currentRuling(disputeID).call)
     )
     const address = yield call(
       arbitrableAddressListView.methods.arbitratorDisputeIDToAddress(
@@ -126,13 +126,13 @@ function* fetchItems({
     )
 
     // If there was no decisive ruling, there is no loser and the rule does not apply.
-    if (currentRuling.toString() === tcrConstants.RULING_OPTIONS.None) {
+    if (currentRuling === tcrConstants.RULING_OPTIONS.None) {
       addressesInAppealPeriod[address] = true
       continue
     }
 
     const loser =
-      currentRuling.toString() === tcrConstants.RULING_OPTIONS.Accept
+      currentRuling === tcrConstants.RULING_OPTIONS.Accept
         ? tcrConstants.SIDE.Challenger
         : tcrConstants.SIDE.Requester
 
@@ -221,6 +221,9 @@ function* fetchBadges() {
   }, {})
 
   const cachedBadges = localStorage.getItem(`${t2crAddr}badges@${APP_VERSION}`)
+  if (cachedBadges)
+    // Load current cache while loading newer data.
+    yield put(cacheBadges(JSON.parse(cachedBadges)))
 
   try {
     const badges = (yield all(

@@ -17,7 +17,9 @@ import {
 import { itemShape, tcrShape } from '../../../reducers/generic-shapes'
 import { arbitrableAddressListDataShape } from '../../../reducers/arbitrable-address-list'
 import * as tcrConstants from '../../../constants/tcr'
-import CrowdfundingMsg from '../../../components/crowdfungind-msg'
+import CrowdfundingMsg from '../../../components/crowdfunding-msg'
+
+import './badge-details-card.css'
 
 const BadgeDetailsCard = ({
   badge,
@@ -103,7 +105,7 @@ const BadgeDetailsCard = ({
             </div>
           </div>
           {appealable && !loserTimedOut && (
-            <CrowdfundingMsg decisiveRuling={decisiveRuling} />
+            <CrowdfundingMsg decisiveRuling={decisiveRuling} type="Badge" />
           )}
         </div>
         <div className="BadgeDetails-footer">

@@ -16,7 +16,7 @@ import { tcrShape } from '../../../reducers/generic-shapes'
 import { badgesShape } from '../../../reducers/badge'
 import * as tokenSelectors from '../../../reducers/token'
 import { getItemInformation, getRemainingTime } from '../../../utils/ui'
-import CrowdfundingMsg from '../../../components/crowdfungind-msg'
+import CrowdfundingMsg from '../../../components/crowdfunding-msg'
 
 import './token-details-card.css'
 
@@ -96,7 +96,7 @@ const TokenDetailsCard = ({
             />
           </div>
           {appealable && !loserTimedOut ? (
-            <CrowdfundingMsg decisiveRuling={decisiveRuling} />
+            <CrowdfundingMsg decisiveRuling={decisiveRuling} type="Token" />
           ) : (
             <div className="TokenDetailsCard-actionWrapper">
               <ItemActionButton

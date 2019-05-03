@@ -150,7 +150,8 @@ class Badges extends Component {
               </p>
             ) : (
               <>
-                {displayedBadges.length > 0 || !badges.loading ? (
+                {(displayedBadges.length > 0 || !badges.loading) &&
+                arbitrableAddressListData.data ? (
                   displayedBadges.map(badge => (
                     <BadgeCard
                       badge={badge}
