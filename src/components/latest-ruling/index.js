@@ -29,13 +29,6 @@ const LatestRuling = ({ item, userAccount }) => {
         alignItems: 'center',
         color: '#4d00b4'
       }}
-      data-tip={
-        ruling.toString() === '0'
-          ? `If the requester does not fully fund, the token will ${
-              item.status.toString() === '2' ? 'not be added' : 'not be removed'
-            } and parties will be reimbursed.`
-          : ''
-      }
     >
       <FontAwesomeIcon
         className="LatestRuling-icon"
