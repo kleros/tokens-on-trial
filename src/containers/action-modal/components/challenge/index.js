@@ -59,7 +59,7 @@ const Challenge = ({
             className="TokenDetails-withdraw"
             target="_blank"
             rel="noopener noreferrer"
-            href="https://ipfs.kleros.io/ipfs/QmQU5z61RmMSjNG6FQ6ndgnhxCyHJArN2qEbKJbBvaYoCo/blockchain-non-technical.pdf"
+            href="https://ipfs.kleros.io/ipfs/QmR3Czocg8ffYhNNFGL1W6TUpzGacFghU1yK9QwU1rmJPG/token-curated-list-policies.pdf"
             style={{ margin: 0, textDecoration: 'underline' }}
           >
             listing criteria.
