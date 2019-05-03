@@ -164,6 +164,173 @@ class TokenDetails extends PureComponent {
     }
   }
 
+  async setupListeners({
+    arbitrableTokenListEvents,
+    fetchToken,
+    tokenID,
+    accounts,
+    arbitratorEvents,
+    archon,
+    arbitrableTokenListView,
+    latestRequest,
+    T2CR_BLOCK
+  }) {
+    arbitrableTokenListEvents.events.Ruling((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (!token) return
+      const { latestRequest } = token
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchToken(tokenID)
+    })
+    arbitrableTokenListEvents.events.RewardWithdrawal((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (
+        !token ||
+        event.returnValues._beneficiary !== accounts.data[0] ||
+        token.ID !== event.returnValues._tokenID
+      )
+        return
+      fetchToken(event.returnValues._tokenID)
+    })
+    arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (!token) return
+
+      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
+    })
+    arbitratorEvents.events.AppealPossible((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (!token) return
+
+      const { latestRequest } = token
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchToken(tokenID)
+    })
+    arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (!token) return
+      if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
+    })
+    arbitrableTokenListEvents.events.Evidence(async (err, e) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { token } = this.state
+      if (!token) return
+      const { latestRequest } = token
+      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+        return
+
+      const evidence = await (await fetch(
+        `${IPFS_URL}${e.returnValues._evidence}`
+      )).json()
+      /* eslint-disable unicorn/number-literal-case */
+      const calculatedMultihash = archon.utils.multihashFile(
+        evidence,
+        0x1b // keccak-256
+      )
+
+      if (
+        !(await Archon.utils.validateFileFromURI(
+          `${IPFS_URL}${e.returnValues._evidence}`,
+          { hash: calculatedMultihash }
+        ))
+      ) {
+        console.warn('Invalid evidence', evidence)
+        return
+      }
+
+      const { evidences } = this.state
+      const mimeType = mime.lookup(evidence.fileTypeExtension)
+      evidence.icon = getFileIcon(mimeType)
+      this.setState({
+        evidences: {
+          ...evidences,
+          [e.transactionHash]: {
+            ...evidence,
+            blockNumber: e.blockNumber
+          }
+        }
+      })
+    })
+
+    await Promise.all(
+      (await arbitrableTokenListView.getPastEvents('Evidence', {
+        filter: {
+          _evidenceGroupID: latestRequest.evidenceGroupID
+        },
+        fromBlock: T2CR_BLOCK,
+        toBlock: 'latest'
+      })).map(async e => {
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+          return
+
+        const evidence = await (await fetch(
+          `${IPFS_URL}${e.returnValues._evidence}`
+        )).json()
+        /* eslint-disable unicorn/number-literal-case */
+        const calculatedMultihash = archon.utils.multihashFile(
+          evidence,
+          0x1b // keccak-256
+        )
+
+        if (
+          !(await Archon.utils.validateFileFromURI(
+            `${IPFS_URL}${e.returnValues._evidence}`,
+            { hash: calculatedMultihash }
+          ))
+        ) {
+          console.warn('Invalid evidence', evidence)
+          return
+        }
+
+        const { evidences } = this.state
+        const mimeType = mime.lookup(evidence.fileTypeExtension)
+        evidence.icon = getFileIcon(mimeType)
+        this.setState({
+          evidences: {
+            ...evidences,
+            [e.transactionHash]: {
+              ...evidence,
+              blockNumber: e.blockNumber
+            }
+          }
+        })
+      })
+    )
+  }
+
   async componentDidUpdate() {
     if (!this.context) return
     const { arbitrableTokenListView } = this.context
@@ -201,164 +368,20 @@ class TokenDetails extends PureComponent {
 
     const { latestRequest } = token
 
-    if (token && !evidenceListenerSet) {
-      arbitrableTokenListEvents.events.Ruling((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (!token) return
-        const { latestRequest } = token
-        if (
-          latestRequest.disputed &&
-          (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-            latestRequest.appealDisputeID ===
-              Number(event.returnValues._disputeID))
-        )
-          fetchToken(tokenID)
-      })
-      arbitrableTokenListEvents.events.RewardWithdrawal((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (
-          !token ||
-          event.returnValues._beneficiary !== accounts.data[0] ||
-          token.ID !== event.returnValues._tokenID
-        )
-          return
-        fetchToken(event.returnValues._tokenID)
-      })
-      arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (!token) return
-
-        if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
-      })
-      arbitratorEvents.events.AppealPossible((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (!token) return
-
-        const { latestRequest } = token
-        if (
-          latestRequest.disputed &&
-          (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-            latestRequest.appealDisputeID ===
-              Number(event.returnValues._disputeID))
-        )
-          fetchToken(tokenID)
-      })
-      arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (!token) return
-        if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
-      })
-      arbitrableTokenListEvents.events.Evidence(async (err, e) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { token } = this.state
-        if (!token) return
-        const { latestRequest } = token
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-
-        const evidence = await (await fetch(
-          `${IPFS_URL}${e.returnValues._evidence}`
-        )).json()
-        /* eslint-disable unicorn/number-literal-case */
-        const calculatedMultihash = archon.utils.multihashFile(
-          evidence,
-          0x1b // keccak-256
-        )
-
-        if (
-          !(await Archon.utils.validateFileFromURI(
-            `${IPFS_URL}${e.returnValues._evidence}`,
-            { hash: calculatedMultihash }
-          ))
-        ) {
-          console.warn('Invalid evidence', evidence)
-          return
-        }
-
-        const { evidences } = this.state
-        const mimeType = mime.lookup(evidence.fileTypeExtension)
-        evidence.icon = getFileIcon(mimeType)
-        this.setState({
-          evidences: {
-            ...evidences,
-            [e.transactionHash]: {
-              ...evidence,
-              blockNumber: e.blockNumber
-            }
-          }
+    if (token && !evidenceListenerSet)
+      this.setState({ evidenceListenerSet: true }, () => {
+        this.setupListeners({
+          arbitrableTokenListEvents,
+          fetchToken,
+          tokenID,
+          accounts,
+          arbitratorEvents,
+          archon,
+          arbitrableTokenListView,
+          latestRequest,
+          T2CR_BLOCK
         })
       })
-
-      await Promise.all(
-        (await arbitrableTokenListView.getPastEvents('Evidence', {
-          filter: {
-            _evidenceGroupID: latestRequest.evidenceGroupID
-          },
-          fromBlock: T2CR_BLOCK,
-          toBlock: 'latest'
-        })).map(async e => {
-          if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-            return
-
-          const evidence = await (await fetch(
-            `${IPFS_URL}${e.returnValues._evidence}`
-          )).json()
-          /* eslint-disable unicorn/number-literal-case */
-          const calculatedMultihash = archon.utils.multihashFile(
-            evidence,
-            0x1b // keccak-256
-          )
-
-          if (
-            !(await Archon.utils.validateFileFromURI(
-              `${IPFS_URL}${e.returnValues._evidence}`,
-              { hash: calculatedMultihash }
-            ))
-          ) {
-            console.warn('Invalid evidence', evidence)
-            return
-          }
-
-          const { evidences } = this.state
-          const mimeType = mime.lookup(evidence.fileTypeExtension)
-          evidence.icon = getFileIcon(mimeType)
-          this.setState({
-            evidences: {
-              ...evidences,
-              [e.transactionHash]: {
-                ...evidence,
-                blockNumber: e.blockNumber
-              }
-            }
-          })
-        })
-      )
-
-      this.setState({ evidenceListenerSet: true })
-    }
   }
 
   render() {

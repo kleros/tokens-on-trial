@@ -171,6 +171,160 @@ class BadgeDetails extends PureComponent {
     }
   }
 
+  async setupListeners({
+    latestRequest,
+    arbitrableAddressListEvents,
+    fetchBadge,
+    badgeAddr,
+    tokenAddr,
+    match,
+    arbitratorEvents,
+    badge,
+    archon,
+    arbitrableAddressListView,
+    badgeContractBlockNumber
+  }) {
+    arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { tokenAddr } = match.params
+      if (tokenAddr === event.returnValues._address)
+        fetchBadge(tokenAddr, badgeAddr)
+    })
+    arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { tokenAddr } = match.params
+      if (tokenAddr === event.returnValues._address)
+        fetchBadge(tokenAddr, badgeAddr)
+    })
+    arbitratorEvents.events.AppealPossible((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { badge } = this.state
+      if (!badge) return
+      const { latestRequest } = badge
+
+      if (
+        latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+        latestRequest.appealDisputeID === Number(event.returnValues._disputeID)
+      )
+        fetchBadge(tokenAddr, badgeAddr)
+    })
+    arbitrableAddressListEvents.events.Ruling((err, event) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { badge } = this.state
+      if (!badge) return
+      const { latestRequest } = badge
+      if (
+        latestRequest.disputed &&
+        (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
+          latestRequest.appealDisputeID ===
+            Number(event.returnValues._disputeID))
+      )
+        fetchBadge(tokenAddr, badgeAddr)
+    })
+    arbitrableAddressListEvents.events.Evidence(async (err, e) => {
+      if (err) {
+        console.error(err)
+        return
+      }
+      const { badge } = this.state
+      if (!badge) return
+      const { latestRequest } = badge
+      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+        return
+
+      const evidence = await (await fetch(
+        `${IPFS_URL}${e.returnValues._evidence}`
+      )).json()
+      /* eslint-disable unicorn/number-literal-case */
+      const calculatedMultihash = archon.utils.multihashFile(
+        evidence,
+        0x1b // keccak-256
+      )
+
+      if (
+        !(await Archon.utils.validateFileFromURI(
+          `${IPFS_URL}${e.returnValues._evidence}`,
+          { hash: calculatedMultihash }
+        ))
+      ) {
+        console.warn('Invalid evidence', evidence)
+        return
+      }
+
+      const { evidences } = this.state
+      const mimeType = mime.lookup(evidence.fileTypeExtension)
+      evidence.icon = getFileIcon(mimeType)
+      this.setState({
+        evidences: {
+          ...evidences,
+          [e.transactionHash]: {
+            ...evidence,
+            blockNumber: e.blockNumber
+          }
+        }
+      })
+    })
+    await Promise.all(
+      (await arbitrableAddressListView.getPastEvents('Evidence', {
+        filter: {
+          _evidenceGroupID: badge.latestRequest.evidenceGroupID
+        },
+        fromBlock: badgeContractBlockNumber,
+        toBlock: 'latest'
+      })).map(async e => {
+        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
+          return
+        try {
+          const evidence = await (await fetch(
+            `${IPFS_URL}${e.returnValues._evidence}`
+          )).json()
+          /* eslint-disable unicorn/number-literal-case */
+          const calculatedMultihash = archon.utils.multihashFile(
+            evidence,
+            0x1b // keccak-256
+          )
+
+          if (
+            !(await Archon.utils.validateFileFromURI(
+              `${IPFS_URL}${e.returnValues._evidence}`,
+              { hash: calculatedMultihash }
+            ))
+          ) {
+            console.warn('Invalid evidence', evidence)
+            return
+          }
+
+          const { evidences } = this.state
+          const mimeType = mime.lookup(evidence.fileTypeExtension)
+          evidence.icon = getFileIcon(mimeType)
+          this.setState({
+            evidences: {
+              ...evidences,
+              [e.transactionHash]: {
+                ...evidence,
+                blockNumber: e.blockNumber
+              }
+            }
+          })
+        } catch (err) {
+          console.error('a', err)
+        }
+      })
+    )
+  }
+
   async componentDidUpdate() {
     if (!this.context) return
 
@@ -230,148 +384,22 @@ class BadgeDetails extends PureComponent {
 
     const { latestRequest } = badge
 
-    if (badge && !evidenceListenerSet) {
-      arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { tokenAddr } = match.params
-        if (tokenAddr === event.returnValues._address)
-          fetchBadge(tokenAddr, badgeAddr)
-      })
-      arbitrableAddressListEvents.events.AddressStatusChange((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { tokenAddr } = match.params
-        if (tokenAddr === event.returnValues._address)
-          fetchBadge(tokenAddr, badgeAddr)
-      })
-      arbitratorEvents.events.AppealPossible((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { badge } = this.state
-        if (!badge) return
-        const { latestRequest } = badge
-
-        if (
-          latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-          latestRequest.appealDisputeID ===
-            Number(event.returnValues._disputeID)
-        )
-          fetchBadge(tokenAddr, badgeAddr)
-      })
-      arbitrableAddressListEvents.events.Ruling((err, event) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { badge } = this.state
-        if (!badge) return
-        const { latestRequest } = badge
-        if (
-          latestRequest.disputed &&
-          (latestRequest.disputeID === Number(event.returnValues._disputeID) ||
-            latestRequest.appealDisputeID ===
-              Number(event.returnValues._disputeID))
-        )
-          fetchBadge(tokenAddr, badgeAddr)
-      })
-      arbitrableAddressListEvents.events.Evidence(async (err, e) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        const { badge } = this.state
-        if (!badge) return
-        const { latestRequest } = badge
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-
-        const evidence = await (await fetch(
-          `${IPFS_URL}${e.returnValues._evidence}`
-        )).json()
-        /* eslint-disable unicorn/number-literal-case */
-        const calculatedMultihash = archon.utils.multihashFile(
-          evidence,
-          0x1b // keccak-256
-        )
-
-        if (
-          !(await Archon.utils.validateFileFromURI(
-            `${IPFS_URL}${e.returnValues._evidence}`,
-            { hash: calculatedMultihash }
-          ))
-        ) {
-          console.warn('Invalid evidence', evidence)
-          return
-        }
-
-        const { evidences } = this.state
-        const mimeType = mime.lookup(evidence.fileTypeExtension)
-        evidence.icon = getFileIcon(mimeType)
-        this.setState({
-          evidences: {
-            ...evidences,
-            [e.transactionHash]: {
-              ...evidence,
-              blockNumber: e.blockNumber
-            }
-          }
+    if (badge && !evidenceListenerSet)
+      this.setState({ evidenceListenerSet: true }, () => {
+        this.setupListeners({
+          latestRequest,
+          arbitrableAddressListEvents,
+          fetchBadge,
+          badgeAddr,
+          tokenAddr,
+          match,
+          arbitratorEvents,
+          badge,
+          archon,
+          arbitrableAddressListView,
+          badgeContractBlockNumber
         })
       })
-    }
-
-    await Promise.all(
-      (await arbitrableAddressListView.getPastEvents('Evidence', {
-        filter: {
-          _evidenceGroupID: badge.latestRequest.evidenceGroupID
-        },
-        fromBlock: badgeContractBlockNumber,
-        toBlock: 'latest'
-      })).map(async e => {
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-
-        const evidence = await (await fetch(
-          `${IPFS_URL}${e.returnValues._evidence}`
-        )).json()
-        /* eslint-disable unicorn/number-literal-case */
-        const calculatedMultihash = archon.utils.multihashFile(
-          evidence,
-          0x1b // keccak-256
-        )
-
-        if (
-          !(await Archon.utils.validateFileFromURI(
-            `${IPFS_URL}${e.returnValues._evidence}`,
-            { hash: calculatedMultihash }
-          ))
-        ) {
-          console.warn('Invalid evidence', evidence)
-          return
-        }
-
-        const { evidences } = this.state
-        const mimeType = mime.lookup(evidence.fileTypeExtension)
-        evidence.icon = getFileIcon(mimeType)
-        this.setState({
-          evidences: {
-            ...evidences,
-            [e.transactionHash]: {
-              ...evidence,
-              blockNumber: e.blockNumber
-            }
-          }
-        })
-      })
-    )
-
-    this.setState({ evidenceListenerSet: true })
   }
 
   render() {
