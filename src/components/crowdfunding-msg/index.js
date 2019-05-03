@@ -25,8 +25,8 @@ const CrowdfundingMsg = ({ decisiveRuling, type }) =>
           textAlign: 'center'
         }}
       >
-        If the loser complete it’s appeal funding, the winner of the previous
-        round should also fully fund the appeal, in order not to lose the case.
+        If the loser is fully funded, the winner of the previous round should
+        also fully fund the appeal, in order not to lose the case.
       </p>
     </div>
   ) : (
