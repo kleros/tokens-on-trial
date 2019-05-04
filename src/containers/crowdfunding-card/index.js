@@ -92,7 +92,7 @@ const CrowdfundingCard = ({
                   Previous Round{' '}
                   {winnerSide === tcrConstants.SIDE.Requester
                     ? 'Winner'
-                    : 'Looser'}
+                    : 'Loser'}
                 </p>
               )}
               <p style={{ color: 'white' }}>
@@ -143,7 +143,7 @@ const CrowdfundingCard = ({
                   Previous Round{' '}
                   {winnerSide === tcrConstants.SIDE.Challenger
                     ? 'Winner'
-                    : 'Looser'}
+                    : 'Loser'}
                 </p>
               )}
               <p style={{ color: 'white' }}>
