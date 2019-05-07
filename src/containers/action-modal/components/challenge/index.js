@@ -86,7 +86,7 @@ const Challenge = ({
     </div>
     <p style={{ textAlign: 'start', marginTop: '12px', lineHeight: '1.16' }}>
       <small>
-        Explain why you think this submission should be rejected (this will be
+        Explain why you think this request should not be executed (this will be
         seen by jurors).
       </small>
     </p>
