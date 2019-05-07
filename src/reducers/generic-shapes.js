@@ -4,7 +4,6 @@ import * as tcrConstants from '../constants/tcr'
 
 export const cacheItemShape = PropTypes.shape({
   address: PropTypes.string.isRequired,
-  blockNumber: PropTypes.number.isRequired,
   clientStatus: PropTypes.number.isRequired,
   status: PropTypes.shape({
     challenger: PropTypes.string.isRequired,

@@ -3,31 +3,31 @@ import createReducer, { createResource } from 'lessdux'
 
 import * as itemConstants from '../constants/tcr'
 
+const _arbitrableAddressListDataShape = PropTypes.shape({
+  arbitrator: PropTypes.string.isRequired,
+  requesterBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
+  challengerBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
+  challengePeriodDuration: PropTypes.number.isRequired,
+  arbitrationCost: PropTypes.shape({}).isRequired, // BigNumber
+  winnerStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+  loserStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+  sharedStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+  countByStatus: PropTypes.shape(
+    itemConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
+      acc[value] = PropTypes.number.isRequired
+      return acc
+    }, {})
+  ).isRequired
+})
+
 // Shapes
 const {
   shape: arbitrableAddressListDataShape,
   initialState: arbitrableAddressListDataInitialState
 } = createResource(
-  PropTypes.objectOf(
-    PropTypes.shape({
-      arbitrator: PropTypes.string.isRequired,
-      requesterBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
-      challengerBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
-      challengePeriodDuration: PropTypes.number.isRequired,
-      arbitrationCost: PropTypes.shape({}).isRequired, // BigNumber
-      winnerStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-      loserStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-      sharedStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-      countByStatus: PropTypes.shape(
-        itemConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
-          acc[value] = PropTypes.number.isRequired
-          return acc
-        }, {})
-      ).isRequired
-    })
-  ).isRequired
+  PropTypes.objectOf(_arbitrableAddressListDataShape).isRequired
 )
-export { arbitrableAddressListDataShape }
+export { arbitrableAddressListDataShape, _arbitrableAddressListDataShape }
 
 // Reducer
 export default createReducer({

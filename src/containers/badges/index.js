@@ -12,7 +12,8 @@ import * as arbitrableAddressListActions from '../../actions/arbitrable-address-
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
-import { tcrShape } from '../../reducers/generic-shapes'
+import { badgesShape } from '../../reducers/badges'
+import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
 
 import './badges.css'
 
@@ -27,16 +28,19 @@ class Badges extends Component {
     location: PropTypes.shape({
       search: PropTypes.string.isRequired
     }).isRequired,
+    arbitrableAddressListData: PropTypes.objectOf(
+      PropTypes.oneOfType([
+        PropTypes.shape({
+          data: _arbitrableAddressListDataShape
+        }),
+        PropTypes.bool
+      ])
+    ).isRequired,
 
     // Redux State
-    badges: PropTypes.shape({
-      data: PropTypes.shape({
-        statusBlockNumber: PropTypes.number.isRequired
-      })
-    }).isRequired,
+    badges: badgesShape.isRequired,
     filter: filterSelectors.filterShape.isRequired,
     accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
-    arbitrableAddressListData: tcrShape.isRequired,
 
     // Action Dispatchers
     toggleFilter: PropTypes.func.isRequired
@@ -132,7 +136,7 @@ class Badges extends Component {
         />
         <SortBar
           displayedItemsCount={displayedBadges.length}
-          items={badges.data}
+          items={badges}
           totalFiltered={filteredBadges.length}
           displayBadgeFilters
         />

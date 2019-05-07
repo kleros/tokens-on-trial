@@ -53,8 +53,9 @@ class ActionModal extends PureComponent {
     envObjects: PropTypes.shape({}).isRequired,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
-    badgeContracts:
-      arbitrableAddressListSelectors.arbitrableAddressListDataShape.isRequired,
+    badgeContracts: PropTypes.objectOf(
+      arbitrableAddressListSelectors._arbitrableAddressListDataShape
+    ),
 
     // Token actions
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
@@ -84,7 +85,8 @@ class ActionModal extends PureComponent {
     openActionModal: null,
     actionModalParam: null,
     token: null,
-    badge: null
+    badge: null,
+    badgeContracts: null
   }
 
   state = { file: null, fileInfoMessage: null }
@@ -476,8 +478,9 @@ class ActionModal extends PureComponent {
     return (
       <Modal
         className={
-          openActionModal === modalConstants.ACTION_MODAL_ENUM.AddBadge &&
-          'Modal-add-badge'
+          openActionModal === modalConstants.ACTION_MODAL_ENUM.AddBadge
+            ? 'Modal-add-badge'
+            : 'ActionModal'
         }
         isOpen={openActionModal !== null}
         onRequestClose={this.handleRequestClose}

@@ -19,7 +19,6 @@ export const _tokenShape = PropTypes.shape({
 export const _cacheTokenShape = PropTypes.shape({
   ID: PropTypes.string.isRequired,
   address: PropTypes.string.isRequired,
-  blockNumber: PropTypes.number.isRequired,
   clientStatus: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   symbolMultihash: PropTypes.string.isRequired,

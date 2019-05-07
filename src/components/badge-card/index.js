@@ -9,7 +9,7 @@ import { BeatLoader } from 'react-spinners'
 import UnknownToken from '../../assets/images/unknown.svg'
 import { IPFS_URL, web3Utils } from '../../bootstrap/dapp-api'
 import { cacheItemShape } from '../../reducers/generic-shapes'
-import { arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
+import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
 import { getItemStatusColor, getItemStatusText } from '../../utils/ui'
 import * as tokenSelectors from '../../reducers/token'
 import * as tcrConstants from '../../constants/tcr'
@@ -130,7 +130,8 @@ BadgeCard.propTypes = {
   tokens: tokenSelectors.tokensShape.isRequired,
   badge: cacheItemShape.isRequired,
   envObjects: PropTypes.shape({}).isRequired,
-  arbitrableAddressListData: arbitrableAddressListDataShape.isRequired
+  arbitrableAddressListData: PropTypes.objectOf(_arbitrableAddressListDataShape)
+    .isRequired
 }
 
 export default connect(state => ({

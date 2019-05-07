@@ -7,23 +7,23 @@ import * as filterConstants from '../../constants/filter'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
-import { cacheItemShape, tcrShape } from '../../reducers/generic-shapes'
+import { tokensShape } from '../../reducers/token'
+import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
+import { badgesShape } from '../../reducers/badges'
 
 import './sort-bar.css'
 
 class SortBar extends PureComponent {
   static propTypes = {
     // Redux State
-    items: PropTypes.shape({
-      data: PropTypes.shape({
-        items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired
-      }).isRequired
-    }).isRequired,
+    items: PropTypes.oneOfType([tokensShape, badgesShape]).isRequired,
     filter: filterSelectors.filterShape.isRequired,
     displayedItemsCount: PropTypes.number.isRequired,
     totalFiltered: PropTypes.number.isRequired,
     displayBadgeFilters: PropTypes.bool,
-    arbitrableAddressListData: tcrShape.isRequired,
+    arbitrableAddressListData: PropTypes.objectOf(
+      _arbitrableAddressListDataShape
+    ),
 
     // Action Dispatchers
     setOldestFirst: PropTypes.func.isRequired,
@@ -31,7 +31,8 @@ class SortBar extends PureComponent {
   }
 
   static defaultProps = {
-    displayBadgeFilters: false
+    displayBadgeFilters: false,
+    arbitrableAddressListData: null
   }
 
   static contextType = ContractsContext

@@ -11,11 +11,13 @@ import { cacheItemShape } from './generic-shapes'
 
 export const badgesShape = PropTypes.shape({
   loading: PropTypes.bool.isRequired,
-  data: PropTypes.objectOf({
-    badgeContractAddr: PropTypes.string.isRequired,
-    items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired,
-    statusBlockNumber: PropTypes.number.isRequired
-  }).isRequired
+  data: PropTypes.objectOf(
+    PropTypes.shape({
+      badgeContractAddr: PropTypes.string.isRequired,
+      items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired,
+      statusBlockNumber: PropTypes.number.isRequired
+    })
+  ).isRequired
 })
 
 const initialState = {

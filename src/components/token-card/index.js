@@ -3,6 +3,7 @@ import Img from 'react-image'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+import PropTypes from 'prop-types'
 
 import * as tcrConstants from '../../constants/tcr'
 import EtherScanLogo from '../../assets/images/etherscan.png'
@@ -12,9 +13,8 @@ import {
   getBadgeStyle
 } from '../../utils/ui'
 import { IPFS_URL } from '../../bootstrap/dapp-api'
-import { envObjectsShape } from '../../reducers/generic-shapes'
-import { badgesShape } from '../../reducers/badge'
-import { _tokenShape } from '../../reducers/token'
+import { envObjectsShape, cacheItemShape } from '../../reducers/generic-shapes'
+import { _cacheTokenShape } from '../../reducers/token'
 
 import './token-card.css'
 
@@ -88,8 +88,14 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
 )
 
 TokenCard.propTypes = {
-  token: _tokenShape.isRequired,
-  badges: badgesShape.isRequired,
+  token: _cacheTokenShape.isRequired,
+  badges: PropTypes.objectOf(
+    PropTypes.shape({
+      badgeContractAddr: PropTypes.string.isRequired,
+      items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired,
+      statusBlockNumber: PropTypes.number.isRequired
+    })
+  ).isRequired,
   envObjects: envObjectsShape.isRequired
 }
 

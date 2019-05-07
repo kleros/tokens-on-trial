@@ -6,14 +6,14 @@ import * as tcrConstants from '../constants/tcr'
 import { requestShape } from './generic-shapes'
 
 // Common Shapes
-export const _badgeShape = PropTypes.shape({
+const _badgeShape = PropTypes.shape({
   address: PropTypes.string.isRequired,
   numberOfRequests: PropTypes.number.isRequired,
   status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
   latestRequest: requestShape.isRequired
 })
-export const _badgesShape = PropTypes.arrayOf(_badgeShape.isRequired)
+const _badgesShape = PropTypes.arrayOf(_badgeShape.isRequired)
 
 // Shapes
 const { shape: badgesShape, initialState: badgesInitialState } = createResource(
@@ -23,7 +23,7 @@ const { shape: badgeShape, initialState: badgeInitialState } = createResource(
   _badgeShape,
   { withCreate: true, withUpdate: true }
 )
-export { badgesShape, badgeShape }
+export { badgesShape, badgeShape, _badgeShape, _badgesShape }
 
 // Reducer
 export default createReducer({
