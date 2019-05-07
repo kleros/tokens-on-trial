@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { slide as ReactBurgerMenu } from 'react-burger-menu'
 import debounce from 'debounce'
 
-import logo from '../../assets/images/kleros-logo.png'
+import T2CRLogo from '../../assets/images/t2cr-logo.png'
 import { onlyInfura } from '../../bootstrap/dapp-api'
 import './nav-bar.css'
 
@@ -57,7 +57,7 @@ export default class NavBar extends PureComponent {
     const { routes, extras, submenus, action } = this.props
     const { isMobile, isOpen } = this.state
 
-    const logoImg = <img alt="Logo" className="NavBar-logo" src={logo} />
+    const logoImg = <img alt="Logo" className="NavBar-logo" src={T2CRLogo} />
     const routesAndExtras = [
       ...routes.map(r => (
         <div key={r.title}>
