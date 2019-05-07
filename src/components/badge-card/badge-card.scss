@@ -5,7 +5,6 @@
   background: $card;
   border: 1px solid $border;
   border-radius: 3px;
-  box-shadow: 0 3px 6px $shadow;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
@@ -16,7 +15,7 @@
   width: 248px;
 
   &:hover {
-    box-shadow: 0 6px 12px $shadowRaised;
+    box-shadow: 0 3px 6px $shadow;
   }
 
   &-header {
