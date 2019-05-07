@@ -329,7 +329,7 @@ export const getItemStatusText = item => {
   if (item.inAppealPeriod) return 'Crowdfunding'
   if (item.clientStatus === 0) return 'Absent'
   if (item.clientStatus === 1) return 'Registered'
-  if (item.clientStatus === 2) return 'Pending Registration'
-  if (item.clientStatus === 3) return 'Pending Removal'
+  if (item.clientStatus === 2) return 'Registration Requested'
+  if (item.clientStatus === 3) return 'Removal Requested'
   return 'Challenged'
 }
