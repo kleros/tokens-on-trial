@@ -16,6 +16,7 @@ const getFileIcon = type => {
     case 'application/pdf':
       return 'file-pdf'
     case 'application/msword':
+    case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
       return 'file-word'
     default:
       return 'file'
