@@ -5,7 +5,6 @@
   background: linear-gradient(101.6deg, #4d00b4 48.27%, #6500b4 86.4%);
   border: 1px solid #d09cff;
   border-radius: 3px;
-  box-shadow: 0 3px 6px rgba(172, 125, 214, 0.941);
   color: white;
   display: flex;
   height: 200px;
@@ -20,7 +19,7 @@
   }
 
   &:hover {
-    box-shadow: 0 6px 12px rgba(172, 125, 214, 0.74);
+    box-shadow: 0 3px 6px $shadow;
   }
 
   &-info {
