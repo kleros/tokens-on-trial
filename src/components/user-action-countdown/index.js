@@ -40,8 +40,7 @@ const UserActionCountdown = ({
     decisiveRuling
   )
 
-  if (remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid))
-    return null
+  if (remainingTime <= 0) return null
 
   /* eslint-disable react/jsx-no-bind */
 
@@ -66,16 +65,22 @@ const UserActionCountdown = ({
       <>
         <ActionCountdown
           icon="clock"
-          text="Winner Deadline"
+          text={`${
+            remainingLoserTime <= 0 && !loserHasPaid
+              ? 'Enforcement Countdown'
+              : 'Winner Deadline'
+          }`}
           endTime={Date.now() + remainingTime}
           onComplete={() => onAppealPeriodEnd(true)}
         />
-        <ActionCountdown
-          icon="clock"
-          text="Loser Deadline"
-          endTime={Date.now() + remainingLoserTime}
-          onComplete={() => onLoserTimedOut(true)}
-        />
+        {remainingLoserTime > 0 && (
+          <ActionCountdown
+            icon="clock"
+            text="Loser Deadline"
+            endTime={Date.now() + remainingLoserTime}
+            onComplete={() => onLoserTimedOut(true)}
+          />
+        )}
       </>
     )
 
