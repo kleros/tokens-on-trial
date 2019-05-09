@@ -12,8 +12,7 @@ const UserActionCountdown = ({
   userAccount,
   tcrData,
   onAppealPeriodEnd,
-  onLoserTimedOut,
-  onChallengePeriodEnd
+  onLoserTimedOut
 }) => {
   const { latestRequest } = item
   const { dispute, parties } = latestRequest
@@ -50,7 +49,6 @@ const UserActionCountdown = ({
         icon="clock"
         text="Challenge Deadline"
         endTime={Date.now() + remainingTime}
-        onComplete={() => onChallengePeriodEnd(true)}
       />
     )
 
@@ -103,8 +101,7 @@ UserActionCountdown.propTypes = {
   userAccount: PropTypes.string.isRequired,
   tcrData: tcrShape.isRequired,
   onAppealPeriodEnd: PropTypes.func.isRequired,
-  onLoserTimedOut: PropTypes.func.isRequired,
-  onChallengePeriodEnd: PropTypes.func.isRequired
+  onLoserTimedOut: PropTypes.func.isRequired
 }
 
 export default UserActionCountdown
