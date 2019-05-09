@@ -480,7 +480,7 @@ class ActionModal extends PureComponent {
         className={
           openActionModal === modalConstants.ACTION_MODAL_ENUM.AddBadge
             ? 'Modal-add-badge'
-            : 'ActionModal'
+            : ''
         }
         isOpen={openActionModal !== null}
         onRequestClose={this.handleRequestClose}
