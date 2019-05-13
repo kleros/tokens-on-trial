@@ -7,11 +7,11 @@
   justify-content: center;
   padding: 15px 0;
 
-  @media (min-width: 840px) {
+  @media (min-width: 940px) {
     flex-direction: row;
   }
 
-  @media (max-width: 839px) {
+  @media (max-width: 939px) {
     flex-direction: column;
   }
 
@@ -22,7 +22,7 @@
     object-fit: contain;
     width: 98px;
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       align-self: unset;
       margin: 0 0 26px 0;
     }
@@ -52,11 +52,11 @@
       display: flex;
       min-height: 102px;
 
-      @media (min-width: 840px) {
+      @media (min-width: 940px) {
         flex-direction: row;
       }
 
-      @media (max-width: 839px) {
+      @media (max-width: 939px) {
         align-items: center;
         flex-direction: column;
         margin-top: 26px;
@@ -74,13 +74,13 @@
     height: 48px;
     padding-left: 30px;
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       &-badge {
         display: none;
       }
     }
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       padding: 0 26px;
     }
   }
@@ -94,11 +94,11 @@
     margin: 0 26px;
     min-width: 100px;
 
-    @media (min-width: 840px) {
+    @media (min-width: 940px) {
       align-items: flex-start;
     }
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       flex-direction: row;
     }
 
@@ -118,7 +118,7 @@
     border-left: 1px solid $border;
     margin: 17px;
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       border-top: 1px solid $border;
     }
   }
@@ -145,7 +145,7 @@
     margin-right: auto;
     vertical-align: middle;
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       margin: 0 26px;
 
       &-crowdfunding {
@@ -190,7 +190,7 @@
     min-width: 200px;
     padding-right: 26px;
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       justify-content: center;
       margin: 0;
       margin-top: 16px;
@@ -198,7 +198,7 @@
       width: 100%;
     }
 
-    @media (min-width: 840px) {
+    @media (min-width: 940px) {
       &::before {
         border-bottom: 50px solid transparent;
         border-left: 20px solid #fff;
@@ -218,7 +218,7 @@
     padding-right: 36px;
     position: relative;
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       flex-direction: column;
       margin: 0;
       margin-top: 17px;
@@ -247,7 +247,7 @@
       width: 120px;
     }
 
-    @media (max-width: 839px) {
+    @media (max-width: 939px) {
       width: 250px;
     }
 
@@ -269,7 +269,7 @@
     padding: 17px;
     width: 235px;
 
-    @media (max-width: 889px) {
+    @media (max-width: 989px) {
       border-left: 0;
       margin: 10px;
       padding: 0;

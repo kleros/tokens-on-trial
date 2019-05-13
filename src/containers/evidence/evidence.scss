@@ -17,6 +17,12 @@
     justify-content: space-between;
   }
 
+  &-requests {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+
   &-evidence {
     display: flex;
     flex-direction: row;
@@ -26,7 +32,8 @@
     &--list {
       display: flex;
       flex-wrap: wrap;
-      margin-bottom: 26px;
+      margin: 0 -5px;
+      margin-bottom: 16px;
     }
 
     &--item {

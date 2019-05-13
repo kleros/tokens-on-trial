@@ -287,7 +287,7 @@ export const rulingMessage = (
 ) => {
   if (!decisiveRuling) return 'Jurors did not rule'
   if (!requesterOrChallenger)
-    return ruling === '1'
+    return ruling.toString() === '1'
       ? 'Jurors ruled in favor of the requester'
       : 'Jurors ruled in favor of the challenger'
   if (isLoser) return 'Jurors ruled against you'

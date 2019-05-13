@@ -17,8 +17,8 @@ import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
 
-const fetchEvents = async (eventName, contract) =>
-  contract.getPastEvents(eventName, { fromBlock: 0 }) // Web3js returns an empty array if fromBlock is not set.
+const fetchEvents = async (eventName, contract, fromBlock) =>
+  contract.getPastEvents(eventName, { fromBlock: fromBlock || 0 }) // Web3js returns an empty array if fromBlock is not set.
 
 /**
  * Fetches the arbitrable token list's data.
@@ -32,6 +32,7 @@ export function* fetchArbitrableTokenListData() {
 
   // Fetch the contract deployment block number. We use the first meta evidence
   // events emitted when the constructor is run.
+  // TODO: Cache this.
   const metaEvidenceEvents = (yield call(
     fetchEvents,
     'MetaEvidence',
@@ -44,8 +45,22 @@ export function* fetchArbitrableTokenListData() {
     metaEvidenceEvents[metaEvidenceEvents.length - 1].returnValues._evidence
   }`
   const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
-
   const { fileURI } = metaEvidence
+
+  // TODO: Cache this to speed up future loads.
+  const evidenceEvents = (yield call(
+    fetchEvents,
+    'Evidence',
+    arbitrableTokenListView,
+    blockNumber
+  )).reduce((acc, curr) => {
+    const {
+      returnValues: { _evidenceGroupID }
+    } = curr
+    acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
+    acc[_evidenceGroupID].push(curr)
+    return acc
+  }, {})
 
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
@@ -85,6 +100,7 @@ export function* fetchArbitrableTokenListData() {
   return {
     blockNumber,
     fileURI,
+    evidenceEvents,
     arbitrator: d.arbitrator,
     governor: d.governor,
     requesterBaseDeposit: toBN(d.requesterBaseDeposit),

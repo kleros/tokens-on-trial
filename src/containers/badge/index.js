@@ -2,17 +2,14 @@ import React, { PureComponent } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
-import Archon from '@kleros/archon'
 
-import { IPFS_URL, onlyInfura } from '../../bootstrap/dapp-api'
+import { onlyInfura } from '../../bootstrap/dapp-api'
 import Button from '../../components/button'
 import Modal from '../../components/modal'
-import Evidence from '../../components/evidence'
+import Evidence from '../evidence'
 import FilterBar from '../filter-bar'
 import { getRemainingTime } from '../../utils/ui'
-import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as badgeActions from '../../actions/badge'
@@ -62,11 +59,10 @@ class BadgeDetails extends PureComponent {
 
   state = {
     countdownCompleted: false,
-    evidences: null,
     appealModalOpen: false,
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
-    evidenceListenerSet: false,
+    eventListenerSet: false,
     evidencePeriodEnded: false
   }
 
@@ -172,17 +168,12 @@ class BadgeDetails extends PureComponent {
   }
 
   async setupListeners({
-    latestRequest,
     arbitrableAddressListEvents,
     fetchBadge,
     badgeAddr,
     tokenAddr,
     match,
-    arbitratorEvents,
-    badge,
-    archon,
-    arbitrableAddressListView,
-    badgeContractBlockNumber
+    arbitratorEvents
   }) {
     arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
       if (err) {
@@ -233,96 +224,6 @@ class BadgeDetails extends PureComponent {
       )
         fetchBadge(tokenAddr, badgeAddr)
     })
-    arbitrableAddressListEvents.events.Evidence(async (err, e) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { badge } = this.state
-      if (!badge) return
-      const { latestRequest } = badge
-      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-        return
-
-      const evidence = await (await fetch(
-        `${IPFS_URL}${e.returnValues._evidence}`
-      )).json()
-      /* eslint-disable unicorn/number-literal-case */
-      const calculatedMultihash = archon.utils.multihashFile(
-        evidence,
-        0x1b // keccak-256
-      )
-
-      if (
-        !(await Archon.utils.validateFileFromURI(
-          `${IPFS_URL}${e.returnValues._evidence}`,
-          { hash: calculatedMultihash }
-        ))
-      ) {
-        console.warn('Invalid evidence', evidence)
-        return
-      }
-
-      const { evidences } = this.state
-      const mimeType = mime.lookup(evidence.fileTypeExtension)
-      evidence.icon = getFileIcon(mimeType)
-      this.setState({
-        evidences: {
-          ...evidences,
-          [e.transactionHash]: {
-            ...evidence,
-            blockNumber: e.blockNumber
-          }
-        }
-      })
-    })
-    await Promise.all(
-      (await arbitrableAddressListView.getPastEvents('Evidence', {
-        filter: {
-          _evidenceGroupID: badge.latestRequest.evidenceGroupID
-        },
-        fromBlock: badgeContractBlockNumber,
-        toBlock: 'latest'
-      })).map(async e => {
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-        try {
-          const evidence = await (await fetch(
-            `${IPFS_URL}${e.returnValues._evidence}`
-          )).json()
-          /* eslint-disable unicorn/number-literal-case */
-          const calculatedMultihash = archon.utils.multihashFile(
-            evidence,
-            0x1b // keccak-256
-          )
-
-          if (
-            !(await Archon.utils.validateFileFromURI(
-              `${IPFS_URL}${e.returnValues._evidence}`,
-              { hash: calculatedMultihash }
-            ))
-          ) {
-            console.warn('Invalid evidence', evidence)
-            return
-          }
-
-          const { evidences } = this.state
-          const mimeType = mime.lookup(evidence.fileTypeExtension)
-          evidence.icon = getFileIcon(mimeType)
-          this.setState({
-            evidences: {
-              ...evidences,
-              [e.transactionHash]: {
-                ...evidence,
-                blockNumber: e.blockNumber
-              }
-            }
-          })
-        } catch (err) {
-          console.error('a', err)
-        }
-      })
-    )
   }
 
   async componentDidUpdate() {
@@ -349,25 +250,24 @@ class BadgeDetails extends PureComponent {
     const badgeContractBlockNumber = badgeTCRs[badgeAddr].blockNumber
     const arbitrableAddressListEvents = badgeEventsContracts[badgeAddr]
     const arbitrableAddressListView = badgeViewContracts[badgeAddr]
-    const { badge, fetching, evidenceListenerSet } = this.state
+    const { badge, fetching, eventListenerSet } = this.state
     if (
       !fetching &&
       badge &&
-      evidenceListenerSet &&
+      eventListenerSet &&
       badge.tokenAddress !== tokenAddr
     ) {
       fetchBadge(tokenAddr, badgeAddr)
       this.setState({
         fetching: true,
-        evidenceListenerSet: false,
-        evidences: null
+        eventListenerSet: false
       })
       return
     }
 
     if (
       fetching ||
-      (badge && evidenceListenerSet && badge.tokenAddress === tokenAddr)
+      (badge && eventListenerSet && badge.tokenAddress === tokenAddr)
     )
       return
 
@@ -380,12 +280,12 @@ class BadgeDetails extends PureComponent {
     if (badge && badge.tokenAddress !== tokenAddr && !fetching)
       window.location.reload(true)
 
-    if (evidenceListenerSet) return
+    if (eventListenerSet) return
 
     const { latestRequest } = badge
 
-    if (badge && !evidenceListenerSet)
-      this.setState({ evidenceListenerSet: true }, () => {
+    if (badge && !eventListenerSet)
+      this.setState({ eventListenerSet: true }, () => {
         this.setupListeners({
           latestRequest,
           arbitrableAddressListEvents,
@@ -403,12 +303,7 @@ class BadgeDetails extends PureComponent {
   }
 
   render() {
-    const {
-      evidences,
-      appealModalOpen,
-      loserCountdownCompleted,
-      badge
-    } = this.state
+    const { appealModalOpen, loserCountdownCompleted, badge } = this.state
 
     const {
       accounts,
@@ -559,7 +454,8 @@ class BadgeDetails extends PureComponent {
         />
         <Evidence
           item={badge}
-          evidences={evidences}
+          tcr={arbitrableAddressListView}
+          tcrData={arbitrableAddressListData.data}
           handleOpenEvidenceModal={this.handleOpenEvidenceModal}
           handleViewEvidenceClick={this.handleViewEvidenceClick}
         />

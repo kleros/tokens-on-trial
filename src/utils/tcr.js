@@ -189,7 +189,6 @@ export const getBlock = (block, web3, hash, callback) => {
 export const convertFromString = item => {
   const { latestRequest } = item
   item.numberOfRequests = Number(item.numberOfRequests)
-  latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
   latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
   latestRequest.disputeID = latestRequest.dispute
     ? Number(latestRequest.disputeID)
@@ -198,6 +197,13 @@ export const convertFromString = item => {
     Number(latestRequest.numberOfRounds) > 1
       ? Number(latestRequest.appealDisputeID)
       : 0
+
+  item.requests = item.requests.map(request => ({
+    ...request,
+    submissionTime: Number(request.submissionTime) * 1000,
+    ruling: Number(request.ruling)
+  }))
+  latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
 
   if (latestRequest.dispute) {
     latestRequest.dispute.ruling = Number(latestRequest.dispute.ruling)

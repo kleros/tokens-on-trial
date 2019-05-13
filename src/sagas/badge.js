@@ -45,22 +45,24 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
   let badge = yield call(
     arbitrableAddressListView.methods.getAddressInfo(tokenAddress).call
   )
+  badge.requests = []
 
   if (Number(badge.numberOfRequests > 0)) {
-    badge.latestRequest = yield call(
-      arbitrableAddressListView.methods.getRequestInfo(
-        tokenAddress,
-        Number(badge.numberOfRequests) - 1
-      ).call
-    )
-    if (badge.latestRequest.arbitratorExtraData === null)
-      badge.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
-
-    badge.latestRequest.evidenceGroupID = web3Utils
-      .toBN(
-        web3Utils.soliditySha3(tokenAddress, Number(badge.numberOfRequests) - 1)
+    for (let i = 0; i < badge.numberOfRequests; i++) {
+      const request = yield call(
+        arbitrableAddressListView.methods.getRequestInfo(tokenAddress, i).call
       )
-      .toString()
+      if (request.arbitratorExtraData === null)
+        request.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
+
+      request.evidenceGroupID = web3Utils
+        .toBN(web3Utils.soliditySha3(tokenAddress, i))
+        .toString()
+
+      badge.requests.push(request)
+    }
+
+    badge.latestRequest = badge.requests[badge.requests.length - 1]
 
     // Calculate amount withdrawable
     let i

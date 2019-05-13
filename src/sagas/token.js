@@ -43,19 +43,23 @@ export function* fetchToken({ payload: { ID } }) {
     token['1'] = '0x'
   }
 
+  token.requests = []
   if (Number(token.numberOfRequests > 0)) {
-    token.latestRequest = yield call(
-      arbitrableTokenListView.methods.getRequestInfo(
-        ID,
-        Number(token.numberOfRequests) - 1
-      ).call
-    )
-    if (token.latestRequest.arbitratorExtraData === null)
-      token.latestRequest.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
+    for (let i = 0; i < token.numberOfRequests; i++) {
+      const request = yield call(
+        arbitrableTokenListView.methods.getRequestInfo(ID, i).call
+      )
+      if (request.arbitratorExtraData === null)
+        request.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-    token.latestRequest.evidenceGroupID = web3Utils
-      .toBN(web3Utils.soliditySha3(ID, Number(token.numberOfRequests) - 1))
-      .toString()
+      request.evidenceGroupID = web3Utils
+        .toBN(web3Utils.soliditySha3(ID, i))
+        .toString()
+
+      token.requests.push(request)
+    }
+
+    token.latestRequest = token.requests[token.requests.length - 1]
 
     // Calculate amount withdrawable
     let i

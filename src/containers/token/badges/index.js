@@ -33,7 +33,6 @@ const BadgesSection = ({
 
   return (
     <div className="TokenDescription">
-      <hr className="Badges-separator" />
       <div className="Badges-badge-header">
         <h3 style={{ marginTop: 0 }}>Badges</h3>
         {(status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered'] ||

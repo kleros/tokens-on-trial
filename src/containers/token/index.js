@@ -2,17 +2,14 @@ import React, { PureComponent } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-import * as mime from 'mime-types'
 import { BeatLoader } from 'react-spinners'
-import Archon from '@kleros/archon'
 
-import { IPFS_URL, onlyInfura } from '../../bootstrap/dapp-api'
+import { onlyInfura } from '../../bootstrap/dapp-api'
 import Button from '../../components/button'
 import Modal from '../../components/modal'
 import FilterBar from '../filter-bar'
 import WithdrawFundsButton from '../../components/withdraw-funds'
 import { getRemainingTime } from '../../utils/ui'
-import { getFileIcon } from '../../utils/evidence'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
@@ -22,7 +19,7 @@ import * as tcrConstants from '../../constants/tcr'
 import * as walletSelectors from '../../reducers/wallet'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import { ContractsContext } from '../../bootstrap/contexts'
-import Evidence from '../../components/evidence'
+import Evidence from '../evidence'
 import CrowdfundingCard from '../crowdfunding-card'
 
 import Badges from './badges'
@@ -66,12 +63,11 @@ class TokenDetails extends PureComponent {
   }
 
   state = {
-    evidences: null,
     countdownCompleted: false,
     appealModalOpen: false,
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
-    evidenceListenerSet: false,
+    eventListenerSet: false,
     evidencePeriodEnded: false
   }
 
@@ -169,11 +165,7 @@ class TokenDetails extends PureComponent {
     fetchToken,
     tokenID,
     accounts,
-    arbitratorEvents,
-    archon,
-    arbitrableTokenListView,
-    latestRequest,
-    T2CR_BLOCK
+    arbitratorEvents
   }) {
     arbitrableTokenListEvents.events.Ruling((err, event) => {
       if (err) {
@@ -241,94 +233,6 @@ class TokenDetails extends PureComponent {
       if (!token) return
       if (tokenID === event.returnValues._tokenID) fetchToken(tokenID)
     })
-    arbitrableTokenListEvents.events.Evidence(async (err, e) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-      const { token } = this.state
-      if (!token) return
-      const { latestRequest } = token
-      if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-        return
-
-      const evidence = await (await fetch(
-        `${IPFS_URL}${e.returnValues._evidence}`
-      )).json()
-      /* eslint-disable unicorn/number-literal-case */
-      const calculatedMultihash = archon.utils.multihashFile(
-        evidence,
-        0x1b // keccak-256
-      )
-
-      if (
-        !(await Archon.utils.validateFileFromURI(
-          `${IPFS_URL}${e.returnValues._evidence}`,
-          { hash: calculatedMultihash }
-        ))
-      ) {
-        console.warn('Invalid evidence', evidence)
-        return
-      }
-
-      const { evidences } = this.state
-      const mimeType = mime.lookup(evidence.fileTypeExtension)
-      evidence.icon = getFileIcon(mimeType)
-      this.setState({
-        evidences: {
-          ...evidences,
-          [e.transactionHash]: {
-            ...evidence,
-            blockNumber: e.blockNumber
-          }
-        }
-      })
-    })
-
-    await Promise.all(
-      (await arbitrableTokenListView.getPastEvents('Evidence', {
-        filter: {
-          _evidenceGroupID: latestRequest.evidenceGroupID
-        },
-        fromBlock: T2CR_BLOCK,
-        toBlock: 'latest'
-      })).map(async e => {
-        if (latestRequest.evidenceGroupID !== e.returnValues._evidenceGroupID)
-          return
-
-        const evidence = await (await fetch(
-          `${IPFS_URL}${e.returnValues._evidence}`
-        )).json()
-        /* eslint-disable unicorn/number-literal-case */
-        const calculatedMultihash = archon.utils.multihashFile(
-          evidence,
-          0x1b // keccak-256
-        )
-
-        if (
-          !(await Archon.utils.validateFileFromURI(
-            `${IPFS_URL}${e.returnValues._evidence}`,
-            { hash: calculatedMultihash }
-          ))
-        ) {
-          console.warn('Invalid evidence', evidence)
-          return
-        }
-
-        const { evidences } = this.state
-        const mimeType = mime.lookup(evidence.fileTypeExtension)
-        evidence.icon = getFileIcon(mimeType)
-        this.setState({
-          evidences: {
-            ...evidences,
-            [e.transactionHash]: {
-              ...evidence,
-              blockNumber: e.blockNumber
-            }
-          }
-        })
-      })
-    )
   }
 
   async componentDidUpdate() {
@@ -343,19 +247,17 @@ class TokenDetails extends PureComponent {
       archon
     } = this.context
 
-    const { token, fetching, evidenceListenerSet } = this.state
+    const { token, fetching, eventListenerSet } = this.state
     const { tokenID } = match.params
-    if (!fetching && token && evidenceListenerSet && token.ID !== tokenID) {
+    if (!fetching && token && eventListenerSet && token.ID !== tokenID) {
       fetchToken(tokenID)
       this.setState({
         fetching: true,
-        evidenceListenerSet: false,
-        evidences: null
+        eventListenerSet: false
       })
       return
     }
-    if (fetching || (token && evidenceListenerSet && token.ID === tokenID))
-      return
+    if (fetching || (token && eventListenerSet && token.ID === tokenID)) return
 
     if (!token && !fetching) {
       fetchToken(tokenID)
@@ -364,12 +266,12 @@ class TokenDetails extends PureComponent {
 
     if (!token && fetching) return
     if (token && token.ID !== tokenID && !fetching) window.location.reload(true)
-    if (evidenceListenerSet) return
+    if (eventListenerSet) return
 
     const { latestRequest } = token
 
-    if (token && !evidenceListenerSet)
-      this.setState({ evidenceListenerSet: true }, () => {
+    if (token && !eventListenerSet)
+      this.setState({ eventListenerSet: true }, () => {
         this.setupListeners({
           arbitrableTokenListEvents,
           fetchToken,
@@ -385,12 +287,10 @@ class TokenDetails extends PureComponent {
   }
 
   render() {
-    const {
-      evidences,
-      appealModalOpen,
-      loserCountdownCompleted,
-      token
-    } = this.state
+    const { appealModalOpen, loserCountdownCompleted, token } = this.state
+
+    if (!this.context) return null
+    const { arbitrableTokenListView } = this.context
 
     const {
       accounts,
@@ -522,7 +422,8 @@ class TokenDetails extends PureComponent {
         />
         <Evidence
           item={token}
-          evidences={evidences}
+          tcr={arbitrableTokenListView}
+          tcrData={arbitrableTokenListData.data}
           handleOpenEvidenceModal={this.handleOpenEvidenceModal}
           handleViewEvidenceClick={this.handleViewEvidenceClick}
         />
