@@ -7,11 +7,13 @@ import * as mime from 'mime-types'
 
 import * as tcrConstants from '../../constants/tcr'
 import { onlyInfura, IPFS_URL } from '../../bootstrap/dapp-api'
-import { itemShape } from '../../reducers/generic-shapes'
+import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 import { getFileIcon } from '../../utils/evidence'
 import { ContractsContext } from '../../bootstrap/contexts'
 import { rulingMessage } from '../../utils/ui'
 import Button from '../../components/button'
+import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 
 import './evidence.css'
 
@@ -46,6 +48,15 @@ const getEvidenceInfo = async ({ returnValues, archon }) => {
 
 class EvidenceSection extends Component {
   static contextType = ContractsContext
+
+  static propTypes = {
+    tcrData: tcrShape.isRequired,
+    tcr: PropTypes.oneOfType([
+      arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+      arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    ]).isRequired
+  }
+
   state = { requestInfo: null }
 
   async componentWillReceiveProps({
