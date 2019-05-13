@@ -44,7 +44,7 @@ export const instantiateEnvObjects = async () => {
   let viewWeb3 = new Web3(httpProvider)
 
   let arbitrableTokenList
-  let badgeContracts
+  let badgeContracts = {}
   let arbitrator
   let web3
   if (window.ethereum) {
@@ -54,19 +54,22 @@ export const instantiateEnvObjects = async () => {
     viewWeb3 = web3
     eventsWeb3 = web3
 
+    arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+
     arbitrableTokenList = new web3.eth.Contract(
       ArbitrableTokenList.abi,
       ARBITRABLE_TOKEN_LIST_ADDRESS
     )
-    badgeContracts = badgeTCRs[networkID]
-      .map(
-        address => new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
-      )
-      .reduce((acc, contract) => {
-        acc[contract.options.address] = contract
-        return acc
-      }, {})
-    arbitrator = new web3.eth.Contract(Arbitrator.abi, ARBITRATOR_ADDRESS)
+    if (badgeTCRs[networkID])
+      badgeContracts = badgeTCRs[networkID]
+        .map(
+          address =>
+            new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+        )
+        .reduce((acc, contract) => {
+          acc[contract.options.address] = contract
+          return acc
+        }, {})
   }
 
   const arbitrableTokenListView = new viewWeb3.eth.Contract(
@@ -77,14 +80,17 @@ export const instantiateEnvObjects = async () => {
     Arbitrator.abi,
     ARBITRATOR_ADDRESS
   )
-  const badgeViewContracts = badgeTCRs[networkID]
-    .map(
-      address => new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
-    )
-    .reduce((acc, contract) => {
-      acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
-      return acc
-    }, {})
+
+  let badgeViewContracts = {}
+  if (badgeTCRs[networkID])
+    badgeViewContracts = badgeTCRs[networkID]
+      .map(
+        address => new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+      )
+      .reduce((acc, contract) => {
+        acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
+        return acc
+      }, {})
 
   const arbitrableTokenListEvents = new eventsWeb3.eth.Contract(
     ArbitrableTokenList.abi,
@@ -94,14 +100,18 @@ export const instantiateEnvObjects = async () => {
     Arbitrator.abi,
     ARBITRATOR_ADDRESS
   )
-  const badgeEventsContracts = badgeTCRs[networkID]
-    .map(
-      address => new eventsWeb3.eth.Contract(ArbitrableAddressList.abi, address)
-    )
-    .reduce((acc, contract) => {
-      acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
-      return acc
-    }, {})
+
+  let badgeEventsContracts = {}
+  if (badgeTCRs[networkID])
+    badgeEventsContracts = badgeTCRs[networkID]
+      .map(
+        address =>
+          new eventsWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+      )
+      .reduce((acc, contract) => {
+        acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
+        return acc
+      }, {})
 
   const latestBlock = (await viewWeb3.eth.getBlock('latest')).number
 
