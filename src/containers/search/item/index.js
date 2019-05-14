@@ -3,13 +3,17 @@ import PropTypes from 'prop-types'
 import Img from 'react-image'
 import { connect } from 'react-redux'
 
-import { truncateMiddle } from '../../../utils/ui'
+import { truncateMiddle, getItemStatusColor } from '../../../utils/ui'
 import { web3Utils, IPFS_URL } from '../../../bootstrap/dapp-api'
 
 import './item.css'
 
 const SearchItem = ({ onClick, item, FILE_BASE_URL }) => (
-  <li onClick={onClick} className="SearchItem">
+  <li
+    onClick={onClick}
+    className="SearchItem"
+    style={{ borderLeft: `4px solid ${getItemStatusColor(item)}` }}
+  >
     <Img
       className="SearchItem-symbol"
       alt="submission-symbol"

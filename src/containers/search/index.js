@@ -37,7 +37,14 @@ class SearchBar extends Component {
     const FILE_BASE_URL = envObjects ? envObjects.FILE_BASE_URL : null
     const tokenData = tokens.items
     const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
-      const { name, ticker, address, symbolMultihash } = tokenData[tokenID]
+      const {
+        name,
+        ticker,
+        address,
+        symbolMultihash,
+        clientStatus,
+        inAppealPeriod
+      } = tokenData[tokenID]
       return {
         value: name || '',
         searchVal: name ? name.toLowerCase() : '',
@@ -45,7 +52,9 @@ class SearchBar extends Component {
         name,
         ticker,
         address,
-        symbolMultihash
+        symbolMultihash,
+        clientStatus,
+        inAppealPeriod
       }
     })
 
