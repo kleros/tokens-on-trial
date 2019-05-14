@@ -130,6 +130,9 @@ class EvidenceSection extends Component {
       })
       const { requestsInfo } = this.state
       const newRequestInfo = { ...requestsInfo }
+
+      if (!newRequestInfo[evidence._evidenceGroupID]) window.reload()
+
       newRequestInfo[evidence._evidenceGroupID].evidences[
         e.transactionHash
       ] = evidence
