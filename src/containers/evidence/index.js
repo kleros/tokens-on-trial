@@ -17,7 +17,7 @@ import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-addre
 
 import './evidence.css'
 
-const getEvidenceInfo = async ({ returnValues, archon }) => {
+const getEvidenceInfo = async ({ returnValues, archon, txHash }) => {
   const { _evidence, _evidenceGroupID, _arbitrator, _party } = returnValues
   const evidence = await (await fetch(`${IPFS_URL}${_evidence}`)).json()
 
@@ -38,6 +38,7 @@ const getEvidenceInfo = async ({ returnValues, archon }) => {
 
   const mimeType = mime.lookup(evidence.fileTypeExtension)
   return {
+    txHash,
     evidence,
     icon: getFileIcon(mimeType),
     _arbitrator,
@@ -57,15 +58,15 @@ class EvidenceSection extends Component {
     ]).isRequired
   }
 
-  state = { requestInfo: null }
+  state = { requestsInfo: null }
 
   async componentWillReceiveProps({
     item: { requests, badgeContractAddr },
     tcrData,
     tcr
   }) {
-    const { requestInfo } = this.state
-    if (requestInfo) return
+    let { requestsInfo } = this.state
+    if (requestsInfo) return
     if (!tcrData || (badgeContractAddr && !tcrData[badgeContractAddr])) return
     if (
       (badgeContractAddr && !tcrData[badgeContractAddr].evidenceEvents) ||
@@ -77,12 +78,15 @@ class EvidenceSection extends Component {
     const { evidenceEvents } = badgeContractAddr
       ? tcrData[badgeContractAddr]
       : tcrData
-    const requestsInfo = {}
+    requestsInfo = {}
     requests.forEach(request => {
       requestsInfo[request.evidenceGroupID] = {
         evidences: evidenceEvents[request.evidenceGroupID]
-          ? evidenceEvents[request.evidenceGroupID].map(e => e.returnValues)
-          : [],
+          ? evidenceEvents[request.evidenceGroupID].reduce((acc, curr) => {
+              acc[curr.transactionHash] = curr
+              return acc
+            }, {})
+          : {},
         ruling: request.ruling,
         resolved: request.resolved,
         submissionTime: request.submissionTime,
@@ -93,13 +97,22 @@ class EvidenceSection extends Component {
     const { archon } = this.context
 
     await Promise.all(
-      Object.keys(requestsInfo).map(async key => {
-        requestsInfo[key].evidences = await Promise.all(
-          requestsInfo[key].evidences.map(async returnValues =>
-            getEvidenceInfo({ returnValues, archon })
+      Object.keys(requestsInfo).map(async evidenceGroupID => {
+        requestsInfo[evidenceGroupID].evidences = (await Promise.all(
+          Object.keys(requestsInfo[evidenceGroupID].evidences).map(
+            async txHash =>
+              getEvidenceInfo({
+                returnValues:
+                  requestsInfo[evidenceGroupID].evidences[txHash].returnValues,
+                archon,
+                txHash
+              })
           )
-        )
-        return requestsInfo[key]
+        )).reduce((acc, curr) => {
+          acc[curr.txHash] = curr
+          return acc
+        }, {})
+        return requestsInfo[evidenceGroupID]
       })
     )
 
@@ -112,16 +125,15 @@ class EvidenceSection extends Component {
 
       const evidence = await getEvidenceInfo({
         returnValues: e.returnValues,
-        archon
+        archon,
+        txHash: e.transactionHash
       })
       const { requestsInfo } = this.state
       const newRequestInfo = { ...requestsInfo }
-      const newEvidences = [].concat(
-        newRequestInfo[evidence._evidenceGroupID].evidences
-      )
-      newEvidences.push(evidence)
-      newRequestInfo[evidence._evidenceGroupID].evidences = newEvidences
-      this.setState({ requestInfo: newRequestInfo })
+      newRequestInfo[evidence._evidenceGroupID].evidences[
+        e.transactionHash
+      ] = evidence
+      this.setState({ requestsInfo: newRequestInfo })
     })
 
     this.setState({ requestsInfo, eventSubscription })
@@ -198,15 +210,17 @@ class EvidenceSection extends Component {
                           <i>No evidence submitted.</i>
                         </small>
                       )}
-                      {requestInfo.evidences.map((evidence, j) => (
-                        <div
-                          className="Evidence-evidence--item"
-                          key={`${i}${j}`}
-                          onClick={handleViewEvidenceClick(evidence.evidence)}
-                        >
-                          <FontAwesomeIcon icon={evidence.icon} size="2x" />
-                        </div>
-                      ))}
+                      {Object.keys(requestInfo.evidences)
+                        .map(txHash => requestInfo.evidences[txHash])
+                        .map((evidence, j) => (
+                          <div
+                            className="Evidence-evidence--item"
+                            key={`${i}${j}`}
+                            onClick={handleViewEvidenceClick(evidence.evidence)}
+                          >
+                            <FontAwesomeIcon icon={evidence.icon} size="2x" />
+                          </div>
+                        ))}
                     </div>
                     <hr
                       className="Evidence-separator"
