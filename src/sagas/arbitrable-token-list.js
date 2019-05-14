@@ -26,7 +26,7 @@ const fetchEvents = async (eventName, contract, fromBlock) =>
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitrableTokenListData() {
-  const { arbitrableTokenListView, arbitratorView } = yield call(
+  const { arbitrableTokenListView, arbitratorView, T2CR_BLOCK } = yield call(
     instantiateEnvObjects
   )
 
@@ -36,7 +36,8 @@ export function* fetchArbitrableTokenListData() {
   const metaEvidenceEvents = (yield call(
     fetchEvents,
     'MetaEvidence',
-    arbitrableTokenListView
+    arbitrableTokenListView,
+    T2CR_BLOCK
   )).sort((a, b) => a.blockNumber - b.blockNumber)
   const blockNumber = metaEvidenceEvents[0].blockNumber
 
