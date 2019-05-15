@@ -12,7 +12,7 @@ const SearchItem = ({ onClick, item, FILE_BASE_URL }) => (
   <li
     onClick={onClick}
     className="SearchItem"
-    style={{ borderLeft: `4px solid ${getItemStatusColor(item)}` }}
+    style={{ borderLeft: `2px solid ${getItemStatusColor(item)}` }}
   >
     <Img
       className="SearchItem-symbol"
