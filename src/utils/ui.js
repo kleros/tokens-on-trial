@@ -301,21 +301,11 @@ export const truncateETHValue = (str, digits) => {
   return input.substring(0, input.indexOf('.') + (digits || 5))
 }
 
-export const sanitize = str => {
-  const a = 'àáäâãåăæçèéëêǵḧìíïîḿńǹñòóöôœṕŕßśșțùúüûǘẃẍÿź·/_,:;'
-  const b = 'aaaaaaaaceeeeghiiiimnnnoooooprssstuuuuuwxyz------'
-  const p = new RegExp(a.split('').join('|'), 'g')
-  return str
+export const sanitize = str =>
+  str
     .toString()
     .toLowerCase()
-    .replace(/#/g, '-') // Replace all # with -
-    .replace(/\s+/g, '-') // Replace spaces with -
-    .replace(p, c => b.charAt(a.indexOf(c))) // Replace special characters
-    .replace(/&/g, '-and-') // Replace & with ‘and’
-    .replace(/--+/g, '-') // Replace multiple - with single -
-    .replace(/^-+/, '') // Trim - from start of text
-    .replace(/-+$/, '') // Trim - from end of text
-}
+    .replace(/([^a-z0-9]+)/gi, '-') // Only allow numbers and aplhanumeric.
 
 export const getItemStatusColor = item => {
   if (item.inAppealPeriod) return '#4d00b4' // Purple.
