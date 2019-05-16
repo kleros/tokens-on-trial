@@ -1,19 +1,18 @@
 import React, { Component } from 'react'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
 import Archon from '@kleros/archon'
 import * as mime from 'mime-types'
 
-import * as tcrConstants from '../../constants/tcr'
 import { onlyInfura, IPFS_URL } from '../../bootstrap/dapp-api'
 import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 import { getFileIcon } from '../../utils/evidence'
 import { ContractsContext } from '../../bootstrap/contexts'
-import { rulingMessage } from '../../utils/ui'
 import Button from '../../components/button'
 import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
+
+import RequestEvidences from './request-evidences'
 
 import './evidence.css'
 
@@ -151,14 +150,20 @@ class EvidenceSection extends Component {
 
   render() {
     const {
-      item: {
-        latestRequest: { resolved },
-        badgeContractAddr
-      },
+      item: { badgeContractAddr },
       handleOpenEvidenceModal,
       handleViewEvidenceClick
     } = this.props
     const { requestsInfo } = this.state
+
+    if (!requestsInfo) return <BeatLoader color="#3d464d" />
+
+    const history = Object.keys(requestsInfo)
+      .map(key => requestsInfo[key])
+      .sort((a, b) => b.submissionTime - a.submissionTime)
+
+    const latestRequest = history[0]
+    const { resolved } = latestRequest
 
     return (
       <div className="Evidence">
@@ -178,61 +183,22 @@ class EvidenceSection extends Component {
           )}
         </div>
         <div className="Evidence-evidence">
-          {!requestsInfo ? (
-            <BeatLoader color="#3d464d" />
-          ) : (
-            <div className="Evidence-requests">
-              {Object.keys(requestsInfo)
-                .map(key => requestsInfo[key])
-                .sort((a, b) => b.submissionTime - a.submissionTime)
-                .map((requestInfo, i) => (
-                  <div key={i}>
-                    <h4 style={{ margin: 0 }}>
-                      Request # {Object.keys(requestsInfo).length - i}
-                    </h4>
-                    {requestInfo.disputed && requestInfo.resolved && (
-                      <h5
-                        style={{
-                          margin: 0,
-                          marginBottom: '16px',
-                          fontWeight: 400
-                        }}
-                      >
-                        {rulingMessage(
-                          requestInfo.ruling !==
-                            tcrConstants.RULING_OPTIONS.None,
-                          false,
-                          false,
-                          requestInfo.ruling.toString()
-                        )}
-                      </h5>
-                    )}
-                    <div className="Evidence-evidence--list">
-                      {requestInfo.evidences.length === 0 && (
-                        <small style={{ marginLeft: '5px', marginTop: '10px' }}>
-                          <i>No evidence submitted.</i>
-                        </small>
-                      )}
-                      {Object.keys(requestInfo.evidences)
-                        .map(txHash => requestInfo.evidences[txHash])
-                        .map((evidence, j) => (
-                          <div
-                            className="Evidence-evidence--item"
-                            key={`${i}${j}`}
-                            onClick={handleViewEvidenceClick(evidence.evidence)}
-                          >
-                            <FontAwesomeIcon icon={evidence.icon} size="2x" />
-                          </div>
-                        ))}
-                    </div>
-                    <hr
-                      className="Evidence-separator"
-                      style={{ marginBottom: '26px' }}
-                    />
-                  </div>
-                ))}
-            </div>
-          )}
+          <div className="Evidence-requests">
+            <RequestEvidences
+              requestInfo={latestRequest}
+              requestNumber={Object.keys(requestsInfo).length}
+              handleViewEvidenceClick={handleViewEvidenceClick}
+            />
+            {history
+              .filter((_, i) => i > 0)
+              .map((requestInfo, i) => (
+                <RequestEvidences
+                  requestInfo={requestInfo}
+                  requestNumber={Object.keys(history).length - i}
+                  handleViewEvidenceClick={handleViewEvidenceClick}
+                />
+              ))}
+          </div>
         </div>
       </div>
     )

@@ -6,7 +6,7 @@ import Button from '../../../../components/button'
 import './view-evidence.css'
 
 const downloadClick = url => async () => {
-  window.open(`${IPFS_URL}${url}`)
+  window.open(`${IPFS_URL}${encodeURI(url)}`)
 }
 
 const ViewEvidence = ({ closeActionModal, evidence }) => (

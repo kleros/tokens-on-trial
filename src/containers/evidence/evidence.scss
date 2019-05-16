@@ -28,18 +28,5 @@
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
-
-    &--list {
-      display: flex;
-      flex-wrap: wrap;
-      margin: 0 -5px;
-      margin-bottom: 16px;
-    }
-
-    &--item {
-      color: $badgeBlue;
-      cursor: pointer;
-      margin: 6px;
-    }
   }
 }

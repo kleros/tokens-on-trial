@@ -1,0 +1,33 @@
+@import '../../../styles/_colors.scss';
+
+/* @define RequestEvidence */
+.RequestEvidence {
+  display: flex;
+  flex-direction: column;
+
+  &-separator {
+    border-color: $darkerGrey;
+    border-width: 1px;
+    width: 100%;
+  }
+
+  &-evidence {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    &--list {
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -5px;
+      margin-bottom: 16px;
+    }
+
+    &--item {
+      color: $badgeBlue;
+      cursor: pointer;
+      margin: 6px;
+    }
+  }
+}
