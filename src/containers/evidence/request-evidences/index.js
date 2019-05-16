@@ -1,50 +1,75 @@
 import React from 'react'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
 import * as tcrConstants from '../../../constants/tcr'
 import { rulingMessage } from '../../../utils/ui'
+
+import EvidenceCard from './evidence-card'
 
 import './request-evidences.css'
 
 const RequestEvidences = ({
   requestInfo,
   requestNumber,
-  handleViewEvidenceClick
+  requester,
+  challenger,
+  idKey
 }) => (
-  <div key={requestNumber}>
-    <h4 style={{ margin: 0 }}>Request # {requestNumber}</h4>
+  <div
+    key={idKey}
+    style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+  >
+    <h4 className="RequestEvidence-title">Request #{requestNumber}</h4>
     {requestInfo.disputed && requestInfo.resolved && (
-      <h5
-        style={{
-          margin: 0,
-          marginBottom: '16px',
-          fontWeight: 400
-        }}
-      >
-        {rulingMessage(
-          requestInfo.ruling !== tcrConstants.RULING_OPTIONS.None,
-          false,
-          false,
-          requestInfo.ruling.toString()
-        )}
-      </h5>
+      <>
+        <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
+        <h5
+          style={{
+            margin: '16px 0',
+            fontWeight: 400
+          }}
+        >
+          {rulingMessage(
+            requestInfo.ruling !== tcrConstants.RULING_OPTIONS.None,
+            false,
+            false,
+            requestInfo.ruling.toString()
+          )}
+        </h5>
+      </>
     )}
     <div className="RequestEvidence-evidence--list">
-      {(!requestInfo.evidences || requestInfo.evidences.length === 0) && (
-        <small style={{ marginLeft: '5px', marginTop: '10px' }}>
-          <i>No evidence submitted.</i>
-        </small>
+      {(!requestInfo.evidences ||
+        Object.keys(requestInfo.evidences).length === 0) && (
+        <>
+          <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
+          <small style={{ marginLeft: '5px', marginTop: '16px' }}>
+            <i>No evidence submitted.</i>
+          </small>
+        </>
       )}
       {Object.keys(requestInfo.evidences)
         .map(txHash => requestInfo.evidences[txHash])
+        .sort((a, b) => b.blockNumber - a.blockNumber)
         .map((evidence, j) => (
           <div
-            className="RequestEvidence-evidence--item"
-            key={`${requestNumber}${j}`}
-            onClick={handleViewEvidenceClick(evidence.evidence)}
+            key={`${idKey}${j}`}
+            style={{
+              width: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}
           >
-            <FontAwesomeIcon icon={evidence.icon} size="2x" />
+            <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
+            <EvidenceCard
+              key={`${requestNumber}${j}`}
+              requester={requester}
+              challenger={challenger}
+              evidence={evidence}
+              requestNumber={requestNumber}
+              idKey={`${requestNumber}${j}`}
+            />
           </div>
         ))}
     </div>
@@ -62,13 +87,23 @@ RequestEvidences.propTypes = {
     ruling: PropTypes.number.isRequired,
     evidences: PropTypes.arrayOf(
       PropTypes.shape({
-        evidence: PropTypes.shape({}).isRequired,
+        evidence: PropTypes.shape({
+          evidence: PropTypes.shape({
+            description: PropTypes.string.isRequired,
+            fileTypeExtension: PropTypes.string.isRequired,
+            fileURI: PropTypes.string.isRequired,
+            title: PropTypes.string.isRequired,
+            position: PropTypes.number
+          })
+        }).isRequired,
         icon: PropTypes.string.isRequired
       })
     )
   }).isRequired,
-  handleViewEvidenceClick: PropTypes.func.isRequired,
-  requestNumber: PropTypes.number.isRequired
+  requestNumber: PropTypes.number.isRequired,
+  requester: PropTypes.string.isRequired,
+  challenger: PropTypes.string.isRequired,
+  idKey: PropTypes.string.isRequired
 }
 
 export default RequestEvidences

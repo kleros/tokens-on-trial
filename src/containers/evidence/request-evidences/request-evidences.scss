@@ -5,6 +5,17 @@
   display: flex;
   flex-direction: column;
 
+  &-title {
+    align-self: center;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    height: 33px;
+    margin: 0;
+    padding: 5px;
+    text-align: center;
+    width: 140px;
+  }
+
   &-separator {
     border-color: $darkerGrey;
     border-width: 1px;
@@ -18,16 +29,12 @@
     justify-content: space-between;
 
     &--list {
+      align-items: center;
       display: flex;
+      flex-direction: column;
       flex-wrap: wrap;
       margin: 0 -5px;
       margin-bottom: 16px;
-    }
-
-    &--item {
-      color: $badgeBlue;
-      cursor: pointer;
-      margin: 6px;
     }
   }
 }

@@ -1,0 +1,45 @@
+@import '../../../../styles/_colors.scss';
+
+/* @define EvidenceCard */
+.EvidenceCard {
+  align-items: stretch;
+  background: $card;
+  border: 1.2px solid $border;
+  border-radius: 3px;
+  color: $klerosPurpleLight;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 2;
+  justify-content: space-between;
+  transition: 0.3s;
+  width: 50%;
+
+  &:hover {
+    box-shadow: 0 3px 6px $shadow;
+  }
+
+  &-content {
+    padding: 19px;
+    padding-bottom: 8px;
+
+    &-title {
+      color: $klerosPurpleLight;
+      font-size: 18px;
+      font-weight: 500;
+      line-height: 21px;
+      margin-bottom: 16px;
+    }
+  }
+
+  &-footer {
+    align-content: center;
+    align-items: center;
+    background-color: #f8f8f8;
+    border-radius: 0 0 3px 3px;
+    display: flex;
+    flex-direction: row;
+    height: 60px;
+    justify-content: space-between;
+    padding: 5px 19px;
+  }
+}

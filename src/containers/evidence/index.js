@@ -16,7 +16,12 @@ import RequestEvidences from './request-evidences'
 
 import './evidence.css'
 
-const getEvidenceInfo = async ({ returnValues, archon, txHash }) => {
+const getEvidenceInfo = async ({
+  returnValues,
+  archon,
+  txHash,
+  blockNumber
+}) => {
   const { _evidence, _evidenceGroupID, _arbitrator, _party } = returnValues
   const evidence = await (await fetch(`${IPFS_URL}${_evidence}`)).json()
 
@@ -38,6 +43,7 @@ const getEvidenceInfo = async ({ returnValues, archon, txHash }) => {
   const mimeType = mime.lookup(evidence.fileTypeExtension)
   return {
     txHash,
+    blockNumber,
     evidence,
     icon: getFileIcon(mimeType),
     _arbitrator,
@@ -104,7 +110,9 @@ class EvidenceSection extends Component {
                 returnValues:
                   requestsInfo[evidenceGroupID].evidences[txHash].returnValues,
                 archon,
-                txHash
+                txHash,
+                blockNumber:
+                  requestsInfo[evidenceGroupID].evidences[txHash].blockNumber
               })
           )
         )).reduce((acc, curr) => {
@@ -125,12 +133,13 @@ class EvidenceSection extends Component {
       const evidence = await getEvidenceInfo({
         returnValues: e.returnValues,
         archon,
-        txHash: e.transactionHash
+        txHash: e.transactionHash,
+        blockNumber: e.blockNumber
       })
       const { requestsInfo } = this.state
       const newRequestInfo = { ...requestsInfo }
 
-      if (!newRequestInfo[evidence._evidenceGroupID]) window.reload()
+      if (!newRequestInfo[evidence._evidenceGroupID]) window.location.reload()
 
       newRequestInfo[evidence._evidenceGroupID].evidences[
         e.transactionHash
@@ -150,20 +159,32 @@ class EvidenceSection extends Component {
 
   render() {
     const {
-      item: { badgeContractAddr },
-      handleOpenEvidenceModal,
-      handleViewEvidenceClick
+      item: { badgeContractAddr, latestRequest },
+      handleOpenEvidenceModal
     } = this.props
     const { requestsInfo } = this.state
+    const requester = latestRequest.parties[1]
+    const challenger = latestRequest.parties[2]
 
-    if (!requestsInfo) return <BeatLoader color="#3d464d" />
+    if (!requestsInfo)
+      return (
+        <div className="Evidence">
+          <hr className="Evidence-separator" />
+          <div className="Evidence-header">
+            <h3>Evidence</h3>
+          </div>
+          <div className="Evidence-evidence">
+            <BeatLoader color="#3d464d" />
+          </div>
+        </div>
+      )
 
     const history = Object.keys(requestsInfo)
       .map(key => requestsInfo[key])
       .sort((a, b) => b.submissionTime - a.submissionTime)
 
-    const latestRequest = history[0]
-    const { resolved } = latestRequest
+    const latestRequestEvent = history[0]
+    const { resolved } = latestRequestEvent
 
     return (
       <div className="Evidence">
@@ -185,17 +206,20 @@ class EvidenceSection extends Component {
         <div className="Evidence-evidence">
           <div className="Evidence-requests">
             <RequestEvidences
-              requestInfo={latestRequest}
-              requestNumber={history.length > 1 ? history.length - 1 : 1}
-              handleViewEvidenceClick={handleViewEvidenceClick}
+              requester={requester}
+              challenger={challenger}
+              requestInfo={latestRequestEvent}
+              requestNumber={history.length > 1 ? history.length : 1}
             />
             {history
               .filter((_, i) => i > 0)
               .map((requestInfo, i) => (
                 <RequestEvidences
+                  idKey={i}
+                  requester={requester}
+                  challenger={challenger}
                   requestInfo={requestInfo}
-                  requestNumber={history.length - i}
-                  handleViewEvidenceClick={handleViewEvidenceClick}
+                  requestNumber={history.length - i - 1}
                 />
               ))}
           </div>
@@ -207,8 +231,7 @@ class EvidenceSection extends Component {
 
 EvidenceSection.propTypes = {
   item: itemShape,
-  handleOpenEvidenceModal: PropTypes.func.isRequired,
-  handleViewEvidenceClick: PropTypes.func.isRequired
+  handleOpenEvidenceModal: PropTypes.func.isRequired
 }
 
 EvidenceSection.defaultProps = {

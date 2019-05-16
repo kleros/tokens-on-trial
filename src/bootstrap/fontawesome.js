@@ -27,6 +27,8 @@ import faFilePdf from '@fortawesome/fontawesome-free-solid/faFilePdf'
 import faFileWord from '@fortawesome/fontawesome-free-solid/faFileWord'
 import faBalanceScale from '@fortawesome/fontawesome-free-solid/faBalanceScale'
 import faCoins from '@fortawesome/fontawesome-free-solid/faCoins'
+import faThumbsUp from '@fortawesome/fontawesome-free-solid/faThumbsUp'
+import faThumbsDown from '@fortawesome/fontawesome-free-solid/faThumbsDown'
 
 library.add(
   faCaretDown,
@@ -56,5 +58,7 @@ library.add(
   faFilePdf,
   faFileWord,
   faBalanceScale,
-  faCoins
+  faCoins,
+  faThumbsUp,
+  faThumbsDown
 )

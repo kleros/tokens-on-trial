@@ -420,6 +420,7 @@ class TokenDetails extends PureComponent {
           fundAppeal={this.fundAppeal}
           handleActionClick={this.handleActionClick}
         />
+        <br />
         <Evidence
           item={token}
           tcr={arbitrableTokenListView}
@@ -427,7 +428,6 @@ class TokenDetails extends PureComponent {
           handleOpenEvidenceModal={this.handleOpenEvidenceModal}
           handleViewEvidenceClick={this.handleViewEvidenceClick}
         />
-        <br />
         <Badges token={token} />
         {/* eslint-disable react/jsx-no-bind */}
         {(!decisiveRuling || !loserTimedOut) && (
