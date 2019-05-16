@@ -186,7 +186,7 @@ class EvidenceSection extends Component {
           <div className="Evidence-requests">
             <RequestEvidences
               requestInfo={latestRequest}
-              requestNumber={Object.keys(requestsInfo).length}
+              requestNumber={history.length > 1 ? history.length - 1 : 1}
               handleViewEvidenceClick={handleViewEvidenceClick}
             />
             {history
@@ -194,7 +194,7 @@ class EvidenceSection extends Component {
               .map((requestInfo, i) => (
                 <RequestEvidences
                   requestInfo={requestInfo}
-                  requestNumber={Object.keys(history).length - i}
+                  requestNumber={history.length - i}
                   handleViewEvidenceClick={handleViewEvidenceClick}
                 />
               ))}
