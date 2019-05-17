@@ -29,6 +29,8 @@ import faBalanceScale from '@fortawesome/fontawesome-free-solid/faBalanceScale'
 import faCoins from '@fortawesome/fontawesome-free-solid/faCoins'
 import faThumbsUp from '@fortawesome/fontawesome-free-solid/faThumbsUp'
 import faThumbsDown from '@fortawesome/fontawesome-free-solid/faThumbsDown'
+import faAngleDown from '@fortawesome/fontawesome-free-solid/faAngleDown'
+import faAngleUp from '@fortawesome/fontawesome-free-solid/faAngleUp'
 
 library.add(
   faCaretDown,
@@ -60,5 +62,7 @@ library.add(
   faBalanceScale,
   faCoins,
   faThumbsUp,
-  faThumbsDown
+  faThumbsDown,
+  faAngleDown,
+  faAngleUp
 )

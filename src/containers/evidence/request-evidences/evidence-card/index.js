@@ -23,9 +23,7 @@ const EvidenceCard = ({
           ? 'flex-start'
           : evidenceFile.position === 2
           ? 'flex-start'
-          : 'auto',
-
-      width: evidenceFile.position ? '' : '75%'
+          : 'auto'
     }}
     className="EvidenceCard"
     key={idKey}

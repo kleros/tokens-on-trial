@@ -35,6 +35,18 @@
       flex-wrap: wrap;
       margin: 0 -5px;
       margin-bottom: 16px;
+      width: 100%;
     }
+  }
+
+  &-toggle {
+    align-items: center;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    width: 150px;
   }
 }

@@ -12,7 +12,11 @@
   flex-grow: 2;
   justify-content: space-between;
   transition: 0.3s;
-  width: 50%;
+  width: 75%;
+
+  @media (max-width: 800px) {
+    width: 100%;
+  }
 
   &:hover {
     box-shadow: 0 3px 6px $shadow;
