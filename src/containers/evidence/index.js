@@ -169,7 +169,8 @@ class EvidenceSection extends Component {
   render() {
     const {
       item: { badgeContractAddr, latestRequest },
-      handleOpenEvidenceModal
+      handleOpenEvidenceModal,
+      itemID
     } = this.props
     const { requestsInfo } = this.state
     const requester = latestRequest.parties[1]
@@ -219,12 +220,14 @@ class EvidenceSection extends Component {
               challenger={challenger}
               requestInfo={latestRequestEvent}
               requestNumber={history.length > 1 ? history.length : 1}
+              itemID={itemID}
             />
             {history
               .filter((_, i) => i > 0)
               .map((requestInfo, i) => (
                 <RequestEvidences
                   idKey={i}
+                  itemID={itemID}
                   requester={requester}
                   challenger={challenger}
                   requestInfo={requestInfo}

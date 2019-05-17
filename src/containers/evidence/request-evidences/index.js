@@ -9,14 +9,51 @@ import EvidenceCard from './evidence-card'
 
 import './request-evidences.css'
 
+const getResultMessage = ({
+  registrationRequest,
+  disputed,
+  ruling,
+  isToken
+}) => {
+  let message
+  console.info(registrationRequest, disputed, ruling, isToken)
+  if (registrationRequest)
+    if (disputed) {
+      if (ruling === tcrConstants.RULING_OPTIONS.Accept)
+        message = isToken ? 'Token Accepted' : 'Badge Added'
+      else message = isToken ? 'Token Rejected' : 'Badge Denied'
+    } else {
+      message = isToken ? 'Token Accepted' : 'Badge Added'
+    }
+  else if (disputed)
+    if (ruling === tcrConstants.RULING_OPTIONS.Accept) {
+      message = isToken ? 'Token Removed' : 'Badge Removed'
+    } else {
+      message = isToken ? 'Token Kept' : 'Badge Kept'
+    }
+  else message = isToken ? 'Token Removed' : 'Badge Removed'
+
+  return message
+}
+
 const RequestEvidences = ({
   requestInfo,
   requestNumber,
   requester,
   challenger,
-  idKey
+  idKey,
+  itemID
 }) => {
   const [showHistory, toggleShowHistory] = useState(false)
+  const {
+    requestSubmittedEvent: {
+      returnValues: { _registrationRequest }
+    }
+  } = requestInfo
+
+  // Detect if request is related to a token or a badge.
+  const isToken = itemID.length === 66
+
   /* eslint-disable react/jsx-no-bind */
   return (
     <div
@@ -24,16 +61,20 @@ const RequestEvidences = ({
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <h4 className="RequestEvidence-title">
-        {requestInfo.requestSubmittedEvent.returnValues._registrationRequest
-          ? 'Registration Request'
-          : 'Removal Request'}
+        {_registrationRequest
+          ? isToken
+            ? 'Token Submission'
+            : 'Badge Addition'
+          : isToken
+          ? 'Token Removal'
+          : 'Badge Removal'}
       </h4>
       <div className="RequestEvidence-evidence--list">
         {(!requestInfo.evidences ||
           Object.keys(requestInfo.evidences).length === 0) && (
           <>
             <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
-            <small style={{ marginLeft: '5px', marginTop: '16px' }}>
+            <small style={{ margin: '16px 0' }}>
               <i>No evidence submitted.</i>
             </small>
           </>
@@ -101,6 +142,19 @@ const RequestEvidences = ({
             </h5>
           </>
         )}
+        {requestInfo.resolved && (
+          <>
+            <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
+            <h4 className="RequestEvidence-title">
+              {getResultMessage({
+                ruling: requestInfo.ruling,
+                disputed: requestInfo.disputed,
+                registrationRequest: _registrationRequest,
+                isToken
+              })}
+            </h4>
+          </>
+        )}
       </div>
       <hr
         className="RequestEvidence-separator"
@@ -133,7 +187,8 @@ RequestEvidences.propTypes = {
   requestNumber: PropTypes.number.isRequired,
   requester: PropTypes.string.isRequired,
   challenger: PropTypes.string.isRequired,
-  idKey: PropTypes.string.isRequired
+  idKey: PropTypes.string.isRequired,
+  itemID: PropTypes.string.isRequired
 }
 
 export default RequestEvidences
