@@ -16,7 +16,6 @@ const getResultMessage = ({
   isToken
 }) => {
   let message
-  console.info(registrationRequest, disputed, ruling, isToken)
   if (registrationRequest)
     if (disputed) {
       if (ruling === tcrConstants.RULING_OPTIONS.Accept)
