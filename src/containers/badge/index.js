@@ -454,6 +454,7 @@ class BadgeDetails extends PureComponent {
         />
         <Evidence
           item={badge}
+          itemID={tokenAddr}
           tcr={arbitrableAddressListView}
           tcrData={arbitrableAddressListData.data}
           handleOpenEvidenceModal={this.handleOpenEvidenceModal}

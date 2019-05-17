@@ -30,7 +30,7 @@ const fetchEvents = async (eventName, contract, fromBlock) =>
 export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
   // Fetch the contract deployment block number. We use the first meta evidence
   // events emitted when the constructor is run.
-  // TODO: Cache this.
+  // TODO: Cache this to speed up future loads.
   const metaEvidenceEvents = (yield call(
     fetchEvents,
     'MetaEvidence',
@@ -56,6 +56,19 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     const { _evidenceGroupID } = returnValues
     acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
     acc[_evidenceGroupID].push(curr)
+    return acc
+  }, {})
+
+  // TODO: Cache this to speed up future loads.
+  const requestSubmittedEvents = (yield call(
+    fetchEvents,
+    'RequestSubmitted',
+    arbitrableAddressListView,
+    blockNumber
+  )).reduce((acc, curr) => {
+    if (!acc[curr.returnValues._address]) acc[curr.returnValues._address] = []
+
+    acc[curr.returnValues._address].push(curr)
     return acc
   }, {})
 
@@ -98,6 +111,7 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     variables,
     fileURI,
     evidenceEvents,
+    requestSubmittedEvents,
     badgeContractAddr: arbitrableAddressListView.options.address,
     arbitrator: d.arbitrator,
     governor: d.governor,

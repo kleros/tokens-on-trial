@@ -4,7 +4,7 @@ import { BeatLoader } from 'react-spinners'
 import Archon from '@kleros/archon'
 import * as mime from 'mime-types'
 
-import { onlyInfura, IPFS_URL } from '../../bootstrap/dapp-api'
+import { onlyInfura, IPFS_URL, web3Utils } from '../../bootstrap/dapp-api'
 import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 import { getFileIcon } from '../../utils/evidence'
 import { ContractsContext } from '../../bootstrap/contexts'
@@ -60,7 +60,8 @@ class EvidenceSection extends Component {
     tcr: PropTypes.oneOfType([
       arbitrableTokenListSelectors.arbitrableTokenListDataShape,
       arbitrableAddressListSelectors.arbitrableAddressListDataShape
-    ]).isRequired
+    ]).isRequired,
+    itemID: PropTypes.string.isRequired
   }
 
   state = { requestsInfo: null }
@@ -68,7 +69,8 @@ class EvidenceSection extends Component {
   async componentWillReceiveProps({
     item: { requests, badgeContractAddr },
     tcrData,
-    tcr
+    tcr,
+    itemID
   }) {
     let { requestsInfo } = this.state
     if (requestsInfo) return
@@ -80,7 +82,7 @@ class EvidenceSection extends Component {
       return
     if (!this.context) return
 
-    const { evidenceEvents } = badgeContractAddr
+    const { evidenceEvents, requestSubmittedEvents } = badgeContractAddr
       ? tcrData[badgeContractAddr]
       : tcrData
     requestsInfo = {}
@@ -97,6 +99,13 @@ class EvidenceSection extends Component {
         submissionTime: request.submissionTime,
         disputed: request.disputed
       }
+    })
+
+    requestSubmittedEvents[itemID].forEach((event, i) => {
+      const evidenceGroupID = web3Utils
+        .toBN(web3Utils.soliditySha3(itemID, i))
+        .toString(10)
+      requestsInfo[evidenceGroupID].requestSubmittedEvent = event
     })
 
     const { archon } = this.context

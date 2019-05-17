@@ -63,6 +63,19 @@ export function* fetchArbitrableTokenListData() {
     return acc
   }, {})
 
+  // TODO: Cache this to speed up future loads.
+  const requestSubmittedEvents = (yield call(
+    fetchEvents,
+    'RequestSubmitted',
+    arbitrableTokenListView,
+    blockNumber
+  )).reduce((acc, curr) => {
+    if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
+
+    acc[curr.returnValues._tokenID].push(curr)
+    return acc
+  }, {})
+
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
     requesterBaseDeposit: call(
@@ -102,6 +115,7 @@ export function* fetchArbitrableTokenListData() {
     blockNumber,
     fileURI,
     evidenceEvents,
+    requestSubmittedEvents,
     arbitrator: d.arbitrator,
     governor: d.governor,
     requesterBaseDeposit: toBN(d.requesterBaseDeposit),

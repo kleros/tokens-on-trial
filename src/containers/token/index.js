@@ -422,6 +422,7 @@ class TokenDetails extends PureComponent {
         />
         <br />
         <Evidence
+          itemID={tokenID}
           item={token}
           tcr={arbitrableTokenListView}
           tcrData={arbitrableTokenListData.data}

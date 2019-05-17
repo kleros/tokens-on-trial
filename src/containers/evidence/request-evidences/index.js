@@ -23,7 +23,11 @@ const RequestEvidences = ({
       key={idKey}
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
-      <h4 className="RequestEvidence-title">Request #{requestNumber}</h4>
+      <h4 className="RequestEvidence-title">
+        {requestInfo.requestSubmittedEvent.returnValues._registrationRequest
+          ? 'Registration Request'
+          : 'Removal Request'}
+      </h4>
       <div className="RequestEvidence-evidence--list">
         {(!requestInfo.evidences ||
           Object.keys(requestInfo.evidences).length === 0) && (
