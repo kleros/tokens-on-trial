@@ -44,6 +44,8 @@ const RequestEvidences = ({
   itemID
 }) => {
   const [showHistory, toggleShowHistory] = useState(false)
+  if (!requestInfo || !requestInfo.requestSubmittedEvent) return null
+
   const {
     requestSubmittedEvent: {
       returnValues: { _registrationRequest }
