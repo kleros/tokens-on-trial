@@ -22,8 +22,7 @@ const Challenge = ({
   closeActionModal,
   fundDispute,
   challengeFormIsInvalid,
-  submitChallengeForm,
-  badgeContractAddr
+  submitChallengeForm
 }) => (
   <div className="ActionModal">
     <h3 className="Modal-title">
@@ -31,23 +30,19 @@ const Challenge = ({
       Challenge
     </h3>
     <hr />
-    {badgeContractAddr && (
-      <>
-        <p>
-          See the{' '}
-          <a
-            className="TokenDetails-withdraw"
-            target="_blank"
-            rel="noopener noreferrer"
-            href={`${IPFS_URL}${tcrData.fileURI}`}
-            style={{ margin: 0, textDecoration: 'underline' }}
-          >
-            listing criteria
-          </a>
-          .
-        </p>
-      </>
-    )}
+    <p>
+      See the{' '}
+      <a
+        className="TokenDetails-withdraw"
+        target="_blank"
+        rel="noopener noreferrer"
+        href={`${IPFS_URL}${tcrData.fileURI}`}
+        style={{ margin: 0, textDecoration: 'underline' }}
+      >
+        listing criteria
+      </a>
+      .
+    </p>
     <h5 className="Modal-subtitle">
       In order to challenge, the following <br /> amount of ETH is required
     </h5>
@@ -119,16 +114,11 @@ Challenge.propTypes = {
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
   ]).isRequired,
   challengeFormIsInvalid: PropTypes.bool.isRequired,
-  badgeContractAddr: PropTypes.shape({}),
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   fundDispute: PropTypes.func.isRequired,
   submitChallengeForm: PropTypes.func.isRequired
-}
-
-Challenge.defaultProps = {
-  badgeContractAddr: null
 }
 
 export default connect(
