@@ -143,7 +143,7 @@ const RequestEvidences = ({
             </h5>
           </>
         )}
-        {requestInfo.resolved && (
+        {requestInfo.disputed && requestInfo.resolved && (
           <>
             <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
             <h4 className="RequestEvidence-title">
