@@ -45,4 +45,73 @@
       width: 38px;
     }
   }
+
+  &-checkboxExtra {
+    margin-top: 12px;
+  }
+
+  &-options {
+    display: flex;
+    flex-direction: column;
+
+    &-item {
+      align-items: center;
+      border-bottom: 1px solid $border;
+      cursor: pointer;
+      display: flex;
+      font-size: 15px;
+      justify-content: space-between;
+      width: 100%;
+
+      &:hover {
+        background-color: $darkWhite;
+      }
+
+      &-icon {
+        align-items: center;
+        border-radius: 20px;
+        display: flex;
+        height: 28px;
+        justify-content: center;
+        margin: 8px;
+        width: 28px;
+      }
+
+      &-radio {
+        align-content: center;
+        align-items: center;
+        display: flex;
+        height: 18px;
+        justify-content: center;
+        margin: 10px;
+        width: 18px;
+
+        &-input {
+          opacity: 0;
+          position: absolute;
+        }
+
+        &-bg {
+          border: 2px solid $darkGrey;
+          border-radius: 50%;
+          cursor: pointer;
+          height: 18px;
+          position: absolute;
+          width: 18px;
+
+          &:hover {
+            background-color: $darkerGrey;
+          }
+        }
+
+        &-marked {
+          background-color: $primaryBlue;
+          border-radius: 50%;
+          height: 8px;
+          position: absolute;
+          width: 8px;
+        }
+      }
+    }
+  }
 }
