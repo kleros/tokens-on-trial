@@ -82,6 +82,16 @@ const UserActionCountdown = ({
       </>
     )
 
+  if (loserHasPaid && userIsLoser && remainingTime > 0)
+    return (
+      <ActionCountdown
+        icon="clock"
+        text="Opponent Deadline"
+        endTime={Date.now() + remainingTime}
+        onComplete={() => onAppealPeriodEnd(true)}
+      />
+    )
+
   return (
     <ActionCountdown
       icon="clock"
