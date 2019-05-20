@@ -31,6 +31,7 @@ import faThumbsUp from '@fortawesome/fontawesome-free-solid/faThumbsUp'
 import faThumbsDown from '@fortawesome/fontawesome-free-solid/faThumbsDown'
 import faAngleDown from '@fortawesome/fontawesome-free-solid/faAngleDown'
 import faAngleUp from '@fortawesome/fontawesome-free-solid/faAngleUp'
+import faFolderOpen from '@fortawesome/fontawesome-free-solid/faFolderOpen'
 
 library.add(
   faCaretDown,
@@ -64,5 +65,6 @@ library.add(
   faThumbsUp,
   faThumbsDown,
   faAngleDown,
-  faAngleUp
+  faAngleUp,
+  faFolderOpen
 )
