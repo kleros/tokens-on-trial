@@ -141,7 +141,9 @@ export function* fetchArbitrableTokenListData() {
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
-function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
+function* submitTokenEvidence({
+  payload: { evidenceData, file, ID, evidenceSide }
+}) {
   if (!ID) throw new Error('No selected token ID')
 
   let fileURI = ''
@@ -190,7 +192,8 @@ function* submitTokenEvidence({ payload: { evidenceData, file, ID } }) {
     title: evidenceData.title,
     description: evidenceData.description,
     fileURI,
-    fileTypeExtension
+    fileTypeExtension,
+    evidenceSide
   }
 
   const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)

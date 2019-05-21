@@ -189,20 +189,21 @@ class ActionModal extends PureComponent {
     })
   }
 
-  handleSubmitEvidenceClick = evidence => {
+  handleSubmitEvidenceClick = (evidence, evidenceSide) => {
     const { submitTokenEvidence, closeActionModal, token } = this.props
     const { file } = this.state
 
     submitTokenEvidence({
       file,
       evidenceData: evidence,
-      ID: token.data.ID
+      ID: token.data.ID,
+      evidenceSide
     })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
   }
 
-  handleSubmitEvidenceBadgeClick = evidence => {
+  handleSubmitEvidenceBadgeClick = (evidence, evidenceSide) => {
     const {
       submitBadgeEvidence,
       closeActionModal,
@@ -216,7 +217,8 @@ class ActionModal extends PureComponent {
       file,
       evidenceData: evidence,
       tokenAddress,
-      badgeContractAddr
+      badgeContractAddr,
+      evidenceSide
     })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()

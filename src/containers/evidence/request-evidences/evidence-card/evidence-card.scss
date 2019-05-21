@@ -45,5 +45,21 @@
     height: 60px;
     justify-content: space-between;
     padding: 5px 19px;
+
+    &-meta {
+      align-items: center;
+      display: flex;
+    }
+
+    &-icon {
+      align-items: center;
+      border-radius: 20px;
+      display: flex;
+      height: 28px;
+      justify-content: center;
+      margin: 8px;
+      margin-left: 0;
+      width: 28px;
+    }
   }
 }

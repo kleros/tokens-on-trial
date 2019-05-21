@@ -24,9 +24,9 @@
     align-items: flex-start;
     display: flex;
     flex-direction: column;
+    overflow-wrap: break-word;
     text-align: start;
     width: 100%;
-    word-break: break-all;
     word-wrap: anywhere;
   }
 

@@ -159,7 +159,7 @@ export function* fetchArbitrableAddressListData() {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* submitBadgeEvidence({
-  payload: { evidenceData, file, tokenAddress, badgeContractAddr }
+  payload: { evidenceData, file, tokenAddress, badgeContractAddr, evidenceSide }
 }) {
   const { badgeContracts, archon } = yield call(instantiateEnvObjects)
   const arbitrableAddressList = badgeContracts[badgeContractAddr]
@@ -212,7 +212,8 @@ function* submitBadgeEvidence({
     description: evidenceData.description,
     fileURI,
     fileHash: multihash,
-    fileTypeExtension
+    fileTypeExtension,
+    evidenceSide
   }
 
   /* eslint-disable unicorn/number-literal-case */
