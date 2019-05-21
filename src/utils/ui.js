@@ -305,7 +305,7 @@ export const sanitize = str =>
   str
     .toString()
     .toLowerCase()
-    .replace(/([^a-z0-9]+)/gi, '-') // Only allow numbers and aplhanumeric.
+    .replace(/([^a-z0-9.]+)/gi, '-') // Only allow numbers and aplhanumeric.
 
 export const getItemStatusColor = item => {
   if (item.inAppealPeriod) return '#4d00b4' // Purple.
