@@ -405,7 +405,7 @@ function* feeTimeoutBadge({ payload: { tokenAddr, badgeContractAddr } }) {
 function* withdrawBadgeFunds({
   payload: { tokenAddr, badgeContractAddr, item }
 }) {
-  let count = 0
+  let count = 5
   if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
   const { badgeContracts } = yield call(instantiateEnvObjects)
   const arbitrableAddressList = badgeContracts[badgeContractAddr]

@@ -469,7 +469,7 @@ function* feeTimeout({ payload: { token } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the token object.
  */
 function* withdrawTokenFunds({ payload: { ID, item } }) {
-  let count = 0
+  let count = 5
   if (!item.latestRequest.resolved) count = item.numberOfRequests - 2
   const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
