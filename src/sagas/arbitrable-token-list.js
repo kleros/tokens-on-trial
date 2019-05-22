@@ -9,7 +9,7 @@ import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import readFile from '../utils/read-file'
-import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL, APP_VERSION } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import asyncReadFile from '../utils/async-file-reader'
 
@@ -30,51 +30,96 @@ export function* fetchArbitrableTokenListData() {
     instantiateEnvObjects
   )
 
-  // Fetch the contract deployment block number. We use the first meta evidence
-  // events emitted when the constructor is run.
-  // TODO: Cache this.
-  const metaEvidenceEvents = (yield call(
-    fetchEvents,
-    'MetaEvidence',
-    arbitrableTokenListView,
-    T2CR_BLOCK
-  )).sort((a, b) => a.blockNumber - b.blockNumber)
-  const blockNumber = metaEvidenceEvents[0].blockNumber
+  // Initial cache object.
+  // This gets overwritten if there is cached data available.
+  let eventsData = {
+    metaEvidenceEvents: {
+      blockNumber: Number(T2CR_BLOCK),
+      events: []
+    },
+    evidenceEvents: {
+      blockNumber: Number(T2CR_BLOCK)
+    },
+    requestSubmittedEvents: {
+      blockNumber: Number(T2CR_BLOCK)
+    }
+  }
+
+  // Load from cache, if available.
+  if (
+    localStorage.getItem(
+      `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`
+    )
+  )
+    eventsData = JSON.parse(
+      localStorage.getItem(
+        `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`
+      )
+    )
+
+  eventsData.metaEvidenceEvents.events = eventsData.metaEvidenceEvents.events
+    .concat(
+      yield call(
+        fetchEvents,
+        'MetaEvidence',
+        arbitrableTokenListView,
+        eventsData.metaEvidenceEvents.blockNumber
+      )
+    )
+    .sort((a, b) => a.blockNumber - b.blockNumber)
+    .map(e => {
+      if (e.blockNumber > eventsData.metaEvidenceEvents.blockNumber)
+        eventsData.metaEvidenceEvents.blockNumber = e.blockNumber
+      return e
+    })
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
-    metaEvidenceEvents[metaEvidenceEvents.length - 1].returnValues._evidence
+    eventsData.metaEvidenceEvents.events[
+      eventsData.metaEvidenceEvents.events.length - 1
+    ].returnValues._evidence
   }`
   const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
   const { fileURI } = metaEvidence
 
-  // TODO: Cache this to speed up future loads.
-  const evidenceEvents = (yield call(
+  eventsData.evidenceEvents = (yield call(
     fetchEvents,
     'Evidence',
     arbitrableTokenListView,
-    blockNumber
+    eventsData.evidenceEvents.blockNumber
   )).reduce((acc, curr) => {
     const {
-      returnValues: { _evidenceGroupID }
+      returnValues: { _evidenceGroupID },
+      blockNumber
     } = curr
+
+    if (blockNumber > eventsData.evidenceEvents.blockNumber)
+      eventsData.evidenceEvents.blockNumber = blockNumber
+
     acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
     acc[_evidenceGroupID].push(curr)
     return acc
-  }, {})
+  }, eventsData.evidenceEvents)
 
-  // TODO: Cache this to speed up future loads.
-  const requestSubmittedEvents = (yield call(
+  eventsData.requestSubmittedEvents = (yield call(
     fetchEvents,
     'RequestSubmitted',
     arbitrableTokenListView,
-    blockNumber
+    eventsData.requestSubmittedEvents.blockNumber
   )).reduce((acc, curr) => {
     if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
 
+    if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
+      eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber
+
     acc[curr.returnValues._tokenID].push(curr)
     return acc
-  }, {})
+  }, eventsData.requestSubmittedEvents)
+
+  localStorage.setItem(
+    `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`,
+    JSON.stringify(eventsData)
+  )
 
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
@@ -112,10 +157,10 @@ export function* fetchArbitrableTokenListData() {
   )
 
   return {
-    blockNumber,
+    blockNumber: T2CR_BLOCK,
     fileURI,
-    evidenceEvents,
-    requestSubmittedEvents,
+    evidenceEvents: eventsData.evidenceEvents,
+    requestSubmittedEvents: eventsData.requestSubmittedEvents,
     arbitrator: d.arbitrator,
     governor: d.governor,
     arbitratorExtraData: d.arbitratorExtraData,
