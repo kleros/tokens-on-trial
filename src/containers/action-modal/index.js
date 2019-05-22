@@ -579,7 +579,7 @@ class ActionModal extends PureComponent {
                   arbitrableAddressListData={arbitrableAddressListData}
                   submitItem={this.handleSubmitBadgeClick}
                   closeActionModal={closeActionModal}
-                  tokenAddr={badge.data.tokenAddress}
+                  tokenAddr={token.data.address}
                   unavailable={actionModalParam}
                 />
               )
