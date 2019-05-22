@@ -115,6 +115,7 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     badgeContractAddr: arbitrableAddressListView.options.address,
     arbitrator: d.arbitrator,
     governor: d.governor,
+    arbitratorExtraData: d.arbitratorExtraData,
     requesterBaseDeposit: toBN(d.requesterBaseDeposit),
     challengerBaseDeposit: toBN(d.challengerBaseDeposit),
     challengePeriodDuration: Number(d.challengePeriodDuration) * 1000, // Time in js is milliseconds.
