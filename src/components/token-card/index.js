@@ -59,19 +59,22 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
     </div>
     <div className="TokenCard-footer">
       <div style={{ display: 'flex' }}>
-        {Object.keys(badges).map(badgeContrAddr => {
-          const badge = badges[badgeContrAddr].items[token.address]
-          return (
-            badge &&
-            badge.clientStatus !== 0 && (
-              <span
-                key={badgeContrAddr}
-                className="TokenCard-footer-badge"
-                style={getBadgeStyle(badge)}
-              />
+        {(token.clientStatus === 1 ||
+          token.clientStatus === 3 ||
+          token.clientStatus === 5) &&
+          Object.keys(badges).map(badgeContrAddr => {
+            const badge = badges[badgeContrAddr].items[token.address]
+            return (
+              badge &&
+              badge.clientStatus !== 0 && (
+                <span
+                  key={badgeContrAddr}
+                  className="TokenCard-footer-badge"
+                  style={getBadgeStyle(badge)}
+                />
+              )
             )
-          )
-        })}
+          })}
       </div>
       <span>
         <a
