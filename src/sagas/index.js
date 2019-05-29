@@ -5,7 +5,7 @@ import { all, call, spawn } from 'redux-saga/effects'
 import walletSaga from './wallet'
 import arbitrableTokenListSaga from './arbitrable-token-list'
 import arbitrableAddressListSaga from './arbitrable-address-list'
-// import arbitratorSaga from './arbitrator'
+import arbitratorSaga from './arbitrator'
 import tokenSaga from './token'
 import badgeSaga from './badge'
 import notificationSaga from './notifications'
@@ -45,7 +45,7 @@ const rootSagas = [
   arbitrableAddressListSaga,
   tokenSaga,
   badgeSaga,
-  // arbitratorSaga,
+  arbitratorSaga,
   notificationSaga,
   tokensSaga,
   badgesSaga,

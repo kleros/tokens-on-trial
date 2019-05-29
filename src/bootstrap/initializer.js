@@ -7,6 +7,7 @@ import { BeatLoader } from 'react-spinners'
 import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
 import * as initializationActions from '../actions/initialization'
+import * as arbitratorActions from '../actions/arbitrator'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tokensActions from '../actions/tokens'
@@ -107,6 +108,7 @@ class Initializer extends PureComponent {
     fetchAccounts: PropTypes.func.isRequired,
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     fetchArbitrableAddressListData: PropTypes.func.isRequired,
+    fetchArbitratorData: PropTypes.func.isRequired,
     fetchTokens: PropTypes.func.isRequired,
     fetchBadges: PropTypes.func.isRequired,
     initialize: PropTypes.func.isRequired,
@@ -129,6 +131,7 @@ class Initializer extends PureComponent {
     const {
       fetchArbitrableAddressListData,
       fetchArbitrableTokenListData,
+      fetchArbitratorData,
       fetchTokens,
       fetchBadges,
       fetchAccounts,
@@ -139,6 +142,7 @@ class Initializer extends PureComponent {
     fetchAccounts()
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
+    fetchArbitratorData()
     fetchTokens()
     fetchBadges()
   }
@@ -191,6 +195,7 @@ export default connect(
       arbitrableTokenListActions.fetchArbitrableTokenListData,
     fetchTokens: tokensActions.fetchTokens,
     fetchBadges: badgesActions.fetchBadges,
+    fetchArbitratorData: arbitratorActions.fetchArbitratorData,
     initialize: initializationActions.initialize
   }
 )(Initializer)

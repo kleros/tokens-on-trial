@@ -1,9 +1,12 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { connect } from 'react-redux'
 
 import * as tcrConstants from '../../../constants/tcr'
 import { rulingMessage } from '../../../utils/ui'
+import * as arbitrableTokenListSelectors from '../../../reducers/arbitrable-token-list'
+import * as arbitrableAddressListSelectors from '../../../reducers/arbitrable-address-list'
 
 import EvidenceCard from './evidence-card'
 
@@ -41,16 +44,33 @@ const RequestEvidences = ({
   requester,
   challenger,
   idKey,
-  itemID
+  itemID,
+  tcrData
 }) => {
-  const [showHistory, toggleShowHistory] = useState(false)
-  if (!requestInfo || !requestInfo.requestSubmittedEvent) return null
+  if (!requestInfo || !requestInfo.requestSubmittedEvent || !tcrData)
+    return null
 
+  const [showHistory, toggleShowHistory] = useState(false)
+  const [timelineItems, setTimelineItems] = useState({})
   const {
     requestSubmittedEvent: {
       returnValues: { _registrationRequest }
     }
   } = requestInfo
+
+  useEffect(() => {
+    if (Object.keys(requestInfo.evidences).length > 0) {
+      const evidenceGroupID =
+        requestInfo.evidences[Object.keys(requestInfo.evidences)[0]]
+          ._evidenceGroupID
+
+      requestInfo.evidences[tcrData.disputeEvents[evidenceGroupID].txHash] = {
+        ...tcrData.disputeEvents[evidenceGroupID],
+        arbitratorEvent: true
+      }
+    }
+    setTimelineItems(requestInfo.evidences)
+  }, [])
 
   // Detect if request is related to a token or a badge.
   const isToken = itemID.length === 66
@@ -71,8 +91,7 @@ const RequestEvidences = ({
           : 'Badge Removal'}
       </h4>
       <div className="RequestEvidence-evidence--list">
-        {(!requestInfo.evidences ||
-          Object.keys(requestInfo.evidences).length === 0) && (
+        {Object.keys(timelineItems).length === 0 && (
           <>
             <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
             <small style={{ margin: '16px 0' }}>
@@ -80,32 +99,52 @@ const RequestEvidences = ({
             </small>
           </>
         )}
-        {Object.keys(requestInfo.evidences)
-          .map(txHash => requestInfo.evidences[txHash])
+        {Object.keys(timelineItems)
+          .map(txHash => timelineItems[txHash])
           .sort((a, b) => a.blockNumber - b.blockNumber)
           .filter((_, i) => showHistory || i <= 1)
           .map((evidence, j) => (
-            <div
-              key={`${idKey}${j}`}
-              style={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center'
-              }}
-            >
-              <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
-              <EvidenceCard
-                key={`${requestNumber}${j}`}
-                requester={requester}
-                challenger={challenger}
-                evidence={evidence}
-                requestNumber={requestNumber}
-                idKey={`${requestNumber}${j}`}
-              />
-            </div>
+            <>
+              {evidence.arbitratorEvent ? (
+                <div
+                  style={{
+                    alignItems: 'center',
+                    display: 'flex',
+                    flexDirection: 'column'
+                  }}
+                  key={j}
+                >
+                  <div
+                    style={{ height: '20px', borderLeft: '1px solid #ccc' }}
+                  />
+                  <h4 className="RequestEvidence-title">Dispute Created</h4>
+                </div>
+              ) : (
+                <div
+                  key={`${idKey}${j}`}
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center'
+                  }}
+                >
+                  <div
+                    style={{ height: '20px', borderLeft: '1px solid #ccc' }}
+                  />
+                  <EvidenceCard
+                    key={`${requestNumber}${j}`}
+                    requester={requester}
+                    challenger={challenger}
+                    evidence={evidence}
+                    requestNumber={requestNumber}
+                    idKey={`${requestNumber}${j}`}
+                  />
+                </div>
+              )}
+            </>
           ))}
-        {Object.keys(requestInfo.evidences).length > 2 && (
+        {Object.keys(timelineItems).length > 2 && (
           <>
             <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
             <div
@@ -189,7 +228,16 @@ RequestEvidences.propTypes = {
   requester: PropTypes.string.isRequired,
   challenger: PropTypes.string.isRequired,
   idKey: PropTypes.string.isRequired,
-  itemID: PropTypes.string.isRequired
+  itemID: PropTypes.string.isRequired,
+  tcrData: PropTypes.oneOfType([
+    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+  ]).isRequired
 }
 
-export default RequestEvidences
+export default connect(state => ({
+  arbitrableAddressListData:
+    state.arbitrableAddressList.arbitrableAddressListData.data,
+  arbitrableTokenListData:
+    state.arbitrableTokenList.arbitrableTokenListData.data
+}))(RequestEvidences)

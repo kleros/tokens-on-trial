@@ -42,6 +42,9 @@ export function* fetchArbitrableTokenListData() {
     },
     requestSubmittedEvents: {
       blockNumber: Number(T2CR_BLOCK)
+    },
+    disputeEvents: {
+      blockNumber: Number(T2CR_BLOCK)
     }
   }
 
@@ -57,21 +60,22 @@ export function* fetchArbitrableTokenListData() {
       )
     )
 
-  eventsData.metaEvidenceEvents.events = eventsData.metaEvidenceEvents.events
-    .concat(
-      yield call(
-        fetchEvents,
-        'MetaEvidence',
-        arbitrableTokenListView,
-        eventsData.metaEvidenceEvents.blockNumber
-      )
-    )
-    .sort((a, b) => a.blockNumber - b.blockNumber)
-    .map(e => {
-      if (e.blockNumber > eventsData.metaEvidenceEvents.blockNumber)
-        eventsData.metaEvidenceEvents.blockNumber = e.blockNumber
-      return e
-    })
+  // Fetch the contract deployment block number. We use the first meta evidence
+  // events emitted when the constructor is run.
+  if (eventsData.metaEvidenceEvents.blockNumber === Number(T2CR_BLOCK)) {
+    eventsData.metaEvidenceEvents.events = (yield call(
+      fetchEvents,
+      'MetaEvidence',
+      arbitrableTokenListView
+    )).sort((a, b) => a.blockNumber - b.blockNumber)
+
+    const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
+
+    eventsData.metaEvidenceEvents.blockNumber = blockNumber
+    eventsData.evidenceEvents.blockNumber = blockNumber
+    eventsData.requestSubmittedEvents.blockNumber = blockNumber
+    eventsData.disputeEvents.blockNumber = blockNumber
+  }
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
@@ -89,15 +93,18 @@ export function* fetchArbitrableTokenListData() {
     eventsData.evidenceEvents.blockNumber
   )).reduce((acc, curr) => {
     const {
-      returnValues: { _evidenceGroupID },
-      blockNumber
+      returnValues: { _evidenceGroupID }
     } = curr
 
-    if (blockNumber > eventsData.evidenceEvents.blockNumber)
-      eventsData.evidenceEvents.blockNumber = blockNumber
+    if (curr.blockNumber > eventsData.evidenceEvents.blockNumber)
+      eventsData.evidenceEvents.blockNumber = curr.blockNumber + 1
 
     acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
-    acc[_evidenceGroupID].push(curr)
+    acc[_evidenceGroupID].push({
+      returnValues: curr.returnValues,
+      transactionHash: curr.transactionHash,
+      blockNumber: curr.blockNumber
+    })
     return acc
   }, eventsData.evidenceEvents)
 
@@ -107,14 +114,38 @@ export function* fetchArbitrableTokenListData() {
     arbitrableTokenListView,
     eventsData.requestSubmittedEvents.blockNumber
   )).reduce((acc, curr) => {
-    if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
-
     if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
-      eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber
+      eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
 
-    acc[curr.returnValues._tokenID].push(curr)
+    if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
+    acc[curr.returnValues._tokenID].push({
+      returnValues: curr.returnValues,
+      transactionHash: curr.transactionHash,
+      blockNumber: curr.blockNumber
+    })
     return acc
   }, eventsData.requestSubmittedEvents)
+
+  eventsData.disputeEvents = (yield call(
+    fetchEvents,
+    'Dispute',
+    arbitrableTokenListView,
+    eventsData.disputeEvents.blockNumber
+  )).reduce((acc, curr) => {
+    const {
+      returnValues: { _evidenceGroupID }
+    } = curr
+
+    if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
+      eventsData.disputeEvents.blockNumber = curr.blockNumber + 1
+
+    acc[_evidenceGroupID] = {
+      returnValues: curr.returnValues,
+      transactionHash: curr.transactionHash,
+      blockNumber: curr.blockNumber
+    }
+    return acc
+  }, eventsData.disputeEvents)
 
   localStorage.setItem(
     `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`,
@@ -161,6 +192,7 @@ export function* fetchArbitrableTokenListData() {
     fileURI,
     evidenceEvents: eventsData.evidenceEvents,
     requestSubmittedEvents: eventsData.requestSubmittedEvents,
+    disputeEvents: eventsData.disputeEvents,
     arbitrator: d.arbitrator,
     governor: d.governor,
     arbitratorExtraData: d.arbitratorExtraData,

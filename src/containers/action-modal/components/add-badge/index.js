@@ -53,7 +53,11 @@ const AddBadge = ({
               </div>
               <div>
                 See{' '}
-                <a href={`${IPFS_URL}${badgeContract.fileURI}`}>
+                <a
+                  href={`${IPFS_URL}${badgeContract.fileURI}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Listing Criteria
                 </a>
                 .

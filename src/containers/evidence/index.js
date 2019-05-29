@@ -105,6 +105,7 @@ class EvidenceSection extends Component {
       const evidenceGroupID = web3Utils
         .toBN(web3Utils.soliditySha3(itemID, i))
         .toString(10)
+
       requestsInfo[evidenceGroupID].requestSubmittedEvent = event
     })
 
@@ -156,7 +157,11 @@ class EvidenceSection extends Component {
       this.setState({ requestsInfo: newRequestInfo })
     })
 
-    this.setState({ requestsInfo, eventSubscription })
+    this.setState({
+      requestsInfo,
+      eventSubscription,
+      tcrData: badgeContractAddr ? tcrData[badgeContractAddr] : tcrData
+    })
   }
 
   componentWillUnmount() {
@@ -172,7 +177,7 @@ class EvidenceSection extends Component {
       handleOpenEvidenceModal,
       itemID
     } = this.props
-    const { requestsInfo } = this.state
+    const { requestsInfo, tcrData } = this.state
     const requester = latestRequest.parties[1]
     const challenger = latestRequest.parties[2]
 
@@ -221,6 +226,7 @@ class EvidenceSection extends Component {
               requestInfo={latestRequestEvent}
               requestNumber={history.length > 1 ? history.length : 1}
               itemID={itemID}
+              tcrData={tcrData}
             />
             {history
               .filter((_, i) => i > 0)
@@ -232,6 +238,7 @@ class EvidenceSection extends Component {
                   challenger={challenger}
                   requestInfo={requestInfo}
                   requestNumber={history.length - i - 1}
+                  tcrData={tcrData}
                 />
               ))}
           </div>
