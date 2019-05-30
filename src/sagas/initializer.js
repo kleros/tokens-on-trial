@@ -30,6 +30,14 @@ function* initialize() {
     })
   )
 
+  // Clear cache if app version changed.
+  const latestAppVersion = localStorage.getItem('LATEST_APP_VERSION')
+  if (latestAppVersion !== APP_VERSION) {
+    localStorage.clear()
+    localStorage.setItem('LATEST_APP_VERSION', APP_VERSION)
+    window.location.reload(true)
+  }
+
   // Load filter cache, if any.
   const cachedFilters = localStorage.getItem(
     `${arbitrableTokenListView.options.address}filter@${APP_VERSION}`
