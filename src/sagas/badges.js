@@ -12,10 +12,7 @@ import {
 import { APP_VERSION } from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
 
-import { fetchAppealable } from './utils'
-
-const fetchEvents = async ({ eventName, fromBlock, contract }) =>
-  contract.getPastEvents(eventName, { fromBlock })
+import { fetchAppealable, fetchEvents } from './utils'
 
 /**
  * Fetches the all items in a TCR.
@@ -27,20 +24,22 @@ function* fetchItems({
   blockNumber: tcrBlockNumber,
   badges,
   arbitratorView,
-  ARBITRATOR_BLOCK
+  ARBITRATOR_BLOCK,
+  web3
 }) {
   // Get the lastest status change for every badge.
 
   let statusBlockNumber = tcrBlockNumber
   const latestStatusChanges = {}
-  const statusChanges = yield call(fetchEvents, {
-    eventName: 'AddressStatusChange',
-    fromBlock:
-      badges.statusBlockNumber === tcrBlockNumber
-        ? tcrBlockNumber
-        : badges.statusBlockNumber,
-    contract: arbitrableAddressListView
-  })
+  const statusChanges = yield call(
+    fetchEvents,
+    'AddressStatusChange',
+    arbitrableAddressListView,
+    badges.statusBlockNumber === tcrBlockNumber
+      ? tcrBlockNumber
+      : badges.statusBlockNumber,
+    web3
+  )
 
   statusChanges.forEach(event => {
     const { returnValues } = event
@@ -100,7 +99,8 @@ function* fetchItems({
     fetchAppealable,
     arbitratorView,
     ARBITRATOR_BLOCK,
-    arbitrableAddressListView
+    arbitrableAddressListView,
+    web3
   )
 
   // The appeal period can also be over if the arbitrators gave
@@ -180,16 +180,19 @@ function* fetchItems({
 /**
  * Fetches the block number of a deployed TCR contract.
  * @param {object} tcr - The TCR object.
+ * @param {object} web3 - A web3 object to fetch events.
  * @returns {object} - An object with the TCR address and its deployment block number.
  */
-function* fetchBlockNumber(tcr) {
+function* fetchBlockNumber(tcr, web3) {
   // Fetch the contract deployment block number. We use the first meta evidence
   // events emitted when the constructor is run.
-  const metaEvidenceEvents = (yield call(fetchEvents, {
-    eventName: 'MetaEvidence',
-    contract: tcr,
-    fromBlock: 0
-  })).sort((a, b) => a.blockNumber - b.blockNumber)
+  const metaEvidenceEvents = (yield call(
+    fetchEvents,
+    'MetaEvidence',
+    tcr,
+    0,
+    web3
+  )).sort((a, b) => a.blockNumber - b.blockNumber)
 
   return {
     address: tcr.options.address,
@@ -208,12 +211,13 @@ function* fetchBadges() {
       options: { address: t2crAddr }
     },
     arbitratorView,
-    ARBITRATOR_BLOCK
+    ARBITRATOR_BLOCK,
+    viewWeb3
   } = yield call(instantiateEnvObjects)
 
   const blockNumbers = (yield all(
     Object.keys(badgeViewContracts).map(address =>
-      call(fetchBlockNumber, badgeViewContracts[address])
+      call(fetchBlockNumber, badgeViewContracts[address], viewWeb3)
     )
   )).reduce((acc, curr) => {
     acc[curr.address] = curr.blockNumber
@@ -240,7 +244,8 @@ function* fetchBadges() {
                   items: {}
                 },
           arbitratorView,
-          ARBITRATOR_BLOCK
+          ARBITRATOR_BLOCK,
+          web3: viewWeb3
         })
       )
     )).reduce((acc, curr) => {

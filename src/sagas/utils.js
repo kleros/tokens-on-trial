@@ -1,23 +1,50 @@
 import { call } from 'redux-saga/effects'
 
-export const fetchEvents = async (eventName, fromBlock, contract) =>
-  contract.getPastEvents(eventName, { fromBlock })
+export const fetchEvents = async (eventName, contract, fromBlock = 0, web3) => {
+  fromBlock = Number(fromBlock)
+  const latestBlockNumber = (await web3.eth.getBlock('latest')).number
+  const blocksPerRequest = 500000
+  const rounds = Math.ceil((latestBlockNumber - fromBlock) / blocksPerRequest)
+
+  let events = []
+  for (let round = 0; round < rounds; round++) {
+    const startBlock = fromBlock + round * blocksPerRequest
+    const endBlock =
+      startBlock + blocksPerRequest < latestBlockNumber
+        ? startBlock + blocksPerRequest
+        : latestBlockNumber
+    events = events.concat(
+      await contract.getPastEvents(eventName, {
+        fromBlock: startBlock,
+        toBlock: endBlock
+      })
+    )
+  }
+  return events
+}
 
 /**
  * Fetches a list dispute IDs of items which are within appeal period. Does not exclude disputes of appeals that did not receive enough funds from the loser in the first half of the appeal period.
  * @param {object} arbitratorView - The arbitrator contract instance.
  * @param {number} ARBITRATOR_BLOCK - The arbitrator contract deployment block.
  * @param {object} tcrView - The tcr contract instance.
+ * @param {object} web3 - A web3 object to fetch events.
  * @returns {object} An mappping of dispute IDs within the appeal period to the appeal period interval.
  */
-export function* fetchAppealable(arbitratorView, ARBITRATOR_BLOCK, tcrView) {
+export function* fetchAppealable(
+  arbitratorView,
+  ARBITRATOR_BLOCK,
+  tcrView,
+  web3
+) {
   // We use AppealPossible, NewPeriod and AppealDecision events to find all
   // disputes with Period.Appeal state at once.
   const tcrAppealableEvents = (yield call(
     fetchEvents,
     'AppealPossible',
+    arbitratorView,
     ARBITRATOR_BLOCK,
-    arbitratorView
+    web3
   ))
     .filter(e => e.returnValues._arbitrable === tcrView._address)
     .reduce((acc, curr) => {
@@ -41,8 +68,9 @@ export function* fetchAppealable(arbitratorView, ARBITRATOR_BLOCK, tcrView) {
   const appealDecisionEvents = (yield call(
     fetchEvents,
     'AppealDecision',
+    arbitratorView,
     ARBITRATOR_BLOCK,
-    arbitratorView
+    web3
   ))
     .filter(e => e.returnValues._arbitrable === tcrView._address) // Remove disputes unrelated to the tcr
     .reduce((acc, curr) => {
@@ -59,7 +87,13 @@ export function* fetchAppealable(arbitratorView, ARBITRATOR_BLOCK, tcrView) {
     }, {})
 
   const tcrPeriodChangeEvents = Object.keys(
-    (yield call(fetchEvents, 'NewPeriod', ARBITRATOR_BLOCK, arbitratorView))
+    (yield call(
+      fetchEvents,
+      'NewPeriod',
+      arbitratorView,
+      ARBITRATOR_BLOCK,
+      web3
+    ))
       .filter(e => !!tcrAppealableEvents[e.returnValues._disputeID]) // Remove disputes unrelated to the tcr
       .reduce((acc, curr) => {
         // Take the most recent period change event for each dispute.

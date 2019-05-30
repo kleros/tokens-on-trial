@@ -23,7 +23,8 @@ function* fetchTokens() {
     arbitrableTokenListView,
     arbitratorView,
     T2CR_BLOCK,
-    ARBITRATOR_BLOCK
+    ARBITRATOR_BLOCK,
+    viewWeb3
   } = yield call(instantiateEnvObjects)
 
   try {
@@ -46,8 +47,9 @@ function* fetchTokens() {
     const submissionEvents = yield call(
       fetchEvents,
       'TokenSubmitted',
+      arbitrableTokenListView,
       tokens.blockNumber === T2CR_BLOCK ? T2CR_BLOCK : tokens.blockNumber + 1,
-      arbitrableTokenListView
+      viewWeb3
     )
 
     // Find the block number of the lastest token submission event.
@@ -118,10 +120,11 @@ function* fetchTokens() {
     const statusChanges = yield call(
       fetchEvents,
       'TokenStatusChange',
+      arbitrableTokenListView,
       tokens.statusBlockNumber < blockNumber
         ? tokens.statusBlockNumber
         : blockNumber,
-      arbitrableTokenListView
+      viewWeb3
     )
 
     statusChanges.forEach(event => {
@@ -219,7 +222,8 @@ function* fetchTokens() {
       fetchAppealable,
       arbitratorView,
       ARBITRATOR_BLOCK,
-      arbitrableTokenListView
+      arbitrableTokenListView,
+      viewWeb3
     )
 
     // The appeal period can also be over if the arbitrators gave
