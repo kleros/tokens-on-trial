@@ -221,6 +221,7 @@ class EvidenceSection extends Component {
         <div className="Evidence-evidence">
           <div className="Evidence-requests">
             <RequestEvidences
+              idKey={'firstRequest'}
               requester={requester}
               challenger={challenger}
               requestInfo={latestRequestEvent}

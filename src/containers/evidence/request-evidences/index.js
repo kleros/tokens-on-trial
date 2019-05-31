@@ -64,10 +64,11 @@ const RequestEvidences = ({
         requestInfo.evidences[Object.keys(requestInfo.evidences)[0]]
           ._evidenceGroupID
 
-      requestInfo.evidences[tcrData.disputeEvents[evidenceGroupID].txHash] = {
-        ...tcrData.disputeEvents[evidenceGroupID],
-        arbitratorEvent: true
-      }
+      if (tcrData.disputeEvents[evidenceGroupID])
+        requestInfo.evidences[tcrData.disputeEvents[evidenceGroupID].txHash] = {
+          ...tcrData.disputeEvents[evidenceGroupID],
+          arbitratorEvent: true
+        }
     }
     setTimelineItems(requestInfo.evidences)
   }, [])
@@ -102,9 +103,9 @@ const RequestEvidences = ({
         {Object.keys(timelineItems)
           .map(txHash => timelineItems[txHash])
           .sort((a, b) => a.blockNumber - b.blockNumber)
-          .filter((_, i) => showHistory || i <= 1)
+          .filter((_, i) => showHistory || i <= 2)
           .map((evidence, j) => (
-            <>
+            <React.Fragment key={`${idKey}${j}`}>
               {evidence.arbitratorEvent ? (
                 <div
                   style={{
@@ -112,7 +113,6 @@ const RequestEvidences = ({
                     display: 'flex',
                     flexDirection: 'column'
                   }}
-                  key={j}
                 >
                   <div
                     style={{ height: '20px', borderLeft: '1px solid #ccc' }}
@@ -121,7 +121,6 @@ const RequestEvidences = ({
                 </div>
               ) : (
                 <div
-                  key={`${idKey}${j}`}
                   style={{
                     width: '100%',
                     display: 'flex',
@@ -142,7 +141,7 @@ const RequestEvidences = ({
                   />
                 </div>
               )}
-            </>
+            </React.Fragment>
           ))}
         {Object.keys(timelineItems).length > 2 && (
           <>
