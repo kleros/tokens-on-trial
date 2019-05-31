@@ -4,9 +4,7 @@ import * as arbitratorActions from '../actions/arbitrator'
 import { lessduxSaga } from '../utils/saga'
 import { instantiateEnvObjects } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
-
-const fetchEvents = async (eventName, contract, fromBlock) =>
-  contract.getPastEvents(eventName, { fromBlock: fromBlock || 0 }) // Web3js returns an empty array if fromBlock is not set.
+import { fetchEvents } from '../sagas/utils'
 
 /**
  * Fetches the arbitrators's data.
@@ -14,13 +12,11 @@ const fetchEvents = async (eventName, contract, fromBlock) =>
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitratorData() {
-  const { arbitratorView, ARBITRATOR_BLOCK } = yield call(instantiateEnvObjects)
+  const { arbitratorView, ARBITRATOR_BLOCK, viewWeb3 } = yield call(
+    instantiateEnvObjects
+  )
 
   let eventsData = {
-    appealPossibleEvents: {
-      blockNumber: Number(ARBITRATOR_BLOCK),
-      events: {}
-    },
     appealDecisionEvents: {
       blockNumber: Number(ARBITRATOR_BLOCK),
       events: {}
@@ -39,29 +35,12 @@ export function* fetchArbitratorData() {
       )
     )
 
-  eventsData.appealPossibleEvents.events = (yield call(
-    fetchEvents,
-    'AppealPossible',
-    arbitratorView,
-    eventsData.appealPossibleEvents.blockNumber
-  )).reduce((acc, curr) => {
-    const {
-      returnValues: { _disputeID },
-      blockNumber
-    } = curr
-
-    if (blockNumber > eventsData.appealPossibleEvents.blockNumber)
-      eventsData.appealPossibleEvents.blockNumber = blockNumber
-
-    acc[_disputeID] = curr
-    return acc
-  }, eventsData.appealPossibleEvents.events)
-
   eventsData.appealDecisionEvents.events = (yield call(
     fetchEvents,
-    'AppealPossible',
+    'AppealDecision',
     arbitratorView,
-    eventsData.appealDecisionEvents.blockNumber
+    eventsData.appealDecisionEvents.blockNumber,
+    viewWeb3
   )).reduce((acc, curr) => {
     const {
       returnValues: { _disputeID },
@@ -71,7 +50,13 @@ export function* fetchArbitratorData() {
     if (blockNumber > eventsData.appealDecisionEvents.blockNumber)
       eventsData.appealDecisionEvents.blockNumber = blockNumber
 
-    acc[_disputeID] = curr
+    if (!acc[_disputeID]) acc[_disputeID] = {}
+
+    acc[_disputeID][curr.transactionHash] = {
+      returnValues: curr.returnValues,
+      transactionHash: curr.transactionHash,
+      blockNumber: curr.blockNumber
+    }
     return acc
   }, eventsData.appealDecisionEvents.events)
 
@@ -82,7 +67,6 @@ export function* fetchArbitratorData() {
   )
 
   return {
-    appealPossibleEvents: eventsData.appealPossibleEvents,
     appealDecisionEvents: eventsData.appealDecisionEvents
   }
 }

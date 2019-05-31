@@ -326,7 +326,7 @@ class BadgeDetails extends PureComponent {
         </div>
       )
 
-    const { badgeViewContracts } = this.context
+    const { badgeViewContracts, arbitratorView } = this.context
     const arbitrableAddressListView = badgeViewContracts[badgeAddr]
     const FILE_BASE_URL = envObjects ? envObjects.FILE_BASE_URL : null
     const { filters } = filter
@@ -456,6 +456,7 @@ class BadgeDetails extends PureComponent {
           item={badge}
           itemID={tokenAddr}
           tcr={arbitrableAddressListView}
+          arbitratorView={arbitratorView}
           tcrData={arbitrableAddressListData.data}
           handleOpenEvidenceModal={this.handleOpenEvidenceModal}
           handleViewEvidenceClick={this.handleViewEvidenceClick}

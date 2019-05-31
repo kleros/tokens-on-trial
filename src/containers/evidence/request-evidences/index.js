@@ -45,7 +45,9 @@ const RequestEvidences = ({
   challenger,
   idKey,
   itemID,
-  tcrData
+  tcrData,
+  arbitratorData,
+  arbitratorView
 }) => {
   if (!requestInfo || !requestInfo.requestSubmittedEvent || !tcrData)
     return null
@@ -59,18 +61,62 @@ const RequestEvidences = ({
   } = requestInfo
 
   useEffect(() => {
-    if (Object.keys(requestInfo.evidences).length > 0) {
-      const evidenceGroupID =
-        requestInfo.evidences[Object.keys(requestInfo.evidences)[0]]
-          ._evidenceGroupID
+    const fetchArbitratorData = async () => {
+      if (Object.keys(requestInfo.evidences).length > 0) {
+        const evidenceGroupID =
+          requestInfo.evidences[Object.keys(requestInfo.evidences)[0]]
+            ._evidenceGroupID
 
-      if (tcrData.disputeEvents[evidenceGroupID])
-        requestInfo.evidences[tcrData.disputeEvents[evidenceGroupID].txHash] = {
-          ...tcrData.disputeEvents[evidenceGroupID],
-          arbitratorEvent: true
+        // If a dispute is raised, fetch events.
+        if (tcrData.disputeEvents[evidenceGroupID]) {
+          const { _disputeID: disputeID } = tcrData.disputeEvents[
+            evidenceGroupID
+          ].returnValues
+          requestInfo.evidences[
+            tcrData.disputeEvents[evidenceGroupID].txHash
+          ] = {
+            ...tcrData.disputeEvents[evidenceGroupID],
+            message: 'Dispute Created',
+            arbitratorEvent: true
+          }
+
+          // Fetch rulings by the arbitrator.
+          if (arbitratorData.appealDecisionEvents.events[disputeID]) {
+            const winningChoices = await Promise.all(
+              Object.keys(
+                arbitratorData.appealDecisionEvents.events[disputeID]
+              ).map(async (txHash, i) => ({
+                blockNumber:
+                  arbitratorData.appealDecisionEvents.events[disputeID][txHash]
+                    .blockNumber,
+                txHash,
+                arbitratorEvent: true,
+                message: (await arbitratorView.methods
+                  .getVoteCounter(disputeID, i)
+                  .call()).winningChoice
+              }))
+            )
+
+            winningChoices
+              .map(winningChoice => ({
+                ...winningChoice,
+                message: rulingMessage(
+                  Number(winningChoice.message) !==
+                    tcrConstants.RULING_OPTIONS.None,
+                  false,
+                  false,
+                  winningChoice.message.toString()
+                )
+              }))
+              .forEach(winningChoice => {
+                requestInfo.evidences[winningChoice.txHash] = winningChoice
+              })
+          }
         }
+      }
+      setTimelineItems(requestInfo.evidences)
     }
-    setTimelineItems(requestInfo.evidences)
+    fetchArbitratorData()
   }, [])
 
   // Detect if request is related to a token or a badge.
@@ -117,7 +163,7 @@ const RequestEvidences = ({
                   <div
                     style={{ height: '20px', borderLeft: '1px solid #ccc' }}
                   />
-                  <h4 className="RequestEvidence-title">Dispute Created</h4>
+                  <h4 className="RequestEvidence-title">{evidence.message}</h4>
                 </div>
               ) : (
                 <div
@@ -143,7 +189,7 @@ const RequestEvidences = ({
               )}
             </React.Fragment>
           ))}
-        {Object.keys(timelineItems).length > 2 && (
+        {Object.keys(timelineItems).length > 3 && (
           <>
             <div style={{ height: '20px', borderLeft: '1px solid #ccc' }} />
             <div
@@ -231,12 +277,24 @@ RequestEvidences.propTypes = {
   tcrData: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
     arbitrableAddressListSelectors.arbitrableAddressListDataShape
-  ]).isRequired
+  ]).isRequired,
+  arbitratorView: PropTypes.shape({
+    methods: PropTypes.shape({
+      getVoteCounter: PropTypes.func.isRequired
+    })
+  }).isRequired,
+  arbitratorData: PropTypes.shape({
+    appealDecisionEvents: PropTypes.shape({
+      events: PropTypes.shape({}),
+      blockNumber: PropTypes.number
+    })
+  }).isRequired
 }
 
 export default connect(state => ({
   arbitrableAddressListData:
     state.arbitrableAddressList.arbitrableAddressListData.data,
   arbitrableTokenListData:
-    state.arbitrableTokenList.arbitrableTokenListData.data
+    state.arbitrableTokenList.arbitrableTokenListData.data,
+  arbitratorData: state.arbitrator.arbitratorData.data
 }))(RequestEvidences)

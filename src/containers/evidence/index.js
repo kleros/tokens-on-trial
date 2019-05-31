@@ -175,7 +175,8 @@ class EvidenceSection extends Component {
     const {
       item: { badgeContractAddr, latestRequest },
       handleOpenEvidenceModal,
-      itemID
+      itemID,
+      arbitratorView
     } = this.props
     const { requestsInfo, tcrData } = this.state
     const requester = latestRequest.parties[1]
@@ -186,7 +187,7 @@ class EvidenceSection extends Component {
         <div className="Evidence">
           <hr className="Evidence-separator" />
           <div className="Evidence-header">
-            <h3>Evidence</h3>
+            <h3>Latest Request</h3>
           </div>
           <div className="Evidence-evidence">
             <BeatLoader color="#3d464d" />
@@ -206,7 +207,7 @@ class EvidenceSection extends Component {
         <hr className="Evidence-separator" />
         <div className="Evidence-header">
           {/* eslint-disable react/jsx-no-bind */}
-          <h3>Evidence</h3>
+          <h3>Latest Request</h3>
           {!resolved && (
             <Button
               tooltip={onlyInfura ? 'Please install MetaMask.' : null}
@@ -228,7 +229,9 @@ class EvidenceSection extends Component {
               requestNumber={history.length > 1 ? history.length : 1}
               itemID={itemID}
               tcrData={tcrData}
+              arbitratorView={arbitratorView}
             />
+            <h3>Previous Requests</h3>
             {history
               .filter((_, i) => i > 0)
               .map((requestInfo, i) => (
@@ -240,6 +243,7 @@ class EvidenceSection extends Component {
                   requestInfo={requestInfo}
                   requestNumber={history.length - i - 1}
                   tcrData={tcrData}
+                  arbitratorView={arbitratorView}
                 />
               ))}
           </div>
@@ -251,7 +255,12 @@ class EvidenceSection extends Component {
 
 EvidenceSection.propTypes = {
   item: itemShape,
-  handleOpenEvidenceModal: PropTypes.func.isRequired
+  handleOpenEvidenceModal: PropTypes.func.isRequired,
+  arbitratorView: PropTypes.shape({
+    methods: PropTypes.shape({
+      getVoteCounter: PropTypes.func.isRequired
+    })
+  }).isRequired
 }
 
 EvidenceSection.defaultProps = {

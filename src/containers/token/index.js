@@ -290,7 +290,7 @@ class TokenDetails extends PureComponent {
     const { appealModalOpen, loserCountdownCompleted, token } = this.state
 
     if (!this.context) return null
-    const { arbitrableTokenListView } = this.context
+    const { arbitrableTokenListView, arbitratorView } = this.context
 
     const {
       accounts,
@@ -426,6 +426,7 @@ class TokenDetails extends PureComponent {
           item={token}
           tcr={arbitrableTokenListView}
           tcrData={arbitrableTokenListData.data}
+          arbitratorView={arbitratorView}
           handleOpenEvidenceModal={this.handleOpenEvidenceModal}
           handleViewEvidenceClick={this.handleViewEvidenceClick}
         />
