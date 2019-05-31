@@ -39,246 +39,252 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
     arbitratorView
   } = yield call(instantiateEnvObjects)
 
-  badgeContractAddr = web3Utils.toChecksumAddress(badgeContractAddr)
-  const arbitrableAddressListView = badgeViewContracts[badgeContractAddr]
+  try {
+    badgeContractAddr = web3Utils.toChecksumAddress(badgeContractAddr)
+    const arbitrableAddressListView = badgeViewContracts[badgeContractAddr]
 
-  let badge = yield call(
-    arbitrableAddressListView.methods.getAddressInfo(tokenAddress).call
-  )
-  badge.requests = []
-
-  if (Number(badge.numberOfRequests > 0)) {
-    for (let i = 0; i < badge.numberOfRequests; i++) {
-      const request = yield call(
-        arbitrableAddressListView.methods.getRequestInfo(tokenAddress, i).call
-      )
-      if (request.arbitratorExtraData === null)
-        request.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
-
-      request.evidenceGroupID = web3Utils
-        .toBN(web3Utils.soliditySha3(tokenAddress, i))
-        .toString()
-
-      badge.requests.push(request)
-    }
-
-    badge.latestRequest = badge.requests[badge.requests.length - 1]
-
-    // Calculate amount withdrawable
-    let i
-    badge.withdrawable = web3Utils.toBN(0)
-    if (badge.latestRequest.resolved) i = badge.numberOfRequests - 1
-    // Start from the last round.
-    else if (badge.numberOfRequests > 1) i = badge.numberOfRequests - 2 // Start from the penultimate round.
-
-    while (i >= 0) {
-      const amount = yield call(
-        arbitrableAddressListView.methods.amountWithdrawable(
-          tokenAddress,
-          account,
-          i
-        ).call
-      )
-      badge.withdrawable = badge.withdrawable.add(web3Utils.toBN(amount))
-      i--
-    }
-
-    badge.latestRequest.latestRound = yield call(
-      arbitrableAddressListView.methods.getRoundInfo(
-        tokenAddress,
-        Number(badge.numberOfRequests) - 1,
-        Number(badge.latestRequest.numberOfRounds) - 1
-      ).call
+    let badge = yield call(
+      arbitrableAddressListView.methods.getAddressInfo(tokenAddress).call
     )
-    badge.latestRequest.latestRound.paidFees[0] = toBN(
-      badge.latestRequest.latestRound.paidFees[0]
-    )
-    badge.latestRequest.latestRound.paidFees[1] = toBN(
-      badge.latestRequest.latestRound.paidFees[1]
-    )
-    badge.latestRequest.latestRound.paidFees[2] = toBN(
-      badge.latestRequest.latestRound.paidFees[2]
-    )
+    badge.requests = []
 
-    if (badge.latestRequest.disputed) {
-      // Fetch dispute data.
-      arbitratorView.options.tokenAddress = badge.latestRequest.arbitrator
-      badge.latestRequest.dispute = yield call(
-        arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
-      )
-      badge.latestRequest.dispute.court = yield call(
-        arbitratorView.methods.getSubcourt(
-          badge.latestRequest.dispute.subcourtID
-        ).call
-      )
-      badge.latestRequest.dispute.status = yield call(
-        arbitratorView.methods.disputeStatus(badge.latestRequest.disputeID).call
-      )
-      badge.latestRequest.dispute.ruling = yield call(
-        arbitratorView.methods.currentRuling(badge.latestRequest.disputeID).call
-      )
+    if (Number(badge.numberOfRequests > 0)) {
+      for (let i = 0; i < badge.numberOfRequests; i++) {
+        const request = yield call(
+          arbitrableAddressListView.methods.getRequestInfo(tokenAddress, i).call
+        )
+        if (request.arbitratorExtraData === null)
+          request.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
 
-      // Fetch appeal disputeID, if there was an appeal.
-      if (Number(badge.latestRequest.numberOfRounds) > 2) {
-        badge.latestRequest.appealDisputeID = badge.latestRequest.disputeID
-        badge.latestRequest.dispute.appealStatus =
-          badge.latestRequest.dispute.status
-      } else badge.latestRequest.appealDisputeID = 0
+        request.evidenceGroupID = web3Utils
+          .toBN(web3Utils.soliditySha3(tokenAddress, i))
+          .toString()
 
-      // Fetch appeal period and cost if in appeal period.
-      if (
-        badge.latestRequest.dispute.status ===
-          tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
-        !badge.latestRequest.latestRound.appealed
-      ) {
-        badge.latestRequest.latestRound.appealCost = yield call(
-          arbitratorView.methods.appealCost(
-            badge.latestRequest.disputeID,
-            badge.latestRequest.arbitratorExtraData
+        badge.requests.push(request)
+      }
+
+      badge.latestRequest = badge.requests[badge.requests.length - 1]
+
+      // Calculate amount withdrawable
+      let i
+      badge.withdrawable = web3Utils.toBN(0)
+      if (badge.latestRequest.resolved) i = badge.numberOfRequests - 1
+      // Start from the last round.
+      else if (badge.numberOfRequests > 1) i = badge.numberOfRequests - 2 // Start from the penultimate round.
+
+      while (i >= 0) {
+        const amount = yield call(
+          arbitrableAddressListView.methods.amountWithdrawable(
+            tokenAddress,
+            account,
+            i
           ).call
         )
-        const MULTIPLIER_DIVISOR = yield call(
-          arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
-        )
-        const winnerStakeMultiplier = yield call(
-          arbitrableAddressListView.methods.winnerStakeMultiplier().call
-        )
-        const loserStakeMultiplier = yield call(
-          arbitrableAddressListView.methods.loserStakeMultiplier().call
-        )
-        const sharedStakeMultiplier = yield call(
-          arbitrableAddressListView.methods.sharedStakeMultiplier().call
-        )
-        badge.latestRequest.latestRound.requiredForSide = [toBN(0)]
-
-        const ruling = Number(badge.latestRequest.dispute.ruling)
-        if (ruling === 0) {
-          badge.latestRequest.latestRound.requiredForSide.push(
-            toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost)
-                .mul(toBN(sharedStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-          badge.latestRequest.latestRound.requiredForSide.push(
-            toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost)
-                .mul(toBN(sharedStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-        } else if (ruling === 1) {
-          badge.latestRequest.latestRound.requiredForSide.push(
-            toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost)
-                .mul(toBN(winnerStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-          badge.latestRequest.latestRound.requiredForSide.push(
-            toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost)
-                .mul(toBN(loserStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-        } else {
-          badge.latestRequest.latestRound.requiredForSide.push(
-            toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost)
-                .mul(toBN(loserStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-          badge.latestRequest.latestRound.requiredForSide.push(
-            toBN(badge.latestRequest.latestRound.appealCost).add(
-              toBN(badge.latestRequest.latestRound.appealCost)
-                .mul(toBN(winnerStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-        }
-
-        if (typeof arbitratorView.methods.appealPeriod === 'function')
-          badge.latestRequest.latestRound.appealPeriod = yield call(
-            arbitratorView.methods.appealPeriod(badge.latestRequest.disputeID)
-              .call
-          )
-        else
-          badge.latestRequest.latestRound.appealPeriod = [
-            1549163380,
-            1643771380
-          ]
+        badge.withdrawable = badge.withdrawable.add(web3Utils.toBN(amount))
+        i--
       }
-    }
 
-    const tokenIDs = (yield call(
-      arbitrableTokenListView.methods.queryTokens(
-        ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
-        100, // Number of items to return at once.
-        filter,
-        true, // Return oldest first.
-        tokenAddress // The token address for which to return the submissions.
-      ).call
-    )).values.filter(ID => ID !== ZERO_ID)
-
-    let tokens
-    if (tokenIDs && tokenIDs.length > 0)
-      tokens = (yield all(
-        tokenIDs.map(ID =>
-          call(arbitrableTokenListView.methods.getTokenInfo(ID).call)
-        )
-      )).filter(
-        token => Number(token.status) === 1 || Number(token.status) === 3
+      badge.latestRequest.latestRound = yield call(
+        arbitrableAddressListView.methods.getRoundInfo(
+          tokenAddress,
+          Number(badge.numberOfRequests) - 1,
+          Number(badge.latestRequest.numberOfRounds) - 1
+        ).call
+      )
+      badge.latestRequest.latestRound.paidFees[0] = toBN(
+        badge.latestRequest.latestRound.paidFees[0]
+      )
+      badge.latestRequest.latestRound.paidFees[1] = toBN(
+        badge.latestRequest.latestRound.paidFees[1]
+      )
+      badge.latestRequest.latestRound.paidFees[2] = toBN(
+        badge.latestRequest.latestRound.paidFees[2]
       )
 
-    if (tokens && tokens.length >= 1) {
-      badge.token = tokens[0]
-      badge.token.ID = tokenIDs[0]
-      // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
-      if (badge.token.name === null || badge.token['0'] === null) {
-        badge.token.name = '0x'
-        badge.token['0'] = '0x'
-      }
+      if (badge.latestRequest.disputed) {
+        // Fetch dispute data.
+        arbitratorView.options.tokenAddress = badge.latestRequest.arbitrator
+        badge.latestRequest.dispute = yield call(
+          arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
+        )
+        badge.latestRequest.dispute.court = yield call(
+          arbitratorView.methods.getSubcourt(
+            badge.latestRequest.dispute.subcourtID
+          ).call
+        )
+        badge.latestRequest.dispute.status = yield call(
+          arbitratorView.methods.disputeStatus(badge.latestRequest.disputeID)
+            .call
+        )
+        badge.latestRequest.dispute.ruling = yield call(
+          arbitratorView.methods.currentRuling(badge.latestRequest.disputeID)
+            .call
+        )
 
-      if (badge.token.ticker === null || badge.token['1'] === null) {
-        badge.token.ticker = '0x'
-        badge.token['1'] = '0x'
-      }
-    }
+        // Fetch appeal disputeID, if there was an appeal.
+        if (Number(badge.latestRequest.numberOfRounds) > 2) {
+          badge.latestRequest.appealDisputeID = badge.latestRequest.disputeID
+          badge.latestRequest.dispute.appealStatus =
+            badge.latestRequest.dispute.status
+        } else badge.latestRequest.appealDisputeID = 0
 
-    badge = convertFromString(badge)
-  } else
-    badge = {
-      status: 0,
-      numberOfRequests: 0,
-      latestRequest: {
-        disputed: false,
-        disputeID: 0,
-        dispute: null,
-        submissionTime: 0,
-        feeRewards: 0,
-        pot: [],
-        resolved: false,
-        parties: [],
-        latestRound: {
-          appealed: false,
-          paidFees: new Array(3).fill(web3Utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
+        // Fetch appeal period and cost if in appeal period.
+        if (
+          badge.latestRequest.dispute.status ===
+            tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
+          !badge.latestRequest.latestRound.appealed
+        ) {
+          badge.latestRequest.latestRound.appealCost = yield call(
+            arbitratorView.methods.appealCost(
+              badge.latestRequest.disputeID,
+              badge.latestRequest.arbitratorExtraData
+            ).call
+          )
+          const MULTIPLIER_DIVISOR = yield call(
+            arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
+          )
+          const winnerStakeMultiplier = yield call(
+            arbitrableAddressListView.methods.winnerStakeMultiplier().call
+          )
+          const loserStakeMultiplier = yield call(
+            arbitrableAddressListView.methods.loserStakeMultiplier().call
+          )
+          const sharedStakeMultiplier = yield call(
+            arbitrableAddressListView.methods.sharedStakeMultiplier().call
+          )
+          badge.latestRequest.latestRound.requiredForSide = [toBN(0)]
+
+          const ruling = Number(badge.latestRequest.dispute.ruling)
+          if (ruling === 0) {
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(sharedStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
+              )
+            )
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(sharedStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
+              )
+            )
+          } else if (ruling === 1) {
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(winnerStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
+              )
+            )
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(loserStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
+              )
+            )
+          } else {
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(loserStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
+              )
+            )
+            badge.latestRequest.latestRound.requiredForSide.push(
+              toBN(badge.latestRequest.latestRound.appealCost).add(
+                toBN(badge.latestRequest.latestRound.appealCost)
+                  .mul(toBN(winnerStakeMultiplier))
+                  .div(toBN(MULTIPLIER_DIVISOR))
+              )
+            )
+          }
+
+          if (typeof arbitratorView.methods.appealPeriod === 'function')
+            badge.latestRequest.latestRound.appealPeriod = yield call(
+              arbitratorView.methods.appealPeriod(badge.latestRequest.disputeID)
+                .call
+            )
+          else
+            badge.latestRequest.latestRound.appealPeriod = [
+              1549163380,
+              1643771380
+            ]
         }
       }
-    }
 
-  return {
-    ...badge,
-    tokenAddress,
-    badgeContractAddr,
-    status: Number(badge.status),
-    clientStatus: contractStatusToClientStatus(
-      badge.status,
-      badge.latestRequest.disputed,
-      badge.latestRequest.resolved
-    )
+      const tokenIDs = (yield call(
+        arbitrableTokenListView.methods.queryTokens(
+          ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
+          100, // Number of items to return at once.
+          filter,
+          true, // Return oldest first.
+          tokenAddress // The token address for which to return the submissions.
+        ).call
+      )).values.filter(ID => ID !== ZERO_ID)
+
+      let tokens
+      if (tokenIDs && tokenIDs.length > 0)
+        tokens = (yield all(
+          tokenIDs.map(ID =>
+            call(arbitrableTokenListView.methods.getTokenInfo(ID).call)
+          )
+        )).filter(
+          token => Number(token.status) === 1 || Number(token.status) === 3
+        )
+
+      if (tokens && tokens.length >= 1) {
+        badge.token = tokens[0]
+        badge.token.ID = tokenIDs[0]
+        // web3js@1.0.0-beta.34 returns null if a string value in the smart contract is "0x".
+        if (badge.token.name === null || badge.token['0'] === null) {
+          badge.token.name = '0x'
+          badge.token['0'] = '0x'
+        }
+
+        if (badge.token.ticker === null || badge.token['1'] === null) {
+          badge.token.ticker = '0x'
+          badge.token['1'] = '0x'
+        }
+      }
+
+      badge = convertFromString(badge)
+    } else
+      badge = {
+        status: 0,
+        numberOfRequests: 0,
+        latestRequest: {
+          disputed: false,
+          disputeID: 0,
+          dispute: null,
+          submissionTime: 0,
+          feeRewards: 0,
+          pot: [],
+          resolved: false,
+          parties: [],
+          latestRound: {
+            appealed: false,
+            paidFees: new Array(3).fill(web3Utils.toBN(0)),
+            requiredForSide: new Array(3).fill(web3Utils.toBN(0))
+          }
+        }
+      }
+
+    return {
+      ...badge,
+      tokenAddress,
+      badgeContractAddr,
+      status: Number(badge.status),
+      clientStatus: contractStatusToClientStatus(
+        badge.status,
+        badge.latestRequest.disputed,
+        badge.latestRequest.resolved
+      )
+    }
+  } catch (err) {
+    console.info('Error fetching badge', err)
   }
 }
 

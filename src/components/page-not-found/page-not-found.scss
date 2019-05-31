@@ -2,12 +2,13 @@
 
 /* @define PageNotFound */
 .PageNotFound {
-  background: $background;
+  background: #ead6fe;
   height: 100%;
+  position: absolute;
 
   &-message {
     font-size: 40px;
-    padding: 70px 50px;
+    padding: 0;
     text-align: center;
   }
 }

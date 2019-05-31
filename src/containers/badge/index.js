@@ -21,6 +21,7 @@ import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-addre
 import { ContractsContext } from '../../bootstrap/contexts'
 import WithdrawFundsButton from '../../components/withdraw-funds'
 import CrowdfundingCard from '../crowdfunding-card'
+import PageNotFound from '../../components/page-not-found'
 
 import BadgeDetailsCard from './badge-details-card'
 import TokenInfo from './token-info'
@@ -41,6 +42,7 @@ class BadgeDetails extends PureComponent {
         tokenID: PropTypes.string
       })
     }),
+    failedLoading: PropTypes.bool.isRequired,
 
     // Functions
     timeout: PropTypes.func.isRequired,
@@ -310,8 +312,19 @@ class BadgeDetails extends PureComponent {
       filter,
       match,
       arbitrableAddressListData,
-      envObjects
+      envObjects,
+      failedLoading
     } = this.props
+
+    if (failedLoading)
+      return (
+        <PageNotFound
+          type="404"
+          title="Oops,"
+          msg="Badge Not Found"
+          small="Are you in the correct network?"
+        />
+      )
 
     const { tokenAddr, badgeAddr } = match.params
     if (
@@ -338,16 +351,12 @@ class BadgeDetails extends PureComponent {
 
     if (badge.numberOfRequests === 0 || missingTCRdata)
       return (
-        <div className="PageNotFound">
-          <div className="PageNotFound-message">
-            404.
-            <br />
-            <small>
-              <h3>Badge status not found.</h3>
-              <p style={{ fontSize: '0.6em' }}>Was it ever submitted?</p>
-            </small>
-          </div>
-        </div>
+        <PageNotFound
+          type="404"
+          title="Oops,"
+          msg="Badge Not Found"
+          small="Are you in the correct network?"
+        />
       )
 
     let decisiveRuling
@@ -544,6 +553,7 @@ class BadgeDetails extends PureComponent {
 export default connect(
   state => ({
     badge: state.badge.badge.data,
+    failedLoading: state.badge.badge.failedLoading,
     accounts: state.wallet.accounts,
     arbitrableAddressListData:
       state.arbitrableAddressList.arbitrableAddressListData,

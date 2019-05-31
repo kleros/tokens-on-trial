@@ -21,6 +21,7 @@ import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-l
 import { ContractsContext } from '../../bootstrap/contexts'
 import Evidence from '../evidence'
 import CrowdfundingCard from '../crowdfunding-card'
+import PageNotFound from '../../components/page-not-found'
 
 import Badges from './badges'
 import TokenDetailsCard from './token-details-card'
@@ -315,16 +316,12 @@ class TokenDetails extends PureComponent {
 
     if (token.numberOfRequests === 0)
       return (
-        <div className="PageNotFound">
-          <div className="PageNotFound-message">
-            404.
-            <br />
-            <small>
-              <h3>Token not found.</h3>
-              <p style={{ fontSize: '0.6em' }}>Was it ever submitted?</p>
-            </small>
-          </div>
-        </div>
+        <PageNotFound
+          type="404"
+          title="Oops,"
+          msg="Token Not Found"
+          small="Are you in the correct network?"
+        />
       )
 
     let decisiveRuling
