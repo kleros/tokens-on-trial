@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
+import Img from 'react-image'
 
 import { IPFS_URL } from '../../../../bootstrap/dapp-api'
 import * as tcrConstants from '../../../../constants/tcr'
 import { instantiateEnvObjects } from '../../../../utils/tcr'
+import EtherScanLogo from '../../../../assets/images/etherscan.png'
 
 import './evidence-card.css'
 
@@ -13,7 +15,7 @@ const downloadClick = url => async () => {
 }
 
 const EvidenceCard = ({
-  evidence: { evidence: evidenceFile, _party, icon, blockNumber },
+  evidence: { evidence: evidenceFile, _party, icon, blockNumber, txHash },
   idKey,
   requester,
   challenger
@@ -34,9 +36,41 @@ const EvidenceCard = ({
     <div className="EvidenceCard" key={idKey}>
       <div className="EvidenceCard-content">
         {evidenceFile.title && (
-          <p className="EvidenceCard-content-title">{evidenceFile.title}</p>
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between'
+            }}
+          >
+            <p className="EvidenceCard-content-title">{evidenceFile.title}</p>
+            <a
+              href={`https://etherscan.io/tx/${txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ alignSelf: 'flex-end' }}
+            >
+              <Img src={EtherScanLogo} className="EvidenceCard-content-title" />
+            </a>
+          </div>
         )}
-        {evidenceFile.description && <p>{evidenceFile.description}</p>}
+        {evidenceFile.description && (
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <p>{evidenceFile.description}</p>
+            {!evidenceFile.title && (
+              <a
+                href={`https://etherscan.io/tx/${txHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ alignSelf: 'flex-end' }}
+              >
+                <Img
+                  src={EtherScanLogo}
+                  className="EvidenceCard-content-title"
+                />
+              </a>
+            )}
+          </div>
+        )}
       </div>
       <div className="EvidenceCard-footer">
         <div
