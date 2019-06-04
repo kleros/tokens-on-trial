@@ -4,6 +4,7 @@
 .SubmitEvidence {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
 
   &-form-fieldset {
@@ -14,6 +15,7 @@
   &-actions {
     align-content: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     width: 100%;
   }
@@ -22,6 +24,7 @@
     align-items: center;
     background-color: $klerosPurpleLight;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     height: 55px;
     justify-content: center;
@@ -52,6 +55,7 @@
 
   &-options {
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
 
     &-item {
@@ -59,6 +63,7 @@
       border-bottom: 1px solid $border;
       cursor: pointer;
       display: flex;
+      display: -webkit-flex;
       font-size: 15px;
       justify-content: space-between;
       width: 100%;
@@ -71,6 +76,7 @@
         align-items: center;
         border-radius: 20px;
         display: flex;
+        display: -webkit-flex;
         height: 28px;
         justify-content: center;
         margin: 8px;
@@ -81,6 +87,7 @@
         align-content: center;
         align-items: center;
         display: flex;
+        display: -webkit-flex;
         height: 18px;
         justify-content: center;
         margin: 10px;

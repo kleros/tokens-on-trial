@@ -4,6 +4,7 @@
 .TokenDetails {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   justify-content: center;
   padding: 15px 0;
 
@@ -35,6 +36,7 @@
     border-radius: 3px;
     box-shadow: 0 3px 6px $shadow;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     flex-grow: 2;
     justify-content: space-between;
@@ -46,6 +48,7 @@
 
     &-content {
       display: flex;
+      display: -webkit-flex;
       min-height: 102px;
 
       @media (min-width: 840px) {
@@ -63,6 +66,7 @@
     align-items: center;
     background-color: $action;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     font-size: 14px;
     height: 48px;
@@ -82,6 +86,7 @@
   &-label {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 21px;
     justify-content: center;
@@ -120,6 +125,7 @@
   &--link {
     color: $darkGrey;
     display: flex;
+    display: -webkit-flex;
     overflow-x: auto;
     text-decoration: none;
 
@@ -133,6 +139,7 @@
     align-items: flex-start;
     align-self: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 0.8em;
     margin: 17px 0;
@@ -158,6 +165,7 @@
 
     &-item {
       display: flex;
+      display: -webkit-flex;
       margin: 7px 0;
       vertical-align: middle;
     }
@@ -183,6 +191,7 @@
   &-action {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     position: relative;
 
     @media (max-width: 839px) {
@@ -231,6 +240,7 @@
 /* @define TokenDescription */
 .TokenDescription {
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
 
   &-separator {
@@ -241,12 +251,14 @@
 
   &-evidence {
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
 
     &--list {
       display: flex;
+      display: -webkit-flex;
       flex-wrap: wrap;
       margin-bottom: 26px;
     }
@@ -285,6 +297,7 @@
   &-badge-header {
     align-items: flex-start;
     display: flex;
+    display: -webkit-flex;
     justify-content: space-between;
     margin: 26px 0 10px 0;
   }

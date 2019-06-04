@@ -18,6 +18,7 @@ import { APP_VERSION } from '../bootstrap/dapp-api'
 import { notificationsShape } from '../reducers/notification'
 
 import { ContractsContext } from './contexts'
+import './app.css'
 
 class ContractsProvider extends Component {
   static propTypes = {
@@ -162,15 +163,7 @@ class Initializer extends PureComponent {
           !accounts.data || (window.ethereum && accounts.data.length === 0)
         ]}
         loading={
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'column',
-              justifyContent: 'center',
-              height: '100vh'
-            }}
-          >
+          <div className="InitializerLoading">
             <BeatLoader color="#3d464d" />
           </div>
         }

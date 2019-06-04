@@ -23,8 +23,8 @@ body,
 #router-root,
 #scroll-root {
   border: 0;
-  height: 100%;
   margin: 0;
+  min-height: 100%;
   padding: 0;
   width: 100%;
 }
@@ -33,6 +33,7 @@ body,
 #root {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   justify-content: center;
 }
 
@@ -51,6 +52,7 @@ body,
 #scroll-root {
   background: $background;
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
   min-height: 90vh;
   overflow: auto;
@@ -96,6 +98,7 @@ img {
   align-items: stretch;
   background-color: $background;
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
   margin: 0 9%;
   margin-bottom: 56px;
@@ -104,9 +107,10 @@ img {
   &--loading {
     align-items: center;
     display: flex;
-    height: 100%;
+    display: -webkit-flex;
     justify-content: center;
     margin: 0;
+    min-height: 100%;
     padding: 0;
     position: fixed;
     width: 100%;
@@ -116,4 +120,14 @@ img {
 /* @define Hidden */
 .Hidden {
   visibility: hidden;
+}
+
+/* @define InitializerLoading */
+.InitializerLoading {
+  align-items: center;
+  display: flex;
+  display: -webkit-flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
 }

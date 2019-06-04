@@ -7,6 +7,7 @@
   border-radius: 3px;
   box-sizing: border-box;
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
   height: 230px;
   justify-content: space-between;
@@ -25,6 +26,7 @@
     border-radius: 3px 3px 0 0;
     color: white;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     height: 35px;
     justify-content: space-between;
@@ -35,10 +37,18 @@
   &-content {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     flex-grow: 1;
     justify-content: center;
     text-decoration: none;
+
+    &-title {
+      align-items: center;
+      display: flex;
+      margin-top: 12px;
+      min-height: 30px;
+    }
   }
 
   &-footer {
@@ -47,6 +57,7 @@
     background-color: #f8f8f8;
     border-radius: 0 0 3px 3px;
     display: flex;
+    display: -webkit-flex;
     height: 39px;
     justify-content: space-between;
     padding: 0 15px;

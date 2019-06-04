@@ -36,6 +36,7 @@
     box-sizing: border-box;
     cursor: default;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     justify-content: flex-start;
     line-height: normal;
@@ -72,6 +73,7 @@
       border-bottom: 1px solid $mint;
       cursor: pointer;
       display: flex;
+      display: -webkit-flex;
       flex-direction: row;
       height: 60px;
 
@@ -86,6 +88,7 @@
 
       &-content {
         display: flex;
+        display: -webkit-flex;
         flex-direction: column;
         font-size: 14px;
         padding-left: 21px;
@@ -99,6 +102,7 @@
         &-footer {
           color: $badgeBlue;
           display: flex;
+          display: -webkit-flex;
           flex-direction: row;
           justify-content: space-between;
         }
@@ -109,6 +113,7 @@
       align-items: center;
       cursor: pointer;
       display: flex;
+      display: -webkit-flex;
       flex-direction: column;
       height: 32.5px;
       justify-content: flex-end;

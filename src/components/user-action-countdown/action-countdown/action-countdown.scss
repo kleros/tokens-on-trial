@@ -4,6 +4,7 @@
 .ActionCountdown {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   justify-content: center;
   padding: 15px 0;
 
@@ -19,6 +20,7 @@
     align-items: flex-start;
     align-self: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 14px;
     margin: 17px 0;
@@ -37,6 +39,7 @@
       align-items: center;
       color: '#f60c36';
       display: flex;
+      display: -webkit-flex;
       margin: 7px;
       vertical-align: middle;
     }
@@ -49,6 +52,7 @@
   &-timer {
     color: $darkerRed;
     display: flex;
+    display: -webkit-flex;
     font-size: 14px;
   }
 }

@@ -3,6 +3,7 @@
 /* @define SortBar */
 .SortBar {
   display: flex;
+  display: -webkit-flex;
   font-size: 15px;
   justify-content: space-between;
   margin-top: 10px;
@@ -13,6 +14,7 @@
 
   &-sort {
     display: flex;
+    display: -webkit-flex;
     font-size: 0.9em;
 
     &-label {

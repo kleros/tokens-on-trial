@@ -3,6 +3,7 @@
 /* @define RequestEvidence */
 .RequestEvidence {
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
 
   &-title {
@@ -22,6 +23,7 @@
 
   &-evidence {
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -29,6 +31,7 @@
     &--list {
       align-items: center;
       display: flex;
+      display: -webkit-flex;
       flex-direction: column;
       flex-wrap: wrap;
       margin: 0 -5px;
@@ -43,6 +46,7 @@
     border-radius: 20px;
     cursor: pointer;
     display: flex;
+    display: -webkit-flex;
     height: 40px;
     justify-content: center;
     width: 150px;

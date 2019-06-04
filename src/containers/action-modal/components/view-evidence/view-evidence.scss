@@ -4,8 +4,9 @@
 .ViewEvidence {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
-  height: 100%;
+  min-height: 100%;
   overflow-wrap: break-word;
   width: 100%;
   word-break: break-word;
@@ -16,6 +17,7 @@
 
   &-actions {
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     width: 100%;
   }
@@ -23,6 +25,7 @@
   &-information {
     align-items: flex-start;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     overflow-wrap: break-word;
     text-align: start;

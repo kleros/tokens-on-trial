@@ -4,6 +4,7 @@
 .TokenDetailsCard {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   justify-content: center;
   padding: 15px 0;
 
@@ -34,6 +35,7 @@
     border: 1.2px solid $border;
     border-radius: 3px;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     flex-grow: 2;
     justify-content: space-between;
@@ -50,6 +52,7 @@
 
     &-content {
       display: flex;
+      display: -webkit-flex;
       min-height: 102px;
 
       @media (min-width: 940px) {
@@ -69,6 +72,7 @@
     background-color: $action;
     border-radius: 0 0 3px 3px;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     font-size: 14px;
     height: 48px;
@@ -88,6 +92,7 @@
   &-label {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 21px;
     justify-content: center;
@@ -126,6 +131,7 @@
   &--link {
     color: $darkGrey;
     display: flex;
+    display: -webkit-flex;
     overflow-x: auto;
     text-decoration: none;
 
@@ -139,6 +145,7 @@
     align-items: flex-start;
     align-self: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 14px;
     margin: 17px 0;
@@ -160,6 +167,7 @@
 
     &-item {
       display: flex;
+      display: -webkit-flex;
       margin: 7px 0;
       vertical-align: middle;
     }
@@ -186,6 +194,7 @@
     background: rgb(248, 248, 248);
     border-radius: 0 3px 0 0;
     display: flex;
+    display: -webkit-flex;
     margin-left: 26px;
     min-width: 200px;
     padding-right: 26px;
@@ -214,6 +223,7 @@
     align-items: center;
     background: $action;
     display: flex;
+    display: -webkit-flex;
     padding-left: 36px;
     padding-right: 36px;
     position: relative;
@@ -264,6 +274,7 @@
     align-items: center;
     border-left: 1px solid #ccc;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     margin: 17px;
     padding: 17px;

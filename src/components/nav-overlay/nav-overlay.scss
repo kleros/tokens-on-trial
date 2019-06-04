@@ -4,8 +4,8 @@
 .NavOverlay {
   background: rgba(0, 0, 0, 0.3);
   cursor: default;
-  height: 100%;
   left: 0;
+  min-height: 100%;
   position: fixed;
   top: 0;
   width: 100%;

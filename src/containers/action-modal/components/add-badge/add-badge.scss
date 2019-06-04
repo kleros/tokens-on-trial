@@ -6,6 +6,7 @@
     align-items: center;
     background-color: $klerosPurpleLight;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     height: 55px;
     justify-content: center;
@@ -30,11 +31,13 @@
 
   &-options {
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
 
     &-item {
       border-bottom: 1px solid $border;
       display: flex;
+      display: -webkit-flex;
       justify-content: space-between;
       width: 100%;
 
@@ -52,6 +55,7 @@
       &-desc {
         align-items: flex-start;
         display: flex;
+        display: -webkit-flex;
         flex-direction: column;
         justify-content: center;
         width: 100%;
@@ -70,6 +74,7 @@
         align-content: center;
         align-items: center;
         display: flex;
+        display: -webkit-flex;
         height: 50px;
         justify-content: center;
         margin: 30px;
@@ -107,11 +112,13 @@
   &-footer {
     align-items: flex-end;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     padding: 41px 33px;
 
     &-deposit {
       display: flex;
+      display: -webkit-flex;
       justify-content: space-between;
       margin-bottom: 26px;
       width: 250px;
@@ -136,6 +143,7 @@
 
     &-actions {
       display: flex;
+      display: -webkit-flex;
       justify-content: space-between;
       width: 100%;
 

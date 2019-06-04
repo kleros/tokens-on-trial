@@ -78,14 +78,7 @@ const BadgeCard = ({
             className="BadgeCard-image"
             src={`${IPFS_URL}${symbolURI}`}
           />
-          <div
-            style={{
-              minHeight: '30px',
-              display: 'flex',
-              alignItems: 'center',
-              marginTop: '12px'
-            }}
-          >
+          <div className="BadgeCard-content-title">
             <h5
               style={{
                 margin: 0,

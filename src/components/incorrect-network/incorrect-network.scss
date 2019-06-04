@@ -4,6 +4,7 @@
 .IncorrectNetwork {
   background: $mint;
   display: flex;
+  display: -webkit-flex;
   flex-wrap: wrap;
   height: 100vh;
   justify-content: center;

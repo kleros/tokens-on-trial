@@ -4,12 +4,14 @@
 .BadgeDetails {
   align-items: center;
   display: flex;
+  display: -webkit-flex;
   flex-wrap: wrap;
   padding: 13px 0;
 
   &-header {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
 
     @media (max-width: 899px) {
@@ -45,6 +47,7 @@
   &-description {
     align-items: flex-start;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     margin: 26px 26px 26px 0;
     width: 100%;
@@ -57,6 +60,7 @@
     &-status {
       align-items: flex-start;
       display: flex;
+      display: -webkit-flex;
       margin-top: 26px;
       width: 100%;
 
@@ -87,6 +91,7 @@
     border-radius: 3px;
     box-sizing: border-box;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     min-height: 102px;
     transition: 0.3s;
@@ -102,6 +107,7 @@
 
     &-content {
       display: flex;
+      display: -webkit-flex;
       flex-direction: row;
       overflow-x: auto;
       padding-right: 26px;
@@ -117,6 +123,7 @@
   &-label {
     align-items: flex-start;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 21px;
     justify-content: center;
@@ -157,6 +164,7 @@
 
   &-meta {
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     font-size: 14px;
     justify-content: space-around;
@@ -169,12 +177,14 @@
 
     &--aligned {
       display: flex;
+      display: -webkit-flex;
       margin: 5px 0;
       vertical-align: middle;
     }
 
     &-item {
       display: flex;
+      display: -webkit-flex;
       margin: 7px 0;
       vertical-align: middle;
     }
@@ -209,6 +219,7 @@
   &-token {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     margin: 0 0;
     text-decoration: none;
@@ -219,6 +230,7 @@
     background-color: $darkWhite;
     border-radius: 0 0 3px 3px;
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     padding: 0 26px;
 
@@ -243,8 +255,8 @@
 
       &-divider {
         border-left: 1px solid $border;
-        height: 100%;
         margin: 10px 13px 10px 26px;
+        min-height: 100%;
       }
     }
   }
@@ -252,6 +264,7 @@
   &-timer {
     color: $darkerRed;
     display: flex;
+    display: -webkit-flex;
     font-size: 14px;
   }
 
@@ -279,6 +292,7 @@
     align-items: center;
     border-left: 1px solid #ccc;
     display: flex;
+    display: -webkit-flex;
     flex-direction: column;
     justify-content: center;
     margin: 17px;
@@ -299,6 +313,7 @@
 /* @define BadgeDescription */
 .BadgeDescription {
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
 
   &-separator {
@@ -309,12 +324,14 @@
 
   &-evidence {
     display: flex;
+    display: -webkit-flex;
     flex-direction: row;
     justify-content: space-between;
     padding: 26px;
 
     &--list {
       display: flex;
+      display: -webkit-flex;
     }
 
     &--item {
@@ -345,6 +362,7 @@
   &-badge-header {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     justify-content: space-between;
     margin: 7px 0 10px 0;
   }

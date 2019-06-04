@@ -3,11 +3,13 @@
 /* @define TokenGrid */
 .TokenGrid {
   display: flex;
+  display: -webkit-flex;
   flex-direction: column;
   margin-top: 1em;
 
   &-container {
     display: flex;
+    display: -webkit-flex;
     flex-wrap: wrap;
     justify-content: flex-start;
     margin: 0 -13px;
@@ -16,6 +18,7 @@
   &-loading {
     align-items: center;
     display: flex;
+    display: -webkit-flex;
     height: 200px;
     justify-content: center;
     width: 100%;
@@ -23,12 +26,14 @@
 
   &-paging {
     display: flex;
+    display: -webkit-flex;
     justify-content: space-between;
     margin: 50px 0;
     width: 100%;
 
     &-numbers {
       display: flex;
+      display: -webkit-flex;
 
       &-number {
         color: $border;
@@ -50,6 +55,7 @@
 
     &-navigation {
       display: flex;
+      display: -webkit-flex;
 
       &-button {
         color: $border;
