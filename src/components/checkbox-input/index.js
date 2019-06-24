@@ -2,12 +2,17 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './checkbox-input.css'
 
-const CheckboxInput = ({ input: { value, onChange }, label, className }) => (
+const CheckboxInput = ({
+  input: { value, onChange },
+  label,
+  className,
+  customKey
+}) => (
   <div className={`CheckboxInput ${className}`}>
     <div className="CheckboxInput-checkbox">
       <input
         checked={value}
-        id={`chk-${label}`}
+        id={`chk-${label}-${customKey}`}
         onChange={onChange}
         type="checkbox"
       />
@@ -15,7 +20,7 @@ const CheckboxInput = ({ input: { value, onChange }, label, className }) => (
         className={`CheckboxInput-checkbox-overlay ${
           value === true ? 'CheckboxInput-checkbox-marked' : ''
         }`}
-        htmlFor={`chk-${label}`}
+        htmlFor={`chk-${label}-${customKey}`}
       />
     </div>
     {label}
@@ -29,6 +34,7 @@ CheckboxInput.propTypes = {
     onChange: PropTypes.func.isRequired
   }).isRequired,
   label: PropTypes.string,
+  customKey: PropTypes.string,
 
   // Modifiers
   className: PropTypes.string
@@ -37,7 +43,8 @@ CheckboxInput.propTypes = {
 CheckboxInput.defaultProps = {
   // Modifiers
   label: '',
-  className: ''
+  className: '',
+  customKey: ''
 }
 
 export default CheckboxInput

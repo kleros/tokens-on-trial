@@ -2,7 +2,9 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import reactClickOutside from 'react-click-outside'
+
 import './dropdown.css'
+import CheckboxInput from '../checkbox-input'
 
 class Dropdown extends PureComponent {
   static propTypes = {
@@ -51,8 +53,10 @@ class Dropdown extends PureComponent {
   handleBoxClick = () => this.setState(state => ({ isOpen: !state.isOpen }))
 
   handleOptionClick = ({ currentTarget: { id: _id } }) => {
+    const idNumber = _id.slice(_id.lastIndexOf('-') + 1)
     const { type, value, onChange } = this.props
-    const id = Number(_id)
+    const id = Number(idNumber)
+    console.info(idNumber, id)
     const isCheckbox = type === 'checkbox'
 
     let newValue
@@ -108,28 +112,18 @@ class Dropdown extends PureComponent {
                   key={i}
                   onClick={this.handleOptionClick}
                 >
-                  {isCheckbox && (
-                    <span className="Dropdown-options-option-checkbox">
-                      {isActive && (
-                        <FontAwesomeIcon
-                          className="Dropdown-options-option-checkbox-check"
-                          icon="check"
-                        />
-                      )}
-                    </span>
+                  {isCheckbox ? (
+                    <CheckboxInput
+                      label={o.label || o}
+                      input={{
+                        value: isActive,
+                        onChange: this.handleOptionClick
+                      }}
+                      customKey={i}
+                    />
+                  ) : (
+                    o.label || o
                   )}
-                  {o.label || o}
-                  {o.count ? (
-                    <div className="Dropdown-options-option-count">
-                      {o.color && (
-                        <div
-                          className="Dropdown-options-option-count-color"
-                          style={{ background: o.color }}
-                        />
-                      )}
-                      {o.count}
-                    </div>
-                  ) : null}
                 </div>
               )
             })}
