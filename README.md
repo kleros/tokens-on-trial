@@ -13,10 +13,12 @@ Kleros' token² curated list.
 
 ## Get Started
 
-1.  Clone this repo.
-2.  Install and set up the [MetaMask](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en) chrome extension.
-3.  Configure MetaMask on the Kovan Test Network.
-4.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
+1.  Clone this repo;
+2.  Duplicate and rename `.env.example` to `.env`;
+3.  Inside `.env`, replace <api-key> with your infura key;
+4.  Install and set up the [MetaMask](https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en) chrome extension;
+5.  Configure MetaMask on the Kovan Test Network;
+6.  Run `yarn` to install dependencies and then `yarn start` to start the dev server.
 
 ## Other Scripts
 
