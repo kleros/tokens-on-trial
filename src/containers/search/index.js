@@ -91,6 +91,38 @@ class SearchBar extends Component {
                               item.address.toLowerCase() ===
                                 inputValue.toLowerCase())
                         )
+                        .sort((a, b) => {
+                          // Status of both items are within the same category
+                          // (not pending, pending, challenged), don't sort.
+                          if (
+                            (a.clientStatus === 0 && b.clientStatus === 1) ||
+                            (a.clientStatus === 2 && b.clientStatus === 3) ||
+                            (a.clientStatus === 4 && b.clientStatus === 5) ||
+                            (a.clientStatus === 1 && b.clientStatus === 0) ||
+                            (a.clientStatus === 3 && b.clientStatus === 2) ||
+                            (a.clientStatus === 5 && b.clientStatus === 4)
+                          )
+                            return 0
+                          if (a.clientStatus > b.clientStatus) return -1
+                          if (b.clientStatus > a.clientStatus) return 1
+                          return 0
+                        })
+                        .sort((a, b) => {
+                          // Display registered tokens before rejected ones.
+                          if (
+                            (a.clientStatus === 0 && b.clientStatus === 1) ||
+                            (a.clientStatus === 1 && a.clientStatus === 1)
+                          )
+                            return b.clientStatus - a.clientStatus
+                          else return 0
+                        })
+                        .sort((a, b) => {
+                          // Show items crowdfunding state first.
+                          if (a.inAppealPeriod && !b.inAppealPeriod) return -1
+                          else if (!a.inAppealPeriod && b.inAppealPeriod)
+                            return 1
+                          else return 0
+                        })
                         .map((item, index) => (
                           <Item
                             item={item}
