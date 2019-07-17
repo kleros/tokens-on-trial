@@ -6,6 +6,7 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
 import * as notificationSelectors from '../../reducers/notification'
 import * as modalActions from '../../actions/modal'
+import * as notificationActions from '../../actions/notification'
 import * as tcrConstants from '../../constants/tcr'
 import NavOverlay from '../../components/nav-overlay'
 import './notification-badge.css'
@@ -22,7 +23,8 @@ class NotificationBadge extends PureComponent {
     onShowAll: PropTypes.func,
     openNotificationsModal: PropTypes.func.isRequired,
     closeNotificationsModal: PropTypes.func.isRequired,
-    onNotificationClick: PropTypes.func.isRequired
+    onNotificationClick: PropTypes.func.isRequired,
+    clearAllNotifications: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -42,6 +44,11 @@ class NotificationBadge extends PureComponent {
   handleOverlayClick = () => {
     const { closeNotificationsModal } = this.props
     closeNotificationsModal()
+  }
+
+  handleOnClearAll = () => {
+    const { clearAllNotifications } = this.props
+    clearAllNotifications()
   }
 
   render() {
@@ -111,6 +118,14 @@ class NotificationBadge extends PureComponent {
                       </div>
                     </div>
                   ))}
+                {notifications.data.length > 2 && (
+                  <div
+                    className="NotificationBadge-notifications-showAll"
+                    onClick={this.handleOnClearAll}
+                  >
+                    Clear All
+                  </div>
+                )}
                 {useMaxShown &&
                 false && ( // TODO: remove false flag once notifications view is implemented
                     <div
@@ -135,6 +150,7 @@ export default connect(
   }),
   {
     openNotificationsModal: modalActions.openNotificationsModal,
-    closeNotificationsModal: modalActions.closeNotificationsModal
+    closeNotificationsModal: modalActions.closeNotificationsModal,
+    clearAllNotifications: notificationActions.clearAll
   }
 )(NotificationBadge)
