@@ -41,6 +41,14 @@ export default createReducer(
         ...state.notifications,
         data: action.payload.data
       }
+    }),
+    [notificationActions.CLEAR_ALL_NOTIFICATIONS]: state => ({
+      ...state,
+      notifications: {
+        ...notificationInitialState,
+        data: []
+      },
+      notification: notificationInitialState
     })
   }
 )
