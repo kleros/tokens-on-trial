@@ -56,7 +56,6 @@ class Dropdown extends PureComponent {
     const idNumber = _id.slice(_id.lastIndexOf('-') + 1)
     const { type, value, onChange } = this.props
     const id = Number(idNumber)
-    console.info(idNumber, id)
     const isCheckbox = type === 'checkbox'
 
     let newValue

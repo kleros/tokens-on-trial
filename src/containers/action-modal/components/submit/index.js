@@ -36,7 +36,7 @@ const Submit = ({
     >
       See the{' '}
       <a
-        href={`${IPFS_URL}${tcr.data.fileURI}`}
+        href={`${IPFS_URL}/ipfs/QmQGDs9jvWJxRAmCVtTXy3EPQeMj2dPMtLnr5WrWqYUYy6/t2cr-primary-document.pdf`}
         target="_blank"
         rel="noopener noreferrer"
       >
