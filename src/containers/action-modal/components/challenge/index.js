@@ -36,7 +36,7 @@ const Challenge = ({
         className="TokenDetails-withdraw"
         target="_blank"
         rel="noopener noreferrer"
-        href={`${IPFS_URL}${tcrData.fileURI}`}
+        href={`${IPFS_URL}/ipfs/QmQGDs9jvWJxRAmCVtTXy3EPQeMj2dPMtLnr5WrWqYUYy6/t2cr-primary-document.pdf`}
         style={{ margin: 0, textDecoration: 'underline' }}
       >
         listing criteria
