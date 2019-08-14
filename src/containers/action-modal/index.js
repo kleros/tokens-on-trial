@@ -477,6 +477,34 @@ class ActionModal extends PureComponent {
 
     /* eslint-disable react/jsx-no-bind */
 
+    if (!arbitrableTokenListData.data)
+      switch (openActionModal) {
+        case modalConstants.ACTION_MODAL_ENUM.Submit:
+        case modalConstants.ACTION_MODAL_ENUM.Resubmit:
+        case modalConstants.ACTION_MODAL_ENUM.Clear:
+        case modalConstants.ACTION_MODAL_ENUM.Challenge:
+        case modalConstants.ACTION_MODAL_ENUM.FundRequester:
+        case modalConstants.ACTION_MODAL_ENUM.FundChallenger:
+        case modalConstants.ACTION_MODAL_ENUM.FundAppeal: {
+          return (
+            <Modal
+              className="ActionModal"
+              isOpen={openActionModal !== null}
+              onRequestClose={this.handleRequestClose}
+            >
+              <div>
+                <small>
+                  <h4>Fetching TCR data</h4>
+                </small>
+                <BeatLoader color="#3d464d" />
+              </div>
+            </Modal>
+          )
+        }
+        default:
+          break
+      }
+
     return (
       <Modal
         className={
