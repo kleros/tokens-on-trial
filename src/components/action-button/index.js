@@ -11,6 +11,11 @@ import { hasPendingRequest, isRegistrationRequest } from '../../utils/tcr'
 const ZERO_ADDR = '0x0000000000000000000000000000000000000000'
 const { toBN } = web3Utils
 
+const ETHFINEX_BADGE = {
+  1: '0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab',
+  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759'
+}
+
 const getActionButton = ({
   item,
   userAccount,
@@ -26,6 +31,8 @@ const getActionButton = ({
   let disabled = true
   let label = 'Loading...'
   let icon = 'spinner'
+  let actionTooltip
+  let hidden = false
 
   if (!item || !tcr || item.creating || item.updating)
     return (
@@ -205,6 +212,15 @@ const getActionButton = ({
     }
   else {
     disabled = false
+    if (
+      badgeContractAddr &&
+      (badgeContractAddr === ETHFINEX_BADGE[1] ||
+        badgeContractAddr === ETHFINEX_BADGE[42])
+    ) {
+      disabled = true
+      actionTooltip = 'Actions for this badge are suspended.'
+      hidden = true
+    }
     if (item.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
       method = () =>
         handleActionClick(
@@ -231,10 +247,11 @@ const getActionButton = ({
   return (
     <Button
       disabled={onlyInfura || disabled}
-      tooltip={onlyInfura ? 'Please install MetaMask.' : null}
+      tooltip={onlyInfura ? 'Please install MetaMask.' : actionTooltip}
       onClick={method}
       style={{ cursor: disabled ? 'not-allowed' : 'pointer' }}
       type="primary"
+      hidden={hidden}
     >
       <FontAwesomeIcon className="TokenDetails-icon" icon={icon} />
       {label}

@@ -10,6 +10,11 @@ import { arbitrableAddressListDataShape } from '../../../../reducers/arbitrable-
 
 import './add-badge.css'
 
+const ETHFINEX_BADGE = {
+  1: '0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab',
+  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759'
+}
+
 const AddBadge = ({
   closeActionModal,
   submitItem,
@@ -18,6 +23,13 @@ const AddBadge = ({
   unavailable
 }) => {
   const badgeContracts = Object.keys(arbitrableAddressListData)
+    .filter(
+      (
+        badgeContractAddr // Ethfinex badge is halted.
+      ) =>
+        badgeContractAddr !== ETHFINEX_BADGE[42] &&
+        badgeContractAddr !== ETHFINEX_BADGE[1]
+    )
     .map(badgeContractAddr => arbitrableAddressListData[badgeContractAddr])
     .filter(badgeContract => badgeContract.variables)
     .filter(

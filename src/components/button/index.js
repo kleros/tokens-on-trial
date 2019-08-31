@@ -12,6 +12,7 @@ const Button = ({
   disabled,
   className,
   labelClassName,
+  hidden,
   ...rest
 }) => {
   const button = (
@@ -22,6 +23,7 @@ const Button = ({
       data-tip={tooltip}
       onClick={disabled ? null : onClick}
       {...rest}
+      style={{ display: hidden ? 'none' : '' }}
     >
       <h2
         className={`Button-label ${labelClassName}${
@@ -62,7 +64,8 @@ Button.propTypes = {
   size: PropTypes.oneOf(['small', 'normal', 'large']),
   disabled: PropTypes.bool,
   className: PropTypes.string,
-  labelClassName: PropTypes.string
+  labelClassName: PropTypes.string,
+  hidden: PropTypes.bool
 }
 
 Button.defaultProps = {
@@ -78,7 +81,8 @@ Button.defaultProps = {
   size: 'normal',
   disabled: false,
   className: '',
-  labelClassName: ''
+  labelClassName: '',
+  hidden: false
 }
 
 export default Button
