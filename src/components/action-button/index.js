@@ -212,15 +212,6 @@ const getActionButton = ({
     }
   else {
     disabled = false
-    if (
-      badgeContractAddr &&
-      (badgeContractAddr === ETHFINEX_BADGE[1] ||
-        badgeContractAddr === ETHFINEX_BADGE[42])
-    ) {
-      disabled = true
-      actionTooltip = 'Actions for this badge are suspended.'
-      hidden = true
-    }
     if (item.status === tcrConstants.IN_CONTRACT_STATUS_ENUM['Registered']) {
       method = () =>
         handleActionClick(
@@ -232,6 +223,14 @@ const getActionButton = ({
       label = badgeContractAddr ? 'Remove Badge' : 'Remove Token'
       icon = 'times-circle'
     } else {
+      if (
+        badgeContractAddr &&
+        (badgeContractAddr === ETHFINEX_BADGE[1] ||
+          badgeContractAddr === ETHFINEX_BADGE[42])
+      ) {
+        disabled = true
+        hidden = true
+      }
       label = badgeContractAddr ? 'Add Badge' : 'Resubmit Token'
       icon = 'plus'
       method = () =>
