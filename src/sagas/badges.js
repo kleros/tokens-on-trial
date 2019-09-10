@@ -9,7 +9,6 @@ import {
   contractStatusToClientStatus,
   instantiateEnvObjects
 } from '../utils/tcr'
-import { APP_VERSION } from '../bootstrap/dapp-api'
 import * as tcrConstants from '../constants/tcr'
 
 import { fetchAppealable, fetchEvents } from './utils'
@@ -35,9 +34,7 @@ function* fetchItems({
     fetchEvents,
     'AddressStatusChange',
     arbitrableAddressListView,
-    badges.statusBlockNumber === tcrBlockNumber
-      ? tcrBlockNumber
-      : badges.statusBlockNumber,
+    0,
     web3
   )
 
@@ -207,9 +204,6 @@ function* fetchBlockNumber(tcr, web3) {
 function* fetchBadges() {
   const {
     badgeViewContracts,
-    arbitrableTokenListView: {
-      options: { address: t2crAddr }
-    },
     arbitratorView,
     ARBITRATOR_BLOCK,
     viewWeb3
@@ -224,25 +218,17 @@ function* fetchBadges() {
     return acc
   }, {})
 
-  const cachedBadges = localStorage.getItem(`${t2crAddr}badges@${APP_VERSION}`)
-  if (cachedBadges)
-    // Load current cache while loading newer data.
-    yield put(cacheBadges(JSON.parse(cachedBadges)))
-
   try {
     const badges = (yield all(
       Object.keys(badgeViewContracts).map(address =>
         call(fetchItems, {
           arbitrableAddressListView: badgeViewContracts[address],
           blockNumber: blockNumbers[address],
-          badges:
-            cachedBadges && cachedBadges[address]
-              ? cachedBadges[address]
-              : {
-                  badgeContractAddr: address,
-                  statusBlockNumber: blockNumbers[address], // Use contract block number by default
-                  items: {}
-                },
+          badges: {
+            badgeContractAddr: address,
+            statusBlockNumber: blockNumbers[address], // Use contract block number by default
+            items: {}
+          },
           arbitratorView,
           ARBITRATOR_BLOCK,
           web3: viewWeb3
@@ -252,11 +238,6 @@ function* fetchBadges() {
       acc[curr.badgeContractAddr] = curr
       return acc
     }, {})
-
-    localStorage.setItem(
-      `${t2crAddr}badges@${APP_VERSION}`,
-      JSON.stringify(badges)
-    )
 
     yield put(cacheBadges(badges))
   } catch (err) {

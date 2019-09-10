@@ -9,7 +9,7 @@ import { sanitize } from '../utils/ui'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
-import { web3Utils, IPFS_URL, APP_VERSION } from '../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import Arbitrator from '../assets/contracts/arbitrator'
 import asyncReadFile from '../utils/async-file-reader'
@@ -30,7 +30,7 @@ const fetchEvents = async (eventName, contract, fromBlock) =>
 export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
   // Initial cache object.
   // This gets overwritten if there is cached data available.
-  let eventsData = {
+  const eventsData = {
     metaEvidenceEvents: {
       blockNumber: 0,
       events: []
@@ -46,34 +46,20 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     }
   }
 
-  // Load from cache, if available.
-  if (
-    localStorage.getItem(
-      `${arbitrableAddressListView.options.address}tcrData@${APP_VERSION}`
-    )
-  )
-    eventsData = JSON.parse(
-      localStorage.getItem(
-        `${arbitrableAddressListView.options.address}tcrData@${APP_VERSION}`
-      )
-    )
-
   // Fetch the contract deployment block number. We use the first meta evidence
   // events emitted when the constructor is run.
-  if (eventsData.metaEvidenceEvents.blockNumber === 0) {
-    eventsData.metaEvidenceEvents.events = (yield call(
-      fetchEvents,
-      'MetaEvidence',
-      arbitrableAddressListView
-    )).sort((a, b) => a.blockNumber - b.blockNumber)
+  eventsData.metaEvidenceEvents.events = (yield call(
+    fetchEvents,
+    'MetaEvidence',
+    arbitrableAddressListView
+  )).sort((a, b) => a.blockNumber - b.blockNumber)
 
-    const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
+  const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
 
-    eventsData.metaEvidenceEvents.blockNumber = blockNumber
-    eventsData.evidenceEvents.blockNumber = blockNumber
-    eventsData.requestSubmittedEvents.blockNumber = blockNumber
-    eventsData.disputeEvents.blockNumber = blockNumber
-  }
+  eventsData.metaEvidenceEvents.blockNumber = blockNumber
+  eventsData.evidenceEvents.blockNumber = blockNumber
+  eventsData.requestSubmittedEvents.blockNumber = blockNumber
+  eventsData.disputeEvents.blockNumber = blockNumber
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
@@ -88,12 +74,10 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     fetchEvents,
     'Evidence',
     arbitrableAddressListView,
-    eventsData.evidenceEvents.blockNumber
+    0
   )).reduce((acc, curr) => {
     const { returnValues } = curr
     const { _evidenceGroupID } = returnValues
-    if (curr.blockNumber > eventsData.evidenceEvents.blockNumber)
-      eventsData.evidenceEvents.blockNumber = curr.blockNumber + 1
 
     acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
     acc[_evidenceGroupID].push({
@@ -107,12 +91,9 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
   eventsData.requestSubmittedEvents = (yield call(
     fetchEvents,
     'RequestSubmitted',
-    arbitrableAddressListView,
-    eventsData.requestSubmittedEvents.blockNumber
+    arbitrableAddressListView
   )).reduce((acc, curr) => {
     if (!acc[curr.returnValues._address]) acc[curr.returnValues._address] = []
-    if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
-      eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
 
     acc[curr.returnValues._address].push({
       returnValues: curr.returnValues,
@@ -126,8 +107,7 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
   eventsData.disputeEvents = (yield call(
     fetchEvents,
     'Dispute',
-    arbitrableAddressListView,
-    eventsData.disputeEvents.blockNumber
+    arbitrableAddressListView
   )).reduce((acc, curr) => {
     const {
       returnValues: { _evidenceGroupID }
@@ -143,11 +123,6 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     }
     return acc
   }, eventsData.disputeEvents)
-
-  localStorage.setItem(
-    `${arbitrableAddressListView.options.address}tcrData@${APP_VERSION}`,
-    JSON.stringify(eventsData)
-  )
 
   const d = yield all({
     arbitrator: call(arbitrableAddressListView.methods.arbitrator().call),

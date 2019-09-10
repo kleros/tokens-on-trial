@@ -9,7 +9,7 @@ import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import readFile from '../utils/read-file'
-import { web3Utils, IPFS_URL, APP_VERSION } from '../bootstrap/dapp-api'
+import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import asyncReadFile from '../utils/async-file-reader'
 
@@ -32,7 +32,7 @@ export function* fetchArbitrableTokenListData() {
 
   // Initial cache object.
   // This gets overwritten if there is cached data available.
-  let eventsData = {
+  const eventsData = {
     metaEvidenceEvents: {
       blockNumber: Number(T2CR_BLOCK),
       events: []
@@ -48,34 +48,20 @@ export function* fetchArbitrableTokenListData() {
     }
   }
 
-  // Load from cache, if available.
-  if (
-    localStorage.getItem(
-      `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`
-    )
-  )
-    eventsData = JSON.parse(
-      localStorage.getItem(
-        `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`
-      )
-    )
-
   // Fetch the contract deployment block number. We use the first meta evidence
   // events emitted when the constructor is run.
-  if (eventsData.metaEvidenceEvents.blockNumber === Number(T2CR_BLOCK)) {
-    eventsData.metaEvidenceEvents.events = (yield call(
-      fetchEvents,
-      'MetaEvidence',
-      arbitrableTokenListView
-    )).sort((a, b) => a.blockNumber - b.blockNumber)
+  eventsData.metaEvidenceEvents.events = (yield call(
+    fetchEvents,
+    'MetaEvidence',
+    arbitrableTokenListView
+  )).sort((a, b) => a.blockNumber - b.blockNumber)
 
-    const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
+  const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
 
-    eventsData.metaEvidenceEvents.blockNumber = blockNumber
-    eventsData.evidenceEvents.blockNumber = blockNumber
-    eventsData.requestSubmittedEvents.blockNumber = blockNumber
-    eventsData.disputeEvents.blockNumber = blockNumber
-  }
+  eventsData.metaEvidenceEvents.blockNumber = blockNumber
+  eventsData.evidenceEvents.blockNumber = blockNumber
+  eventsData.requestSubmittedEvents.blockNumber = blockNumber
+  eventsData.disputeEvents.blockNumber = blockNumber
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
@@ -89,8 +75,7 @@ export function* fetchArbitrableTokenListData() {
   eventsData.evidenceEvents = (yield call(
     fetchEvents,
     'Evidence',
-    arbitrableTokenListView,
-    eventsData.evidenceEvents.blockNumber
+    arbitrableTokenListView
   )).reduce((acc, curr) => {
     const {
       returnValues: { _evidenceGroupID }
@@ -111,8 +96,7 @@ export function* fetchArbitrableTokenListData() {
   eventsData.requestSubmittedEvents = (yield call(
     fetchEvents,
     'RequestSubmitted',
-    arbitrableTokenListView,
-    eventsData.requestSubmittedEvents.blockNumber
+    arbitrableTokenListView
   )).reduce((acc, curr) => {
     if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
       eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
@@ -129,8 +113,7 @@ export function* fetchArbitrableTokenListData() {
   eventsData.disputeEvents = (yield call(
     fetchEvents,
     'Dispute',
-    arbitrableTokenListView,
-    eventsData.disputeEvents.blockNumber
+    arbitrableTokenListView
   )).reduce((acc, curr) => {
     const {
       returnValues: { _evidenceGroupID }
@@ -146,11 +129,6 @@ export function* fetchArbitrableTokenListData() {
     }
     return acc
   }, eventsData.disputeEvents)
-
-  localStorage.setItem(
-    `${arbitrableTokenListView.options.address}tcrData@${APP_VERSION}`,
-    JSON.stringify(eventsData)
-  )
 
   const d = yield all({
     arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
