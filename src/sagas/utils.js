@@ -5,13 +5,11 @@ export const fetchEvents = async (
   contract,
   fromBlock = 0,
   web3,
-  rounds
+  blocksPerRequest = 200000
 ) => {
   fromBlock = Number(fromBlock)
   const latestBlockNumber = (await web3.eth.getBlock('latest')).number
-  const blocksPerRequest = 200000
-  rounds =
-    rounds || Math.ceil((latestBlockNumber - fromBlock) / blocksPerRequest)
+  const rounds = Math.ceil((latestBlockNumber - fromBlock) / blocksPerRequest)
 
   const promises = []
   for (let round = 0; round < rounds; round++) {
@@ -67,7 +65,7 @@ export function* fetchAppealableTokens(tcrView, arbitrableTCRView) {
     arbitrableTCRView.methods.fetchAppealableToken(
       tcrView.options.address,
       0,
-      5000
+      4000
     ).call
   ))
     .filter(item => item.disputeID !== '0')

@@ -1,4 +1,4 @@
-import { put, takeLatest, call } from 'redux-saga/effects'
+import { put, takeLatest, call, all } from 'redux-saga/effects'
 
 import {
   FETCH_TOKENS_CACHE,
@@ -32,13 +32,17 @@ function* fetchTokens() {
       items: {},
       addressToIDs: {}
     }
-    const events = (yield call(
-      fetchEvents,
-      'allEvents',
-      arbitrableTokenListView,
-      0,
-      viewWeb3
-    )).sort((a, b) => a.blockNumber - b.blockNumber)
+    const [events, tokensInAppealPeriod] = yield all([
+      call(
+        fetchEvents,
+        'allEvents',
+        arbitrableTokenListView,
+        0,
+        viewWeb3,
+        500000
+      ),
+      call(fetchAppealableTokens, arbitrableTokenListView, arbitrableTCRView)
+    ])
     const submissionEvents = events.filter(e => e.event === 'TokenSubmitted')
 
     // Find the block number of the lastest token submission event.
@@ -196,13 +200,6 @@ function* fetchTokens() {
         cachedTokens.addressToIDs[token.address].push(tokenID)
       else cachedTokens.addressToIDs[token.address] = [tokenID]
     })
-
-    // Mark items in appeal period.
-    const tokensInAppealPeriod = yield call(
-      fetchAppealableTokens,
-      arbitrableTokenListView,
-      arbitrableTCRView
-    )
 
     // Update appealPeriod state of each item.
     for (const tokenID of Object.keys(cachedTokens.items))

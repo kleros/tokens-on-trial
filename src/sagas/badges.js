@@ -24,16 +24,20 @@ function* fetchItems({
   web3,
   arbitrableTCRView
 }) {
-  // Get the lastest status change for every badge.
+  // Get the lastest status change for every badge
+  // and all appealable addresses.
   let statusBlockNumber = tcrBlockNumber
   const latestStatusChanges = {}
-  const statusChanges = yield call(
-    fetchEvents,
-    'AddressStatusChange',
-    arbitrableAddressListView,
-    0,
-    web3
-  )
+  const [statusChanges, addressesInAppealPeriod] = yield all([
+    call(
+      fetchEvents,
+      'AddressStatusChange',
+      arbitrableAddressListView,
+      0,
+      web3
+    ),
+    call(fetchAppealableAddresses, arbitrableAddressListView, arbitrableTCRView)
+  ])
 
   statusChanges.forEach(event => {
     const { returnValues } = event
@@ -87,14 +91,6 @@ function* fetchItems({
     )
   })
 
-  // Mark items in appeal period.
-  // Fetch badge disputes in appeal period.
-  const addressesInAppealPeriod = yield call(
-    fetchAppealableAddresses,
-    arbitrableAddressListView,
-    arbitrableTCRView
-  )
-
   // Update appealPeriod state of each item.
   for (const address of Object.keys(cachedBadges.items))
     cachedBadges.items[address].inAppealPeriod = !!addressesInAppealPeriod[
@@ -102,29 +98,6 @@ function* fetchItems({
     ]
 
   return cachedBadges
-}
-
-/**
- * Fetches the block number of a deployed TCR contract.
- * @param {object} tcr - The TCR object.
- * @param {object} web3 - A web3 object to fetch events.
- * @returns {object} - An object with the TCR address and its deployment block number.
- */
-function* fetchBlockNumber(tcr, web3) {
-  // Fetch the contract deployment block number. We use the first meta evidence
-  // events emitted when the constructor is run.
-  const metaEvidenceEvents = (yield call(
-    fetchEvents,
-    'MetaEvidence',
-    tcr,
-    0,
-    web3
-  )).sort((a, b) => a.blockNumber - b.blockNumber)
-
-  return {
-    address: tcr.options.address,
-    blockNumber: metaEvidenceEvents[0].blockNumber
-  }
 }
 
 /**
@@ -140,21 +113,12 @@ function* fetchBadges() {
     arbitrableTCRView
   } = yield call(instantiateEnvObjects)
 
-  const blockNumbers = (yield all(
-    Object.keys(badgeViewContracts).map(address =>
-      call(fetchBlockNumber, badgeViewContracts[address], viewWeb3)
-    )
-  )).reduce((acc, curr) => {
-    acc[curr.address] = curr.blockNumber
-    return acc
-  }, {})
-
   try {
     const badges = (yield all(
       Object.keys(badgeViewContracts).map(address =>
         call(fetchItems, {
           arbitrableAddressListView: badgeViewContracts[address],
-          blockNumber: blockNumbers[address],
+          blockNumber: 0,
           badges: {
             badgeContractAddr: address,
             statusBlockNumber: 0, // Use contract block number by default
