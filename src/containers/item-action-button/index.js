@@ -5,7 +5,7 @@ import PropTypes from 'prop-types'
 import Button from '../../components/button'
 import getActionButton from '../../components/action-button'
 import * as tcrConstants from '../../constants/tcr'
-import { getItemInformation } from '../../utils/ui'
+import { getItemInformation, getRemainingTime } from '../../utils/ui'
 import { onlyInfura } from '../../bootstrap/dapp-api'
 import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 
@@ -25,9 +25,19 @@ const ItemActionButton = ({
   const { status, latestRequest } = item
   const { dispute } = latestRequest
 
-  const { userSide, decisiveRuling, loserPercent } = getItemInformation(
+  const {
+    userSide,
+    decisiveRuling,
+    loserPercent,
+    loserSide
+  } = getItemInformation(item, userAccount)
+
+  const remainingTime = getRemainingTime(
     item,
-    userAccount
+    tcr,
+    tcrConstants,
+    loserSide,
+    decisiveRuling
   )
 
   return (
@@ -35,7 +45,7 @@ const ItemActionButton = ({
       {status > 1 &&
       dispute &&
       dispute.status === tcrConstants.DISPUTE_STATUS.Appealable &&
-      userSide === tcrConstants.SIDE.None ? (
+      (userSide === tcrConstants.SIDE.None || !decisiveRuling) ? (
         <Button
           type="primary"
           onClick={fundAppeal}
@@ -44,13 +54,13 @@ const ItemActionButton = ({
             onlyInfura ||
             (decisiveRuling
               ? (appealPeriodEnded && loserTimedOut) || loserTimedOut
-              : countdownCompleted)
+              : countdownCompleted || remainingTime <= 0)
           }
         >
           <FontAwesomeIcon className="TokenDetails-icon" icon="coins" />
           {(decisiveRuling
           ? (!appealPeriodEnded || !loserTimedOut) && !loserTimedOut
-          : !countdownCompleted)
+          : !countdownCompleted && remainingTime > 0)
             ? 'Contribute Fees'
             : 'Waiting Enforcement'}
         </Button>

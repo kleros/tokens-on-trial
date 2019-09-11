@@ -49,7 +49,7 @@ const CrowdfundingCard = ({
     status <= 1 ||
     !dispute ||
     dispute.status !== tcrConstants.DISPUTE_STATUS.Appealable ||
-    loserTimedOut ||
+    (decisiveRuling && loserTimedOut) ||
     appealPeriodEnded ||
     !payableValue
   )

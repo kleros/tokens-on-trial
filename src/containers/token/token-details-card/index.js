@@ -95,7 +95,9 @@ const TokenDetailsCard = ({
               onLoserTimedOut={setLoserTimedOut}
             />
           </div>
-          {appealable && !loserTimedOut ? (
+          {appealable &&
+          (!decisiveRuling || !loserTimedOut) &&
+          remainingTime > 0 ? (
             <CrowdfundingMsg decisiveRuling={decisiveRuling} type="Token" />
           ) : (
             <div className="TokenDetailsCard-actionWrapper">
