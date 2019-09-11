@@ -5,6 +5,7 @@ import {
   cacheTokens,
   fetchTokensFailed
 } from '../actions/tokens'
+import { fetchBadges } from '../actions/badges'
 import { web3Utils } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
@@ -14,7 +15,7 @@ import {
 import { fetchEvents, fetchAppealableTokens } from './utils'
 
 /**
- * Fetches token and status information by events.
+ * Fetches token and status information by events and dispatches a `fetchBadges` action.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
@@ -208,6 +209,7 @@ function* fetchTokens() {
       ]
 
     yield put(cacheTokens(cachedTokens))
+    yield put(fetchBadges())
   } catch (err) {
     console.error('Error fetching tokens ', err)
     yield put(fetchTokensFailed())

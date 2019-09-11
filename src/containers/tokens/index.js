@@ -11,7 +11,6 @@ import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterActions from '../../actions/filter'
 import * as tokensActions from '../../actions/tokens'
-import * as badgesActions from '../../actions/badges'
 import { ContractsContext } from '../../bootstrap/contexts'
 import { envObjectsShape } from '../../reducers/generic-shapes'
 
@@ -34,14 +33,12 @@ class Tokens extends Component {
 
     // Dispatchers
     toggleFilter: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired
   }
 
   componentDidMount() {
-    const { fetchTokens, fetchBadges } = this.props
+    const { fetchTokens } = this.props
     fetchTokens()
-    fetchBadges()
   }
 
   static contextType = ContractsContext
@@ -233,8 +230,7 @@ export default withRouter(
     }),
     {
       toggleFilter: filterActions.toggleFilter,
-      fetchTokens: tokensActions.fetchTokens,
-      fetchBadges: badgesActions.fetchBadges
+      fetchTokens: tokensActions.fetchTokens
     }
   )(Tokens)
 )
