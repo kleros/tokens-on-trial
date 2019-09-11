@@ -6,6 +6,7 @@ import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list'
 import ArbitrableAddressList from '../assets/contracts/arbitrable-address-list'
 import badgeTCRs from '../assets/badge-addresses.json'
 import Arbitrator from '../assets/contracts/arbitrator'
+import _arbitrableTCRView from '../assets/contracts/arbitrable-tcr-view-abi.json'
 import { network as networkPromise, web3Utils } from '../bootstrap/dapp-api'
 
 const { toBN } = web3Utils
@@ -29,6 +30,8 @@ export const instantiateEnvObjects = async () => {
   const ARBITRABLE_TOKEN_LIST_ADDRESS =
     process.env[`REACT_APP_${env}_ARBITRABLE_TOKEN_LIST_ADDRESS`]
   const ARBITRATOR_ADDRESS = process.env[`REACT_APP_${env}_ARBITRATOR_ADDRESS`]
+  const ARBITRABLE_TCR_VIEW_ADDRESS =
+    process.env[`REACT_APP_${env}_ARBITRABLE_TCR_VIEW_ADDRESS`]
   const FILE_UPLOAD_URL = process.env[`REACT_APP_${env}_FILE_UPLOAD_URL`]
   const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
   const T2CR_BLOCK = process.env[`REACT_APP_${env}_T2CR_BLOCK`]
@@ -79,6 +82,10 @@ export const instantiateEnvObjects = async () => {
   const arbitratorView = new viewWeb3.eth.Contract(
     Arbitrator.abi,
     ARBITRATOR_ADDRESS
+  )
+  const arbitrableTCRView = new viewWeb3.eth.Contract(
+    _arbitrableTCRView,
+    ARBITRABLE_TCR_VIEW_ADDRESS
   )
 
   let badgeViewContracts = {}
@@ -137,7 +144,8 @@ export const instantiateEnvObjects = async () => {
     eventsWeb3,
     networkID,
     badgeTCRs: badgeTCRs[networkID],
-    latestBlock
+    latestBlock,
+    arbitrableTCRView
   }
 }
 

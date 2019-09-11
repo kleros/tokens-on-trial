@@ -11,7 +11,6 @@ import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
 import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
-import Arbitrator from '../assets/contracts/arbitrator'
 import asyncReadFile from '../utils/async-file-reader'
 
 import ipfsPublish from './api/ipfs-publish'
@@ -24,10 +23,13 @@ const fetchEvents = async (eventName, contract, fromBlock) =>
 /**
  * Fetches the arbitrable address list data.
  * @param { object } arbitrableAddressListView - The contract.
- * @param { object } viewWeb3 - Web3 object for instantiating an arbitrator.
+ * @param { object } arbitrableTCRView - View contract to fetch arbitrable data in a batch.
  * @returns {object} - The fetched data.
  */
-export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
+export function* fetchBadgeContractData(
+  arbitrableAddressListView,
+  arbitrableTCRView
+) {
   // Initial cache object.
   // This gets overwritten if there is cached data available.
   const eventsData = {
@@ -43,23 +45,18 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
     },
     disputeEvents: {
       blockNumber: 0
-    }
+    },
+    allEvents: {}
   }
 
-  // Fetch the contract deployment block number. We use the first meta evidence
-  // events emitted when the constructor is run.
-  eventsData.metaEvidenceEvents.events = (yield call(
+  eventsData.allEvents.events = (yield call(
     fetchEvents,
-    'MetaEvidence',
+    'allEvents',
     arbitrableAddressListView
   )).sort((a, b) => a.blockNumber - b.blockNumber)
-
-  const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
-
-  eventsData.metaEvidenceEvents.blockNumber = blockNumber
-  eventsData.evidenceEvents.blockNumber = blockNumber
-  eventsData.requestSubmittedEvents.blockNumber = blockNumber
-  eventsData.disputeEvents.blockNumber = blockNumber
+  eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
+    e => e.event === 'MetaEvidence'
+  )
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
@@ -70,93 +67,59 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
   const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
 
   const { fileURI, variables } = metaEvidence
-  eventsData.evidenceEvents = (yield call(
-    fetchEvents,
-    'Evidence',
-    arbitrableAddressListView,
-    0
-  )).reduce((acc, curr) => {
-    const { returnValues } = curr
-    const { _evidenceGroupID } = returnValues
+  eventsData.evidenceEvents = eventsData.allEvents.events
+    .filter(e => e.event === 'Evidence')
+    .reduce((acc, curr) => {
+      const { returnValues } = curr
+      const { _evidenceGroupID } = returnValues
 
-    acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
-    acc[_evidenceGroupID].push({
-      returnValues: curr.returnValues,
-      transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
-    })
-    return acc
-  }, eventsData.evidenceEvents)
+      acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
+      acc[_evidenceGroupID].push({
+        returnValues: curr.returnValues,
+        transactionHash: curr.transactionHash,
+        blockNumber: curr.blockNumber
+      })
+      return acc
+    }, eventsData.evidenceEvents)
 
-  eventsData.requestSubmittedEvents = (yield call(
-    fetchEvents,
-    'RequestSubmitted',
-    arbitrableAddressListView
-  )).reduce((acc, curr) => {
-    if (!acc[curr.returnValues._address]) acc[curr.returnValues._address] = []
+  eventsData.requestSubmittedEvents = eventsData.allEvents.events
+    .filter(e => e.event === 'RequestSubmitted')
+    .reduce((acc, curr) => {
+      if (!acc[curr.returnValues._address]) acc[curr.returnValues._address] = []
 
-    acc[curr.returnValues._address].push({
-      returnValues: curr.returnValues,
-      transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
-    })
+      acc[curr.returnValues._address].push({
+        returnValues: curr.returnValues,
+        transactionHash: curr.transactionHash,
+        blockNumber: curr.blockNumber
+      })
 
-    return acc
-  }, eventsData.requestSubmittedEvents)
+      return acc
+    }, eventsData.requestSubmittedEvents)
 
-  eventsData.disputeEvents = (yield call(
-    fetchEvents,
-    'Dispute',
-    arbitrableAddressListView
-  )).reduce((acc, curr) => {
-    const {
-      returnValues: { _evidenceGroupID }
-    } = curr
+  eventsData.disputeEvents = eventsData.allEvents.events
+    .filter(e => e.event === 'Dispute')
+    .reduce((acc, curr) => {
+      const {
+        returnValues: { _evidenceGroupID }
+      } = curr
 
-    if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
-      eventsData.disputeEvents.blockNumber = curr.blockNumber + 1
+      if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
+        eventsData.disputeEvents.blockNumber = curr.blockNumber + 1
 
-    acc[_evidenceGroupID] = {
-      returnValues: curr.returnValues,
-      transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
-    }
-    return acc
-  }, eventsData.disputeEvents)
+      acc[_evidenceGroupID] = {
+        returnValues: curr.returnValues,
+        transactionHash: curr.transactionHash,
+        blockNumber: curr.blockNumber
+      }
+      return acc
+    }, eventsData.disputeEvents)
 
-  const d = yield all({
-    arbitrator: call(arbitrableAddressListView.methods.arbitrator().call),
-    requesterBaseDeposit: call(
-      arbitrableAddressListView.methods.requesterBaseDeposit().call
-    ),
-    challengerBaseDeposit: call(
-      arbitrableAddressListView.methods.challengerBaseDeposit().call
-    ),
-    challengePeriodDuration: call(
-      arbitrableAddressListView.methods.challengePeriodDuration().call
-    ),
-    winnerStakeMultiplier: call(
-      arbitrableAddressListView.methods.winnerStakeMultiplier().call
-    ),
-    loserStakeMultiplier: call(
-      arbitrableAddressListView.methods.loserStakeMultiplier().call
-    ),
-    sharedStakeMultiplier: call(
-      arbitrableAddressListView.methods.sharedStakeMultiplier().call
-    ),
-    MULTIPLIER_DIVISOR: call(
-      arbitrableAddressListView.methods.MULTIPLIER_DIVISOR().call
-    ),
-    arbitratorExtraData: call(
-      arbitrableAddressListView.methods.arbitratorExtraData().call
-    ),
-    countByStatus: call(arbitrableAddressListView.methods.countByStatus().call)
-  })
-
-  const arbitratorView = new viewWeb3.eth.Contract(Arbitrator.abi, d.arbitrator)
-  const arbitrationCost = yield call(
-    arbitratorView.methods.arbitrationCost(d.arbitratorExtraData).call
+  const d = yield call(
+    arbitrableTCRView.methods.fetchArbitrable(
+      arbitrableAddressListView.options.address
+    ).call
   )
+  const { arbitrationCost } = d
 
   return {
     blockNumber: eventsData.metaEvidenceEvents.blockNumber,
@@ -193,11 +156,17 @@ export function* fetchBadgeContractData(arbitrableAddressListView, viewWeb3) {
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitrableAddressListData() {
-  const { badgeViewContracts, viewWeb3 } = yield call(instantiateEnvObjects)
+  const { badgeViewContracts, arbitrableTCRView } = yield call(
+    instantiateEnvObjects
+  )
 
   const badgeContractsData = (yield all(
     Object.keys(badgeViewContracts).map(address =>
-      call(fetchBadgeContractData, badgeViewContracts[address], viewWeb3)
+      call(
+        fetchBadgeContractData,
+        badgeViewContracts[address],
+        arbitrableTCRView
+      )
     )
   )).reduce((acc, curr) => {
     acc[curr.badgeContractAddr] = curr

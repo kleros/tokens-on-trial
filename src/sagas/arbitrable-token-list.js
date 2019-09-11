@@ -1,7 +1,7 @@
 import piexif from 'piexifjs'
 import JSZip from 'jszip'
 
-import { all, call, select, takeLatest } from 'redux-saga/effects'
+import { call, select, takeLatest } from 'redux-saga/effects'
 
 import { lessduxSaga } from '../utils/saga'
 import { sanitize } from '../utils/ui'
@@ -26,9 +26,12 @@ const fetchEvents = async (eventName, contract, fromBlock) =>
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitrableTokenListData() {
-  const { arbitrableTokenListView, arbitratorView, T2CR_BLOCK } = yield call(
-    instantiateEnvObjects
-  )
+  const {
+    arbitrableTokenListView,
+    arbitratorView,
+    arbitrableTCRView,
+    T2CR_BLOCK
+  } = yield call(instantiateEnvObjects)
 
   // Initial cache object.
   // This gets overwritten if there is cached data available.
@@ -45,23 +48,18 @@ export function* fetchArbitrableTokenListData() {
     },
     disputeEvents: {
       blockNumber: Number(T2CR_BLOCK)
-    }
+    },
+    allEvents: {}
   }
 
-  // Fetch the contract deployment block number. We use the first meta evidence
-  // events emitted when the constructor is run.
-  eventsData.metaEvidenceEvents.events = (yield call(
+  eventsData.allEvents.events = (yield call(
     fetchEvents,
-    'MetaEvidence',
+    'allEvents',
     arbitrableTokenListView
   )).sort((a, b) => a.blockNumber - b.blockNumber)
-
-  const blockNumber = eventsData.metaEvidenceEvents.events[0].blockNumber
-
-  eventsData.metaEvidenceEvents.blockNumber = blockNumber
-  eventsData.evidenceEvents.blockNumber = blockNumber
-  eventsData.requestSubmittedEvents.blockNumber = blockNumber
-  eventsData.disputeEvents.blockNumber = blockNumber
+  eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
+    e => e.event === 'MetaEvidence'
+  )
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
@@ -72,98 +70,66 @@ export function* fetchArbitrableTokenListData() {
   const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
   const { fileURI } = metaEvidence
 
-  eventsData.evidenceEvents = (yield call(
-    fetchEvents,
-    'Evidence',
-    arbitrableTokenListView
-  )).reduce((acc, curr) => {
-    const {
-      returnValues: { _evidenceGroupID }
-    } = curr
+  eventsData.evidenceEvents = eventsData.allEvents.events
+    .filter(e => e.event === 'Evidence')
+    .reduce((acc, curr) => {
+      const {
+        returnValues: { _evidenceGroupID }
+      } = curr
 
-    if (curr.blockNumber > eventsData.evidenceEvents.blockNumber)
-      eventsData.evidenceEvents.blockNumber = curr.blockNumber + 1
+      if (curr.blockNumber > eventsData.evidenceEvents.blockNumber)
+        eventsData.evidenceEvents.blockNumber = curr.blockNumber + 1
 
-    acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
-    acc[_evidenceGroupID].push({
-      returnValues: curr.returnValues,
-      transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
-    })
-    return acc
-  }, eventsData.evidenceEvents)
+      acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
+      acc[_evidenceGroupID].push({
+        returnValues: curr.returnValues,
+        transactionHash: curr.transactionHash,
+        blockNumber: curr.blockNumber
+      })
+      return acc
+    }, eventsData.evidenceEvents)
 
-  eventsData.requestSubmittedEvents = (yield call(
-    fetchEvents,
-    'RequestSubmitted',
-    arbitrableTokenListView
-  )).reduce((acc, curr) => {
-    if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
-      eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
+  eventsData.requestSubmittedEvents = eventsData.allEvents.events
+    .filter(e => e.event === 'RequestSubmitted')
+    .reduce((acc, curr) => {
+      if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
+        eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
 
-    if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
-    acc[curr.returnValues._tokenID].push({
-      returnValues: curr.returnValues,
-      transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
-    })
-    return acc
-  }, eventsData.requestSubmittedEvents)
+      if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
+      acc[curr.returnValues._tokenID].push({
+        returnValues: curr.returnValues,
+        transactionHash: curr.transactionHash,
+        blockNumber: curr.blockNumber
+      })
+      return acc
+    }, eventsData.requestSubmittedEvents)
 
-  eventsData.disputeEvents = (yield call(
-    fetchEvents,
-    'Dispute',
-    arbitrableTokenListView
-  )).reduce((acc, curr) => {
-    const {
-      returnValues: { _evidenceGroupID }
-    } = curr
+  eventsData.disputeEvents = eventsData.allEvents.events
+    .filter(e => e.event === 'Dispute')
+    .reduce((acc, curr) => {
+      const {
+        returnValues: { _evidenceGroupID }
+      } = curr
 
-    if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
-      eventsData.disputeEvents.blockNumber = curr.blockNumber + 1
+      if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
+        eventsData.disputeEvents.blockNumber = curr.blockNumber + 1
 
-    acc[_evidenceGroupID] = {
-      returnValues: curr.returnValues,
-      transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
-    }
-    return acc
-  }, eventsData.disputeEvents)
+      acc[_evidenceGroupID] = {
+        returnValues: curr.returnValues,
+        transactionHash: curr.transactionHash,
+        blockNumber: curr.blockNumber
+      }
+      return acc
+    }, eventsData.disputeEvents)
 
-  const d = yield all({
-    arbitrator: call(arbitrableTokenListView.methods.arbitrator().call),
-    requesterBaseDeposit: call(
-      arbitrableTokenListView.methods.requesterBaseDeposit().call
-    ),
-    challengerBaseDeposit: call(
-      arbitrableTokenListView.methods.challengerBaseDeposit().call
-    ),
-    challengePeriodDuration: call(
-      arbitrableTokenListView.methods.challengePeriodDuration().call
-    ),
-    governor: call(arbitrableTokenListView.methods.governor().call),
-    winnerStakeMultiplier: call(
-      arbitrableTokenListView.methods.winnerStakeMultiplier().call
-    ),
-    loserStakeMultiplier: call(
-      arbitrableTokenListView.methods.loserStakeMultiplier().call
-    ),
-    sharedStakeMultiplier: call(
-      arbitrableTokenListView.methods.sharedStakeMultiplier().call
-    ),
-    MULTIPLIER_DIVISOR: call(
-      arbitrableTokenListView.methods.MULTIPLIER_DIVISOR().call
-    ),
-    arbitratorExtraData: call(
-      arbitrableTokenListView.methods.arbitratorExtraData().call
-    ),
-    countByStatus: call(arbitrableTokenListView.methods.countByStatus().call)
-  })
+  const d = yield call(
+    arbitrableTCRView.methods.fetchArbitrable(
+      arbitrableTokenListView.options.address
+    ).call
+  )
+  const { arbitrationCost } = d
 
   arbitratorView.options.address = d.arbitrator
-  const arbitrationCost = yield call(
-    arbitratorView.methods.arbitrationCost(d.arbitratorExtraData).call
-  )
 
   return {
     blockNumber: T2CR_BLOCK,

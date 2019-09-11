@@ -3,7 +3,6 @@ import { call, takeLatest } from 'redux-saga/effects'
 import * as arbitratorActions from '../actions/arbitrator'
 import { lessduxSaga } from '../utils/saga'
 import { instantiateEnvObjects } from '../utils/tcr'
-import { APP_VERSION } from '../bootstrap/dapp-api'
 import { fetchEvents } from '../sagas/utils'
 
 /**
@@ -16,7 +15,7 @@ export function* fetchArbitratorData() {
     instantiateEnvObjects
   )
 
-  let eventsData = {
+  const eventsData = {
     appealDecisionEvents: {
       blockNumber: Number(ARBITRATOR_BLOCK),
       events: {}
@@ -24,22 +23,22 @@ export function* fetchArbitratorData() {
   }
 
   // Load from cache, if available.
-  if (
-    localStorage.getItem(
-      `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`
-    )
-  )
-    eventsData = JSON.parse(
-      localStorage.getItem(
-        `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`
-      )
-    )
+  // if (
+  //   localStorage.getItem(
+  //     `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`
+  //   )
+  // )
+  //   eventsData = JSON.parse(
+  //     localStorage.getItem(
+  //       `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`
+  //     )
+  //   )
 
   eventsData.appealDecisionEvents.events = (yield call(
     fetchEvents,
     'AppealDecision',
     arbitratorView,
-    eventsData.appealDecisionEvents.blockNumber,
+    ARBITRATOR_BLOCK,
     viewWeb3
   )).reduce((acc, curr) => {
     const {
@@ -60,11 +59,11 @@ export function* fetchArbitratorData() {
     return acc
   }, eventsData.appealDecisionEvents.events)
 
-  JSON.stringify(eventsData)
-  localStorage.setItem(
-    `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`,
-    JSON.stringify(eventsData)
-  )
+  // JSON.stringify(eventsData)
+  // localStorage.setItem(
+  //   `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`,
+  //   JSON.stringify(eventsData)
+  // )
 
   return {
     appealDecisionEvents: eventsData.appealDecisionEvents

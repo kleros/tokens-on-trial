@@ -10,8 +10,6 @@ import * as initializationActions from '../actions/initialization'
 import * as arbitratorActions from '../actions/arbitrator'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
-import * as tokensActions from '../actions/tokens'
-import * as badgesActions from '../actions/badges'
 import IncorrectNetwork from '../components/incorrect-network'
 import { instantiateEnvObjects } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
@@ -24,8 +22,6 @@ class ContractsProvider extends Component {
   static propTypes = {
     children: PropTypes.node.isRequired,
     fetchAccounts: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired,
     notifications: notificationsShape.isRequired,
     envObjects: PropTypes.shape({
       networkID: PropTypes.number.isRequired
@@ -35,13 +31,8 @@ class ContractsProvider extends Component {
   state = {}
 
   async componentDidMount() {
-    const { fetchBadges, fetchTokens } = this.props
     const envObjects = await instantiateEnvObjects()
-    const {
-      arbitrableTokenListView,
-      arbitrableTokenListEvents,
-      badgeEventsContracts
-    } = envObjects
+    const { arbitrableTokenListView } = envObjects
     this.setState({ envObjects })
 
     // Save notifications on unload.
@@ -56,20 +47,6 @@ class ContractsProvider extends Component {
         JSON.stringify(data)
       )
     })
-
-    arbitrableTokenListEvents.events.TokenStatusChange(err => {
-      if (err) return
-      fetchTokens()
-    })
-
-    Object.keys(badgeEventsContracts).map(badgeContractAddr =>
-      badgeEventsContracts[badgeContractAddr].events.AddressStatusChange(
-        err => {
-          if (err) return
-          fetchBadges()
-        }
-      )
-    )
   }
 
   async componentDidUpdate() {
@@ -110,8 +87,6 @@ class Initializer extends PureComponent {
     fetchArbitrableTokenListData: PropTypes.func.isRequired,
     fetchArbitrableAddressListData: PropTypes.func.isRequired,
     fetchArbitratorData: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired,
     initialize: PropTypes.func.isRequired,
 
     // State
@@ -133,8 +108,6 @@ class Initializer extends PureComponent {
       fetchArbitrableAddressListData,
       fetchArbitrableTokenListData,
       fetchArbitratorData,
-      fetchTokens,
-      fetchBadges,
       fetchAccounts,
       initialize
     } = this.props
@@ -144,8 +117,6 @@ class Initializer extends PureComponent {
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
     fetchArbitratorData()
-    fetchTokens()
-    fetchBadges()
   }
 
   render() {
@@ -186,8 +157,6 @@ export default connect(
       arbitrableAddressListActions.fetchArbitrableAddressListData,
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData,
-    fetchTokens: tokensActions.fetchTokens,
-    fetchBadges: badgesActions.fetchBadges,
     fetchArbitratorData: arbitratorActions.fetchArbitratorData,
     initialize: initializationActions.initialize
   }

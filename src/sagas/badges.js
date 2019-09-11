@@ -9,9 +9,8 @@ import {
   contractStatusToClientStatus,
   instantiateEnvObjects
 } from '../utils/tcr'
-import * as tcrConstants from '../constants/tcr'
 
-import { fetchAppealable, fetchEvents } from './utils'
+import { fetchEvents, fetchAppealableAddresses } from './utils'
 
 /**
  * Fetches the all items in a TCR.
@@ -22,12 +21,10 @@ function* fetchItems({
   arbitrableAddressListView,
   blockNumber: tcrBlockNumber,
   badges,
-  arbitratorView,
-  ARBITRATOR_BLOCK,
-  web3
+  web3,
+  arbitrableTCRView
 }) {
   // Get the lastest status change for every badge.
-
   let statusBlockNumber = tcrBlockNumber
   const latestStatusChanges = {}
   const statusChanges = yield call(
@@ -92,78 +89,11 @@ function* fetchItems({
 
   // Mark items in appeal period.
   // Fetch badge disputes in appeal period.
-  const disputesInAppealPeriod = yield call(
-    fetchAppealable,
-    arbitratorView,
-    ARBITRATOR_BLOCK,
+  const addressesInAppealPeriod = yield call(
+    fetchAppealableAddresses,
     arbitrableAddressListView,
-    web3
+    arbitrableTCRView
   )
-
-  // The appeal period can also be over if the arbitrators gave
-  // a decisive ruling (did not refuse or failed to rule) and the
-  // loser of the previous round did not get fully funded in within
-  // the first half of the appeal period.
-  // Remove items that fall under that category.
-  const addressesInAppealPeriod = {}
-  for (const disputeID of Object.keys(disputesInAppealPeriod)) {
-    // To do this we must:
-    // 1- Find out which side lost the previous round.
-    // 2- Find out if the loser received enough arbitration fees.
-
-    // 1- Find out which party lost the previous round.
-    const currentRuling = Number(
-      yield call(arbitratorView.methods.currentRuling(disputeID).call)
-    )
-    const address = yield call(
-      arbitrableAddressListView.methods.arbitratorDisputeIDToAddress(
-        arbitratorView._address,
-        disputeID
-      ).call
-    )
-
-    // If there was no decisive ruling, there is no loser and the rule does not apply.
-    if (currentRuling === tcrConstants.RULING_OPTIONS.None) {
-      addressesInAppealPeriod[address] = true
-      continue
-    }
-
-    const loser =
-      currentRuling === tcrConstants.RULING_OPTIONS.Accept
-        ? tcrConstants.SIDE.Challenger
-        : tcrConstants.SIDE.Requester
-
-    // 2- We start by fetching information on the latest round.
-    const numberOfRequests = Number(
-      (yield call(
-        arbitrableAddressListView.methods.getAddressInfo(address).call
-      )).numberOfRequests
-    )
-    const numberOfRounds = Number(
-      (yield call(
-        arbitrableAddressListView.methods.getRequestInfo(
-          address,
-          numberOfRequests - 1
-        ).call
-      )).numberOfRounds
-    )
-    const latestRound = yield call(
-      arbitrableAddressListView.methods.getRoundInfo(
-        address,
-        numberOfRequests - 1,
-        numberOfRounds - 1
-      ).call
-    )
-    const loserPaid = latestRound.hasPaid[loser]
-    const appealPeriodStart = disputesInAppealPeriod[disputeID][0]
-    const appealPeriodEnd = disputesInAppealPeriod[disputeID][1]
-    const endOfHalf =
-      appealPeriodStart + (appealPeriodEnd - appealPeriodStart) / 2
-
-    addressesInAppealPeriod[address] =
-      endOfHalf * 1000 > Date.now() ||
-      (loserPaid && Date.now() < appealPeriodEnd * 1000)
-  }
 
   // Update appealPeriod state of each item.
   for (const address of Object.keys(cachedBadges.items))
@@ -206,7 +136,8 @@ function* fetchBadges() {
     badgeViewContracts,
     arbitratorView,
     ARBITRATOR_BLOCK,
-    viewWeb3
+    viewWeb3,
+    arbitrableTCRView
   } = yield call(instantiateEnvObjects)
 
   const blockNumbers = (yield all(
@@ -226,12 +157,13 @@ function* fetchBadges() {
           blockNumber: blockNumbers[address],
           badges: {
             badgeContractAddr: address,
-            statusBlockNumber: blockNumbers[address], // Use contract block number by default
+            statusBlockNumber: 0, // Use contract block number by default
             items: {}
           },
           arbitratorView,
           ARBITRATOR_BLOCK,
-          web3: viewWeb3
+          web3: viewWeb3,
+          arbitrableTCRView
         })
       )
     )).reduce((acc, curr) => {
@@ -241,15 +173,8 @@ function* fetchBadges() {
 
     yield put(cacheBadges(badges))
   } catch (err) {
-    if (err.message === 'Returned error: request failed or timed out')
-      // This is a web3js bug. https://github.com/ethereum/web3.js/issues/2311
-      // We can't upgrade to version 37 as suggested because we hit bug https://github.com/ethereum/web3.js/issues/1802.
-      // Work around it by just trying again.
-      yield put({ type: FETCH_BADGES_CACHE })
-    else {
-      console.error('Error fetching badges ', err)
-      yield put(fetchBadgesFailed())
-    }
+    console.error('Error fetching badges ', err)
+    yield put(fetchBadgesFailed())
   }
 }
 

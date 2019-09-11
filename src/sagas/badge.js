@@ -284,7 +284,7 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
       )
     }
   } catch (err) {
-    console.info('Error fetching badge', err)
+    console.error('Error fetching badge', err)
   }
 }
 

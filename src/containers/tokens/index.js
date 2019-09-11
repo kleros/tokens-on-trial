@@ -10,6 +10,7 @@ import Paging from '../../components/paging'
 import SortBar from '../../components/sort-bar'
 import * as tokenSelectors from '../../reducers/token'
 import * as filterActions from '../../actions/filter'
+import * as tokensActions from '../../actions/tokens'
 import { ContractsContext } from '../../bootstrap/contexts'
 import { envObjectsShape } from '../../reducers/generic-shapes'
 
@@ -31,7 +32,13 @@ class Tokens extends Component {
     envObjects: envObjectsShape.isRequired,
 
     // Dispatchers
-    toggleFilter: PropTypes.func.isRequired
+    toggleFilter: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired
+  }
+
+  componentDidMount() {
+    const { fetchTokens } = this.props
+    fetchTokens()
   }
 
   static contextType = ContractsContext
@@ -222,7 +229,8 @@ export default withRouter(
       envObjects: state.envObjects.data
     }),
     {
-      toggleFilter: filterActions.toggleFilter
+      toggleFilter: filterActions.toggleFilter,
+      fetchTokens: tokensActions.fetchTokens
     }
   )(Tokens)
 )
