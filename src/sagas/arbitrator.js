@@ -22,18 +22,6 @@ export function* fetchArbitratorData() {
     }
   }
 
-  // Load from cache, if available.
-  // if (
-  //   localStorage.getItem(
-  //     `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`
-  //   )
-  // )
-  //   eventsData = JSON.parse(
-  //     localStorage.getItem(
-  //       `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`
-  //     )
-  //   )
-
   eventsData.appealDecisionEvents.events = (yield call(
     fetchEvents,
     'AppealDecision',
@@ -58,12 +46,6 @@ export function* fetchArbitratorData() {
     }
     return acc
   }, eventsData.appealDecisionEvents.events)
-
-  // JSON.stringify(eventsData)
-  // localStorage.setItem(
-  //   `${arbitratorView.options.address}arbitratorData@${APP_VERSION}`,
-  //   JSON.stringify(eventsData)
-  // )
 
   return {
     appealDecisionEvents: eventsData.appealDecisionEvents

@@ -1,3 +1,5 @@
+import localforage from 'localforage'
+
 import { put, takeLatest, call, all } from 'redux-saga/effects'
 
 import {
@@ -6,7 +8,7 @@ import {
   fetchTokensFailed
 } from '../actions/tokens'
 import { fetchBadges } from '../actions/badges'
-import { web3Utils } from '../bootstrap/dapp-api'
+import { web3Utils, APP_VERSION } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
   instantiateEnvObjects
@@ -27,12 +29,20 @@ function* fetchTokens() {
   } = yield call(instantiateEnvObjects)
 
   try {
-    const tokens = {
-      blockNumber: T2CR_BLOCK,
-      statusBlockNumber: T2CR_BLOCK,
-      items: {},
-      addressToIDs: {}
-    }
+    let tokens = yield localforage.getItem(
+      `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
+    )
+
+    if (!tokens)
+      tokens = {
+        blockNumber: T2CR_BLOCK,
+        statusBlockNumber: T2CR_BLOCK,
+        items: {},
+        addressToIDs: {}
+      }
+    // Display cached state while fetching latest.
+    else yield put(cacheTokens(tokens))
+
     const [events, tokensInAppealPeriod] = yield all([
       call(
         fetchEvents,
@@ -210,6 +220,11 @@ function* fetchTokens() {
 
     yield put(cacheTokens(cachedTokens))
     yield put(fetchBadges())
+
+    localforage.setItem(
+      `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`,
+      cachedTokens
+    )
   } catch (err) {
     console.error('Error fetching tokens ', err)
     yield put(fetchTokensFailed())

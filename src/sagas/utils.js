@@ -44,7 +44,7 @@ export function* fetchAppealableAddresses(tcrView, arbitrableTCRView) {
     arbitrableTCRView.methods.fetchAppealableAddresses(
       tcrView.options.address,
       0,
-      4000
+      2000
     ).call
   ))
     .filter(item => item.disputeID !== '0')
@@ -65,7 +65,7 @@ export function* fetchAppealableTokens(tcrView, arbitrableTCRView) {
     arbitrableTCRView.methods.fetchAppealableToken(
       tcrView.options.address,
       0,
-      4000
+      2000
     ).call
   ))
     .filter(item => item.disputeID !== '0')

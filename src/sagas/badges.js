@@ -1,3 +1,5 @@
+import localforage from 'localforage'
+
 import { put, takeLatest, call, all } from 'redux-saga/effects'
 
 import {
@@ -9,6 +11,7 @@ import {
   contractStatusToClientStatus,
   instantiateEnvObjects
 } from '../utils/tcr'
+import { APP_VERSION } from '../bootstrap/dapp-api'
 
 import { fetchEvents, fetchAppealableAddresses } from './utils'
 
@@ -107,13 +110,23 @@ function* fetchItems({
 function* fetchBadges() {
   const {
     badgeViewContracts,
+    arbitrableTokenListView: {
+      options: { address: t2crAddr }
+    },
+    arbitrableTCRView,
     arbitratorView,
     ARBITRATOR_BLOCK,
-    viewWeb3,
-    arbitrableTCRView
+    viewWeb3
   } = yield call(instantiateEnvObjects)
 
   try {
+    const cachedBadges = yield localforage.getItem(
+      `${t2crAddr}badges@${APP_VERSION}`
+    )
+    if (cachedBadges)
+      // Display current cache while loading newer data.
+      yield put(cacheBadges(cachedBadges))
+
     const badges = (yield all(
       Object.keys(badgeViewContracts).map(address =>
         call(fetchItems, {
@@ -136,6 +149,7 @@ function* fetchBadges() {
     }, {})
 
     yield put(cacheBadges(badges))
+    localforage.setItem(`${t2crAddr}badges@${APP_VERSION}`, badges)
   } catch (err) {
     console.error('Error fetching badges ', err)
     yield put(fetchBadgesFailed())
