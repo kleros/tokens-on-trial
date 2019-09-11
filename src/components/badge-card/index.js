@@ -104,7 +104,7 @@ const BadgeCard = ({
                   : `${FILE_BASE_URL}/${token.symbolMultihash}`
                 : UnknownToken
             }
-            style={{ width: '25px' }}
+            style={{ width: '25px', height: '25px', objectFit: 'contain' }}
           />
           <h5 className="BadgeCard-footer-text">
             {token ? `${token.name} - ${token.ticker}` : 'Unknown Token'}
