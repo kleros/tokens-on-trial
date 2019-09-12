@@ -2,12 +2,8 @@ import localforage from 'localforage'
 
 import { put, takeLatest, call, all } from 'redux-saga/effects'
 
-import {
-  FETCH_TOKENS_CACHE,
-  cacheTokens,
-  fetchTokensFailed
-} from '../actions/tokens'
-import { fetchBadges } from '../actions/badges'
+import * as tokensActions from '../actions/tokens'
+import * as badgesActions from '../actions/badges'
 import { web3Utils, APP_VERSION } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
@@ -41,7 +37,7 @@ function* fetchTokens() {
         addressToIDs: {}
       }
     // Display cached state while fetching latest.
-    else yield put(cacheTokens(tokens))
+    else yield put(tokensActions.cacheTokens(tokens))
 
     const [events, tokensInAppealPeriod] = yield all([
       call(
@@ -218,8 +214,8 @@ function* fetchTokens() {
         tokenID
       ]
 
-    yield put(cacheTokens(cachedTokens))
-    yield put(fetchBadges())
+    yield put(tokensActions.cacheTokens(cachedTokens))
+    yield put(badgesActions.fetchBadges())
 
     localforage.setItem(
       `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`,
@@ -227,7 +223,11 @@ function* fetchTokens() {
     )
   } catch (err) {
     console.error('Error fetching tokens ', err)
-    yield put(fetchTokensFailed())
+    if (err === `Error: Returned values aren't valid, did it run Out of Gas?`) {
+      // Infura just refused our request. try again.
+      console.info('Infura just refused the request. Attempting fetch again.')
+      yield put(tokensActions.fetchTokens())
+    } else yield put(tokensActions.fetchTokensFailed())
   }
 }
 
@@ -235,5 +235,5 @@ function* fetchTokens() {
  * The root of the tokens saga.
  */
 export default function* actionWatcher() {
-  yield takeLatest(FETCH_TOKENS_CACHE, fetchTokens)
+  yield takeLatest(tokensActions.FETCH_TOKENS_CACHE, fetchTokens)
 }
