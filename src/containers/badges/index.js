@@ -10,7 +10,7 @@ import FilterBar from '../filter-bar'
 import SortBar from '../../components/sort-bar'
 import * as arbitrableAddressListActions from '../../actions/arbitrable-address-list'
 import * as filterActions from '../../actions/filter'
-import * as badgesActions from '../../actions/badges'
+import * as tokensActions from '../../actions/tokens'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
 import { badgesShape } from '../../reducers/badges'
@@ -45,12 +45,13 @@ class Badges extends Component {
 
     // Action Dispatchers
     toggleFilter: PropTypes.func.isRequired,
-    fetchBadges: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired
   }
 
   componentDidMount() {
-    const { fetchBadges } = this.props
-    fetchBadges()
+    // The fetch tokens saga also fetches the badges once its done.
+    const { fetchTokens } = this.props
+    fetchTokens()
   }
 
   static contextType = ContractsContext
@@ -214,7 +215,7 @@ export default withRouter(
       fetchArbitrableAddressListData:
         arbitrableAddressListActions.fetchArbitrableAddressListData,
       toggleFilter: filterActions.toggleFilter,
-      fetchBadges: badgesActions.fetchBadges
+      fetchTokens: tokensActions.fetchTokens
     }
   )(Badges)
 )
