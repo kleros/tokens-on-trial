@@ -222,12 +222,16 @@ function* fetchTokens() {
       cachedTokens
     )
   } catch (err) {
-    console.error('Error fetching tokens ', err)
-    if (err === `Error: Returned values aren't valid, did it run Out of Gas?`) {
+    if (
+      err.message === `Returned values aren't valid, did it run Out of Gas?`
+    ) {
       // Infura just refused our request. try again.
-      console.info('Infura just refused the request. Attempting fetch again.')
+      console.info('Infura refused the request. Attempting fetch again.')
       yield put(tokensActions.fetchTokens())
-    } else yield put(tokensActions.fetchTokensFailed())
+    } else {
+      console.error('Error fetching tokens ', err)
+      yield put(tokensActions.fetchTokensFailed())
+    }
   }
 }
 

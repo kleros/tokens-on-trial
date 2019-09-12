@@ -13,6 +13,7 @@ import { getRemainingTime } from '../../utils/ui'
 import * as filterActions from '../../actions/filter'
 import * as filterSelectors from '../../reducers/filter'
 import * as tokenActions from '../../actions/token'
+import * as tokensActions from '../../actions/tokens'
 import * as modalActions from '../../actions/modal'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
@@ -53,7 +54,8 @@ class TokenDetails extends PureComponent {
     fetchToken: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired,
-    withdrawTokenFunds: PropTypes.func.isRequired
+    withdrawTokenFunds: PropTypes.func.isRequired,
+    fetchTokens: PropTypes.func.isRequired
   }
 
   static contextType = ContractsContext
@@ -142,10 +144,11 @@ class TokenDetails extends PureComponent {
   }
 
   componentDidMount() {
-    const { match, fetchToken } = this.props
+    const { match, fetchToken, fetchTokens } = this.props
     const { tokenID } = match.params
     this.setState({ fetching: true })
     fetchToken(tokenID)
+    fetchTokens()
   }
 
   componentWillReceiveProps(nextProps) {
@@ -516,6 +519,7 @@ export default connect(
     timeout: tokenActions.timeout,
     openActionModal: modalActions.openActionModal,
     feesTimeout: tokenActions.feesTimeout,
-    toggleFilter: filterActions.toggleFilter
+    toggleFilter: filterActions.toggleFilter,
+    fetchTokens: tokensActions.fetchTokens
   }
 )(TokenDetails)
