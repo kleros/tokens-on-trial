@@ -30,10 +30,12 @@ const TokenDetailsCard = ({
   fundAppeal,
   badges
 }) => {
-  const { decisiveRuling, loserHasPaid, appealable } = getItemInformation(
-    token,
-    userAccount
-  )
+  const {
+    decisiveRuling,
+    loserHasPaid,
+    appealable,
+    payableValue
+  } = getItemInformation(token, userAccount)
 
   const remainingTime = getRemainingTime(
     token,
@@ -98,7 +100,11 @@ const TokenDetailsCard = ({
           {appealable &&
           (!decisiveRuling || !loserTimedOut) &&
           remainingTime > 0 ? (
-            <CrowdfundingMsg decisiveRuling={decisiveRuling} type="Token" />
+            <CrowdfundingMsg
+              decisiveRuling={decisiveRuling}
+              payableValue={payableValue}
+              type="Token"
+            />
           ) : (
             <div className="TokenDetailsCard-actionWrapper">
               <ItemActionButton

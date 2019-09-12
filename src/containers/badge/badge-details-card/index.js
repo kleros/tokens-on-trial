@@ -36,10 +36,12 @@ const BadgeDetailsCard = ({
     variables: { title, description, symbolURI, criteriaDescription },
     fileURI
   } = tcrData
-  const { decisiveRuling, loserHasPaid, appealable } = getItemInformation(
-    badge,
-    userAccount
-  )
+  const {
+    decisiveRuling,
+    loserHasPaid,
+    appealable,
+    payableValue
+  } = getItemInformation(badge, userAccount)
 
   const remainingTime = getRemainingTime(
     badge,
@@ -105,7 +107,11 @@ const BadgeDetailsCard = ({
             </div>
           </div>
           {appealable && !loserTimedOut && (
-            <CrowdfundingMsg decisiveRuling={decisiveRuling} type="Badge" />
+            <CrowdfundingMsg
+              decisiveRuling={decisiveRuling}
+              payableValue={payableValue}
+              type="Badge"
+            />
           )}
         </div>
         <div className="BadgeDetails-footer">

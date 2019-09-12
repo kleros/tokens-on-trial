@@ -4,32 +4,62 @@ import PropTypes from 'prop-types'
 
 import './crowdfunding-msg.css'
 
-const CrowdfundingMsg = ({ decisiveRuling, type }) =>
-  decisiveRuling ? (
-    <div className={`${type}CrowdfundingCard-info`}>
-      <FontAwesomeIcon
-        color="#4d00b4"
-        icon="exclamation-triangle"
-        style={{
-          width: '30px',
-          height: '30px',
-          margin: '15px',
-          marginTop: 0
-        }}
-      />
-      <p
-        style={{
-          color: '#4d00b4',
-          fontSize: '14px',
-          lineHeight: '16px',
-          textAlign: 'center'
-        }}
-      >
-        If the loser is fully funded, the winner of the previous round should
-        also fully fund the appeal, in order not to lose the case.
-      </p>
-    </div>
-  ) : (
+const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
+  if (!payableValue)
+    return (
+      <div className={`${type}CrowdfundingCard-info`}>
+        <FontAwesomeIcon
+          color="#4d00b4"
+          icon="exclamation-triangle"
+          style={{
+            width: '30px',
+            height: '30px',
+            margin: '15px',
+            marginTop: 0
+          }}
+        />
+        <p
+          style={{
+            color: '#4d00b4',
+            fontSize: '14px',
+            lineHeight: '16px',
+            textAlign: 'center'
+          }}
+        >
+          The ruling is final and further appeals are not possible. Awaiting
+          enforcement.
+        </p>
+      </div>
+    )
+
+  if (decisiveRuling)
+    return (
+      <div className={`${type}CrowdfundingCard-info`}>
+        <FontAwesomeIcon
+          color="#4d00b4"
+          icon="exclamation-triangle"
+          style={{
+            width: '30px',
+            height: '30px',
+            margin: '15px',
+            marginTop: 0
+          }}
+        />
+        <p
+          style={{
+            color: '#4d00b4',
+            fontSize: '14px',
+            lineHeight: '16px',
+            textAlign: 'center'
+          }}
+        >
+          If the loser is fully funded, the winner of the previous round should
+          also fully fund the appeal, in order not to lose the case.
+        </p>
+      </div>
+    )
+
+  return (
     <div className={`${type}CrowdfundingCard-info`}>
       <FontAwesomeIcon
         color="#4d00b4"
@@ -56,10 +86,12 @@ const CrowdfundingMsg = ({ decisiveRuling, type }) =>
       </p>
     </div>
   )
+}
 
 CrowdfundingMsg.propTypes = {
   decisiveRuling: PropTypes.bool.isRequired,
-  type: PropTypes.string.isRequired
+  type: PropTypes.string.isRequired,
+  payableValue: PropTypes.bool.isRequired
 }
 
 export default CrowdfundingMsg
