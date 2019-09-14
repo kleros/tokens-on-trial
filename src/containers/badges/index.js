@@ -149,6 +149,8 @@ class Badges extends Component {
       currentPage * ITEMS_PER_PAGE + ITEMS_PER_PAGE
     )
 
+    console.info(tokens)
+
     return (
       <div className="Page">
         <FilterBar
@@ -164,7 +166,8 @@ class Badges extends Component {
         />
         <div className="BadgeGrid">
           <div className="BadgeGrid-container">
-            {displayedBadges.length === 0 && !badges.loading ? (
+            {displayedBadges.length === 0 &&
+            (!tokens.loading && !badges.loading) ? (
               <p
                 style={{
                   textAlign: 'center',
