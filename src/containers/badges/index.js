@@ -14,6 +14,7 @@ import * as tokensActions from '../../actions/tokens'
 import * as filterSelectors from '../../reducers/filter'
 import { ContractsContext } from '../../bootstrap/contexts'
 import { badgesShape } from '../../reducers/badges'
+import { tokensShape } from '../../reducers/token'
 import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
 
 import './badges.css'
@@ -40,6 +41,7 @@ class Badges extends Component {
 
     // Redux State
     badges: badgesShape.isRequired,
+    tokens: tokensShape.isRequired,
     filter: filterSelectors.filterShape.isRequired,
     accounts: PropTypes.arrayOf(PropTypes.string).isRequired,
 
@@ -83,7 +85,13 @@ class Badges extends Component {
   }
 
   render() {
-    const { badges, filter, accounts, arbitrableAddressListData } = this.props
+    const {
+      badges,
+      filter,
+      accounts,
+      arbitrableAddressListData,
+      tokens
+    } = this.props
     const userAccount = accounts[0]
 
     // Merge badges from all contracts
@@ -168,7 +176,8 @@ class Badges extends Component {
               </p>
             ) : (
               <>
-                {(displayedBadges.length > 0 || !badges.loading) &&
+                {(displayedBadges.length > 0 ||
+                  (!tokens.loading && !badges.loading)) &&
                 arbitrableAddressListData.data ? (
                   displayedBadges.map(badge => (
                     <BadgeCard
