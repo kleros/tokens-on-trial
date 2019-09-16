@@ -149,8 +149,6 @@ class Badges extends Component {
       currentPage * ITEMS_PER_PAGE + ITEMS_PER_PAGE
     )
 
-    console.info(tokens)
-
     return (
       <div className="Page">
         <FilterBar

@@ -13,7 +13,7 @@ import {
 import { fetchEvents, fetchAppealableTokens } from './utils'
 
 /**
- * Fetches token and status information by events and dispatches a `fetchBadges` action.
+ * Fetches token and status information by events, dispatches a `fetchBadges` action.
  * @param {{ type: string, payload: ?object, meta: ?object }} action - The action object.
  */
 function* fetchTokens() {
@@ -23,6 +23,7 @@ function* fetchTokens() {
     arbitrableTCRView,
     viewWeb3
   } = yield call(instantiateEnvObjects)
+  console.info('started fetching tokens')
 
   try {
     let tokens = yield localforage.getItem(
@@ -37,7 +38,17 @@ function* fetchTokens() {
         addressToIDs: {}
       }
     // Display cached state while fetching latest.
-    else yield put(tokensActions.cacheTokens(tokens))
+    else {
+      // Load badges too since we already have tokens to display
+      const cachedBadges = yield localforage.getItem(
+        `${arbitrableTokenListView.options.address}badges@${APP_VERSION}`
+      )
+      if (cachedBadges)
+        // Display current cache while loading newer data.
+        yield put(badgesActions.cacheBadges(cachedBadges))
+
+      yield put(tokensActions.cacheTokens(tokens))
+    }
 
     const [events, tokensInAppealPeriod] = yield all([
       call(
