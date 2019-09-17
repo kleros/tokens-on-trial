@@ -23,8 +23,6 @@ function* fetchTokens() {
     arbitrableTCRView,
     viewWeb3
   } = yield call(instantiateEnvObjects)
-  console.info('started fetching tokens')
-
   try {
     let tokens = yield localforage.getItem(
       `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`
@@ -237,7 +235,7 @@ function* fetchTokens() {
       err.message === `Returned values aren't valid, did it run Out of Gas?`
     ) {
       // Infura just refused our request. try again.
-      console.info('Infura refused the request. Attempting fetch again.')
+      console.warn('Infura refused the request. Attempting fetch again.')
       yield put(tokensActions.fetchTokens())
     } else {
       console.error('Error fetching tokens ', err)
