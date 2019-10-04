@@ -55,7 +55,7 @@ function* fetchTokens() {
         arbitrableTokenListView,
         0,
         viewWeb3,
-        500000
+        200000
       ),
       call(fetchAppealableTokens, arbitrableTokenListView, arbitrableTCRView)
     ])
