@@ -48,6 +48,7 @@
       &-logo {
         height: 50px;
         margin: 30px;
+        margin-right: 0;
         min-width: 50px;
         object-fit: contain;
         width: 50px;
@@ -59,6 +60,7 @@
         display: -webkit-flex;
         flex-direction: column;
         justify-content: center;
+        margin-left: 30px;
         width: 100%;
 
         &-text {
