@@ -29,6 +29,7 @@
   &-cards {
     display: flex;
     display: -webkit-flex;
+    flex-wrap: wrap;
     margin: 0 -15px;
   }
 }
