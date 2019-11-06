@@ -19,6 +19,7 @@ import * as modalActions from '../actions/modal'
 import * as walletSelectors from '../reducers/wallet'
 import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
+import { arbitrableAddressListDataShape } from '../reducers/arbitrable-address-list'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
@@ -26,9 +27,15 @@ import TelegramButton from '../components/telegram-button'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
-import { onlyInfura } from './dapp-api'
+import { onlyInfura, IPFS_URL } from './dapp-api'
+
 import './fontawesome'
 import './app.css'
+
+const ETHFINEX_BADGE = {
+  1: '0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab',
+  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759'
+}
 
 class _ConnectedNavBar extends Component {
   static propTypes = {
@@ -40,6 +47,7 @@ class _ConnectedNavBar extends Component {
     // Redux State
     accounts: walletSelectors.accountsShape.isRequired,
     notifications: notificationSelectors.notificationsShape.isRequired,
+    arbitrableAddressListData: arbitrableAddressListDataShape.isRequired,
 
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,
@@ -71,7 +79,20 @@ class _ConnectedNavBar extends Component {
   }
 
   render() {
-    const { accounts, notifications } = this.props
+    const { accounts, notifications, arbitrableAddressListData } = this.props
+
+    let badgeContracts
+    if (arbitrableAddressListData)
+      badgeContracts = Object.keys(arbitrableAddressListData)
+        .filter(
+          (
+            badgeContractAddr // Ethfinex badge is halted.
+          ) =>
+            badgeContractAddr !== ETHFINEX_BADGE[42] &&
+            badgeContractAddr !== ETHFINEX_BADGE[1]
+        )
+        .map(badgeContractAddr => arbitrableAddressListData[badgeContractAddr])
+        .filter(badgeContract => badgeContract.variables)
 
     return (
       <NavBar
@@ -137,6 +158,17 @@ class _ConnectedNavBar extends Component {
                 extraStyle: 'NavBar-route-title'
               }
             ]
+          },
+          {
+            title: 'Criteria',
+            extraStyle: 'NavBar-route-title',
+            routes:
+              badgeContracts &&
+              badgeContracts.map(badgeContract => ({
+                title: badgeContract.variables.title,
+                to: `${IPFS_URL}${badgeContract.fileURI}`,
+                extraStyle: 'NavBar-route-title'
+              }))
           }
         ]}
       />
@@ -149,7 +181,9 @@ const ConnectedNavBar = withRouter(
     state => ({
       accounts: state.wallet.accounts,
       notifications: state.notification.notifications,
-      isNotificationsModalOpen: state.modal.isNotificationsModalOpen
+      isNotificationsModalOpen: state.modal.isNotificationsModalOpen,
+      arbitrableAddressListData:
+        state.arbitrableAddressList.arbitrableAddressListData.data
     }),
     {
       deleteNotification: notificationActions.deleteNotification,
