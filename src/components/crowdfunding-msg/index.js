@@ -81,7 +81,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
       >
         If neither party fully funds, the request will not be executed and
         parties will be reimbursed. However, if one of the parties is fully
-        funded, the other must also fully fund in order to not loose the
+        funded, the other must also fully fund in order to not lose the
         dispute.
       </p>
     </div>
