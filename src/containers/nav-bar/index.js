@@ -78,7 +78,7 @@ export default class NavBar extends PureComponent {
         if (!isMobile)
           return (
             <div
-              key={s.title}
+              key={s.key}
               className={`NavBar-route ${s.extraStyle} NavBar-submenu`}
             >
               {s.title}

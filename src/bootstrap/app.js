@@ -5,6 +5,7 @@ import { Provider, connect } from 'react-redux'
 import { ConnectedRouter } from 'react-router-redux'
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { BeatLoader } from 'react-spinners'
 
 import Tokens from '../containers/tokens'
 import Badges from '../containers/badges'
@@ -94,6 +95,48 @@ class _ConnectedNavBar extends Component {
         .map(badgeContractAddr => arbitrableAddressListData[badgeContractAddr])
         .filter(badgeContract => badgeContract.variables)
 
+    const submenus = [
+      {
+        title: 'Guides',
+        key: 'Guides',
+        extraStyle: 'NavBar-route-title',
+        routes: [
+          {
+            title: 'T²CR Guide',
+            to: 'https://blog.kleros.io/kleros-ethfinex-tcr-an-explainer/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Ethfinex Badge',
+            to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Appeal Fees Crowdfunding',
+            to:
+              'https://blog.kleros.io/kleros-decentralized-token-listing-appeal-fees/',
+            extraStyle: 'NavBar-route-title'
+          }
+        ]
+      },
+      {
+        title: badgeContracts ? (
+          'Criteria'
+        ) : (
+          <BeatLoader color="white" size={5} />
+        ),
+        key: 'Criteria',
+        extraStyle: 'NavBar-route-title',
+        routes: badgeContracts
+          ? badgeContracts.map(badgeContract => ({
+              title: badgeContract.variables.title,
+              to: `${IPFS_URL}${badgeContract.fileURI}`,
+              extraStyle: 'NavBar-route-title'
+            }))
+          : []
+      }
+    ]
+
     return (
       <NavBar
         extras={[
@@ -136,41 +179,7 @@ class _ConnectedNavBar extends Component {
             extraStyle: 'NavBar-route-title'
           }
         ]}
-        submenus={[
-          {
-            title: 'Guides',
-            extraStyle: 'NavBar-route-title',
-            routes: [
-              {
-                title: 'T²CR Guide',
-                to: 'https://blog.kleros.io/kleros-ethfinex-tcr-an-explainer/',
-                extraStyle: 'NavBar-route-title'
-              },
-              {
-                title: 'Ethfinex Badge',
-                to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
-                extraStyle: 'NavBar-route-title'
-              },
-              {
-                title: 'Appeal Fees Crowdfunding',
-                to:
-                  'https://blog.kleros.io/kleros-decentralized-token-listing-appeal-fees/',
-                extraStyle: 'NavBar-route-title'
-              }
-            ]
-          },
-          {
-            title: 'Criteria',
-            extraStyle: 'NavBar-route-title',
-            routes:
-              badgeContracts &&
-              badgeContracts.map(badgeContract => ({
-                title: badgeContract.variables.title,
-                to: `${IPFS_URL}${badgeContract.fileURI}`,
-                extraStyle: 'NavBar-route-title'
-              }))
-          }
-        ]}
+        submenus={submenus}
       />
     )
   }
