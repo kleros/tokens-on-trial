@@ -12,7 +12,7 @@ const Footer = () => (
     </div>
     <div>
       <a className="Footer-link" href="/">
-        Kleros · GTCR
+        Kleros · T²CR
       </a>
     </div>
     <div>
