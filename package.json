@@ -58,6 +58,7 @@
   "dependencies": {
     "@fortawesome/fontawesome": "^1.1.8",
     "@fortawesome/fontawesome-free-solid": "^5.0.13",
+    "@fortawesome/free-brands-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.0.20",
     "@kleros/archon": "^0.6.0",
     "base64-arraybuffer": "^0.1.5",

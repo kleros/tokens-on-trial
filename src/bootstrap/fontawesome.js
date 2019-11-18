@@ -17,6 +17,7 @@ import faHourglassHalf from '@fortawesome/fontawesome-free-solid/faHourglassHalf
 import faClock from '@fortawesome/fontawesome-free-solid/faClock'
 import faSpinner from '@fortawesome/fontawesome-free-solid/faSpinner'
 import faBell from '@fortawesome/fontawesome-free-solid/faBell'
+import faBullhorn from '@fortawesome/fontawesome-free-solid/faBullhorn'
 import faEnvelope from '@fortawesome/fontawesome-free-solid/faEnvelope'
 import faFile from '@fortawesome/fontawesome-free-solid/faFile'
 import faFileAlt from '@fortawesome/fontawesome-free-solid/faFileAlt'
@@ -33,6 +34,7 @@ import faAngleDown from '@fortawesome/fontawesome-free-solid/faAngleDown'
 import faAngleUp from '@fortawesome/fontawesome-free-solid/faAngleUp'
 import faFolderOpen from '@fortawesome/fontawesome-free-solid/faFolderOpen'
 import faComments from '@fortawesome/fontawesome-free-solid/faComments'
+import { fab } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
   faCaretDown,
@@ -68,5 +70,7 @@ library.add(
   faAngleDown,
   faAngleUp,
   faFolderOpen,
-  faComments
+  faComments,
+  fab,
+  faBullhorn
 )

@@ -1,0 +1,23 @@
+@import '../../styles/_colors.scss';
+
+/* @define Footer */
+.Footer {
+  align-items: center;
+  background: $klerosPurpleLight;
+  display: flex;
+  flex-flow: row wrap;
+  height: 112px;
+  justify-content: space-between;
+  margin-top: auto;
+  padding: 24px 50px;
+  width: 100%;
+
+  &-link {
+    color: white;
+    text-decoration: none;
+  }
+
+  &-icon {
+    margin: 10px;
+  }
+}
