@@ -6,6 +6,7 @@ import { ConnectedRouter } from 'react-router-redux'
 import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { BeatLoader } from 'react-spinners'
+import { Footer } from '@kleros/react-components/dist'
 
 import Tokens from '../containers/tokens'
 import Badges from '../containers/badges'
@@ -25,7 +26,6 @@ import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
 import TelegramButton from '../components/telegram-button'
-import Footer from '../components/footer'
 
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
@@ -232,7 +232,9 @@ const App = ({ store, history }) => (
                   <Route component={PageNotFound} exact path="/notifications" />
                   <Route component={PageNotFound} />
                 </Switch>
-                <Footer />
+                <div className="FooterWrapper">
+                  <Footer name="Kleros · T²CR" />
+                </div>
               </div>
               <Route component={ActionModal} exact path="*" />
               <Route component={GlobalComponents} exact path="*" />

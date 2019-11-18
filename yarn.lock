@@ -1247,6 +1247,11 @@
     openzeppelin-solidity "^1.12.0"
     solidity-bytes-utils "^0.0.5"
 
+"@kleros/react-components@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@kleros/react-components/-/react-components-0.3.6.tgz#f7c2fc935181e41c7ac8e9fa9d80c9eaef89199a"
+  integrity sha512-Q1axxPc75ZtVGE3dVDosaKvk6XwyDvDY6B+BD13dFmv+ppwSb7uDudtVHjfNtDxe8Osrol6Xd65ajQ1R6cuJdQ==
+
 "@marionebl/sander@^0.6.0":
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/@marionebl/sander/-/sander-0.6.1.tgz#1958965874f24bc51be48875feb50d642fc41f7b"

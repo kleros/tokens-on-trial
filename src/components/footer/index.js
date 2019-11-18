@@ -1,8 +1,6 @@
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 
-import './footer.css'
-
 const Footer = () => (
   <footer className="Footer">
     <div>

@@ -118,6 +118,13 @@ img {
   }
 }
 
+/* @define FooterWrapper */
+.FooterWrapper {
+  align-items: center;
+  display: flex;
+  margin-top: auto;
+}
+
 /* @define Hidden */
 .Hidden {
   visibility: hidden;

@@ -61,6 +61,7 @@
     "@fortawesome/free-brands-svg-icons": "^5.11.2",
     "@fortawesome/react-fontawesome": "^0.0.20",
     "@kleros/archon": "^0.6.0",
+    "@kleros/react-components": "^0.3.6",
     "base64-arraybuffer": "^0.1.5",
     "browser-image-compression": "^0.0.3",
     "create-redux-form": "^0.1.2",
