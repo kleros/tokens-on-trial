@@ -72,17 +72,18 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
       // Start from the last round.
       else if (badge.numberOfRequests > 1) i = badge.numberOfRequests - 2 // Start from the penultimate round.
 
-      while (i >= 0) {
-        const amount = yield call(
-          arbitrableAddressListView.methods.amountWithdrawable(
-            tokenAddress,
-            account,
-            i
-          ).call
-        )
-        badge.withdrawable = badge.withdrawable.add(web3Utils.toBN(amount))
-        i--
-      }
+      if (account)
+        while (i >= 0) {
+          const amount = yield call(
+            arbitrableAddressListView.methods.amountWithdrawable(
+              tokenAddress,
+              account,
+              i
+            ).call
+          )
+          badge.withdrawable = badge.withdrawable.add(web3Utils.toBN(amount))
+          i--
+        }
 
       badge.latestRequest.latestRound = yield call(
         arbitrableAddressListView.methods.getRoundInfo(

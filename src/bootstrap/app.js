@@ -153,7 +153,9 @@ class _ConnectedNavBar extends Component {
           <SettingsModal key="2">
             <FontAwesomeIcon color="white" icon="envelope" />
           </SettingsModal>,
-          <Identicon address={accounts.data[0]} round scale={2} size={15} />
+          !onlyInfura && (
+            <Identicon address={accounts.data[0]} round scale={2} size={15} />
+          )
         ]}
         action={
           <Button

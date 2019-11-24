@@ -68,13 +68,15 @@ export function* fetchToken({ payload: { ID } }) {
     // Start from the last round.
     else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
 
-    while (i >= 0) {
-      const amount = yield call(
-        arbitrableTokenListView.methods.amountWithdrawable(ID, account, i).call
-      )
-      token.withdrawable = token.withdrawable.add(web3Utils.toBN(amount))
-      i--
-    }
+    if (account)
+      while (i >= 0) {
+        const amount = yield call(
+          arbitrableTokenListView.methods.amountWithdrawable(ID, account, i)
+            .call
+        )
+        token.withdrawable = token.withdrawable.add(web3Utils.toBN(amount))
+        i--
+      }
 
     token.latestRequest.latestRound = yield call(
       arbitrableTokenListView.methods.getRoundInfo(
