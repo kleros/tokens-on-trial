@@ -5,8 +5,6 @@ import { connect } from 'react-redux'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 
-import * as tokensActions from '../../actions/tokens'
-
 import Item from './item'
 
 import './search-bar.css'
@@ -19,7 +17,6 @@ class SearchBar extends Component {
     tokens: PropTypes.shape({
       blockNumber: PropTypes.number.isRequired
     }).isRequired,
-    fetchTokens: PropTypes.func.isRequired,
     envObjects: PropTypes.shape({
       FILE_BASE_URL: PropTypes.string.isRequired
     }).isRequired
@@ -146,13 +143,8 @@ class SearchBar extends Component {
 }
 
 export default withRouter(
-  connect(
-    state => ({
-      tokens: state.tokens.data,
-      envObjects: state.envObjects.data
-    }),
-    {
-      fetchTokens: tokensActions.fetchTokens
-    }
-  )(SearchBar)
+  connect(state => ({
+    tokens: state.tokens.data,
+    envObjects: state.envObjects.data
+  }))(SearchBar)
 )

@@ -99,10 +99,10 @@ function* fetchTokens() {
         }
 
         const tokenID = web3Utils.soliditySha3(
-          _name,
-          _ticker,
-          _address,
-          _symbolMultihash
+          { t: 'string', v: _name },
+          { t: 'string', v: _ticker },
+          { t: 'address', v: _address },
+          { t: 'string', v: _symbolMultihash }
         )
 
         acc[tokenID] = {
