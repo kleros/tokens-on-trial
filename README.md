@@ -1,5 +1,5 @@
 <p align="center">
-  <b style="font-size: 32px;">Tokens on Trial</b>
+  <b style="font-size: 32px;">Tokens² Curated List</b>
 </p>
 
 <p align="center">
@@ -9,7 +9,7 @@
   <a href="https://github.com/prettier/prettier"><img src="https://img.shields.io/badge/styled_with-prettier-ff69b4.svg" alt="Styled with Prettier"></a>
 </p>
 
-Kleros' token² curated list.
+The Kleros' Token² Curated List.
 
 ## Get Started
 

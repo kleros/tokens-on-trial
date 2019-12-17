@@ -211,7 +211,7 @@ const App = ({ store, history }) => (
       <ConnectedRouter history={history}>
         <>
           <Helmet>
-            <title>Kleros · Tokens on Trial</title>
+            <title>Kleros · Tokens² Curated List</title>
           </Helmet>
           <Switch>
             <div id="router-root">
