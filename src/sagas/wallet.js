@@ -13,7 +13,7 @@ function* fetchAccounts() {
   if (window.ethereum) {
     const { web3 } = yield call(instantiateEnvObjects)
 
-    yield call(window.ethereum.enable)
+    yield window.ethereum.send({ method: 'eth_requestAccounts' })
     return yield call(web3.eth.getAccounts)
   } else return []
 }
