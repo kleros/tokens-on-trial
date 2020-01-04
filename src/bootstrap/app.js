@@ -172,14 +172,15 @@ class _ConnectedNavBar extends Component {
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
           {
-            title: 'Token² Curated Registry',
-            to: '/tokens',
-            extraStyle: 'NavBar-route-title'
-          },
-          {
             title: 'Badge Requests',
             to: '/badges',
             extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Statistics',
+            to: 'https://t2cr-dashboard.kleros.io',
+            extraStyle: 'NavBar-route-title',
+            isExternal: true
           }
         ]}
         submenus={submenus}

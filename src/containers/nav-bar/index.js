@@ -61,17 +61,37 @@ export default class NavBar extends PureComponent {
     const routesAndExtras = [
       ...routes.map(r => (
         <div key={r.title}>
-          <Link
-            className={`NavBar-route ${r.extraStyle}`}
-            style={{ height: '55px' }}
-            to={r.to}
-            onClick={this.closeMenu}
-          >
-            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-              {r.title}
-              <i style={{ fontSize: '10px', letterSpacing: 0 }}>{r.subtitle}</i>
-            </div>
-          </Link>
+          {r.isExternal ? (
+            <a
+              className={`NavBar-route ${r.extraStyle}`}
+              style={{ height: '55px' }}
+              onClick={this.closeMenu}
+              href={r.to}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                {r.title}
+                <i style={{ fontSize: '10px', letterSpacing: 0 }}>
+                  {r.subtitle}
+                </i>
+              </div>
+            </a>
+          ) : (
+            <Link
+              className={`NavBar-route ${r.extraStyle}`}
+              style={{ height: '55px' }}
+              onClick={this.closeMenu}
+              to={r.to}
+            >
+              <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                {r.title}
+                <i style={{ fontSize: '10px', letterSpacing: 0 }}>
+                  {r.subtitle}
+                </i>
+              </div>
+            </Link>
+          )}
         </div>
       )),
       ...submenus.map(s => {
