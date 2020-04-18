@@ -172,7 +172,7 @@ class _ConnectedNavBar extends Component {
         routes={[
           { title: 'KLEROS', to: '/', extraStyle: 'NavBar-kleros' },
           {
-            title: 'Badge Requests',
+            title: 'Badge',
             to: '/badges',
             extraStyle: 'NavBar-route-title'
           },
