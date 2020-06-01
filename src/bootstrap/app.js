@@ -135,6 +135,33 @@ class _ConnectedNavBar extends Component {
               extraStyle: 'NavBar-route-title'
             }))
           : []
+      },
+      {
+        title: 'Integrations',
+        key: 'Integrations',
+        extraStyle: 'NavBar-route-title',
+        routes: [
+          {
+            title: 'uniswap.ninja',
+            to: 'https://uniswap.ninja/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Fairdex/Slow.Trade',
+            to: 'https://fairdex.net/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Escrow',
+            to: 'https://escrow.kleros.io/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'Ethfinex(Diversifi)',
+            to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
+            extraStyle: 'NavBar-route-title'
+          }
+        ]
       }
     ]
 
