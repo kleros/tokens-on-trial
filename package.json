@@ -67,6 +67,7 @@
     "create-redux-form": "^0.1.2",
     "debounce": "^1.2.0",
     "downshift": "^3.2.2",
+    "ethers": "^5.0.7",
     "history": "^4.7.2",
     "jszip": "^3.2.1",
     "lessdux": "^0.8.3",

@@ -232,7 +232,8 @@ function* fetchTokens() {
     )
   } catch (err) {
     if (
-      err.message === `Returned values aren't valid, did it run Out of Gas?`
+      err.message ===
+      `Returned values aren't valid, did it run Out of Gas? You might also see this error if you are not using the correct ABI for the contract you are retrieving data from, requesting data from a block number that does not exist, or querying a node which is not fully synced.`
     ) {
       // Infura just refused our request. try again.
       console.warn('Infura refused the request. Attempting fetch again.')
