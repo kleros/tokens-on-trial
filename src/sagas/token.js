@@ -249,10 +249,8 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestRegistration({ payload: { token, file, fileData, value } }) {
-  console.info('requestRegistration saga, call instantiate env objects')
   const { archon, arbitrableTokenList } = yield call(instantiateEnvObjects)
 
-  console.info('token to submit')
   const tokenToSubmit = {
     name: token.name,
     ticker: token.ticker,
@@ -276,8 +274,6 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
 
   const { name, ticker, address, symbolMultihash } = tokenToSubmit
 
-  console.info('uploaded to ipfs')
-
   if (isInvalid(name) || isInvalid(ticker) || isInvalid(symbolMultihash))
     throw new Error('Missing data on token submit', tokenToSubmit)
 
@@ -286,17 +282,10 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     [name || '', ticker || '', address, symbolMultihash]
   )
 
-  console.info('check if token was submitted already, fetchtoken')
-  console.info('tokenID', ID)
   const recentToken = yield call(fetchToken, { payload: { ID } })
-
-  console.info('got recentToken', recentToken)
 
   if (recentToken.status !== tcrConstants.IN_CONTRACT_STATUS_ENUM.Absent)
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
-
-  console.info('requestStatusChange')
-  console.info(tokenToSubmit)
 
   yield call(
     arbitrableTokenList.methods.requestStatusChange(
