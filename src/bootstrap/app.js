@@ -49,12 +49,16 @@ class _ConnectedNavBar extends Component {
     // Redux State
     accounts: walletSelectors.accountsShape.isRequired,
     notifications: notificationSelectors.notificationsShape.isRequired,
-    arbitrableAddressListData: arbitrableAddressListDataShape.isRequired,
+    arbitrableAddressListData: arbitrableAddressListDataShape,
 
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,
     deleteNotification: PropTypes.func.isRequired,
     closeNotificationsModal: PropTypes.func.isRequired
+  }
+
+  static defaultProps = {
+    arbitrableAddressListData: null
   }
 
   handleSubmitTokenClick = () => {
