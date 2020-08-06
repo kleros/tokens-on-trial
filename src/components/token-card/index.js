@@ -50,7 +50,7 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
               : `${FILE_BASE_URL}/`
           }${token.symbolMultihash}`}
         />
-        <h5 style={{ marginBottom: 0, marginTop: '12px', textAlign: 'center' }}>
+        <h5 style={{ marginBottom: 0, marginTop: '12px', textAlign: 'center', wordBreak: 'break-word' }}>
           {`${token.name} ${token.name && token.ticker ? '-' : ''} ${
             token.ticker
           }`}
