@@ -6,7 +6,6 @@
   background-color: aliceblue;
   border: 1px solid $lightGrey;
   border-radius: 4px;
-  border-style: dashed;
   box-shadow: 0 2px 0 0 $mint;
   display: flex;
   display: -webkit-flex;
@@ -32,12 +31,15 @@
   }
 
   &-filePreview {
+    align-items: center;
     background-position: center;
     background-repeat: no-repeat;
     background-size: contain;
-    margin: 14px;
-    min-height: 100%;
-    width: 100%;
+    border: 1px dashed gray;
+    display: flex;
+    height: 90px;
+    justify-content: center;
+    width: 90px;
   }
 
   &-icon {
