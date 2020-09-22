@@ -23,9 +23,7 @@ body,
 #router-root,
 #scroll-root {
   border: 0;
-  height: 100%;
   margin: 0;
-  min-height: 100%;
   padding: 0;
   width: 100%;
 }
@@ -122,6 +120,7 @@ img {
 .FooterWrapper {
   align-items: center;
   display: flex;
+  justify-self: flex-end;
   margin-top: auto;
 }
 
