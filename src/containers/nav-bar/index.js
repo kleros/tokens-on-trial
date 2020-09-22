@@ -40,9 +40,10 @@ export default class NavBar extends PureComponent {
     window.removeEventListener('resize', this.handleWindowResize)
   }
 
-  handleWindowResize = debounce(({ currentTarget: { innerWidth } }) =>
-    this.setState({ isMobile: innerWidth < 950 })
-  )
+  handleWindowResize = debounce(({ currentTarget }) => {
+    const { innerWidth } = currentTarget || {}
+    if (innerWidth) this.setState({ isMobile: innerWidth < 950 })
+  })
 
   handleStateChange(state) {
     const { isOpen } = state
