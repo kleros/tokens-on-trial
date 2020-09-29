@@ -15,7 +15,11 @@ import WaitingBadge from '../../../assets/images/badges/badge-waiting.svg'
 import { tcrShape } from '../../../reducers/generic-shapes'
 import { badgesShape } from '../../../reducers/badge'
 import * as tokenSelectors from '../../../reducers/token'
-import { getItemInformation, getRemainingTime } from '../../../utils/ui'
+import {
+  getItemInformation,
+  getRemainingTime,
+  truncateMiddle
+} from '../../../utils/ui'
 import CrowdfundingMsg from '../../../components/crowdfunding-msg'
 
 import './token-details-card.css'
@@ -58,10 +62,14 @@ const TokenDetailsCard = ({
     remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
   )
 
+  const { address, latestRequest, name, ticker, symbolMultihash, status } =
+    token || {}
+  const { parties } = latestRequest || {}
+
   const badgesCount = Object.keys(badges)
     .map(badgeContractAddr => badges[badgeContractAddr])
-    .filter(badgeContractData => badgeContractData.items[token.address])
-    .map(badgeContractData => badgeContractData.items[token.address])
+    .filter(badgeContractData => badgeContractData.items[address])
+    .map(badgeContractData => badgeContractData.items[address])
     .filter(badge => badge.clientStatus !== tcrConstants.STATUS_ENUM['Absent'])
     .length
 
@@ -71,18 +79,16 @@ const TokenDetailsCard = ({
         alt="Token Symbol"
         className="TokenDetailsCard-img"
         src={`${
-          token.symbolMultihash && token.symbolMultihash[0] === '/'
+          symbolMultihash && symbolMultihash[0] === '/'
             ? `${IPFS_URL}`
             : `${FILE_BASE_URL}/`
-        }${token.symbolMultihash}`}
+        }${symbolMultihash}`}
       />
       <div className="TokenDetailsCard-card">
         <div className="TokenDetailsCard-card-content">
           <div className="TokenDetailsCard-label">
-            <span className="TokenDetailsCard-label-name">{token.name}</span>
-            <span className="TokenDetailsCard-label-ticker">
-              {token.ticker}
-            </span>
+            <span className="TokenDetailsCard-label-name">{name}</span>
+            <span className="TokenDetailsCard-label-ticker">{ticker}</span>
           </div>
           <div className="TokenDetailsCard-divider" />
           <div className="TokenDetailsCard-meta">
@@ -96,6 +102,17 @@ const TokenDetailsCard = ({
               onAppealPeriodEnd={setAppealPeriodEnded}
               onLoserTimedOut={setLoserTimedOut}
             />
+            <div style={{ margin: '10px 35px' }}>
+              Requester:
+              <a
+                href={`https://etherscan.io/address/${parties[1]}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ marginLeft: '12px', color: '#4a4a4a' }}
+              >
+                {truncateMiddle(parties[1])}
+              </a>
+            </div>
           </div>
           {appealable &&
           (!decisiveRuling || !loserTimedOut) &&
@@ -124,7 +141,7 @@ const TokenDetailsCard = ({
           <a
             className="TokenDetailsCard--link"
             style={{ marginRight: '14px' }}
-            href={`https://etherscan.io/token/${token.address}`}
+            href={`https://etherscan.io/token/${address}`}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -132,9 +149,9 @@ const TokenDetailsCard = ({
               className="TokenDetailsCard-icon TokenDetailsCard-meta--aligned"
               src={EtherScanLogo}
             />
-            {token.address ? web3Utils.toChecksumAddress(token.address) : ''}
+            {address ? web3Utils.toChecksumAddress(address) : ''}
           </a>
-          {token.status !== tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
+          {status !== tcrConstants.IN_CONTRACT_STATUS_ENUM['Absent'] && (
             <span className="TokenDetailsCard-footer-badge">
               <span
                 className="TokenDetailsCard-icon-badge TokenDetailsCard-meta--aligned"
