@@ -216,9 +216,7 @@ const FundAppeal = ({
       <div style={{ marginLeft: '5px' }}>
         <i>
           Note: This is a deposit and will be reimbursed if the side being
-          funded wins the dispute. Contributions to the side that loses the case
-          will be awarded to the backers of the winner (including if the case is
-          lost because a side is not fully funded).
+          funded wins the dispute.
         </i>
       </div>
     </div>

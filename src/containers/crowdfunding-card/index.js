@@ -183,7 +183,8 @@ const CrowdfundingCard = ({
         />
         <p className="CrowdfundingCard-action-info">
           Contributions to the side that loses the case will be awarded to the
-          backers of the winner.
+          backers of the winner (including if the case is lost because a side is
+          not fully funded).
         </p>
         <ItemActionButton
           item={item}
