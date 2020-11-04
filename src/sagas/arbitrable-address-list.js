@@ -246,7 +246,7 @@ function* submitBadgeEvidence({
   const enc = new TextEncoder()
   const ipfsHashEvidenceObj = yield call(
     ipfsPublish,
-    evidenceJSONMultihash,
+    "evidence.json",
     enc.encode(JSON.stringify(evidenceJSON))
   )
 
