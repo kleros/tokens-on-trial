@@ -251,7 +251,7 @@ function* submitBadgeEvidence({
   )
 
   const ipfsHashEvidence =
-    ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
+    ipfsHashEvidenceObj[1].hash + "/evidence.json"
 
   yield call(
     arbitrableAddressList.methods.submitEvidence(

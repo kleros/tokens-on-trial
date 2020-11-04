@@ -232,7 +232,7 @@ function* submitTokenEvidence({
   )
 
   const ipfsHashEvidence =
-    ipfsHashEvidenceObj[1].hash + ipfsHashEvidenceObj[0].path
+    ipfsHashEvidenceObj[1].hash + "/evidence.json"
 
   yield call(
     arbitrableTokenList.methods.submitEvidence(ID, `/ipfs/${ipfsHashEvidence}`)
