@@ -263,7 +263,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     const data = yield call(readFile, file.preview)
     const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
     try {
-      const ipfsFileObj = yield call(ipfsPublish, fileMultihash, data)
+      const ipfsFileObj = yield call(ipfsPublish, "evidence.json", data)
       tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
         ipfsFileObj[0].path
       }`
@@ -326,7 +326,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     const data = yield call(readFile, file.preview)
     const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
     try {
-      const ipfsFileObj = yield call(ipfsPublish, fileMultihash, data)
+      const ipfsFileObj = yield call(ipfsPublish, "evidence.json", data)
       tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
         ipfsFileObj[0].path
       }`
