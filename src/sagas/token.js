@@ -249,7 +249,7 @@ export function* fetchToken({ payload: { ID } }) {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* requestRegistration({ payload: { token, file, fileData, value } }) {
-  const { archon, arbitrableTokenList } = yield call(instantiateEnvObjects)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   const tokenToSubmit = {
     name: token.name,
@@ -261,9 +261,8 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
   if (file && fileData) {
     /* eslint-disable unicorn/number-literal-case */
     const data = yield call(readFile, file.preview)
-    const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
     try {
-      const ipfsFileObj = yield call(ipfsPublish, fileMultihash, data)
+      const ipfsFileObj = yield call(ipfsPublish, "evidence.json", data)
       tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
         ipfsFileObj[0].path
       }`
@@ -312,7 +311,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (isInvalid(token.ID) && isInvalid(token.address))
     throw new Error('Missing address on token submit', token)
 
-  const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   const tokenToSubmit = {
     name: token.name,
@@ -324,9 +323,8 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
   if (file && fileData) {
     /* eslint-disable unicorn/number-literal-case */
     const data = yield call(readFile, file.preview)
-    const fileMultihash = archon.utils.multihashFile(fileData, 0x1b) // keccak-256
     try {
-      const ipfsFileObj = yield call(ipfsPublish, fileMultihash, data)
+      const ipfsFileObj = yield call(ipfsPublish, "evidence.json", data)
       tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
         ipfsFileObj[0].path
       }`

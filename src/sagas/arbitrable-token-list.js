@@ -218,16 +218,12 @@ function* submitTokenEvidence({
     evidenceSide
   }
 
-  const { arbitrableTokenList, archon } = yield call(instantiateEnvObjects)
-
-  /* eslint-disable unicorn/number-literal-case */
-  const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256
-  /* eslint-enable */
+  const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   const enc = new TextEncoder()
   const ipfsHashEvidenceObj = yield call(
     ipfsPublish,
-    evidenceJSONMultihash,
+    "evidence.json",
     enc.encode(JSON.stringify(evidenceJSON))
   )
 
