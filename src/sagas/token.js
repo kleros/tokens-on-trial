@@ -262,7 +262,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     /* eslint-disable unicorn/number-literal-case */
     const data = yield call(readFile, file.preview)
     try {
-      const ipfsFileObj = yield call(ipfsPublish, "evidence.json", data)
+      const ipfsFileObj = yield call(ipfsPublish, token.ticker, data)
       tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
         ipfsFileObj[0].path
       }`
