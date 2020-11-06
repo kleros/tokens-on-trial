@@ -184,7 +184,7 @@ export function* fetchArbitrableAddressListData() {
 function* submitBadgeEvidence({
   payload: { evidenceData, file, tokenAddress, badgeContractAddr, evidenceSide }
 }) {
-  const { badgeContracts, archon } = yield call(instantiateEnvObjects)
+  const { badgeContracts } = yield call(instantiateEnvObjects)
   const arbitrableAddressList = badgeContracts[badgeContractAddr]
 
   let fileURI = ''
@@ -238,10 +238,6 @@ function* submitBadgeEvidence({
     fileTypeExtension,
     evidenceSide
   }
-
-  /* eslint-disable unicorn/number-literal-case */
-  const evidenceJSONMultihash = archon.utils.multihashFile(evidenceJSON, 0x1b) // 0x1b is keccak-256
-  /* eslint-enable */
 
   const enc = new TextEncoder()
   const ipfsHashEvidenceObj = yield call(
