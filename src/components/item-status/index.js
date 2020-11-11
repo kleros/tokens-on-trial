@@ -7,7 +7,12 @@ import { userFriendlyLabel, toSentenceCase } from '../../utils/ui'
 
 import './item-status.css'
 
-const ItemStatus = ({ item: { clientStatus } }) => (
+const ItemStatus = ({
+  item: {
+    clientStatus,
+    latestRequest: { disputeID, disputed, resolved }
+  }
+}) => (
   <span
     className="ItemStatus-meta-item"
     style={{ color: tcrConstants.STATUS_COLOR_ENUM[clientStatus] }}
@@ -18,8 +23,18 @@ const ItemStatus = ({ item: { clientStatus } }) => (
       icon={tcrConstants.STATUS_ICON_ENUM[clientStatus]}
     />
     <div style={{ fontSize: '14px' }}>
-      {toSentenceCase(
-        userFriendlyLabel[tcrConstants.STATUS_ENUM[clientStatus]]
+      {disputed && !resolved ? (
+        <a
+          href={`https://court.kleros.io/cases/${disputeID}`}
+          style={{ color: 'inherit' }}
+        >
+          {userFriendlyLabel[tcrConstants.STATUS_ENUM[clientStatus]]} - #
+          {disputeID}
+        </a>
+      ) : (
+        toSentenceCase(
+          userFriendlyLabel[tcrConstants.STATUS_ENUM[clientStatus]]
+        )
       )}
     </div>
   </span>

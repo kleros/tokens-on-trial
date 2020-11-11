@@ -94,6 +94,7 @@
 
   &.is-disabled {
     background: $disabled;
+    cursor: not-allowed;
   }
 
   &-submitToken {
