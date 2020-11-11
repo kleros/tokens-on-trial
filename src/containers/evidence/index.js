@@ -236,7 +236,8 @@ class EvidenceSection extends Component {
               .filter((_, i) => i > 0)
               .map((requestInfo, i) => (
                 <RequestEvidences
-                  idKey={i}
+                  idKey={`requestEvidences_${i}`}
+                  key={`reqEvidences_${i}`}
                   itemID={itemID}
                   requester={requester}
                   challenger={challenger}

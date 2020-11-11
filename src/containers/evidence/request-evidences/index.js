@@ -254,7 +254,7 @@ RequestEvidences.propTypes = {
     disputed: PropTypes.bool.isRequired,
     resolved: PropTypes.bool.isRequired,
     ruling: PropTypes.number.isRequired,
-    evidences: PropTypes.arrayOf(
+    evidences: PropTypes.objectOf(
       PropTypes.shape({
         evidence: PropTypes.shape({
           evidence: PropTypes.shape({
