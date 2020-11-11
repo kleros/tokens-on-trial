@@ -26,9 +26,11 @@ const { toBN } = web3Utils
  * @returns {object} - The fetched token.
  */
 export function* fetchToken({ payload: { ID } }) {
-  const { arbitrableTokenListView, arbitratorView } = yield call(
-    instantiateEnvObjects
-  )
+  const {
+    arbitrableTokenListView,
+    arbitratorView,
+    arbitrableTCRView
+  } = yield call(instantiateEnvObjects)
 
   let token = yield call(arbitrableTokenListView.methods.getTokenInfo(ID).call)
   token.address = token.addr
@@ -45,32 +47,98 @@ export function* fetchToken({ payload: { ID } }) {
     token['1'] = '0x'
   }
 
-  token.requests = []
+  token.requests = (yield call(
+    arbitrableTCRView.methods.getRequestsDetails(
+      arbitrableTokenListView.options.address,
+      ID
+    ).call
+  ))
+    .filter(r => r.parties[1] !== '0x0000000000000000000000000000000000000000')
+    .map((r, i) => ({
+      ...r,
+      evidenceGroupID: web3Utils.toBN(web3Utils.soliditySha3(ID, i)).toString()
+    }))
+    .map(r => ({
+      ...r,
+      evidenceGroupID: r.evidenceGroupID,
+      arbitratorExtraData: r.arbitratorExtraData || '0x', // Workaround web3js bug. Web3js returns null if extra data is '0x'
+      submissionTime: Number(r.submissionTime),
+      appealCost: String(r.appealCost),
+      appealPeriod: r.appealPeriod[0] !== '0' &&
+        r.appealPeriod[1] !== '0' && {
+          0: r.appealPeriod[0],
+          1: r.appealPeriod[1],
+          start: r.appealPeriod[0],
+          end: r.appealPeriod[1]
+        },
+      requiredForSide: [
+        toBN(0),
+        toBN(r.requiredForSide[1]),
+        toBN(r.requiredForSide[2])
+      ]
+    }))
+
   if (Number(token.numberOfRequests > 0)) {
-    for (let i = 0; i < token.numberOfRequests; i++) {
-      const request = yield call(
-        arbitrableTokenListView.methods.getRequestInfo(ID, i).call
-      )
-      if (request.arbitratorExtraData === null)
-        request.arbitratorExtraData = '0x' // Workaround web3js bug. Web3js returns null if extra data is '0x'
-
-      request.evidenceGroupID = web3Utils
-        .toBN(web3Utils.soliditySha3(ID, i))
-        .toString()
-
-      token.requests.push(request)
-    }
-
     token.latestRequest = token.requests[token.requests.length - 1]
 
-    // Calculate amount withdrawable
-    let i
-    token.withdrawable = web3Utils.toBN(0)
-    if (token.latestRequest.resolved) i = token.numberOfRequests - 1
-    // Start from the last round.
-    else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
+    token.latestRequest.latestRound = {
+      appealCost: token.latestRequest.appealCost,
+      appealPeriod: token.latestRequest.appealPeriod,
+      appealed:
+        token.latestRequest.hasPaid[1] && token.latestRequest.hasPaid[2],
+      paidFees: token.latestRequest.paidFees,
+      requiredForSide: token.latestRequest.requiredForSide,
+      hasPaid: token.latestRequest.hasPaid
+    }
 
-    if (account)
+    if (token.latestRequest.disputed) {
+      // Fetch dispute data.
+      arbitratorView.options.address = token.latestRequest.arbitrator
+      try {
+        token.latestRequest.dispute = yield call(
+          arbitratorView.methods.disputes(token.latestRequest.disputeID).call
+        )
+        token.latestRequest.dispute.court = yield call(
+          arbitratorView.methods.getSubcourt(
+            token.latestRequest.dispute.subcourtID
+          ).call
+        )
+      } catch (err) {
+        // Arbitrator does not implement getSubcourt (i.e. its probably not Kleros).
+        console.warn(`Arbitrator is not kleros, cannot get court info`, err)
+        // No op, just ignore the field.
+        token.latestRequest.dispute = {}
+      }
+
+      token.latestRequest.dispute.status = token.latestRequest.disputeStatus
+      token.latestRequest.dispute.currentRuling =
+        token.latestRequest.currentRuling
+      token.latestRequest.dispute.ruling =
+        token.latestRequest.dispute.currentRuling
+      token.latestRequest.appealDisputeID = token.latestRequest.disputeID
+      token.latestRequest.dispute.appealStatus =
+        token.latestRequest.dispute.status
+      token.latestRequest.latestRound.appealCost = toBN(
+        token.latestRequest.appealCost
+      )
+      token.latestRequest.latestRound.requiredForSide =
+        token.latestRequest.requiredForSide
+      token.latestRequest.latestRound.appealPeriod =
+        token.latestRequest.appealPeriod
+    }
+
+    token.latestRequest.latestRound.ruled =
+      token.latestRequest.dispute &&
+      token.latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Solved
+
+    token.withdrawable = web3Utils.toBN(0)
+    if (account) {
+      // Calculate amount withdrawable
+      let i
+      if (token.latestRequest.resolved) i = token.numberOfRequests - 1
+      // Start from the last round.
+      else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
+
       while (i >= 0) {
         const amount = yield call(
           arbitrableTokenListView.methods.amountWithdrawable(ID, account, i)
@@ -78,135 +146,6 @@ export function* fetchToken({ payload: { ID } }) {
         )
         token.withdrawable = token.withdrawable.add(web3Utils.toBN(amount))
         i--
-      }
-
-    token.latestRequest.latestRound = yield call(
-      arbitrableTokenListView.methods.getRoundInfo(
-        ID,
-        Number(token.numberOfRequests) - 1,
-        Number(token.latestRequest.numberOfRounds) - 1
-      ).call
-    )
-
-    token.latestRequest.latestRound.paidFees[0] = toBN(
-      token.latestRequest.latestRound.paidFees[0]
-    )
-    token.latestRequest.latestRound.paidFees[1] = toBN(
-      token.latestRequest.latestRound.paidFees[1]
-    )
-    token.latestRequest.latestRound.paidFees[2] = toBN(
-      token.latestRequest.latestRound.paidFees[2]
-    )
-
-    if (token.latestRequest.disputed) {
-      // Fetch dispute data.
-      arbitratorView.options.address = token.latestRequest.arbitrator
-      token.latestRequest.dispute = yield call(
-        arbitratorView.methods.disputes(token.latestRequest.disputeID).call
-      )
-      token.latestRequest.dispute.court = yield call(
-        arbitratorView.methods.getSubcourt(
-          token.latestRequest.dispute.subcourtID
-        ).call
-      )
-      token.latestRequest.dispute.status = yield call(
-        arbitratorView.methods.disputeStatus(token.latestRequest.disputeID).call
-      )
-      token.latestRequest.dispute.ruling = yield call(
-        arbitratorView.methods.currentRuling(token.latestRequest.disputeID).call
-      )
-
-      // Fetch appeal disputeID, if there was an appeal.
-      if (Number(token.latestRequest.numberOfRounds) > 2) {
-        token.latestRequest.appealDisputeID = token.latestRequest.disputeID
-        token.latestRequest.dispute.appealStatus =
-          token.latestRequest.dispute.status
-      } else token.latestRequest.appealDisputeID = 0
-
-      // Fetch appeal period and cost if in appeal period.
-      if (
-        token.latestRequest.dispute.status ===
-          tcrConstants.DISPUTE_STATUS.Appealable.toString() &&
-        !token.latestRequest.latestRound.appealed
-      ) {
-        token.latestRequest.latestRound.appealCost = yield call(
-          arbitratorView.methods.appealCost(
-            token.latestRequest.disputeID,
-            token.latestRequest.arbitratorExtraData
-          ).call
-        )
-        const MULTIPLIER_DIVISOR = yield call(
-          arbitrableTokenListView.methods.MULTIPLIER_DIVISOR().call
-        )
-        const winnerStakeMultiplier = yield call(
-          arbitrableTokenListView.methods.winnerStakeMultiplier().call
-        )
-        const loserStakeMultiplier = yield call(
-          arbitrableTokenListView.methods.loserStakeMultiplier().call
-        )
-        const sharedStakeMultiplier = yield call(
-          arbitrableTokenListView.methods.sharedStakeMultiplier().call
-        )
-        token.latestRequest.latestRound.requiredForSide = [toBN(0)]
-
-        const ruling = Number(token.latestRequest.dispute.ruling)
-        if (ruling === 0) {
-          token.latestRequest.latestRound.requiredForSide.push(
-            toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost)
-                .mul(toBN(sharedStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-          token.latestRequest.latestRound.requiredForSide.push(
-            toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost)
-                .mul(toBN(sharedStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-        } else if (ruling === 1) {
-          token.latestRequest.latestRound.requiredForSide.push(
-            toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost)
-                .mul(toBN(winnerStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-          token.latestRequest.latestRound.requiredForSide.push(
-            toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost)
-                .mul(toBN(loserStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-        } else {
-          token.latestRequest.latestRound.requiredForSide.push(
-            toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost)
-                .mul(toBN(loserStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-          token.latestRequest.latestRound.requiredForSide.push(
-            toBN(token.latestRequest.latestRound.appealCost).add(
-              toBN(token.latestRequest.latestRound.appealCost)
-                .mul(toBN(winnerStakeMultiplier))
-                .div(toBN(MULTIPLIER_DIVISOR))
-            )
-          )
-        }
-
-        if (typeof arbitratorView.methods.appealPeriod === 'function')
-          token.latestRequest.latestRound.appealPeriod = yield call(
-            arbitratorView.methods.appealPeriod(token.latestRequest.disputeID)
-              .call
-          )
-        else
-          token.latestRequest.latestRound.appealPeriod = [
-            1549163380,
-            1643771380
-          ]
       }
     }
 
@@ -324,7 +263,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     /* eslint-disable unicorn/number-literal-case */
     const data = yield call(readFile, file.preview)
     try {
-      const ipfsFileObj = yield call(ipfsPublish, "evidence.json", data)
+      const ipfsFileObj = yield call(ipfsPublish, 'evidence.json', data)
       tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
         ipfsFileObj[0].path
       }`

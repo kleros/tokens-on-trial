@@ -105,14 +105,20 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
         arbitratorView.options.tokenAddress = badge.latestRequest.arbitrator
-        badge.latestRequest.dispute = yield call(
-          arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
-        )
-        badge.latestRequest.dispute.court = yield call(
-          arbitratorView.methods.getSubcourt(
-            badge.latestRequest.dispute.subcourtID
-          ).call
-        )
+        try {
+          badge.latestRequest.dispute = yield call(
+            arbitratorView.methods.disputes(badge.latestRequest.disputeID).call
+          )
+          badge.latestRequest.dispute.court = yield call(
+            arbitratorView.methods.getSubcourt(
+              badge.latestRequest.dispute.subcourtID
+            ).call
+          )
+        } catch (err) {
+          // Arbitrator does not implement getSubcourt (i.e. its probably not Kleros).
+          console.warn(`Arbitrator is not kleros, cannot get court info`, err)
+          badge.latestRequest.dispute = {}
+        }
         badge.latestRequest.dispute.status = yield call(
           arbitratorView.methods.disputeStatus(badge.latestRequest.disputeID)
             .call

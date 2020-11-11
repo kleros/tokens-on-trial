@@ -9,10 +9,10 @@ import { itemShape } from '../../reducers/generic-shapes'
 import './latest-ruling.css'
 
 const LatestRuling = ({ item, userAccount }) => {
-  const { latestRequest } = item
-  const { dispute, latestRound } = latestRequest
-  const { appealed, ruled } = latestRound
-  const ruling = dispute ? dispute.ruling : null
+  const { latestRequest } = item || {}
+  const { dispute, latestRound } = latestRequest || {}
+  const { appealed, ruled } = latestRound || {}
+  const { ruling } = dispute || {}
 
   if (!latestRound.appealPeriod || appealed || ruled) return null
 

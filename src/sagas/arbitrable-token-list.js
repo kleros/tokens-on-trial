@@ -223,7 +223,7 @@ function* submitTokenEvidence({
   const enc = new TextEncoder()
   const ipfsHashEvidenceObj = yield call(
     ipfsPublish,
-    "evidence.json",
+    'evidence.json',
     enc.encode(JSON.stringify(evidenceJSON))
   )
 
