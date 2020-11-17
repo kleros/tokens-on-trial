@@ -109,9 +109,13 @@ const UserActionCountdown = ({
 UserActionCountdown.propTypes = {
   item: itemShape.isRequired,
   userAccount: PropTypes.string.isRequired,
-  tcrData: tcrShape.isRequired,
+  tcrData: tcrShape,
   onAppealPeriodEnd: PropTypes.func.isRequired,
   onLoserTimedOut: PropTypes.func.isRequired
+}
+
+UserActionCountdown.defaultProps = {
+  tcrData: null
 }
 
 export default UserActionCountdown

@@ -6,7 +6,7 @@ import { connect } from 'react-redux'
 import { IPFS_URL, web3Utils } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
-import { arbitrableAddressListDataShape } from '../../../../reducers/arbitrable-address-list'
+import { _arbitrableAddressListDataShape } from '../../../../reducers/arbitrable-address-list'
 
 import './add-badge.css'
 
@@ -169,8 +169,14 @@ AddBadge.propTypes = {
   closeActionModal: PropTypes.func.isRequired,
   submitItem: PropTypes.func.isRequired,
   tokenAddr: PropTypes.string.isRequired,
-  arbitrableAddressListData: arbitrableAddressListDataShape.isRequired,
+  arbitrableAddressListData: PropTypes.objectOf(
+    _arbitrableAddressListDataShape
+  ),
   unavailable: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired
+}
+
+AddBadge.defaultProps = {
+  arbitrableAddressListData: null
 }
 
 export default connect(state => ({

@@ -416,7 +416,7 @@ class TokenDetails extends PureComponent {
         <CrowdfundingCard
           item={token}
           userAccount={accounts.data[0]}
-          tcrData={arbitrableTokenListData}
+          tcrData={arbitrableTokenListData.data}
           fundAppeal={this.fundAppeal}
           handleActionClick={this.handleActionClick}
         />

@@ -6,7 +6,6 @@ import { connect } from 'react-redux'
 import * as tcrConstants from '../../../constants/tcr'
 import { rulingMessage } from '../../../utils/ui'
 import * as arbitrableTokenListSelectors from '../../../reducers/arbitrable-token-list'
-import * as arbitrableAddressListSelectors from '../../../reducers/arbitrable-address-list'
 
 import EvidenceCard from './evidence-card'
 
@@ -274,10 +273,7 @@ RequestEvidences.propTypes = {
   challenger: PropTypes.string.isRequired,
   idKey: PropTypes.string.isRequired,
   itemID: PropTypes.string.isRequired,
-  tcrData: PropTypes.oneOfType([
-    arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
-  ]).isRequired,
+  tcrData: arbitrableTokenListSelectors._arbitrableTokenListDataShape,
   arbitratorView: PropTypes.shape({
     methods: PropTypes.shape({
       getVoteCounter: PropTypes.func.isRequired
@@ -289,6 +285,10 @@ RequestEvidences.propTypes = {
       blockNumber: PropTypes.number
     })
   }).isRequired
+}
+
+RequestEvidences.defaultProps = {
+  tcrData: null
 }
 
 export default connect(state => ({

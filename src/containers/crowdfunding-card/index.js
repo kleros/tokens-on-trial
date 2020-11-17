@@ -204,7 +204,7 @@ const CrowdfundingCard = ({
 CrowdfundingCard.propTypes = {
   item: itemShape.isRequired,
   userAccount: PropTypes.string.isRequired,
-  tcrData: tcrShape.isRequired,
+  tcrData: tcrShape,
   badgeContractAddr: PropTypes.string,
 
   fundAppeal: PropTypes.func.isRequired,
@@ -212,7 +212,8 @@ CrowdfundingCard.propTypes = {
 }
 
 CrowdfundingCard.defaultProps = {
-  badgeContractAddr: null
+  badgeContractAddr: null,
+  tcrData: null
 }
 
 export default CrowdfundingCard

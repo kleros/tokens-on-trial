@@ -32,8 +32,9 @@ const TokenDetailsCard = ({
   handleActionClick,
   handleExecuteRequestClick,
   fundAppeal,
-  badges
+  badges: badgesRes
 }) => {
+  const badges = badgesRes.data
   const {
     decisiveRuling,
     loserHasPaid,
@@ -175,13 +176,17 @@ TokenDetailsCard.propTypes = {
   token: tokenSelectors._tokenShape.isRequired,
   FILE_BASE_URL: PropTypes.string.isRequired,
   userAccount: PropTypes.string.isRequired,
-  arbitrableTokenListData: tcrShape.isRequired,
+  arbitrableTokenListData: tcrShape,
   handleActionClick: PropTypes.func.isRequired,
   handleExecuteRequestClick: PropTypes.func.isRequired,
   fundAppeal: PropTypes.func.isRequired,
   badges: badgesShape.isRequired
 }
 
+TokenDetailsCard.defaultProps = {
+  arbitrableTokenListData: null
+}
+
 export default connect(state => ({
-  badges: state.badges.data
+  badges: state.badges
 }))(TokenDetailsCard)

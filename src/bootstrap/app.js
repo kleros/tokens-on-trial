@@ -21,7 +21,7 @@ import * as modalActions from '../actions/modal'
 import * as walletSelectors from '../reducers/wallet'
 import * as notificationSelectors from '../reducers/notification'
 import * as notificationActions from '../actions/notification'
-import { arbitrableAddressListDataShape } from '../reducers/arbitrable-address-list'
+import { _arbitrableAddressListDataShape } from '../reducers/arbitrable-address-list'
 import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
@@ -49,7 +49,9 @@ class _ConnectedNavBar extends Component {
     // Redux State
     accounts: walletSelectors.accountsShape.isRequired,
     notifications: notificationSelectors.notificationsShape.isRequired,
-    arbitrableAddressListData: arbitrableAddressListDataShape,
+    arbitrableAddressListData: PropTypes.objectOf(
+      _arbitrableAddressListDataShape
+    ),
 
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,

@@ -87,17 +87,22 @@ ItemActionButton.propTypes = {
   userAccount: PropTypes.string.isRequired,
   fundAppeal: PropTypes.func.isRequired,
   handleActionClick: PropTypes.func.isRequired,
-  handleExecuteRequestClick: PropTypes.func.isRequired,
-  tcr: tcrShape.isRequired,
+  handleExecuteRequestClick: PropTypes.func,
+  tcr: tcrShape,
   appealPeriodEnded: PropTypes.bool.isRequired,
-  countdownCompleted: PropTypes.bool.isRequired,
-  loserTimedOut: PropTypes.bool.isRequired,
+  countdownCompleted: PropTypes.bool,
+  loserTimedOut: PropTypes.bool,
   extraClass: PropTypes.string,
-  badgeContractAddr: PropTypes.string.isRequired
+  badgeContractAddr: PropTypes.string
 }
 
 ItemActionButton.defaultProps = {
-  extraClass: ''
+  extraClass: '',
+  handleExecuteRequestClick: null,
+  tcr: null,
+  countdownCompleted: null,
+  loserTimedOut: null,
+  badgeContractAddr: null
 }
 
 export default ItemActionButton

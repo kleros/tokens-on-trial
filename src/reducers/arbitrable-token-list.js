@@ -3,29 +3,29 @@ import createReducer, { createResource } from 'lessdux'
 
 import * as tcrConstants from '../constants/tcr'
 
+const _arbitrableTokenListDataShape = PropTypes.shape({
+  arbitrator: PropTypes.string.isRequired,
+  requesterBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
+  challengerBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
+  challengePeriodDuration: PropTypes.number.isRequired,
+  arbitrationCost: PropTypes.shape({}).isRequired, // BigNumber
+  winnerStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+  loserStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+  sharedStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
+  countByStatus: PropTypes.shape(
+    tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
+      acc[value] = PropTypes.number.isRequired
+      return acc
+    }, {})
+  ).isRequired
+})
+
 // Shapes
 const {
   shape: arbitrableTokenListDataShape,
   initialState: arbitrableTokenListDataInitialState
-} = createResource(
-  PropTypes.shape({
-    arbitrator: PropTypes.string.isRequired,
-    requesterBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
-    challengerBaseDeposit: PropTypes.shape({}).isRequired, // BigNumber
-    challengePeriodDuration: PropTypes.number.isRequired,
-    arbitrationCost: PropTypes.shape({}).isRequired, // BigNumber
-    winnerStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-    loserStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-    sharedStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-    countByStatus: PropTypes.shape(
-      tcrConstants.IN_CONTRACT_STATUS_ENUM.values.reduce((acc, value) => {
-        acc[value] = PropTypes.number.isRequired
-        return acc
-      }, {})
-    ).isRequired
-  })
-)
-export { arbitrableTokenListDataShape }
+} = createResource(_arbitrableTokenListDataShape)
+export { arbitrableTokenListDataShape, _arbitrableTokenListDataShape }
 
 // Reducer
 export default createReducer({

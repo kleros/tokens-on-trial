@@ -86,7 +86,7 @@ export function* fetchToken({ payload: { ID } }) {
       appealPeriod: token.latestRequest.appealPeriod,
       appealed:
         token.latestRequest.hasPaid[1] && token.latestRequest.hasPaid[2],
-      paidFees: token.latestRequest.paidFees,
+      paidFees: token.latestRequest.paidFees.map(pf => web3Utils.toBN(pf)),
       requiredForSide: token.latestRequest.requiredForSide,
       hasPaid: token.latestRequest.hasPaid
     }
