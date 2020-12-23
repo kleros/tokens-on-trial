@@ -36,6 +36,9 @@ export const instantiateEnvObjects = async () => {
   const FILE_BASE_URL = process.env[`REACT_APP_${env}_FILE_BASE_URL`]
   const T2CR_BLOCK = process.env[`REACT_APP_${env}_T2CR_BLOCK`]
   const ARBITRATOR_BLOCK = process.env[`REACT_APP_${env}_ARBITRATOR_BLOCK`]
+  const PATCH_USER_SETTINGS_URL =
+    process.env[`REACT_APP_${env}_PATCH_USER_SETTINGS_URL`]
+  const T2CR_SUBGRAPH_URL = process.env[`REACT_APP_${env}_T2CR_SUBGRAPH_URL`]
   const archon = new Archon(HTTP_PROVIDER, 'https://ipfs.kleros.io')
 
   const httpProvider = new Web3.providers.HttpProvider(HTTP_PROVIDER)
@@ -145,7 +148,9 @@ export const instantiateEnvObjects = async () => {
     networkID,
     badgeTCRs: badgeTCRs[networkID],
     latestBlock,
-    arbitrableTCRView
+    arbitrableTCRView,
+    PATCH_USER_SETTINGS_URL,
+    T2CR_SUBGRAPH_URL
   }
 }
 

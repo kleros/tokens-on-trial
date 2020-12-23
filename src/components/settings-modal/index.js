@@ -50,7 +50,7 @@ class SettingsModal extends PureComponent {
 
   handleUpdateSettingsClick = async ({ fullName, email, ...rest }) => {
     const { accounts } = this.props
-    const { web3 } = await instantiateEnvObjects()
+    const { web3, PATCH_USER_SETTINGS_URL } = await instantiateEnvObjects()
     const settings = {
       fullName: { S: fullName },
       email: { S: email },
@@ -65,7 +65,7 @@ class SettingsModal extends PureComponent {
     }
 
     try {
-      await fetch(process.env.REACT_APP_DEV_PATCH_USER_SETTINGS_URL, {
+      await fetch(PATCH_USER_SETTINGS_URL, {
         body: JSON.stringify({
           payload: {
             address: accounts.data[0],
