@@ -73,7 +73,7 @@ export function* fetchToken({ payload: { ID } }) {
                 feeRewards
                 hasPaidChallenger
                 hasPaidRequester
-                appealed
+                appealTime
                 amountPaidChallenger
                 amountPaidRequester
                 id
