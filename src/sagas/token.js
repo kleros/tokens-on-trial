@@ -25,10 +25,11 @@ const statusToCode = {
   RegistrationRequested: '2',
   ClearingRequested: '3'
 }
-const rulingToCode = {
-  None: '0',
-  Accept: '1',
-  Reject: '2'
+const resultToCode = {
+  Reverted: '0',
+  Accepted: '1',
+  Rejected: '2',
+  Pending: '3'
 }
 
 /**
@@ -67,7 +68,6 @@ export function* fetchToken({ payload: { ID } }) {
               numberOfRounds
               disputed
               disputeID
-              disputeOutcome
               challenger
               rounds {
                 feeRewards
@@ -84,22 +84,18 @@ export function* fetchToken({ payload: { ID } }) {
       `
     })
   })
-  let tokenFromSubgraph = (yield tokenResponse.json()).data.token
+  let token = (yield tokenResponse.json()).data.token
 
-  tokenFromSubgraph.status = statusToCode[tokenFromSubgraph.status]
-  tokenFromSubgraph.address = web3Utils.toChecksumAddress(
-    tokenFromSubgraph.address
-  )
-  tokenFromSubgraph.addr = web3Utils.toChecksumAddress(
-    tokenFromSubgraph.address
-  )
-  tokenFromSubgraph.requests = tokenFromSubgraph.requests.map((req, i) => ({
+  token.status = statusToCode[token.status]
+  token.address = web3Utils.toChecksumAddress(token.address)
+  token.addr = web3Utils.toChecksumAddress(token.address)
+  token.requests = token.requests.map((req, i) => ({
     ...req,
     arbitrator: web3Utils.toChecksumAddress(req.arbitrator),
     requester: web3Utils.toChecksumAddress(req.requester),
     challenger: web3Utils.toChecksumAddress(req.challenger),
     resolved: req.resolutionTime !== '0',
-    ruling: rulingToCode[req.disputeOutcome],
+    ruling: resultToCode[req.result],
     evidenceGroupID: web3Utils.toBN(web3Utils.soliditySha3(ID, i)).toString(),
     rounds: req.rounds.map(round => ({
       ...round,
@@ -111,130 +107,113 @@ export function* fetchToken({ payload: { ID } }) {
       ]
     }))
   }))
-  tokenFromSubgraph.latestRequest =
-    tokenFromSubgraph.requests[tokenFromSubgraph.requests.length - 1]
-  tokenFromSubgraph.latestRound =
-    tokenFromSubgraph.latestRequest.rounds[
-      tokenFromSubgraph.latestRequest.rounds.length - 1
-    ]
-  tokenFromSubgraph.withdrawable = web3Utils.toBN(0)
-  tokenFromSubgraph.submissionTime = tokenFromSubgraph.submissionTime * 1000
-  tokenFromSubgraph.feeRewards = tokenFromSubgraph.latestRound.feeRewards
+  token.latestRequest = token.requests[token.requests.length - 1]
+  token.latestRound =
+    token.latestRequest.rounds[token.latestRequest.rounds.length - 1]
+  token.withdrawable = web3Utils.toBN(0)
+  token.submissionTime = token.submissionTime * 1000
+  token.feeRewards = token.latestRound.feeRewards
 
   const account = yield select(walletSelectors.getAccount)
   if (account) {
     // Calculate amount withdrawable
     let i
-    if (tokenFromSubgraph.latestRequest.resolved)
-      i = tokenFromSubgraph.numberOfRequests - 1
+    if (token.latestRequest.resolved) i = token.numberOfRequests - 1
     // Start from the last round.
-    else if (tokenFromSubgraph.numberOfRequests > 1)
-      i = tokenFromSubgraph.numberOfRequests - 2 // Start from the penultimate round.
+    else if (token.numberOfRequests > 1) i = token.numberOfRequests - 2 // Start from the penultimate round.
 
     while (i >= 0) {
       const amount = yield call(
         arbitrableTokenListView.methods.amountWithdrawable(ID, account, i).call
       )
-      tokenFromSubgraph.withdrawable = tokenFromSubgraph.withdrawable.add(
-        web3Utils.toBN(amount)
-      )
+      token.withdrawable = token.withdrawable.add(web3Utils.toBN(amount))
       i--
     }
   }
 
-  tokenFromSubgraph.latestRequest = {
-    ...tokenFromSubgraph.latestRequest,
+  token.latestRequest = {
+    ...token.latestRequest,
     ...(yield call(
       arbitrableTCRView.methods.getRequestDetails(
         arbitrableTokenListView.options.address,
         ID,
-        Number(tokenFromSubgraph.numberOfRequests) - 1
+        Number(token.numberOfRequests) - 1
       ).call
     ))
   }
-  tokenFromSubgraph.latestRequest = {
-    ...tokenFromSubgraph.latestRequest,
-    arbitratorExtraData:
-      tokenFromSubgraph.latestRequest.arbitratorExtraData || '0x', // Workaround web3js bug. Web3js returns null if extra data is '0x'
-    submissionTime: Number(tokenFromSubgraph.latestRequest.submissionTime),
-    appealCost: String(tokenFromSubgraph.latestRequest.appealCost),
-    appealPeriod: tokenFromSubgraph.latestRequest.appealPeriod[0] !== '0' &&
-      tokenFromSubgraph.latestRequest.appealPeriod[1] !== '0' && {
-        0: tokenFromSubgraph.latestRequest.appealPeriod[0],
-        1: tokenFromSubgraph.latestRequest.appealPeriod[1],
-        start: tokenFromSubgraph.latestRequest.appealPeriod[0],
-        end: tokenFromSubgraph.latestRequest.appealPeriod[1]
+  token.latestRequest = {
+    ...token.latestRequest,
+    arbitratorExtraData: token.latestRequest.arbitratorExtraData || '0x', // Workaround web3js bug. Web3js returns null if extra data is '0x'
+    submissionTime: Number(token.latestRequest.submissionTime),
+    appealCost: String(token.latestRequest.appealCost),
+    appealPeriod: token.latestRequest.appealPeriod[0] !== '0' &&
+      token.latestRequest.appealPeriod[1] !== '0' && {
+        0: token.latestRequest.appealPeriod[0],
+        1: token.latestRequest.appealPeriod[1],
+        start: token.latestRequest.appealPeriod[0],
+        end: token.latestRequest.appealPeriod[1]
       },
     requiredForSide: [
       toBN(0),
-      toBN(tokenFromSubgraph.latestRequest.requiredForSide[1]),
-      toBN(tokenFromSubgraph.latestRequest.requiredForSide[2])
+      toBN(token.latestRequest.requiredForSide[1]),
+      toBN(token.latestRequest.requiredForSide[2])
     ]
   }
 
-  if (Number(tokenFromSubgraph.numberOfRequests > 0)) {
-    tokenFromSubgraph.latestRequest.latestRound = {
-      appealCost: tokenFromSubgraph.latestRequest.appealCost,
-      appealPeriod: tokenFromSubgraph.latestRequest.appealPeriod,
+  if (Number(token.numberOfRequests > 0)) {
+    token.latestRequest.latestRound = {
+      appealCost: token.latestRequest.appealCost,
+      appealPeriod: token.latestRequest.appealPeriod,
       appealed:
-        tokenFromSubgraph.latestRequest.hasPaid[1] &&
-        tokenFromSubgraph.latestRequest.hasPaid[2],
-      paidFees: tokenFromSubgraph.latestRequest.paidFees.map(pf =>
-        web3Utils.toBN(pf)
-      ),
-      requiredForSide: tokenFromSubgraph.latestRequest.requiredForSide,
-      hasPaid: tokenFromSubgraph.latestRequest.hasPaid
+        token.latestRequest.hasPaid[1] && token.latestRequest.hasPaid[2],
+      paidFees: token.latestRequest.paidFees.map(pf => web3Utils.toBN(pf)),
+      requiredForSide: token.latestRequest.requiredForSide,
+      hasPaid: token.latestRequest.hasPaid
     }
 
-    if (tokenFromSubgraph.latestRequest.disputed) {
+    if (token.latestRequest.disputed) {
       // Fetch dispute data.
-      arbitratorView.options.address =
-        tokenFromSubgraph.latestRequest.arbitrator
+      arbitratorView.options.address = token.latestRequest.arbitrator
       try {
-        tokenFromSubgraph.latestRequest.dispute = yield call(
-          arbitratorView.methods.disputes(
-            tokenFromSubgraph.latestRequest.disputeID
-          ).call
+        token.latestRequest.dispute = yield call(
+          arbitratorView.methods.disputes(token.latestRequest.disputeID).call
         )
-        tokenFromSubgraph.latestRequest.dispute.court = yield call(
+        token.latestRequest.dispute.court = yield call(
           arbitratorView.methods.getSubcourt(
-            tokenFromSubgraph.latestRequest.dispute.subcourtID
+            token.latestRequest.dispute.subcourtID
           ).call
         )
       } catch (err) {
         // Arbitrator does not implement getSubcourt (i.e. its probably not Kleros).
         console.warn(`Arbitrator is not kleros, cannot get court info`, err)
         // No op, just ignore the field.
-        tokenFromSubgraph.latestRequest.dispute = {}
+        token.latestRequest.dispute = {}
       }
 
-      tokenFromSubgraph.latestRequest.dispute.status =
-        tokenFromSubgraph.latestRequest.disputeStatus
-      tokenFromSubgraph.latestRequest.dispute.currentRuling =
-        tokenFromSubgraph.latestRequest.currentRuling
-      tokenFromSubgraph.latestRequest.dispute.ruling =
-        tokenFromSubgraph.latestRequest.dispute.currentRuling
-      tokenFromSubgraph.latestRequest.appealDisputeID =
-        tokenFromSubgraph.latestRequest.disputeID
-      tokenFromSubgraph.latestRequest.dispute.appealStatus =
-        tokenFromSubgraph.latestRequest.dispute.status
-      tokenFromSubgraph.latestRequest.latestRound.appealCost = toBN(
-        tokenFromSubgraph.latestRequest.appealCost
+      token.latestRequest.dispute.status = token.latestRequest.disputeStatus
+      token.latestRequest.dispute.currentRuling =
+        token.latestRequest.currentRuling
+      token.latestRequest.dispute.ruling =
+        token.latestRequest.dispute.currentRuling
+      token.latestRequest.appealDisputeID = token.latestRequest.disputeID
+      token.latestRequest.dispute.appealStatus =
+        token.latestRequest.dispute.status
+      token.latestRequest.latestRound.appealCost = toBN(
+        token.latestRequest.appealCost
       )
-      tokenFromSubgraph.latestRequest.latestRound.requiredForSide =
-        tokenFromSubgraph.latestRequest.requiredForSide
-      tokenFromSubgraph.latestRequest.latestRound.appealPeriod =
-        tokenFromSubgraph.latestRequest.appealPeriod
+      token.latestRequest.latestRound.requiredForSide =
+        token.latestRequest.requiredForSide
+      token.latestRequest.latestRound.appealPeriod =
+        token.latestRequest.appealPeriod
     }
 
-    tokenFromSubgraph.latestRequest.latestRound.ruled =
-      tokenFromSubgraph.latestRequest.dispute &&
-      tokenFromSubgraph.latestRequest.dispute.status ===
-        tcrConstants.DISPUTE_STATUS.Solved
+    token.latestRequest.latestRound.ruled =
+      token.latestRequest.dispute &&
+      token.latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Solved
 
-    tokenFromSubgraph = convertFromString(tokenFromSubgraph)
+    token = convertFromString(token)
   } else
-    tokenFromSubgraph = {
+    token = {
       status: 0,
       latestRequest: {
         disputed: false,
@@ -255,12 +234,12 @@ export function* fetchToken({ payload: { ID } }) {
     }
 
   return {
-    ...tokenFromSubgraph,
+    ...token,
     ID,
-    status: Number(tokenFromSubgraph.status),
+    status: Number(token.status),
     clientStatus: contractStatusToClientStatus(
-      tokenFromSubgraph.status,
-      tokenFromSubgraph.latestRequest.disputed
+      token.status,
+      token.latestRequest.disputed
     )
   }
 }
