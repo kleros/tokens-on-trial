@@ -84,7 +84,29 @@ export function* fetchToken({ payload: { ID } }) {
       `
     })
   })
-  let token = (yield tokenResponse.json()).data.token
+  const { data } = yield tokenResponse.json() || {}
+  let { token } = data || {}
+
+  if (!token)
+    return {
+      status: 0,
+      latestRequest: {
+        disputed: false,
+        disputeID: 0,
+        dispute: null,
+        submissionTime: 0,
+        feeRewards: 0,
+        pot: [],
+        resolved: false,
+        parties: [],
+        latestRound: {
+          appealed: false,
+          paidFees: new Array(3).fill(web3Utils.toBN(0)),
+          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
+        }
+      },
+      numberOfRequests: 0
+    }
 
   token.status = statusToCode[token.status]
   token.address = web3Utils.toChecksumAddress(token.address)
@@ -160,78 +182,56 @@ export function* fetchToken({ payload: { ID } }) {
     ]
   }
 
-  if (Number(token.numberOfRequests > 0)) {
-    token.latestRequest.latestRound = {
-      appealCost: token.latestRequest.appealCost,
-      appealPeriod: token.latestRequest.appealPeriod,
-      appealed:
-        token.latestRequest.hasPaid[1] && token.latestRequest.hasPaid[2],
-      paidFees: token.latestRequest.paidFees.map(pf => web3Utils.toBN(pf)),
-      requiredForSide: token.latestRequest.requiredForSide,
-      hasPaid: token.latestRequest.hasPaid
-    }
+  token.latestRequest.latestRound = {
+    appealCost: token.latestRequest.appealCost,
+    appealPeriod: token.latestRequest.appealPeriod,
+    appealed: token.latestRequest.hasPaid[1] && token.latestRequest.hasPaid[2],
+    paidFees: token.latestRequest.paidFees.map(pf => web3Utils.toBN(pf)),
+    requiredForSide: token.latestRequest.requiredForSide,
+    hasPaid: token.latestRequest.hasPaid
+  }
 
-    if (token.latestRequest.disputed) {
-      // Fetch dispute data.
-      arbitratorView.options.address = token.latestRequest.arbitrator
-      try {
-        token.latestRequest.dispute = yield call(
-          arbitratorView.methods.disputes(token.latestRequest.disputeID).call
-        )
-        token.latestRequest.dispute.court = yield call(
-          arbitratorView.methods.getSubcourt(
-            token.latestRequest.dispute.subcourtID
-          ).call
-        )
-      } catch (err) {
-        // Arbitrator does not implement getSubcourt (i.e. its probably not Kleros).
-        console.warn(`Arbitrator is not kleros, cannot get court info`, err)
-        // No op, just ignore the field.
-        token.latestRequest.dispute = {}
-      }
-
-      token.latestRequest.dispute.status = token.latestRequest.disputeStatus
-      token.latestRequest.dispute.currentRuling =
-        token.latestRequest.currentRuling
-      token.latestRequest.dispute.ruling =
-        token.latestRequest.dispute.currentRuling
-      token.latestRequest.appealDisputeID = token.latestRequest.disputeID
-      token.latestRequest.dispute.appealStatus =
-        token.latestRequest.dispute.status
-      token.latestRequest.latestRound.appealCost = toBN(
-        token.latestRequest.appealCost
+  if (token.latestRequest.disputed) {
+    // Fetch dispute data.
+    arbitratorView.options.address = token.latestRequest.arbitrator
+    try {
+      token.latestRequest.dispute = yield call(
+        arbitratorView.methods.disputes(token.latestRequest.disputeID).call
       )
-      token.latestRequest.latestRound.requiredForSide =
-        token.latestRequest.requiredForSide
-      token.latestRequest.latestRound.appealPeriod =
-        token.latestRequest.appealPeriod
+      token.latestRequest.dispute.court = yield call(
+        arbitratorView.methods.getSubcourt(
+          token.latestRequest.dispute.subcourtID
+        ).call
+      )
+    } catch (err) {
+      // Arbitrator does not implement getSubcourt (i.e. its probably not Kleros).
+      console.warn(`Arbitrator is not kleros, cannot get court info`, err)
+      // No op, just ignore the field.
+      token.latestRequest.dispute = {}
     }
 
-    token.latestRequest.latestRound.ruled =
-      token.latestRequest.dispute &&
-      token.latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Solved
+    token.latestRequest.dispute.status = token.latestRequest.disputeStatus
+    token.latestRequest.dispute.currentRuling =
+      token.latestRequest.currentRuling
+    token.latestRequest.dispute.ruling =
+      token.latestRequest.dispute.currentRuling
+    token.latestRequest.appealDisputeID = token.latestRequest.disputeID
+    token.latestRequest.dispute.appealStatus =
+      token.latestRequest.dispute.status
+    token.latestRequest.latestRound.appealCost = toBN(
+      token.latestRequest.appealCost
+    )
+    token.latestRequest.latestRound.requiredForSide =
+      token.latestRequest.requiredForSide
+    token.latestRequest.latestRound.appealPeriod =
+      token.latestRequest.appealPeriod
+  }
 
-    token = convertFromString(token)
-  } else
-    token = {
-      status: 0,
-      latestRequest: {
-        disputed: false,
-        disputeID: 0,
-        dispute: null,
-        submissionTime: 0,
-        feeRewards: 0,
-        pot: [],
-        resolved: false,
-        parties: [],
-        latestRound: {
-          appealed: false,
-          paidFees: new Array(3).fill(web3Utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
-        }
-      },
-      numberOfRequests: 0
-    }
+  token.latestRequest.latestRound.ruled =
+    token.latestRequest.dispute &&
+    token.latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Solved
+
+  token = convertFromString(token)
 
   return {
     ...token,

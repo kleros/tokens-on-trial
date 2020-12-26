@@ -55,7 +55,7 @@ function* fetchTokens() {
         arbitrableTokenListView,
         0,
         viewWeb3,
-        100000
+        50000
       ),
       call(fetchAppealableTokens, arbitrableTokenListView, arbitrableTCRView)
     ])
@@ -230,6 +230,7 @@ function* fetchTokens() {
       `${arbitrableTokenListView.options.address}tokens@${APP_VERSION}`,
       cachedTokens
     )
+    console.info('Done fetching tokens.')
   } catch (err) {
     if (
       err.message ===
@@ -237,6 +238,9 @@ function* fetchTokens() {
     ) {
       // Infura just refused our request. try again.
       console.warn('Infura refused the request. Attempting fetch again.')
+      yield put(tokensActions.fetchTokens())
+    } else if (err.message === `execution aborted (timeout = 5s)`) {
+      console.warn('Infura timed out. Attempting fetch again.')
       yield put(tokensActions.fetchTokens())
     } else {
       console.error('Error fetching tokens ', err)
