@@ -3,7 +3,7 @@
   command = "yarn build"
 
 [build.environment]
-  NODE_VERSION='9.10.0'
+  NODE_VERSION='11.15.0'
   YARN_FLAGS='--pure-lockfile'
   REACT_APP_DEV_NETWORK="kovan"
   REACT_APP_DEV_ARBITRABLE_TOKEN_LIST_ADDRESS="0x25dd2659a1430cdbd678615c7409164ae486c146"
