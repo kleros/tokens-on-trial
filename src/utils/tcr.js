@@ -222,14 +222,9 @@ export const convertFromString = item => {
     latestRequest.dispute.ruling = Number(latestRequest.dispute.ruling)
     latestRequest.dispute.status = Number(latestRequest.dispute.status)
     latestRequest.dispute.period = Number(latestRequest.dispute.period)
-    latestRequest.dispute.court.timesPerPeriod[0] =
-      Number(latestRequest.dispute.court.timesPerPeriod[0]) * 1000
-    latestRequest.dispute.court.timesPerPeriod[1] =
-      Number(latestRequest.dispute.court.timesPerPeriod[1]) * 1000
-    latestRequest.dispute.court.timesPerPeriod[2] =
-      Number(latestRequest.dispute.court.timesPerPeriod[2]) * 1000
-    latestRequest.dispute.court.timesPerPeriod[3] =
-      Number(latestRequest.dispute.court.timesPerPeriod[3]) * 1000
+    latestRequest.dispute.court.timesPerPeriod =
+      latestRequest.dispute.court.timesPerPeriod.map(t => t * 1000)
+
     latestRequest.dispute.lastPeriodChange =
       Number(latestRequest.dispute.lastPeriodChange) * 1000
   }
@@ -240,12 +235,8 @@ export const convertFromString = item => {
     latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Appealable &&
     !latestRequest.latestRound.appealed
   ) {
-    latestRound.appealPeriod[0] = Number(latestRound.appealPeriod[0]) * 1000
-    latestRound.appealPeriod[1] = Number(latestRound.appealPeriod[1]) * 1000
-
-    latestRound.paidFees[0] = toBN(latestRound.paidFees[0])
-    latestRound.paidFees[1] = toBN(latestRound.paidFees[1])
-    latestRound.paidFees[2] = toBN(latestRound.paidFees[2])
+    latestRound.appealPeriod = latestRound.appealPeriod.map(aP => aP * 1000)
+    latestRound.paidFees = latestRound.paidFees.map(pF => toBN(pF))
   }
 
   item.latestRound = latestRound
