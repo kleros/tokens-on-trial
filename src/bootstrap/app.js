@@ -148,8 +148,13 @@ class _ConnectedNavBar extends Component {
         extraStyle: 'NavBar-route-title',
         routes: [
           {
-            title: 'uniswap.ninja',
-            to: 'https://uniswap.ninja/',
+            title: 'uniswap.exchange',
+            to: 'https://uniswap.exchange/',
+            extraStyle: 'NavBar-route-title'
+          },
+          {
+            title: 'revoke.cash',
+            to: 'https://revoke.cash/',
             extraStyle: 'NavBar-route-title'
           },
           {
