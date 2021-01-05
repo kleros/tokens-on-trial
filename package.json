@@ -33,6 +33,7 @@
     "extends": "react-app"
   },
   "devDependencies": {
+    "@babel/helper-regex": "^7.10.5",
     "ganache-cli": "^6.1.0",
     "husky": "^1.3.1",
     "node-sass-chokidar": "^1.2.2",
