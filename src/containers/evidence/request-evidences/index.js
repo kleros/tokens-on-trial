@@ -136,6 +136,7 @@ const RequestEvidences = ({
           ? 'Token Removal'
           : 'Badge Removal'}
       </h4>
+      <small style={{ margin: '12px' }}>{new Date(requestInfo.submissionTime).toUTCString()}</small>
       <div className="RequestEvidence-evidence--list">
         {Object.keys(timelineItems).length === 0 && (
           <>
@@ -237,6 +238,7 @@ const RequestEvidences = ({
                 isToken
               })}
             </h4>
+            <small style={{ margin: '12px' }}>{new Date(requestInfo.resolutionTime).toUTCString()}</small>
           </>
         )}
       </div>

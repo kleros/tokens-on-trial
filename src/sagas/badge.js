@@ -267,6 +267,7 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
           disputeID: 0,
           dispute: null,
           submissionTime: 0,
+          resolutionTime: 0,
           feeRewards: 0,
           pot: [],
           resolved: false,

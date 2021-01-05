@@ -95,6 +95,7 @@ export function* fetchToken({ payload: { ID } }) {
         disputeID: 0,
         dispute: null,
         submissionTime: 0,
+        resolutionTime: 0,
         feeRewards: 0,
         pot: [],
         resolved: false,
@@ -133,7 +134,6 @@ export function* fetchToken({ payload: { ID } }) {
   token.latestRound =
     token.latestRequest.rounds[token.latestRequest.rounds.length - 1]
   token.withdrawable = web3Utils.toBN(0)
-  token.submissionTime = token.submissionTime * 1000
   token.feeRewards = token.latestRound.feeRewards
 
   const account = yield select(walletSelectors.getAccount)
@@ -167,6 +167,7 @@ export function* fetchToken({ payload: { ID } }) {
     ...token.latestRequest,
     arbitratorExtraData: token.latestRequest.arbitratorExtraData || '0x', // Workaround web3js bug. Web3js returns null if extra data is '0x'
     submissionTime: Number(token.latestRequest.submissionTime),
+    resolutionTime: Number(token.latestRequest.resolutionTime),
     appealCost: String(token.latestRequest.appealCost),
     appealPeriod: token.latestRequest.appealPeriod[0] !== '0' &&
       token.latestRequest.appealPeriod[1] !== '0' && {

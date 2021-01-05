@@ -97,6 +97,7 @@ class EvidenceSection extends Component {
         ruling: request.ruling,
         resolved: request.resolved,
         submissionTime: request.submissionTime,
+        resolutionTime: request.resolutionTime,
         disputed: request.disputed
       }
     })

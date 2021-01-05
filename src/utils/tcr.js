@@ -213,6 +213,7 @@ export const convertFromString = item => {
 
   item.requests = item.requests.map(request => ({
     ...request,
+    resolutionTime: Number(request.resolutionTime) * 1000,
     submissionTime: Number(request.submissionTime) * 1000,
     ruling: Number(request.ruling)
   }))
