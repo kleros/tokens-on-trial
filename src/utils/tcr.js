@@ -236,7 +236,10 @@ export const convertFromString = item => {
     latestRequest.dispute.status === tcrConstants.DISPUTE_STATUS.Appealable &&
     !latestRequest.latestRound.appealed
   ) {
-    latestRound.appealPeriod = latestRound.appealPeriod.map(aP => aP * 1000)
+    latestRound.appealPeriod = [
+      latestRound.appealPeriod.start,
+      latestRound.appealPeriod.end,
+    ].map(aP => aP * 1000)
     latestRound.paidFees = latestRound.paidFees.map(pF => toBN(pF))
   }
 
