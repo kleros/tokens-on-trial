@@ -15,7 +15,6 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "yarn run lint:scss && yarn run lint:js",
     "test": "echo \"\"",
     "start:scss": "yarn run build:scss && yarn run build:scss --watch",
     "start:js": "react-scripts start",

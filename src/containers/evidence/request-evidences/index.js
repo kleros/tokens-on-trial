@@ -75,9 +75,10 @@ const RequestEvidences = ({
             tcrData.disputeEvents[evidenceGroupID].txHash
           ] = {
             ...tcrData.disputeEvents[evidenceGroupID],
-            message: 'Dispute Created',
-            arbitratorEvent: true
-          }
+            message: `Dispute Created`,
+            arbitratorEvent: true,
+            disputeID,
+          };
 
           // Fetch rulings by the arbitrator.
           if (arbitratorData.appealDecisionEvents.events[disputeID]) {
@@ -163,7 +164,7 @@ const RequestEvidences = ({
                   <div
                     style={{ height: '20px', borderLeft: '1px solid #ccc' }}
                   />
-                  <h4 className="RequestEvidence-title">{evidence.message}</h4>
+                  <h4 className="RequestEvidence-title">{evidence.message}{evidence.disputeID && (<>: #<a style={{ color: 'rgb(74, 74, 74)' }}alt="link-to-court-case" href={`https://court.kleros.io/cases/${evidence.disputeID}`}>{evidence.disputeID}</a></>)}</h4>
                 </div>
               ) : (
                 <div
