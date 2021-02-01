@@ -1,13 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import * as tokenSelectors from '../../../../reducers/token'
 import { web3Utils } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
-
 import './resubmit.css'
 
 const Resubmit = ({ tcr, closeActionModal, resubmitToken, item }) => (
@@ -62,16 +60,16 @@ Resubmit.propTypes = {
   item: tokenSelectors.tokenShape,
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape,
   ]).isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  resubmitToken: PropTypes.func.isRequired
+  resubmitToken: PropTypes.func.isRequired,
 }
 
 Resubmit.defaultProps = {
-  item: null
+  item: null,
 }
 
 export default Resubmit

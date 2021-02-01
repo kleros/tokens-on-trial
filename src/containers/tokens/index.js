@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { BeatLoader } from 'react-spinners'
-
 import TokenCard from '../../components/token-card'
 import FilterBar from '../filter-bar'
 import Paging from '../../components/paging'
@@ -13,7 +12,6 @@ import * as filterActions from '../../actions/filter'
 import * as tokensActions from '../../actions/tokens'
 import { ContractsContext } from '../../bootstrap/contexts'
 import { envObjectsShape } from '../../reducers/generic-shapes'
-
 import './tokens.css'
 
 const ITEMS_PER_PAGE = 48
@@ -22,7 +20,7 @@ class Tokens extends Component {
   static propTypes = {
     // Navigation
     history: PropTypes.shape({
-      push: PropTypes.func.isRequired
+      push: PropTypes.func.isRequired,
     }).isRequired,
 
     // Redux State
@@ -33,7 +31,7 @@ class Tokens extends Component {
 
     // Dispatchers
     toggleFilter: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired,
   }
 
   componentDidMount() {
@@ -45,7 +43,7 @@ class Tokens extends Component {
 
   state = { currentPage: 0 }
 
-  handleFilterChange = key => {
+  handleFilterChange = (key) => {
     const { toggleFilter } = this.props
     const { arbitrableTokenListView } = this.context
     toggleFilter(key, arbitrableTokenListView)
@@ -65,7 +63,7 @@ class Tokens extends Component {
     this.setState({ currentPage: currentPage + 1 })
   }
 
-  handleLastPageClicked = lastPage => {
+  handleLastPageClicked = (lastPage) => {
     this.setState({ currentPage: lastPage })
   }
 
@@ -76,11 +74,11 @@ class Tokens extends Component {
     const userAccount = accounts[0]
     const { filters } = filter
     let filteredTokens = []
-    Object.keys(tokensData.items).forEach(tokenID => {
+    for (const tokenID of Object.keys(tokensData.items))
       filteredTokens.push(tokensData.items[tokenID])
-    })
+
     filteredTokens = filteredTokens
-      .filter(token => {
+      .filter((token) => {
         if (userAccount === token.status.requester && filter['My Submissions'])
           return true
         if (userAccount === token.status.challenger && filter['My Challenges'])
@@ -99,7 +97,7 @@ class Tokens extends Component {
         return false
       })
       .filter(
-        token =>
+        (token) =>
           // These tokens have disputes (on the kovan testnet) with an AutoAppealableArbitrator
           // as the arbitrator, which is currently not supported by the UI.
           // Hide them from the list.
@@ -121,9 +119,9 @@ class Tokens extends Component {
       )
       .sort((a, b) => {
         const { oldestFirst } = filter
-        if (oldestFirst)
-          return a.status.statusBlockNumber - b.status.statusBlockNumber
-        else return b.status.statusBlockNumber - a.status.statusBlockNumber
+        return oldestFirst
+          ? a.status.statusBlockNumber - b.status.statusBlockNumber
+          : b.status.statusBlockNumber - a.status.statusBlockNumber
       })
       .sort((a, b) => {
         // Status of both items are within the same category
@@ -141,15 +139,13 @@ class Tokens extends Component {
         if (b.clientStatus > a.clientStatus) return 1
         return 0
       })
-      .sort((a, b) => {
+      .sort((a, b) =>
         // Display registered tokens before rejected ones.
-        if (
-          (a.clientStatus === 0 && b.clientStatus === 1) ||
-          (a.clientStatus === 1 && a.clientStatus === 1)
-        )
-          return b.clientStatus - a.clientStatus
-        else return 0
-      })
+        (a.clientStatus === 0 && b.clientStatus === 1) ||
+        (a.clientStatus === 1 && a.clientStatus === 1)
+          ? b.clientStatus - a.clientStatus
+          : 0
+      )
       .sort((a, b) => {
         // Show items crowdfunding state first.
         if (a.inAppealPeriod && !b.inAppealPeriod) return -1
@@ -183,7 +179,7 @@ class Tokens extends Component {
                 style={{
                   textAlign: 'center',
                   width: '100%',
-                  marginTop: '50px'
+                  marginTop: '50px',
                 }}
               >
                 No tokens found for the selected filters
@@ -191,7 +187,7 @@ class Tokens extends Component {
             ) : (
               <>
                 {displayedTokens.length > 0 || !tokens.loading ? (
-                  displayedTokens.map(token => (
+                  displayedTokens.map((token) => (
                     <TokenCard
                       token={token}
                       key={token.ID}
@@ -222,15 +218,15 @@ class Tokens extends Component {
 
 export default withRouter(
   connect(
-    state => ({
+    (state) => ({
       tokens: state.tokens,
       filter: state.filter,
       accounts: state.wallet.accounts.data,
-      envObjects: state.envObjects.data
+      envObjects: state.envObjects.data,
     }),
     {
       toggleFilter: filterActions.toggleFilter,
-      fetchTokens: tokensActions.fetchTokens
+      fetchTokens: tokensActions.fetchTokens,
     }
   )(Tokens)
 )

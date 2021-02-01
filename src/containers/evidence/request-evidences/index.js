@@ -2,20 +2,17 @@ import React, { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
-
 import * as tcrConstants from '../../../constants/tcr'
 import { rulingMessage } from '../../../utils/ui'
 import * as arbitrableTokenListSelectors from '../../../reducers/arbitrable-token-list'
-
 import EvidenceCard from './evidence-card'
-
 import './request-evidences.css'
 
 const getResultMessage = ({
   registrationRequest,
   disputed,
   ruling,
-  isToken
+  isToken,
 }) => {
   let message
   if (registrationRequest)
@@ -46,18 +43,10 @@ const RequestEvidences = ({
   itemID,
   tcrData,
   arbitratorData,
-  arbitratorView
+  arbitratorView,
 }) => {
-  if (!requestInfo || !requestInfo.requestSubmittedEvent || !tcrData)
-    return null
-
   const [showHistory, toggleShowHistory] = useState(false)
   const [timelineItems, setTimelineItems] = useState({})
-  const {
-    requestSubmittedEvent: {
-      returnValues: { _registrationRequest }
-    }
-  } = requestInfo
 
   useEffect(() => {
     const fetchArbitratorData = async () => {
@@ -78,7 +67,7 @@ const RequestEvidences = ({
             message: `Dispute Created`,
             arbitratorEvent: true,
             disputeID,
-          };
+          }
 
           // Fetch rulings by the arbitrator.
           if (arbitratorData.appealDecisionEvents.events[disputeID]) {
@@ -91,33 +80,41 @@ const RequestEvidences = ({
                     .blockNumber,
                 txHash,
                 arbitratorEvent: true,
-                message: (await arbitratorView.methods
-                  .getVoteCounter(disputeID, i)
-                  .call()).winningChoice
+                message: (
+                  await arbitratorView.methods
+                    .getVoteCounter(disputeID, i)
+                    .call()
+                ).winningChoice,
               }))
             )
 
-            winningChoices
-              .map(winningChoice => ({
-                ...winningChoice,
-                message: rulingMessage(
-                  Number(winningChoice.message) !==
-                    tcrConstants.RULING_OPTIONS.None,
-                  false,
-                  false,
-                  winningChoice.message.toString()
-                )
-              }))
-              .forEach(winningChoice => {
-                requestInfo.evidences[winningChoice.txHash] = winningChoice
-              })
+            for (const winningChoice of winningChoices.map((winningChoice) => ({
+              ...winningChoice,
+              message: rulingMessage(
+                Number(winningChoice.message) !==
+                  tcrConstants.RULING_OPTIONS.None,
+                false,
+                false,
+                winningChoice.message.toString()
+              ),
+            })))
+              requestInfo.evidences[winningChoice.txHash] = winningChoice
           }
         }
       }
       setTimelineItems(requestInfo.evidences)
     }
     fetchArbitratorData()
-  }, [])
+  }, [arbitratorData, arbitratorView, requestInfo, tcrData])
+
+  if (!requestInfo || !requestInfo.requestSubmittedEvent || !tcrData)
+    return null
+
+  const {
+    requestSubmittedEvent: {
+      returnValues: { _registrationRequest },
+    },
+  } = requestInfo
 
   // Detect if request is related to a token or a badge.
   const isToken = itemID.length === 66
@@ -137,7 +134,9 @@ const RequestEvidences = ({
           ? 'Token Removal'
           : 'Badge Removal'}
       </h4>
-      <small style={{ margin: '12px' }}>{new Date(requestInfo.submissionTime).toUTCString()}</small>
+      <small style={{ margin: '12px' }}>
+        {new Date(requestInfo.submissionTime).toUTCString()}
+      </small>
       <div className="RequestEvidence-evidence--list">
         {Object.keys(timelineItems).length === 0 && (
           <>
@@ -148,7 +147,7 @@ const RequestEvidences = ({
           </>
         )}
         {Object.keys(timelineItems)
-          .map(txHash => timelineItems[txHash])
+          .map((txHash) => timelineItems[txHash])
           .sort((a, b) => a.blockNumber - b.blockNumber)
           .filter((_, i) => showHistory || i <= 2)
           .map((evidence, j) => (
@@ -158,13 +157,27 @@ const RequestEvidences = ({
                   style={{
                     alignItems: 'center',
                     display: 'flex',
-                    flexDirection: 'column'
+                    flexDirection: 'column',
                   }}
                 >
                   <div
                     style={{ height: '20px', borderLeft: '1px solid #ccc' }}
                   />
-                  <h4 className="RequestEvidence-title">{evidence.message}{evidence.disputeID && (<>: #<a style={{ color: 'rgb(74, 74, 74)' }}alt="link-to-court-case" href={`https://court.kleros.io/cases/${evidence.disputeID}`}>{evidence.disputeID}</a></>)}</h4>
+                  <h4 className="RequestEvidence-title">
+                    {evidence.message}
+                    {evidence.disputeID && (
+                      <>
+                        : #
+                        <a
+                          style={{ color: 'rgb(74, 74, 74)' }}
+                          alt="link-to-court-case"
+                          href={`https://court.kleros.io/cases/${evidence.disputeID}`}
+                        >
+                          {evidence.disputeID}
+                        </a>
+                      </>
+                    )}
+                  </h4>
                 </div>
               ) : (
                 <div
@@ -172,7 +185,7 @@ const RequestEvidences = ({
                     width: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    alignItems: 'center'
+                    alignItems: 'center',
                   }}
                 >
                   <div
@@ -211,7 +224,7 @@ const RequestEvidences = ({
             <h5
               style={{
                 margin: '16px 0',
-                fontWeight: 400
+                fontWeight: 400,
               }}
             >
               <FontAwesomeIcon
@@ -236,10 +249,12 @@ const RequestEvidences = ({
                 ruling: requestInfo.ruling,
                 disputed: requestInfo.disputed,
                 registrationRequest: _registrationRequest,
-                isToken
+                isToken,
               })}
             </h4>
-            <small style={{ margin: '12px' }}>{new Date(requestInfo.resolutionTime).toUTCString()}</small>
+            <small style={{ margin: '12px' }}>
+              {new Date(requestInfo.resolutionTime).toUTCString()}
+            </small>
           </>
         )}
       </div>
@@ -264,12 +279,12 @@ RequestEvidences.propTypes = {
             fileTypeExtension: PropTypes.string.isRequired,
             fileURI: PropTypes.string.isRequired,
             title: PropTypes.string.isRequired,
-            position: PropTypes.number
-          })
+            position: PropTypes.number,
+          }),
         }).isRequired,
-        icon: PropTypes.string.isRequired
+        icon: PropTypes.string.isRequired,
       })
-    )
+    ),
   }).isRequired,
   requestNumber: PropTypes.number.isRequired,
   requester: PropTypes.string.isRequired,
@@ -279,25 +294,25 @@ RequestEvidences.propTypes = {
   tcrData: arbitrableTokenListSelectors._arbitrableTokenListDataShape,
   arbitratorView: PropTypes.shape({
     methods: PropTypes.shape({
-      getVoteCounter: PropTypes.func.isRequired
-    })
+      getVoteCounter: PropTypes.func.isRequired,
+    }),
   }).isRequired,
   arbitratorData: PropTypes.shape({
     appealDecisionEvents: PropTypes.shape({
       events: PropTypes.shape({}),
-      blockNumber: PropTypes.number
-    })
-  }).isRequired
+      blockNumber: PropTypes.number,
+    }),
+  }).isRequired,
 }
 
 RequestEvidences.defaultProps = {
-  tcrData: null
+  tcrData: null,
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   arbitrableAddressListData:
     state.arbitrableAddressList.arbitrableAddressListData.data,
   arbitrableTokenListData:
     state.arbitrableTokenList.arbitrableTokenListData.data,
-  arbitratorData: state.arbitrator.arbitratorData.data
+  arbitratorData: state.arbitrator.arbitratorData.data,
 }))(RequestEvidences)

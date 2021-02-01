@@ -4,19 +4,19 @@ export const FETCH_BADGES_FAILED = 'FETCH_BADGES_FAILED'
 export const LOAD_BADGES_STATE = 'LOAD_BADGES_STATE'
 
 export const fetchBadges = () => ({
-  type: FETCH_BADGES_CACHE
+  type: FETCH_BADGES_CACHE,
 })
 
 export const fetchBadgesFailed = () => ({
-  type: FETCH_BADGES_FAILED
+  type: FETCH_BADGES_FAILED,
 })
 
-export const cacheBadges = badges => ({
+export const cacheBadges = (badges) => ({
   type: CACHE_BADGES,
-  payload: { badges }
+  payload: { badges },
 })
 
-export const loadState = data => ({
+export const loadState = (data) => ({
   type: LOAD_BADGES_STATE,
-  payload: data
+  payload: data,
 })

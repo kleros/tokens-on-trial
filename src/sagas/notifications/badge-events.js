@@ -1,5 +1,4 @@
 import memoizeOne from 'memoize-one'
-
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
 
@@ -9,7 +8,7 @@ import { contractStatusToClientStatus } from '../../utils/tcr'
 const getBlockDate = memoizeOne((blockHash, viewWeb3) =>
   viewWeb3.eth
     .getBlock(blockHash)
-    .then(block => new Date(block.timestamp * 1000))
+    .then((block) => new Date(block.timestamp * 1000))
 )
 
 const ZERO_ID = `0x0000000000000000000000000000000000000000000000000000000000000000`
@@ -21,7 +20,7 @@ const filter = [
   false, // Do not include tokens with challenged registration requests.
   true, // Include tokens with challenged clearing requests.
   false, // Include token if caller is the author of a pending request.
-  false // Include token if caller is the challenger of a pending request.
+  false, // Include token if caller is the challenger of a pending request.
 ]
 
 /**
@@ -49,19 +48,21 @@ const emitBadgeNotifications = async (
       {
         filter: { _address: returnValues._address },
         fromBlock: 1000,
-        toBlock: `latest`
+        toBlock: `latest`,
       }
     )
 
-    const tokenIDs = (await arbitrableTokenListView.methods
-      .queryTokens(
-        ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
-        10, // Number of items to return at once.
-        filter,
-        true, // Return oldest first.
-        returnValues._address // The token address for which to return the submissions.
-      )
-      .call()).values.filter(ID => ID !== ZERO_ID)
+    const tokenIDs = (
+      await arbitrableTokenListView.methods
+        .queryTokens(
+          ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
+          10, // Number of items to return at once.
+          filter,
+          true, // Return oldest first.
+          returnValues._address // The token address for which to return the submissions.
+        )
+        .call()
+    ).values.filter((ID) => ID !== ZERO_ID)
 
     let token
     if (tokenIDs && tokenIDs.length > 0) {
@@ -166,7 +167,7 @@ const emitBadgeNotifications = async (
         break
       }
       default: {
-        console.warn(`Unhandled notification: `, returnValues)
+        console.warn(`Unhandled notification:`, returnValues)
         console.warn(`isRequester`, isRequester)
         console.warn(`account`, account)
         break
@@ -195,7 +196,7 @@ const emitBadgeNotifications = async (
         date: await getBlockDate(event.blockHash, viewWeb3),
         message,
         clientStatus,
-        successMessage
+        successMessage,
       })
     }
   }
@@ -216,7 +217,8 @@ const emitBadgeNotifications = async (
         date,
         badgeAddr: arbitrableAddressListView._address,
         message: `Badge request pending execution.`,
-        clientStatus: oldestNonDisputedSubmittedStatusEvent.returnValues._status
+        clientStatus:
+          oldestNonDisputedSubmittedStatusEvent.returnValues._status,
       })
   }
 

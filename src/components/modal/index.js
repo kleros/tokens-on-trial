@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactModal from 'react-modal'
 import PropTypes from 'prop-types'
-
 import './modal.css'
 
 ReactModal.setAppElement('#root')
@@ -25,7 +24,7 @@ Modal.propTypes = {
   children: PropTypes.node,
 
   // Modifiers
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 Modal.defaultProps = {
@@ -36,7 +35,7 @@ Modal.defaultProps = {
   children: null,
 
   // Modifiers
-  className: ''
+  className: '',
 }
 
 export default Modal

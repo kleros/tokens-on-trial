@@ -2,32 +2,32 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { BeatLoader } from 'react-spinners'
-
 import { onlyInfura } from '../../../bootstrap/dapp-api'
 import Button from '../../../components/button'
 import BadgeCard from '../../../components/badge-card'
 import {
   itemShape,
   cacheItemShape,
-  tcrShape
+  tcrShape,
 } from '../../../reducers/generic-shapes'
 import * as tcrConstants from '../../../constants/tcr'
 import * as modalActions from '../../../actions/modal'
 import * as modalConstants from '../../../constants/modal'
-
 import './badges.css'
 
 const BadgesSection = ({
   token: { status, address },
   openActionModal,
   badges,
-  arbitrableAddressListData
+  arbitrableAddressListData,
 }) => {
   const displayedBadges = Object.keys(badges)
-    .map(badgeContractAddr => badges[badgeContractAddr])
-    .filter(badgeContractData => badgeContractData.items[address])
-    .map(badgeContractData => badgeContractData.items[address])
-    .filter(badge => badge.clientStatus !== tcrConstants.STATUS_ENUM['Absent'])
+    .map((badgeContractAddr) => badges[badgeContractAddr])
+    .filter((badgeContractData) => badgeContractData.items[address])
+    .map((badgeContractData) => badgeContractData.items[address])
+    .filter(
+      (badge) => badge.clientStatus !== tcrConstants.STATUS_ENUM['Absent']
+    )
 
   /* eslint-disable react/jsx-no-bind */
 
@@ -45,7 +45,7 @@ const BadgesSection = ({
               onClick={() =>
                 openActionModal(
                   modalConstants.ACTION_MODAL_ENUM.AddBadge,
-                  displayedBadges.map(b => b.badgeContractAddr)
+                  displayedBadges.map((b) => b.badgeContractAddr)
                 )
               }
               type="secondary"
@@ -70,7 +70,7 @@ const BadgesSection = ({
               <BeatLoader color="#3d464d" />
             </div>
           ) : (
-            displayedBadges.map(badge => (
+            displayedBadges.map((badge) => (
               <BadgeCard
                 badge={badge}
                 key={`${badge.badgeContractAddr}.${address}`}
@@ -88,16 +88,16 @@ BadgesSection.propTypes = {
   token: itemShape.isRequired,
   openActionModal: PropTypes.func.isRequired,
   badges: PropTypes.objectOf(cacheItemShape.isRequired).isRequired,
-  arbitrableAddressListData: tcrShape.isRequired
+  arbitrableAddressListData: tcrShape.isRequired,
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     badges: state.badges.data,
     arbitrableAddressListData:
-      state.arbitrableAddressList.arbitrableAddressListData
+      state.arbitrableAddressList.arbitrableAddressListData,
   }),
   {
-    openActionModal: modalActions.openActionModal
+    openActionModal: modalActions.openActionModal,
   }
 )(BadgesSection)

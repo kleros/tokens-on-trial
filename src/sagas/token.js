@@ -1,21 +1,18 @@
 import { ethers } from 'ethers'
-
 import { call, select, takeLatest } from 'redux-saga/effects'
-
 import readFile from '../utils/read-file'
 import { lessduxSaga } from '../utils/saga'
 import {
   contractStatusToClientStatus,
   hasPendingRequest,
   convertFromString,
-  instantiateEnvObjects
+  instantiateEnvObjects,
 } from '../utils/tcr'
 import * as tokenActions from '../actions/token'
 import * as walletSelectors from '../reducers/wallet'
 import * as tcrConstants from '../constants/tcr'
 import * as errorConstants from '../constants/error'
 import { web3Utils } from '../bootstrap/dapp-api'
-
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
@@ -23,13 +20,13 @@ const statusToCode = {
   Absent: '0',
   Registered: '1',
   RegistrationRequested: '2',
-  ClearingRequested: '3'
+  ClearingRequested: '3',
 }
 const resultToCode = {
   Reverted: '0',
   Accepted: '1',
   Rejected: '2',
-  Pending: '3'
+  Pending: '3',
 }
 
 /**
@@ -42,7 +39,7 @@ export function* fetchToken({ payload: { ID } }) {
     arbitrableTokenListView,
     arbitratorView,
     arbitrableTCRView,
-    T2CR_SUBGRAPH_URL
+    T2CR_SUBGRAPH_URL,
   } = yield call(instantiateEnvObjects)
   const tokenResponse = yield call(fetch, T2CR_SUBGRAPH_URL, {
     method: 'POST',
@@ -81,8 +78,8 @@ export function* fetchToken({ payload: { ID } }) {
             }
           }
         }
-      `
-    })
+      `,
+    }),
   })
   const { data } = yield tokenResponse.json() || {}
   let { token } = data || {}
@@ -102,11 +99,11 @@ export function* fetchToken({ payload: { ID } }) {
         parties: [],
         latestRound: {
           appealed: false,
-          paidFees: new Array(3).fill(web3Utils.toBN(0)),
-          requiredForSide: new Array(3).fill(web3Utils.toBN(0))
-        }
+          paidFees: Array.from({ length: 3 }).fill(web3Utils.toBN(0)),
+          requiredForSide: Array.from({ length: 3 }).fill(web3Utils.toBN(0)),
+        },
       },
-      numberOfRequests: 0
+      numberOfRequests: 0,
     }
 
   token.status = statusToCode[token.status]
@@ -120,15 +117,15 @@ export function* fetchToken({ payload: { ID } }) {
     resolved: req.resolutionTime !== '0',
     ruling: resultToCode[req.result],
     evidenceGroupID: web3Utils.toBN(web3Utils.soliditySha3(ID, i)).toString(),
-    rounds: req.rounds.map(round => ({
+    rounds: req.rounds.map((round) => ({
       ...round,
       hasPaid: [false, round.hasPaidRequester, round.hasPaidChallenger],
       paidFees: [
         web3Utils.toBN(0),
         web3Utils.toBN(round.amountPaidRequester),
-        web3Utils.toBN(round.amountPaidChallenger)
-      ]
-    }))
+        web3Utils.toBN(round.amountPaidChallenger),
+      ],
+    })),
   }))
   token.latestRequest = token.requests[token.requests.length - 1]
   token.latestRound =
@@ -161,7 +158,7 @@ export function* fetchToken({ payload: { ID } }) {
         ID,
         Number(token.numberOfRequests) - 1
       ).call
-    ))
+    )),
   }
   token.latestRequest = {
     ...token.latestRequest,
@@ -174,22 +171,22 @@ export function* fetchToken({ payload: { ID } }) {
         0: token.latestRequest.appealPeriod[0],
         1: token.latestRequest.appealPeriod[1],
         start: token.latestRequest.appealPeriod[0],
-        end: token.latestRequest.appealPeriod[1]
+        end: token.latestRequest.appealPeriod[1],
       },
     requiredForSide: [
       toBN(0),
       toBN(token.latestRequest.requiredForSide[1]),
-      toBN(token.latestRequest.requiredForSide[2])
-    ]
+      toBN(token.latestRequest.requiredForSide[2]),
+    ],
   }
 
   token.latestRequest.latestRound = {
     appealCost: token.latestRequest.appealCost,
     appealPeriod: token.latestRequest.appealPeriod,
     appealed: token.latestRequest.hasPaid[1] && token.latestRequest.hasPaid[2],
-    paidFees: token.latestRequest.paidFees.map(pf => web3Utils.toBN(pf)),
+    paidFees: token.latestRequest.paidFees.map((pf) => web3Utils.toBN(pf)),
     requiredForSide: token.latestRequest.requiredForSide,
-    hasPaid: token.latestRequest.hasPaid
+    hasPaid: token.latestRequest.hasPaid,
   }
 
   if (token.latestRequest.disputed) {
@@ -241,7 +238,7 @@ export function* fetchToken({ payload: { ID } }) {
     clientStatus: contractStatusToClientStatus(
       token.status,
       token.latestRequest.disputed
-    )
+    ),
   }
 }
 
@@ -257,7 +254,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     name: token.name,
     ticker: token.ticker,
     address: web3Utils.toChecksumAddress(token.address),
-    symbolMultihash: token.symbolMultihash
+    symbolMultihash: token.symbolMultihash,
   }
 
   if (file && fileData) {
@@ -265,9 +262,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     const data = yield call(readFile, file.preview)
     try {
       const ipfsFileObj = yield call(ipfsPublish, token.ticker, data)
-      tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
-        ipfsFileObj[0].path
-      }`
+      tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
     } catch (err) {
       throw new Error('Failed to upload token image', err)
     }
@@ -297,7 +292,7 @@ function* requestRegistration({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value
+      value,
     }
   )
 
@@ -319,7 +314,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     name: token.name,
     ticker: token.ticker,
     address: web3Utils.toChecksumAddress(token.address),
-    symbolMultihash: token.symbolMultihash
+    symbolMultihash: token.symbolMultihash,
   }
 
   if (file && fileData) {
@@ -327,9 +322,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     const data = yield call(readFile, file.preview)
     try {
       const ipfsFileObj = yield call(ipfsPublish, 'evidence.json', data)
-      tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${
-        ipfsFileObj[0].path
-      }`
+      tokenToSubmit.symbolMultihash = `/ipfs/${ipfsFileObj[1].hash}${ipfsFileObj[0].path}`
     } catch (err) {
       throw new Error('Failed to upload token image', err)
     }
@@ -365,7 +358,7 @@ function* requestStatusChange({ payload: { token, file, fileData, value } }) {
     ).send,
     {
       from: yield select(walletSelectors.getAccount),
-      value
+      value,
     }
   )
 
@@ -387,7 +380,7 @@ function* challengeRequest({ payload: { ID, value, evidence } }) {
 
   yield call(arbitrableTokenList.methods.challengeRequest(ID, evidence).send, {
     from: yield select(walletSelectors.getAccount),
-    value
+    value,
   })
 
   return yield call(fetchToken, { payload: { ID } })
@@ -408,7 +401,7 @@ function* fundDispute({ payload: { ID, value, side } }) {
 
   yield call(arbitrableTokenList.methods.fundAppeal(ID, side).send, {
     from: yield select(walletSelectors.getAccount),
-    value
+    value,
   })
 
   return yield call(fetchToken, { payload: { ID } })
@@ -424,7 +417,7 @@ function* fundAppeal({ payload: { ID, side, value } }) {
 
   yield call(arbitrableTokenList.methods.fundAppeal(ID, side).send, {
     from: yield select(walletSelectors.getAccount),
-    value
+    value,
   })
 
   return yield call(fetchToken, { payload: { ID } })
@@ -445,7 +438,7 @@ function* executeRequest({ payload: { ID } }) {
     throw new Error(errorConstants.TOKEN_IN_WRONG_STATE)
 
   yield call(arbitrableTokenList.methods.executeRequest(ID).send, {
-    from: yield select(walletSelectors.getAccount)
+    from: yield select(walletSelectors.getAccount),
   })
 
   return yield call(fetchToken, { payload: { ID } })
@@ -460,7 +453,7 @@ function* feeTimeout({ payload: { token } }) {
   const { arbitrableTokenList } = yield call(instantiateEnvObjects)
 
   yield call(arbitrableTokenList.methods.executeRequest(token.ID).send, {
-    from: yield select(walletSelectors.getAccount)
+    from: yield select(walletSelectors.getAccount),
   })
 
   return yield call(fetchToken, { payload: { ID: token.ID } })
@@ -505,7 +498,7 @@ const updateTokensCollectionModFlow = {
   flow: 'update',
   collection: tokenActions.tokens.self,
   updating: ({ payload: { ID } }) => ID,
-  find: ({ payload: { ID } }) => d => d.ID === ID
+  find: ({ payload: { ID } }) => (d) => d.ID === ID,
 }
 
 /**
@@ -525,7 +518,7 @@ export default function* tokenSaga() {
     lessduxSaga,
     {
       flow: 'create',
-      collection: tokenActions.tokens.self
+      collection: tokenActions.tokens.self,
     },
     tokenActions.token,
     requestRegistration

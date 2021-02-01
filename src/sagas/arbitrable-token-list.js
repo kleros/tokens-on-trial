@@ -1,8 +1,6 @@
 import piexif from 'piexifjs'
 import JSZip from 'jszip'
-
 import { call, select, takeLatest } from 'redux-saga/effects'
-
 import { lessduxSaga } from '../utils/saga'
 import { sanitize } from '../utils/ui'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
@@ -12,7 +10,6 @@ import readFile from '../utils/read-file'
 import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import asyncReadFile from '../utils/async-file-reader'
-
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
@@ -30,7 +27,7 @@ export function* fetchArbitrableTokenListData() {
     arbitrableTokenListView,
     arbitratorView,
     arbitrableTCRView,
-    T2CR_BLOCK
+    T2CR_BLOCK,
   } = yield call(instantiateEnvObjects)
 
   // Initial cache object.
@@ -38,18 +35,18 @@ export function* fetchArbitrableTokenListData() {
   const eventsData = {
     metaEvidenceEvents: {
       blockNumber: Number(T2CR_BLOCK),
-      events: []
+      events: [],
     },
     evidenceEvents: {
-      blockNumber: Number(T2CR_BLOCK)
+      blockNumber: Number(T2CR_BLOCK),
     },
     requestSubmittedEvents: {
-      blockNumber: Number(T2CR_BLOCK)
+      blockNumber: Number(T2CR_BLOCK),
     },
     disputeEvents: {
-      blockNumber: Number(T2CR_BLOCK)
+      blockNumber: Number(T2CR_BLOCK),
     },
-    allEvents: {}
+    allEvents: {},
   }
 
   eventsData.allEvents.events = (yield call(
@@ -58,7 +55,7 @@ export function* fetchArbitrableTokenListData() {
     arbitrableTokenListView
   )).sort((a, b) => a.blockNumber - b.blockNumber)
   eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
-    e => e.event === 'MetaEvidence'
+    (e) => e.event === 'MetaEvidence'
   )
 
   // Fetch tcr information from the latest meta evidence event
@@ -71,10 +68,10 @@ export function* fetchArbitrableTokenListData() {
   const { fileURI } = metaEvidence
 
   eventsData.evidenceEvents = eventsData.allEvents.events
-    .filter(e => e.event === 'Evidence')
+    .filter((e) => e.event === 'Evidence')
     .reduce((acc, curr) => {
       const {
-        returnValues: { _evidenceGroupID }
+        returnValues: { _evidenceGroupID },
       } = curr
 
       if (curr.blockNumber > eventsData.evidenceEvents.blockNumber)
@@ -84,13 +81,13 @@ export function* fetchArbitrableTokenListData() {
       acc[_evidenceGroupID].push({
         returnValues: curr.returnValues,
         transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber
+        blockNumber: curr.blockNumber,
       })
       return acc
     }, eventsData.evidenceEvents)
 
   eventsData.requestSubmittedEvents = eventsData.allEvents.events
-    .filter(e => e.event === 'RequestSubmitted')
+    .filter((e) => e.event === 'RequestSubmitted')
     .reduce((acc, curr) => {
       if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
         eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
@@ -99,16 +96,16 @@ export function* fetchArbitrableTokenListData() {
       acc[curr.returnValues._tokenID].push({
         returnValues: curr.returnValues,
         transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber
+        blockNumber: curr.blockNumber,
       })
       return acc
     }, eventsData.requestSubmittedEvents)
 
   eventsData.disputeEvents = eventsData.allEvents.events
-    .filter(e => e.event === 'Dispute')
+    .filter((e) => e.event === 'Dispute')
     .reduce((acc, curr) => {
       const {
-        returnValues: { _evidenceGroupID }
+        returnValues: { _evidenceGroupID },
       } = curr
 
       if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
@@ -117,7 +114,7 @@ export function* fetchArbitrableTokenListData() {
       acc[_evidenceGroupID] = {
         returnValues: curr.returnValues,
         transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber
+        blockNumber: curr.blockNumber,
       }
       return acc
     }, eventsData.disputeEvents)
@@ -154,7 +151,7 @@ export function* fetchArbitrableTokenListData() {
         return acc
       },
       {}
-    )
+    ),
   }
 }
 
@@ -164,7 +161,7 @@ export function* fetchArbitrableTokenListData() {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* submitTokenEvidence({
-  payload: { evidenceData, file, ID, evidenceSide }
+  payload: { evidenceData, file, ID, evidenceSide },
 }) {
   if (!ID) throw new Error('No selected token ID')
 
@@ -189,12 +186,11 @@ function* submitTokenEvidence({
       const xmlString = yield zip.file('docProps/core.xml').async('text')
       const xmlObject = new DOMParser().parseFromString(xmlString, 'text/xml')
 
-      xmlObject.getElementsByTagName('dc:creator')[0].childNodes[0].nodeValue =
-        ''
-      xmlObject.getElementsByTagName(
+      xmlObject.querySelectorAll('dc:creator')[0].childNodes[0].nodeValue = ''
+      xmlObject.querySelectorAll(
         'cp:lastModifiedBy'
       )[0].childNodes[0].nodeValue = ''
-      xmlObject.getElementsByTagName(
+      xmlObject.querySelectorAll(
         'cp:lastModifiedBy'
       )[0].childNodes[0].nodeValue = ''
 
@@ -215,7 +211,7 @@ function* submitTokenEvidence({
     description: evidenceData.description,
     fileURI,
     fileTypeExtension,
-    evidenceSide
+    evidenceSide,
   }
 
   const { arbitrableTokenList } = yield call(instantiateEnvObjects)
@@ -234,7 +230,7 @@ function* submitTokenEvidence({
     arbitrableTokenList.methods.submitEvidence(ID, `/ipfs/${ipfsHashEvidence}`)
       .send,
     {
-      from: yield select(walletSelectors.getAccount)
+      from: yield select(walletSelectors.getAccount),
     }
   )
 
@@ -259,7 +255,7 @@ export default function* arbitrableTokenListSaga() {
     lessduxSaga,
     {
       flow: 'create',
-      collection: arbitrableTokenListActions.tokenEvidence.self
+      collection: arbitrableTokenListActions.tokenEvidence.self,
     },
     arbitrableTokenListActions.tokenEvidence,
     submitTokenEvidence

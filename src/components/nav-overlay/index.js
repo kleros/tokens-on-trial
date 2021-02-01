@@ -7,7 +7,7 @@ const NavOverlay = ({ onClick }) => (
 )
 
 NavOverlay.propTypes = {
-  onClick: PropTypes.func.isRequired
+  onClick: PropTypes.func.isRequired,
 }
 
 export default NavOverlay

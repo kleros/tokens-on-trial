@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import Img from 'react-image'
 import PropTypes from 'prop-types'
-
 import LatestRuling from '../../../components/latest-ruling'
 import { web3Utils, IPFS_URL } from '../../../bootstrap/dapp-api'
 import Etherscan from '../../../assets/images/etherscan.png'
@@ -12,13 +11,12 @@ import ItemActionButton from '../../item-action-button'
 import {
   truncateMiddle,
   getItemInformation,
-  getRemainingTime
+  getRemainingTime,
 } from '../../../utils/ui'
 import { itemShape, tcrShape } from '../../../reducers/generic-shapes'
 import { arbitrableAddressListDataShape } from '../../../reducers/arbitrable-address-list'
 import * as tcrConstants from '../../../constants/tcr'
 import CrowdfundingMsg from '../../../components/crowdfunding-msg'
-
 import './badge-details-card.css'
 
 const BadgeDetailsCard = ({
@@ -28,19 +26,13 @@ const BadgeDetailsCard = ({
   tcrData,
   handleActionClick,
   handleExecuteRequestClick,
-  fundAppeal
+  fundAppeal,
 }) => {
-  if (!tcrData) return null
-
-  const {
-    variables: { title, description, symbolURI, criteriaDescription },
-    fileURI
-  } = tcrData
   const {
     decisiveRuling,
     loserHasPaid,
     appealable,
-    payableValue
+    payableValue,
   } = getItemInformation(badge, userAccount)
 
   const remainingTime = getRemainingTime(
@@ -58,11 +50,17 @@ const BadgeDetailsCard = ({
     true,
     decisiveRuling
   )
-
   const [appealPeriodEnded, setAppealPeriodEnded] = useState(remainingTime <= 0)
   const [loserTimedOut, setLoserTimedOut] = useState(
     remainingTime <= 0 || (remainingLoserTime <= 0 && !loserHasPaid)
   )
+  if (!tcrData) return null
+
+  const {
+    variables: { title, description, symbolURI, criteriaDescription },
+    fileURI,
+  } = tcrData
+
   const { tokenAddress } = badge
 
   return (
@@ -129,7 +127,7 @@ const BadgeDetailsCard = ({
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                color: '#3d464d'
+                color: '#3d464d',
               }}
             >
               <a
@@ -181,7 +179,7 @@ BadgeDetailsCard.propTypes = {
   handleActionClick: PropTypes.func.isRequired,
   handleExecuteRequestClick: PropTypes.func.isRequired,
   fundAppeal: PropTypes.func.isRequired,
-  tcrData: arbitrableAddressListDataShape.isRequired
+  tcrData: arbitrableAddressListDataShape.isRequired,
 }
 
 export default BadgeDetailsCard

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
-
 import * as tcrConstants from '../constants/tcr'
 
 const _arbitrableTokenListDataShape = PropTypes.shape({
@@ -17,38 +16,38 @@ const _arbitrableTokenListDataShape = PropTypes.shape({
       acc[value] = PropTypes.number.isRequired
       return acc
     }, {})
-  ).isRequired
+  ).isRequired,
 })
 
 // Shapes
 const {
   shape: arbitrableTokenListDataShape,
-  initialState: arbitrableTokenListDataInitialState
+  initialState: arbitrableTokenListDataInitialState,
 } = createResource(_arbitrableTokenListDataShape)
 export { arbitrableTokenListDataShape, _arbitrableTokenListDataShape }
 
 // Reducer
 export default createReducer({
-  arbitrableTokenListData: arbitrableTokenListDataInitialState
+  arbitrableTokenListData: arbitrableTokenListDataInitialState,
 })
 
-export const getWinnerStakeMultiplier = state =>
+export const getWinnerStakeMultiplier = (state) =>
   state.arbitrableAddressList.arbitrableAddressListData.data &&
   state.arbitrableAddressList.arbitrableAddressListData.data
     .winnerStakeMultiplier
 
-export const getLoserStakeMultiplier = state =>
+export const getLoserStakeMultiplier = (state) =>
   state.arbitrableAddressList.arbitrableAddressListData.data &&
   state.arbitrableAddressList.arbitrableAddressListData.data
     .loserStakeMultiplier
 
-export const getSharedStakeMultiplier = state =>
+export const getSharedStakeMultiplier = (state) =>
   state.arbitrableAddressList.arbitrableAddressListData.data &&
   state.arbitrableAddressList.arbitrableAddressListData.data
     .sharedStakeMultiplier
 
 // Selectors
 
-export const getTimeToChallenge = state =>
+export const getTimeToChallenge = (state) =>
   state.arbitrableTokenList.arbitrableTokenListData.data &&
   state.arbitrableTokenList.arbitrableTokenListData.data.challengePeriodDuration

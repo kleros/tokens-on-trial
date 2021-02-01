@@ -2,7 +2,6 @@ import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Progress from 'react-progressbar'
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../../constants/tcr'
 import { getItemInformation } from '../../utils/ui'
 
@@ -15,7 +14,7 @@ const CrowdfundingProgress = ({ item, userAccount, appealPeriodEnded }) => {
     loserTimedOut,
     requesterFeesPercent,
     challengerFeesPercent,
-    payableValue
+    payableValue,
   } = getItemInformation(item, userAccount)
 
   if (
@@ -54,7 +53,7 @@ const CrowdfundingProgress = ({ item, userAccount, appealPeriodEnded }) => {
           border: '1px solid #009aff',
           borderColor: requesterFeesPercent === 100 ? '#7ed9ff' : '#009aff',
           borderRadius: '3px',
-          marginLeft: 0
+          marginLeft: 0,
         }}
       />
       <span>Challenger</span>
@@ -67,7 +66,7 @@ const CrowdfundingProgress = ({ item, userAccount, appealPeriodEnded }) => {
           border: '1px solid #009aff',
           borderColor: challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
           borderRadius: '3px',
-          marginLeft: 0
+          marginLeft: 0,
         }}
       />
     </div>
@@ -79,15 +78,15 @@ CrowdfundingProgress.propTypes = {
     status: PropTypes.number.isRequired,
     latestRequest: PropTypes.shape({
       dispute: PropTypes.shape({
-        status: PropTypes.number.isRequired
+        status: PropTypes.number.isRequired,
       }),
       latestRound: PropTypes.shape({
-        appealed: PropTypes.bool.isRequired
-      }).isRequired
-    }).isRequired
+        appealed: PropTypes.bool.isRequired,
+      }).isRequired,
+    }).isRequired,
   }).isRequired,
   userAccount: PropTypes.string.isRequired,
-  appealPeriodEnded: PropTypes.bool.isRequired
+  appealPeriodEnded: PropTypes.bool.isRequired,
 }
 
 export default CrowdfundingProgress

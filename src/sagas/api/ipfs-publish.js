@@ -13,15 +13,15 @@ const ipfsPublish = async (fileName, data) => {
       method: 'POST',
       body: JSON.stringify({
         fileName,
-        buffer
+        buffer,
       }),
       headers: {
-        'content-type': 'application/json'
-      }
+        'content-type': 'application/json',
+      },
     })
-      .then(response => response.json())
-      .then(success => resolve(success.data))
-      .catch(err => reject(err))
+      .then((response) => response.json())
+      .then((success) => resolve(success.data))
+      .catch((err) => reject(err))
   })
 }
 

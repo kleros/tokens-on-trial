@@ -1,5 +1,4 @@
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../constants/tcr'
 
 export const cacheItemShape = PropTypes.shape({
@@ -8,8 +7,8 @@ export const cacheItemShape = PropTypes.shape({
   status: PropTypes.shape({
     challenger: PropTypes.string.isRequired,
     requester: PropTypes.string.isRequired,
-    status: PropTypes.number.isRequired
-  }).isRequired
+    status: PropTypes.number.isRequired,
+  }).isRequired,
 })
 
 export const tcrShape = PropTypes.shape({
@@ -19,16 +18,16 @@ export const tcrShape = PropTypes.shape({
   arbitrationCost: PropTypes.shape({}).isRequired, // BigNumber
   winnerStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
   loserStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
-  sharedStakeMultiplier: PropTypes.shape({}).isRequired // BigNumber
+  sharedStakeMultiplier: PropTypes.shape({}).isRequired, // BigNumber
 })
 
 export const envObjectsShape = PropTypes.shape({
   FILE_BASE_URL: PropTypes.string.isRequired,
-  T2CR_BLOCK: PropTypes.string.isRequired
+  T2CR_BLOCK: PropTypes.string.isRequired,
 })
 
 export const courtShape = PropTypes.shape({
-  timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired
+  timesPerPeriod: PropTypes.arrayOf(PropTypes.number.isRequired).isRequired,
 })
 
 export const disputeShape = PropTypes.shape({
@@ -36,13 +35,13 @@ export const disputeShape = PropTypes.shape({
   status: PropTypes.number.isRequired,
   lastPeriodChange: PropTypes.number.isRequired,
   period: PropTypes.number.isRequired,
-  court: courtShape.isRequired
+  court: courtShape.isRequired,
 })
 
 export const roundShape = PropTypes.shape({
   appealed: PropTypes.bool.isRequired,
   hasPaid: PropTypes.arrayOf(PropTypes.bool).isRequired,
-  paidFees: PropTypes.arrayOf(PropTypes.shape({})).isRequired // BigNumber.
+  paidFees: PropTypes.arrayOf(PropTypes.shape({})).isRequired, // BigNumber.
 })
 
 export const requestShape = PropTypes.shape({
@@ -52,7 +51,7 @@ export const requestShape = PropTypes.shape({
   numberOfRounds: PropTypes.number.isRequired,
   parties: PropTypes.arrayOf(PropTypes.string).isRequired,
   dispute: disputeShape,
-  latestRound: roundShape.isRequired
+  latestRound: roundShape.isRequired,
 })
 
 export const itemShape = PropTypes.shape({
@@ -60,5 +59,5 @@ export const itemShape = PropTypes.shape({
   numberOfRequests: PropTypes.number.isRequired,
   status: PropTypes.oneOf(tcrConstants.IN_CONTRACT_STATUS_ENUM.indexes)
     .isRequired,
-  latestRequest: requestShape.isRequired
+  latestRequest: requestShape.isRequired,
 })

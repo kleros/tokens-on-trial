@@ -15,7 +15,7 @@ export const getUserSide = (item, userAccount) => {
     : tcrConstants.SIDE.None
 }
 
-export const isDecisiveRuling = item => {
+export const isDecisiveRuling = (item) => {
   const { latestRequest } = item
   const { dispute, disputed, resolved } = latestRequest
   if (!disputed || (disputed && resolved)) return false
@@ -42,7 +42,7 @@ export const isUserLoser = (item, userAccount) => {
   )
 }
 
-export const getCrowdfundingInfo = item => {
+export const getCrowdfundingInfo = (item) => {
   const { status, latestRequest } = item
   const { dispute, latestRound } = latestRequest
   const {
@@ -50,7 +50,7 @@ export const getCrowdfundingInfo = item => {
     hasPaid,
     paidFees,
     requiredForSide,
-    appealCost
+    appealCost,
   } = latestRound
   const payableValue = !appealCost || (appealCost && appealCost.length < 25) // Contract can return unpayable value to denote that a ruling is not appealable.
 
@@ -69,19 +69,17 @@ export const getCrowdfundingInfo = item => {
   let loserPercent = 0
   let winnerPercent = 0
 
-  if (!hasPaid[tcrConstants.SIDE.Requester])
-    requesterFeesPercent =
-      (Number(paidFees[tcrConstants.SIDE.Requester]) /
+  requesterFeesPercent = !hasPaid[tcrConstants.SIDE.Requester]
+    ? (Number(paidFees[tcrConstants.SIDE.Requester]) /
         Number(requiredForSide[tcrConstants.SIDE.Requester])) *
       100
-  else requesterFeesPercent = 100
+    : 100
 
-  if (!hasPaid[tcrConstants.SIDE.Challenger])
-    challengerFeesPercent =
-      (Number(paidFees[tcrConstants.SIDE.Challenger]) /
+  challengerFeesPercent = !hasPaid[tcrConstants.SIDE.Challenger]
+    ? (Number(paidFees[tcrConstants.SIDE.Challenger]) /
         Number(requiredForSide[tcrConstants.SIDE.Challenger])) *
       100
-  else challengerFeesPercent = 100
+    : 100
 
   let winnerSide
   let loserSide
@@ -106,13 +104,13 @@ export const getCrowdfundingInfo = item => {
     winnerSide,
     loserSide,
     appealable:
-      Number(dispute.status) === tcrConstants.DISPUTE_STATUS.Appealable
+      Number(dispute.status) === tcrConstants.DISPUTE_STATUS.Appealable,
   }
 }
 
 export const loserHasPaid = ({ latestRequest }) => {
   const {
-    latestRound: { hasPaid }
+    latestRound: { hasPaid },
   } = latestRequest
   const { dispute } = latestRequest
   if (!dispute) return null
@@ -129,7 +127,7 @@ export const loserHasPaid = ({ latestRequest }) => {
   return hasPaid[loserSide]
 }
 
-export const didLoserTimeout = item => {
+export const didLoserTimeout = (item) => {
   const { status, latestRequest } = item
   const { dispute, latestRound } = latestRequest
   if (status <= 1 || !dispute) return false
@@ -139,7 +137,7 @@ export const didLoserTimeout = item => {
     hasPaid,
     paidFees,
     requiredForSide,
-    appealPeriod
+    appealPeriod,
   } = latestRound
 
   if (
@@ -158,23 +156,22 @@ export const didLoserTimeout = item => {
   let loserPercent = 0
   let loserTimedOut
 
-  if (!hasPaid[tcrConstants.SIDE.Requester])
-    requesterFeesPercent =
-      (Number(paidFees[tcrConstants.SIDE.Requester]) /
+  requesterFeesPercent = !hasPaid[tcrConstants.SIDE.Requester]
+    ? (Number(paidFees[tcrConstants.SIDE.Requester]) /
         Number(requiredForSide[tcrConstants.SIDE.Requester])) *
       100
-  else requesterFeesPercent = 100
+    : 100
 
-  if (!hasPaid[tcrConstants.SIDE.Challenger])
-    challengerFeesPercent =
-      (Number(paidFees[tcrConstants.SIDE.Challenger]) /
+  challengerFeesPercent = !hasPaid[tcrConstants.SIDE.Challenger]
+    ? (Number(paidFees[tcrConstants.SIDE.Challenger]) /
         Number(requiredForSide[tcrConstants.SIDE.Challenger])) *
       100
-  else challengerFeesPercent = 100
+    : 100
 
-  if (ruling === tcrConstants.RULING_OPTIONS.Accept)
-    loserPercent = challengerFeesPercent
-  else loserPercent = requesterFeesPercent
+  loserPercent =
+    ruling === tcrConstants.RULING_OPTIONS.Accept
+      ? challengerFeesPercent
+      : requesterFeesPercent
 
   const appealPeriodStart = Number(appealPeriod[0])
   let appealPeriodEnd = Number(appealPeriod[1])
@@ -193,10 +190,10 @@ export const getItemInformation = (item, userAccount) => ({
   decisiveRuling: isDecisiveRuling(item),
   loserTimedOut: didLoserTimeout(item),
   loserHasPaid: loserHasPaid(item),
-  ...getCrowdfundingInfo(item)
+  ...getCrowdfundingInfo(item),
 })
 
-export const getBadgeStyle = badge => {
+export const getBadgeStyle = (badge) => {
   if (badge.status.status === 1)
     return { backgroundImage: `url(${RegisteredBadge})` }
   if (badge.status.disputed && badge.status.status > 1)
@@ -204,17 +201,17 @@ export const getBadgeStyle = badge => {
   return { backgroundImage: `url(${WaitingBadge})`, color: '#656565' }
 }
 
-export const toSentenceCase = input => {
+export const toSentenceCase = (input) => {
   input = input ? input.toLowerCase() : ''
   return input.charAt(0).toUpperCase() + input.slice(1)
 }
 
-export const capitalizeFirst = s =>
+export const capitalizeFirst = (s) =>
   s.length > 0 ? s.charAt(0).toUpperCase() + s.slice(1) : ''
 
 // Truncate with ellipsis in the middle.
-export const truncateMiddle = str =>
-  `${str.slice(0, 6)}...${str.slice(str.length - 5, str.length - 1)}`
+export const truncateMiddle = (str) =>
+  `${str.slice(0, 6)}...${str.slice(-5, -1)}`
 
 export const getRemainingTime = (
   item,
@@ -276,7 +273,7 @@ export const userFriendlyLabel = {
   'Addition Challenged': 'Addition Challenged',
   'Removal Challenged': 'Removal Challenged',
   Challenged: 'Challenged',
-  Pending: 'Pending'
+  Pending: 'Pending',
 }
 
 export const rulingMessage = (
@@ -290,24 +287,23 @@ export const rulingMessage = (
     return ruling.toString() === '1'
       ? 'Jurors ruled in favor of the requester'
       : 'Jurors ruled in favor of the challenger'
-  if (isLoser) return 'Jurors ruled against you'
-  else return 'Jurors ruled in your favor'
+  return isLoser ? 'Jurors ruled against you' : 'Jurors ruled in your favor'
 }
 
 export const truncateETHValue = (str, digits) => {
   if (!str) return 0
   const input = typeof str === 'string' ? str : str.toString()
-  if (input.indexOf('.') === -1) return input
-  return input.substring(0, input.indexOf('.') + (digits || 5))
+  if (!input.includes('.')) return input
+  return input.slice(0, Math.max(0, input.indexOf('.') + (digits || 5)))
 }
 
-export const sanitize = str =>
+export const sanitize = (str) =>
   str
     .toString()
     .toLowerCase()
-    .replace(/([^a-z0-9.]+)/gi, '-') // Only allow numbers and aplhanumeric.
+    .replace(/([^\d.a-z]+)/gi, '-') // Only allow numbers and aplhanumeric.
 
-export const getItemStatusColor = item => {
+export const getItemStatusColor = (item) => {
   if (item.inAppealPeriod) return '#4d00b4' // Purple.
   if (item.clientStatus === 0) return '#f60c36' // Red.
   if (item.clientStatus === 1) return '#009aff' // Blue.
@@ -315,7 +311,7 @@ export const getItemStatusColor = item => {
   return '#ccc'
 }
 
-export const getItemStatusText = item => {
+export const getItemStatusText = (item) => {
   if (item.inAppealPeriod) return 'Crowdfunding'
   if (item.clientStatus === 0) return 'Rejected'
   if (item.clientStatus === 1) return 'Registered'

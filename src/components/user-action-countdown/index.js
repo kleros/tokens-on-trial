@@ -1,10 +1,8 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../../constants/tcr'
 import { getItemInformation, getRemainingTime } from '../../utils/ui'
 import { itemShape, tcrShape } from '../../reducers/generic-shapes'
-
 import ActionCountdown from './action-countdown'
 
 const UserActionCountdown = ({
@@ -12,7 +10,7 @@ const UserActionCountdown = ({
   userAccount,
   tcrData,
   onAppealPeriodEnd,
-  onLoserTimedOut
+  onLoserTimedOut,
 }) => {
   const { latestRequest } = item
   const { dispute, parties } = latestRequest
@@ -20,7 +18,7 @@ const UserActionCountdown = ({
     userIsLoser,
     decisiveRuling,
     loserHasPaid,
-    payableValue
+    payableValue,
   } = getItemInformation(item, userAccount)
 
   const remainingTime = getRemainingTime(
@@ -111,11 +109,11 @@ UserActionCountdown.propTypes = {
   userAccount: PropTypes.string.isRequired,
   tcrData: tcrShape,
   onAppealPeriodEnd: PropTypes.func.isRequired,
-  onLoserTimedOut: PropTypes.func.isRequired
+  onLoserTimedOut: PropTypes.func.isRequired,
 }
 
 UserActionCountdown.defaultProps = {
-  tcrData: null
+  tcrData: null,
 }
 
 export default UserActionCountdown

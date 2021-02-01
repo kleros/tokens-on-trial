@@ -2,17 +2,15 @@ import React, { useState } from 'react'
 import Img from 'react-image'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-
 import { IPFS_URL, web3Utils } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
 import { _arbitrableAddressListDataShape } from '../../../../reducers/arbitrable-address-list'
-
 import './add-badge.css'
 
 const ETHFINEX_BADGE = {
   1: '0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab',
-  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759'
+  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759',
 }
 
 const AddBadge = ({
@@ -20,7 +18,7 @@ const AddBadge = ({
   submitItem,
   arbitrableAddressListData,
   tokenAddr,
-  unavailable
+  unavailable,
 }) => {
   const badgeContracts = Object.keys(arbitrableAddressListData)
     .filter(
@@ -30,10 +28,10 @@ const AddBadge = ({
         badgeContractAddr !== ETHFINEX_BADGE[42] &&
         badgeContractAddr !== ETHFINEX_BADGE[1]
     )
-    .map(badgeContractAddr => arbitrableAddressListData[badgeContractAddr])
-    .filter(badgeContract => badgeContract.variables)
+    .map((badgeContractAddr) => arbitrableAddressListData[badgeContractAddr])
+    .filter((badgeContract) => badgeContract.variables)
     .filter(
-      badgeContract =>
+      (badgeContract) =>
         !unavailable.reduce((acc, curr) => {
           acc[curr] = true
           return acc
@@ -49,7 +47,7 @@ const AddBadge = ({
         <span className="AddBadge-header-title">Add Badge</span>
       </div>
       <div className="AddBadge-options">
-        {badgeContracts.map(badgeContract => (
+        {badgeContracts.map((badgeContract) => (
           <div
             className="AddBadge-options-item"
             key={badgeContract.badgeContractAddr}
@@ -172,14 +170,14 @@ AddBadge.propTypes = {
   arbitrableAddressListData: PropTypes.objectOf(
     _arbitrableAddressListDataShape
   ),
-  unavailable: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired
+  unavailable: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
 }
 
 AddBadge.defaultProps = {
-  arbitrableAddressListData: null
+  arbitrableAddressListData: null,
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   arbitrableAddressListData:
-    state.arbitrableAddressList.arbitrableAddressListData.data
+    state.arbitrableAddressList.arbitrableAddressListData.data,
 }))(AddBadge)

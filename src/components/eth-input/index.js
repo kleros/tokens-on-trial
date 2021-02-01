@@ -7,7 +7,7 @@ const ETHInput = ({
   meta: { touched, valid, error },
   placeholder,
   step,
-  className
+  className,
 }) => (
   <div style={{ width: '100%', display: 'flex', position: 'relative' }}>
     <div
@@ -47,12 +47,12 @@ ETHInput.propTypes = {
   input: PropTypes.shape({
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onBlur: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   }).isRequired,
   meta: PropTypes.shape({
     touched: PropTypes.bool,
     valid: PropTypes.bool,
-    error: PropTypes.string
+    error: PropTypes.string,
   }),
 
   // State
@@ -61,7 +61,7 @@ ETHInput.propTypes = {
 
   // Modifiers
   step: PropTypes.number,
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 ETHInput.defaultProps = {
@@ -70,7 +70,7 @@ ETHInput.defaultProps = {
 
   // Modifiers
   step: undefined,
-  className: ''
+  className: '',
 }
 
 export default ETHInput

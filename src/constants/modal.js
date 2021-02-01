@@ -21,5 +21,5 @@ export const ACTION_MODAL_ENUM = createEnum([
   'SubmitEvidenceBadge',
   'ViewEvidenceBadge',
   'TxPending',
-  'AddBadge'
+  'AddBadge',
 ])

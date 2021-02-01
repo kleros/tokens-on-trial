@@ -8,7 +8,7 @@ export const defaultFilter = () => {
   const filter = filterConstants.FILTER_OPTIONS_ENUM.values.reduce(
     (acc, curr) => ({
       ...acc,
-      [curr]: true
+      [curr]: true,
     }),
     {}
   )
@@ -22,8 +22,8 @@ export const defaultFilter = () => {
  * @param {object} filter - The filter object.
  * @returns {bool[]} A filter array to be passed as argument to the contract's queryItems() method.
  */
-export const filterToContractParam = filter => {
-  const filterValues = new Array(8).fill(false)
+export const filterToContractParam = (filter) => {
+  const filterValues = Array.from({ length: 8 }).fill(false)
 
   if (filter['Absent']) filterValues[0] = true
   if (filter['Registered']) filterValues[1] = true
@@ -50,7 +50,7 @@ export const totalByStatus = (countByStatus, filters) => {
     registrationRequest,
     clearingRequest,
     challengedRegistrationRequest,
-    challengedClearingRequest
+    challengedClearingRequest,
   } = countByStatus
 
   if (filters.Absent) total += absent

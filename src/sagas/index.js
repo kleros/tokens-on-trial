@@ -1,7 +1,5 @@
 import { delay } from 'redux-saga'
-
 import { all, call, spawn } from 'redux-saga/effects'
-
 import walletSaga from './wallet'
 import arbitrableTokenListSaga from './arbitrable-token-list'
 import arbitrableAddressListSaga from './arbitrable-address-list'
@@ -19,7 +17,7 @@ import initializer from './initializer'
  * @returns {object} - A new generator function with the added functionality.
  */
 export function makeRestartable(saga) {
-  return function*() {
+  return function* () {
     // eslint-disable-next-line no-constant-condition
     while (true)
       try {
@@ -49,12 +47,12 @@ const rootSagas = [
   notificationSaga,
   tokensSaga,
   badgesSaga,
-  initializer
+  initializer,
 ].map(makeRestartable)
 
 /**
  * The root saga.
  */
 export default function* rootSaga() {
-  yield all(rootSagas.map(saga => spawn(saga)))
+  yield all(rootSagas.map((saga) => spawn(saga)))
 }

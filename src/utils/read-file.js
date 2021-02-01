@@ -1,5 +1,5 @@
-export default file =>
-  new Promise(resolve => {
+const readfile = (file) =>
+  new Promise((resolve) => {
     const request = new XMLHttpRequest()
     request.open('GET', file, true)
     request.responseType = 'blob'
@@ -12,3 +12,5 @@ export default file =>
     })
     request.send()
   })
+
+export default readfile

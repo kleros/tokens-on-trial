@@ -2,15 +2,13 @@ import React, { useEffect, useState } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
-
 import { IPFS_URL } from '../../../../bootstrap/dapp-api'
 import * as tcrConstants from '../../../../constants/tcr'
 import { instantiateEnvObjects } from '../../../../utils/tcr'
 import EtherScanLogo from '../../../../assets/images/etherscan.png'
-
 import './evidence-card.css'
 
-const downloadClick = url => async () => {
+const downloadClick = (url) => async () => {
   window.open(`${IPFS_URL}${encodeURI(url)}`)
 }
 
@@ -18,7 +16,7 @@ const EvidenceCard = ({
   evidence: { evidence: evidenceFile, _party, icon, blockNumber, txHash },
   idKey,
   requester,
-  challenger
+  challenger,
 }) => {
   const [fetchingSubmissionDate, setFetchingSubmissionDate] = useState(true)
   const [submissionDate, setSubmissionDate] = useState(0)
@@ -30,7 +28,7 @@ const EvidenceCard = ({
       setSubmissionDate(new Date(timestamp * 1000).toUTCString().slice(5))
     }
     fetchTimestamp()
-  }, [])
+  }, [blockNumber, txHash])
 
   return (
     <div className="EvidenceCard" key={idKey}>
@@ -39,7 +37,7 @@ const EvidenceCard = ({
           <div
             style={{
               display: 'flex',
-              justifyContent: 'space-between'
+              justifyContent: 'space-between',
             }}
           >
             <p className="EvidenceCard-content-title">{evidenceFile.title}</p>
@@ -101,7 +99,7 @@ const EvidenceCard = ({
                 backgroundColor:
                   evidenceFile.evidenceSide === tcrConstants.SIDE.Requester
                     ? '#66e800'
-                    : '#f60c36'
+                    : '#f60c36',
               }}
             >
               <FontAwesomeIcon
@@ -148,11 +146,13 @@ EvidenceCard.propTypes = {
   evidence: PropTypes.shape({
     evidence: PropTypes.shape({
       fileURI: PropTypes.string,
-      position: PropTypes.number
+      position: PropTypes.number,
     }).isRequired,
     _party: PropTypes.string.isRequired,
-    icon: PropTypes.string.isRequired
-  }).isRequired
+    icon: PropTypes.string.isRequired,
+  }).isRequired,
+  blockNumber: PropTypes.number.isRequired,
+  txHash: PropTypes.string.isRequired,
 }
 
 export default EvidenceCard

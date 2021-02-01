@@ -2,10 +2,8 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Img from 'react-image'
 import { connect } from 'react-redux'
-
 import { truncateMiddle, getItemStatusColor } from '../../../utils/ui'
 import { web3Utils, IPFS_URL } from '../../../bootstrap/dapp-api'
-
 import './item.css'
 
 const SearchItem = ({ onClick, item, FILE_BASE_URL }) => (
@@ -40,11 +38,11 @@ SearchItem.propTypes = {
     name: PropTypes.string.isRequired,
     ticker: PropTypes.string.isRequired,
     address: PropTypes.string.isRequired,
-    imgSrc: PropTypes.string.isRequired
+    imgSrc: PropTypes.string.isRequired,
   }).isRequired,
-  FILE_BASE_URL: PropTypes.string.isRequired
+  FILE_BASE_URL: PropTypes.string.isRequired,
 }
 
-export default connect(state => ({
-  envObjects: state.envObjects.data
+export default connect((state) => ({
+  envObjects: state.envObjects.data,
 }))(SearchItem)

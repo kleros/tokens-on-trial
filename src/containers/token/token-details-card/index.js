@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import Img from 'react-image'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-
 import * as tcrConstants from '../../../constants/tcr'
 import ItemStatus from '../../../components/item-status'
 import LatestRuling from '../../../components/latest-ruling'
@@ -18,10 +17,9 @@ import * as tokenSelectors from '../../../reducers/token'
 import {
   getItemInformation,
   getRemainingTime,
-  truncateMiddle
+  truncateMiddle,
 } from '../../../utils/ui'
 import CrowdfundingMsg from '../../../components/crowdfunding-msg'
-
 import './token-details-card.css'
 
 const TokenDetailsCard = ({
@@ -32,14 +30,14 @@ const TokenDetailsCard = ({
   handleActionClick,
   handleExecuteRequestClick,
   fundAppeal,
-  badges: badgesRes
+  badges: badgesRes,
 }) => {
   const badges = badgesRes.data
   const {
     decisiveRuling,
     loserHasPaid,
     appealable,
-    payableValue
+    payableValue,
   } = getItemInformation(token, userAccount)
 
   const remainingTime = getRemainingTime(
@@ -68,11 +66,12 @@ const TokenDetailsCard = ({
   const { parties } = latestRequest || {}
 
   const badgesCount = Object.keys(badges)
-    .map(badgeContractAddr => badges[badgeContractAddr])
-    .filter(badgeContractData => badgeContractData.items[address])
-    .map(badgeContractData => badgeContractData.items[address])
-    .filter(badge => badge.clientStatus !== tcrConstants.STATUS_ENUM['Absent'])
-    .length
+    .map((badgeContractAddr) => badges[badgeContractAddr])
+    .filter((badgeContractData) => badgeContractData.items[address])
+    .map((badgeContractData) => badgeContractData.items[address])
+    .filter(
+      (badge) => badge.clientStatus !== tcrConstants.STATUS_ENUM['Absent']
+    ).length
 
   return (
     <div className="TokenDetailsCard">
@@ -158,7 +157,7 @@ const TokenDetailsCard = ({
                 className="TokenDetailsCard-icon-badge TokenDetailsCard-meta--aligned"
                 style={{
                   backgroundImage: `url(${WaitingBadge})`,
-                  color: '#656565'
+                  color: '#656565',
                 }}
               >
                 {badgesCount}
@@ -180,13 +179,13 @@ TokenDetailsCard.propTypes = {
   handleActionClick: PropTypes.func.isRequired,
   handleExecuteRequestClick: PropTypes.func.isRequired,
   fundAppeal: PropTypes.func.isRequired,
-  badges: badgesShape.isRequired
+  badges: badgesShape.isRequired,
 }
 
 TokenDetailsCard.defaultProps = {
-  arbitrableTokenListData: null
+  arbitrableTokenListData: null,
 }
 
-export default connect(state => ({
-  badges: state.badges
+export default connect((state) => ({
+  badges: state.badges,
 }))(TokenDetailsCard)

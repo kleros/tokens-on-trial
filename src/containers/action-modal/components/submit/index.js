@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3Utils, IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
-import { TokenForm } from '../../components/submit/token-form'
+import { TokenForm } from './token-form'
 import FilePicker from '../../../../components/file-picker'
 import { truncateETHValue } from '../../../../utils/ui'
-
 import './submit.css'
 
 const Submit = ({
@@ -22,7 +20,7 @@ const Submit = ({
   fileInfoMessage,
   handleOnFileDropAccepted,
   item,
-  resubmit
+  resubmit,
 }) => (
   <div className="ActionModal">
     <div className="Modal-header" style={{ justifyContent: 'center' }}>
@@ -74,7 +72,7 @@ const Submit = ({
           textAlign: 'start',
           fontSize: '11.5px',
           marginTop: '10px',
-          display: 'flex'
+          display: 'flex',
         }}
       >
         <FontAwesomeIcon icon="exclamation-circle" color="#FF9900" />
@@ -124,7 +122,7 @@ const Submit = ({
         textAlign: 'start',
         fontSize: '12px',
         marginTop: '15px',
-        display: 'flex'
+        display: 'flex',
       }}
     >
       <FontAwesomeIcon icon="info-circle" />
@@ -140,7 +138,7 @@ const Submit = ({
         textAlign: 'start',
         fontSize: '12px',
         marginTop: '10px',
-        display: 'flex'
+        display: 'flex',
       }}
     >
       <FontAwesomeIcon icon="info-circle" color="#ef0101" />
@@ -180,7 +178,7 @@ Submit.propTypes = {
   fileInfoMessage: PropTypes.string,
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape,
   ]).isRequired,
   item: PropTypes.shape({}),
 
@@ -192,7 +190,7 @@ Submit.propTypes = {
 
   // Item Form
   itemFormIsInvalid: PropTypes.bool,
-  submitItemForm: PropTypes.func
+  submitItemForm: PropTypes.func,
 }
 
 Submit.defaultProps = {
@@ -202,7 +200,7 @@ Submit.defaultProps = {
   handleOnFileDropAccepted: null,
   submitItemForm: null,
   resubmit: null,
-  item: null
+  item: null,
 }
 
 export default Submit

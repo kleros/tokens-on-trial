@@ -1,18 +1,15 @@
 import localforage from 'localforage'
-
 import { put, takeLatest, call, all } from 'redux-saga/effects'
-
 import {
   FETCH_BADGES_CACHE,
   cacheBadges,
-  fetchBadgesFailed
+  fetchBadgesFailed,
 } from '../actions/badges'
 import {
   contractStatusToClientStatus,
-  instantiateEnvObjects
+  instantiateEnvObjects,
 } from '../utils/tcr'
 import { APP_VERSION } from '../bootstrap/dapp-api'
-
 import { fetchEvents, fetchAppealableAddresses } from './utils'
 
 /**
@@ -25,7 +22,7 @@ function* fetchItems({
   blockNumber: tcrBlockNumber,
   badges,
   web3,
-  arbitrableTCRView
+  arbitrableTCRView,
 }) {
   // Get the lastest status change for every badge
   // and all appealable addresses.
@@ -39,10 +36,14 @@ function* fetchItems({
       0,
       web3
     ),
-    call(fetchAppealableAddresses, arbitrableAddressListView, arbitrableTCRView)
+    call(
+      fetchAppealableAddresses,
+      arbitrableAddressListView,
+      arbitrableTCRView
+    ),
   ])
 
-  statusChanges.forEach(event => {
+  for (const event of statusChanges) {
     const { returnValues } = event
     const { _address } = returnValues
     if (event.blockNumber > statusBlockNumber)
@@ -50,29 +51,29 @@ function* fetchItems({
 
     if (!latestStatusChanges[_address]) {
       latestStatusChanges[_address] = event
-      return
+      continue
     }
     if (event.blockNumber > latestStatusChanges[_address].blockNumber)
       latestStatusChanges[_address] = event
-  })
+  }
 
   const statusEvents = Object.keys(latestStatusChanges).map(
-    address => latestStatusChanges[address]
+    (address) => latestStatusChanges[address]
   )
 
   const cachedBadges = {
     ...badges,
-    statusBlockNumber
+    statusBlockNumber,
   }
 
-  statusEvents.forEach(event => {
+  for (const event of statusEvents) {
     const { returnValues, blockNumber } = event
     const {
       _address,
       _status,
       _disputed,
       _requester,
-      _challenger
+      _challenger,
     } = returnValues
     cachedBadges.items[_address] = {
       address: _address,
@@ -82,17 +83,16 @@ function* fetchItems({
         status: Number(_status),
         disputed: _disputed,
         requester: _requester,
-        challenger: _challenger
-      }
+        challenger: _challenger,
+      },
     }
-  })
+  }
 
-  Object.keys(cachedBadges.items).forEach(address => {
+  for (const address of Object.keys(cachedBadges.items))
     cachedBadges.items[address].clientStatus = contractStatusToClientStatus(
       cachedBadges.items[address].status.status,
       cachedBadges.items[address].status.disputed
     )
-  })
 
   // Update appealPeriod state of each item.
   for (const address of Object.keys(cachedBadges.items))
@@ -111,12 +111,12 @@ function* fetchBadges() {
   const {
     badgeViewContracts,
     arbitrableTokenListView: {
-      options: { address: t2crAddr }
+      options: { address: t2crAddr },
     },
     arbitrableTCRView,
     arbitratorView,
     ARBITRATOR_BLOCK,
-    viewWeb3
+    viewWeb3,
   } = yield call(instantiateEnvObjects)
 
   try {
@@ -128,19 +128,19 @@ function* fetchBadges() {
       yield put(cacheBadges(cachedBadges))
 
     const badges = (yield all(
-      Object.keys(badgeViewContracts).map(address =>
+      Object.keys(badgeViewContracts).map((address) =>
         call(fetchItems, {
           arbitrableAddressListView: badgeViewContracts[address],
           blockNumber: 0,
           badges: {
             badgeContractAddr: address,
             statusBlockNumber: 0, // Use contract block number by default
-            items: {}
+            items: {},
           },
           arbitratorView,
           ARBITRATOR_BLOCK,
           web3: viewWeb3,
-          arbitrableTCRView
+          arbitrableTCRView,
         })
       )
     )).reduce((acc, curr) => {
@@ -151,7 +151,7 @@ function* fetchBadges() {
     yield put(cacheBadges(badges))
     localforage.setItem(`${t2crAddr}badges@${APP_VERSION}`, badges)
   } catch (err) {
-    console.error('Error fetching badges ', err)
+    console.error('Error fetching badges', err)
     yield put(fetchBadgesFailed())
   }
 }

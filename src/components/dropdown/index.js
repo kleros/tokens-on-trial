@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import reactClickOutside from 'react-click-outside'
-
 import './dropdown.css'
 import CheckboxInput from '../checkbox-input'
 
@@ -17,13 +16,13 @@ class Dropdown extends PureComponent {
         PropTypes.shape({
           label: PropTypes.string.isRequired,
           count: PropTypes.number.isRequired,
-          color: PropTypes.string
-        })
+          color: PropTypes.string,
+        }),
       ]).isRequired
     ).isRequired,
     value: PropTypes.oneOfType([
       PropTypes.number,
-      PropTypes.arrayOf(PropTypes.number.isRequired)
+      PropTypes.arrayOf(PropTypes.number.isRequired),
     ]).isRequired,
 
     // Handlers
@@ -31,7 +30,7 @@ class Dropdown extends PureComponent {
 
     // Modifiers
     inverted: PropTypes.bool,
-    className: PropTypes.string
+    className: PropTypes.string,
   }
 
   static defaultProps = {
@@ -40,7 +39,7 @@ class Dropdown extends PureComponent {
 
     // Modifiers
     inverted: false,
-    className: ''
+    className: '',
   }
 
   state = { isOpen: false }
@@ -50,7 +49,7 @@ class Dropdown extends PureComponent {
     isOpen && this.setState({ isOpen: false })
   }
 
-  handleBoxClick = () => this.setState(state => ({ isOpen: !state.isOpen }))
+  handleBoxClick = () => this.setState((state) => ({ isOpen: !state.isOpen }))
 
   handleOptionClick = ({ currentTarget: { id: _id } }) => {
     const idNumber = _id.slice(_id.lastIndexOf('-') + 1)
@@ -116,7 +115,7 @@ class Dropdown extends PureComponent {
                       label={o.label || o}
                       input={{
                         value: isActive,
-                        onChange: this.handleOptionClick
+                        onChange: this.handleOptionClick,
                       }}
                       customKey={i}
                     />

@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import RequiresMetaMask from '../../components/incorrect-network'
 import Button from '../../components/button'
-
 import './requires-meta-mask-page.css'
 
 const RequiresMetaMaskPage = ({
   metamaskNetwork,
   requiredNetwork,
-  needsMetamask
+  needsMetamask,
 }) => (
   <div className="RequiresMetaMaskPage">
     <RequiresMetaMask
@@ -40,12 +38,12 @@ const RequiresMetaMaskPage = ({
 RequiresMetaMaskPage.propTypes = {
   metamaskNetwork: PropTypes.string,
   requiredNetwork: PropTypes.string,
-  needsMetamask: PropTypes.bool.isRequired
+  needsMetamask: PropTypes.bool.isRequired,
 }
 
 RequiresMetaMaskPage.defaultProps = {
   metamaskNetwork: '',
-  requiredNetwork: ''
+  requiredNetwork: '',
 }
 
 export default RequiresMetaMaskPage

@@ -1,7 +1,5 @@
 import React, { PureComponent } from 'react'
-
 import telegramButton from '../../assets/images/telegram-button.png'
-
 import './telegram-button.css'
 
 export default class TelegramButton extends PureComponent {

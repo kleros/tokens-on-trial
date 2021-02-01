@@ -2,7 +2,6 @@ import React from 'react'
 import Img from 'react-image'
 import { Link } from 'react-router-dom'
 import PropTypes from 'prop-types'
-
 import { IPFS_URL } from '../../../bootstrap/dapp-api'
 import UnknownToken from '../../../assets/images/unknown.svg'
 import { _badgeShape } from '../../../reducers/badge'
@@ -35,7 +34,7 @@ const TokenInfo = ({ badge: { token }, FILE_BASE_URL }) =>
 
 TokenInfo.propTypes = {
   badge: _badgeShape.isRequired,
-  FILE_BASE_URL: PropTypes.string.isRequired
+  FILE_BASE_URL: PropTypes.string.isRequired,
 }
 
 export default TokenInfo

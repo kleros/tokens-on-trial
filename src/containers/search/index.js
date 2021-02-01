@@ -4,43 +4,41 @@ import { withRouter } from 'react-router-dom'
 import { connect } from 'react-redux'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
-
 import Item from './item'
-
 import './search-bar.css'
 
 class SearchBar extends Component {
   static propTypes = {
     history: PropTypes.shape({
-      push: PropTypes.func.isRequired
+      push: PropTypes.func.isRequired,
     }).isRequired,
     tokens: PropTypes.shape({
-      blockNumber: PropTypes.number.isRequired
+      blockNumber: PropTypes.number.isRequired,
     }).isRequired,
     envObjects: PropTypes.shape({
-      FILE_BASE_URL: PropTypes.string.isRequired
-    }).isRequired
+      FILE_BASE_URL: PropTypes.string.isRequired,
+    }).isRequired,
   }
 
-  itemClicked = selection => {
+  itemClicked = (selection) => {
     const { history } = this.props
     history.push(`/token/${selection.tokenID}`)
   }
 
-  itemCompute = item => (item ? item.value : '')
+  itemCompute = (item) => (item ? item.value : '')
 
   render() {
     const { tokens, envObjects } = this.props
     const FILE_BASE_URL = envObjects ? envObjects.FILE_BASE_URL : null
     const tokenData = tokens.items
-    const tokenSubmissions = Object.keys(tokenData).map(tokenID => {
+    const tokenSubmissions = Object.keys(tokenData).map((tokenID) => {
       const {
         name,
         ticker,
         address,
         symbolMultihash,
         clientStatus,
-        inAppealPeriod
+        inAppealPeriod,
       } = tokenData[tokenID]
       return {
         value: name || '',
@@ -51,7 +49,7 @@ class SearchBar extends Component {
         address,
         symbolMultihash,
         clientStatus,
-        inAppealPeriod
+        inAppealPeriod,
       }
     })
 
@@ -64,7 +62,7 @@ class SearchBar extends Component {
             getItemProps,
             getMenuProps,
             isOpen,
-            inputValue
+            inputValue,
           }) => (
             <div className="SearchBar-box">
               <input
@@ -77,7 +75,7 @@ class SearchBar extends Component {
                   {isOpen
                     ? tokenSubmissions
                         .filter(
-                          item =>
+                          (item) =>
                             inputValue.length > 0 &&
                             (item.name
                               .toLowerCase()
@@ -104,15 +102,13 @@ class SearchBar extends Component {
                           if (b.clientStatus > a.clientStatus) return 1
                           return 0
                         })
-                        .sort((a, b) => {
+                        .sort((a, b) =>
                           // Display registered tokens before rejected ones.
-                          if (
-                            (a.clientStatus === 0 && b.clientStatus === 1) ||
-                            (a.clientStatus === 1 && a.clientStatus === 1)
-                          )
-                            return b.clientStatus - a.clientStatus
-                          else return 0
-                        })
+                          (a.clientStatus === 0 && b.clientStatus === 1) ||
+                          (a.clientStatus === 1 && a.clientStatus === 1)
+                            ? b.clientStatus - a.clientStatus
+                            : 0
+                        )
                         .sort((a, b) => {
                           // Show items crowdfunding state first.
                           if (a.inAppealPeriod && !b.inAppealPeriod) return -1
@@ -126,7 +122,7 @@ class SearchBar extends Component {
                             {...getItemProps({
                               key: index,
                               index,
-                              item
+                              item,
                             })}
                             FILE_BASE_URL={FILE_BASE_URL}
                           />
@@ -143,8 +139,8 @@ class SearchBar extends Component {
 }
 
 export default withRouter(
-  connect(state => ({
+  connect((state) => ({
     tokens: state.tokens.data,
-    envObjects: state.envObjects.data
+    envObjects: state.envObjects.data,
   }))(SearchBar)
 )

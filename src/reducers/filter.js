@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import createReducer from 'lessdux'
-
 import * as filterActions from '../actions/filter'
 import * as filterConstants from '../constants/filter'
 import { defaultFilter } from '../utils/filter'
@@ -17,8 +16,8 @@ const filterShape = PropTypes.shape({
     'Clearing Requests': PropTypes.bool.isRequired,
     'Challenged Clearing Requests': PropTypes.bool.isRequired,
     'My Submissions': PropTypes.bool.isRequired,
-    'My Challenges': PropTypes.bool.isRequired
-  }).isRequired
+    'My Challenges': PropTypes.bool.isRequired,
+  }).isRequired,
 })
 export { filterShape }
 
@@ -27,7 +26,7 @@ export default createReducer(
   {
     oldestFirst: 0,
     filters: defaultFilter(),
-    badgeFilters: {}
+    badgeFilters: {},
   },
   {
     [filterActions.SET_OLDEST_FIRST]: (
@@ -36,7 +35,7 @@ export default createReducer(
     ) => {
       const newState = {
         ...state,
-        oldestFirst
+        oldestFirst,
       }
       localStorage.setItem(
         `${tcr.options.address}filter@${APP_VERSION}`,
@@ -49,8 +48,8 @@ export default createReducer(
         ...state,
         filters: {
           ...state.filters,
-          [key]: !state.filters[key]
-        }
+          [key]: !state.filters[key],
+        },
       }
       localStorage.setItem(
         `${tcr.options.address}filter@${APP_VERSION}`,
@@ -63,8 +62,8 @@ export default createReducer(
         ...state,
         badgeFilters: {
           ...state.badgeFilters,
-          [key]: !state.badgeFilters[key]
-        }
+          [key]: !state.badgeFilters[key],
+        },
       }
       localStorage.setItem(
         `${tcr.options.address}filter@${APP_VERSION}`,
@@ -72,6 +71,6 @@ export default createReducer(
       )
       return newState
     },
-    [filterActions.LOAD_FILTERS_STATE]: (_, { payload: { data } }) => data
+    [filterActions.LOAD_FILTERS_STATE]: (_, { payload: { data } }) => data,
   }
 )

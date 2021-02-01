@@ -4,24 +4,24 @@ import createReducer, { createResource } from 'lessdux'
 // Shapes
 const {
   shape: accountsShape,
-  initialState: accountsInitialState
+  initialState: accountsInitialState,
 } = createResource(PropTypes.arrayOf(PropTypes.string.isRequired))
 const {
   shape: balanceShape,
-  initialState: balanceInitialState
+  initialState: balanceInitialState,
 } = createResource(PropTypes.string)
 const {
   shape: settingsShape,
-  initialState: settingsInitialState
+  initialState: settingsInitialState,
 } = createResource(
   PropTypes.shape({
     dispute: PropTypes.bool.isRequired,
     shouldFund: PropTypes.bool.isRequired,
     rulingGiven: PropTypes.bool.isRequired,
-    requestSubmitted: PropTypes.bool.isRequired
+    requestSubmitted: PropTypes.bool.isRequired,
   }),
   {
-    withUpdate: true
+    withUpdate: true,
   }
 )
 
@@ -39,11 +39,11 @@ export default createReducer({
       rulingGiven: true,
       requestSubmitted: true,
       name: '',
-      email: ''
-    }
-  }
+      email: '',
+    },
+  },
 })
 
 // Selectors
-export const getAccount = state =>
+export const getAccount = (state) =>
   state.wallet.accounts.data && state.wallet.accounts.data[0]

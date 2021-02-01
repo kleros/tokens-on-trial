@@ -65,7 +65,7 @@ Button.propTypes = {
   disabled: PropTypes.bool,
   className: PropTypes.string,
   labelClassName: PropTypes.string,
-  hidden: PropTypes.bool
+  hidden: PropTypes.bool,
 }
 
 Button.defaultProps = {
@@ -82,7 +82,7 @@ Button.defaultProps = {
   disabled: false,
   className: '',
   labelClassName: '',
-  hidden: false
+  hidden: false,
 }
 
 export default Button

@@ -8,7 +8,7 @@ const TextInput = ({
   placeholder,
   type,
   step,
-  className
+  className,
 }) => (
   <div
     className={`TextInput ${
@@ -40,9 +40,7 @@ const TextInput = ({
             : ''
         }`}
         style={
-          type === 'textarea' && (value === '' && !touched)
-            ? { top: '20%' }
-            : {}
+          type === 'textarea' && value === '' && !touched ? { top: '20%' } : {}
         }
       >
         {placeholder}
@@ -57,12 +55,12 @@ TextInput.propTypes = {
   input: PropTypes.shape({
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     onBlur: PropTypes.func.isRequired,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   }).isRequired,
   meta: PropTypes.shape({
     touched: PropTypes.bool,
     valid: PropTypes.bool,
-    error: PropTypes.string
+    error: PropTypes.string,
   }),
 
   // State
@@ -72,7 +70,7 @@ TextInput.propTypes = {
   // Modifiers
   type: PropTypes.string,
   step: PropTypes.number,
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 TextInput.defaultProps = {
@@ -82,7 +80,7 @@ TextInput.defaultProps = {
   // Modifiers
   type: 'text',
   step: undefined,
-  className: ''
+  className: '',
 }
 
 export default TextInput

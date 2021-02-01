@@ -1,7 +1,6 @@
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
-
 import Button from '../../components/button'
 import getActionButton from '../../components/action-button'
 import * as tcrConstants from '../../constants/tcr'
@@ -20,7 +19,7 @@ const ItemActionButton = ({
   appealPeriodEnded,
   loserTimedOut,
   extraClass,
-  badgeContractAddr
+  badgeContractAddr,
 }) => {
   const { status, latestRequest } = item
   const { dispute } = latestRequest
@@ -29,7 +28,7 @@ const ItemActionButton = ({
     userSide,
     decisiveRuling,
     loserPercent,
-    loserSide
+    loserSide,
   } = getItemInformation(item, userAccount)
 
   const remainingTime = getRemainingTime(
@@ -58,9 +57,11 @@ const ItemActionButton = ({
           }
         >
           <FontAwesomeIcon className="TokenDetails-icon" icon="coins" />
-          {(decisiveRuling
-          ? (!appealPeriodEnded || !loserTimedOut) && !loserTimedOut
-          : !countdownCompleted && remainingTime > 0)
+          {(
+            decisiveRuling
+              ? (!appealPeriodEnded || !loserTimedOut) && !loserTimedOut
+              : !countdownCompleted && remainingTime > 0
+          )
             ? 'Contribute Fees'
             : 'Waiting Enforcement'}
         </Button>
@@ -75,7 +76,7 @@ const ItemActionButton = ({
           decisiveRuling,
           loserPercent,
           loserTimedOut,
-          badgeContractAddr
+          badgeContractAddr,
         })
       )}
     </div>
@@ -93,7 +94,7 @@ ItemActionButton.propTypes = {
   countdownCompleted: PropTypes.bool,
   loserTimedOut: PropTypes.bool,
   extraClass: PropTypes.string,
-  badgeContractAddr: PropTypes.string
+  badgeContractAddr: PropTypes.string,
 }
 
 ItemActionButton.defaultProps = {
@@ -102,7 +103,7 @@ ItemActionButton.defaultProps = {
   tcr: null,
   countdownCompleted: null,
   loserTimedOut: null,
-  badgeContractAddr: null
+  badgeContractAddr: null,
 }
 
 export default ItemActionButton

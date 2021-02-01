@@ -5,7 +5,6 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { BeatLoader } from 'react-spinners'
-
 import UnknownToken from '../../assets/images/unknown.svg'
 import { IPFS_URL, web3Utils } from '../../bootstrap/dapp-api'
 import { cacheItemShape } from '../../reducers/generic-shapes'
@@ -13,32 +12,30 @@ import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-addre
 import { getItemStatusColor, getItemStatusText } from '../../utils/ui'
 import * as tokenSelectors from '../../reducers/token'
 import * as tcrConstants from '../../constants/tcr'
-
 import './badge-card.css'
 
 const BadgeCard = ({
   badge,
   tokens,
   envObjects,
-  arbitrableAddressListData
+  arbitrableAddressListData,
 }) => {
   // Link to the oldest, registered token submission for this address.
   if (!badge) return <BeatLoader color="#3d464d" />
 
   const badgeContractData = arbitrableAddressListData[badge.badgeContractAddr]
   const {
-    variables: { symbolURI, title }
+    variables: { symbolURI, title },
   } = badgeContractData
   const tokenData = tokens.data
   let tokenSubmissions = []
   if (tokenData.addressToIDs[badge.address]) {
-    tokenData.addressToIDs[badge.address].forEach(tokenID => {
+    for (const tokenID of tokenData.addressToIDs[badge.address])
       if (
         tokenData.items[tokenID].status.status === 1 ||
         tokenData.items[tokenID].status.status === 3
       )
         tokenSubmissions.push(tokenData.items[tokenID])
-    })
 
     tokenSubmissions = tokenSubmissions.sort((a, b) =>
       a.statusBlockNumber < b.statusBlockNumber ? -1 : 1
@@ -83,7 +80,7 @@ const BadgeCard = ({
               style={{
                 margin: 0,
                 textAlign: 'center',
-                maxWidth: '200px'
+                maxWidth: '200px',
               }}
             >
               {title} Compliant
@@ -122,13 +119,14 @@ const BadgeCard = ({
 BadgeCard.propTypes = {
   tokens: tokenSelectors.tokensShape.isRequired,
   badge: cacheItemShape.isRequired,
-  envObjects: PropTypes.shape({}).isRequired,
+  envObjects: PropTypes.shape({ FILE_BASE_URL: PropTypes.string.isRequired })
+    .isRequired,
   arbitrableAddressListData: PropTypes.objectOf(_arbitrableAddressListDataShape)
-    .isRequired
+    .isRequired,
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   tokens: state.tokens,
   badges: state.badges,
-  envObjects: state.envObjects.data
+  envObjects: state.envObjects.data,
 }))(BadgeCard)

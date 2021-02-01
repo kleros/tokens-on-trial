@@ -1,5 +1,4 @@
 import { eventChannel } from 'redux-saga'
-
 import {
   fork,
   put,
@@ -7,9 +6,8 @@ import {
   race,
   select,
   take,
-  takeLatest
+  takeLatest,
 } from 'redux-saga/effects'
-
 import * as notificationActions from '../../actions/notification'
 import * as walletSelectors from '../../reducers/wallet'
 import * as walletActions from '../../actions/wallet'
@@ -21,7 +19,6 @@ import { lessduxSaga } from '../../utils/saga'
 import { action } from '../../utils/action'
 import { instantiateEnvObjects } from '../../utils/tcr'
 import { APP_VERSION } from '../../bootstrap/dapp-api'
-
 import emitTokenNotifications from './token-events'
 import emitBadgeNotifications from './badge-events'
 import emitArbitratorNotifications from './arbitrator-events'
@@ -38,7 +35,7 @@ function* pushNotificationsListener() {
     arbitratorEvents,
     badgeEventsContracts,
     arbitrableTokenListEvents,
-    latestBlock
+    latestBlock,
   } = yield call(instantiateEnvObjects)
 
   // Get cached notifications
@@ -46,9 +43,9 @@ function* pushNotificationsListener() {
     `${arbitrableTokenListView.options.address}.notifications@${APP_VERSION}`
   )
   if (cachedNotifications) {
-    const parsedCache = JSON.parse(cachedNotifications).map(n => ({
+    const parsedCache = JSON.parse(cachedNotifications).map((n) => ({
       ...n,
-      date: new Date(n.date)
+      date: new Date(n.date),
     })) // Convert date strings into date objects.
     yield put(notificationActions.loadState(parsedCache))
   }
@@ -71,7 +68,7 @@ function* pushNotificationsListener() {
     )
 
     // Set up event channel with subscriber
-    const channel = eventChannel(emit => {
+    const channel = eventChannel((emit) => {
       // Due to an issue with web3js, events get emitted as many times as
       // there are subscribers listening to them. To get around this, keep
       // a dictionary of txHashes and only emit notifications if the event is unique.
@@ -85,12 +82,12 @@ function* pushNotificationsListener() {
       // T2CR events
       arbitrableTokenListView
         .getPastEvents('TokenStatusChange', {
-          fromBlock
+          fromBlock,
         })
-        .then(events => {
+        .then((events) => {
           emitTokenNotifications(account, t2crTimeToChallenge, emit, events, {
             arbitrableTokenListView,
-            viewWeb3
+            viewWeb3,
           })
         })
       arbitrableTokenListEvents.events.TokenStatusChange((err, event) => {
@@ -102,18 +99,18 @@ function* pushNotificationsListener() {
           txHashes[event.transactionHash] = true
           emitTokenNotifications(account, t2crTimeToChallenge, emit, [event], {
             arbitrableTokenListView,
-            viewWeb3
+            viewWeb3,
           })
         }
       })
 
       // Badge contracts events
-      Object.keys(badgeViewContracts).forEach(address => {
+      for (const address of Object.keys(badgeViewContracts)) {
         badgeViewContracts[address]
           .getPastEvents('AddressStatusChange', {
-            fromBlock
+            fromBlock,
           })
-          .then(events => {
+          .then((events) => {
             emitBadgeNotifications(
               account,
               badgeTimeToChallenge,
@@ -122,7 +119,7 @@ function* pushNotificationsListener() {
               {
                 arbitrableAddressListView: badgeViewContracts[address],
                 arbitrableTokenListView,
-                viewWeb3
+                viewWeb3,
               }
             )
           })
@@ -142,25 +139,25 @@ function* pushNotificationsListener() {
                 {
                   arbitrableAddressListView: badgeViewContracts[address],
                   arbitrableTokenListView,
-                  viewWeb3
+                  viewWeb3,
                 }
               )
             }
           }
         )
-      })
+      }
 
       // Arbitator events
       arbitratorView
         .getPastEvents('AppealPossible', {
-          fromBlock
+          fromBlock,
         })
-        .then(events => {
+        .then((events) => {
           emitArbitratorNotifications(account, emit, events, {
             arbitratorView,
             badgeViewContracts,
             arbitrableTokenListView,
-            viewWeb3
+            viewWeb3,
           })
         })
       arbitratorEvents.events.AppealPossible((err, event) => {
@@ -174,7 +171,7 @@ function* pushNotificationsListener() {
             arbitratorView,
             badgeViewContracts,
             arbitrableTokenListView,
-            viewWeb3
+            viewWeb3,
           })
         }
       })
@@ -192,7 +189,7 @@ function* pushNotificationsListener() {
       const [notification, accounts, arbitrableTokenListData] = yield race([
         take(channel), // New notification
         take(walletActions.accounts.RECEIVE), // Accounts refetch
-        take(arbitrableTokenListActions.arbitrableTokenListData.RECEIVE) // T2CR data refetch
+        take(arbitrableTokenListActions.arbitrableTokenListData.RECEIVE), // T2CR data refetch
       ])
 
       if (accounts || arbitrableTokenListData) continue
@@ -202,8 +199,8 @@ function* pushNotificationsListener() {
         action(notificationActions.notification.RECEIVE, {
           collectionMod: {
             collection: notificationActions.notifications.self,
-            resource: notification
-          }
+            resource: notification,
+          },
         })
       )
     }
@@ -227,7 +224,7 @@ export default function* notificationSaga() {
     {
       flow: 'delete',
       collection: notificationActions.notifications.self,
-      find: ({ payload: { ID } }) => n => ID === n.ID
+      find: ({ payload: { ID } }) => (n) => ID === n.ID,
     },
     notificationActions.notification,
     null

@@ -1,15 +1,13 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import Acropolis from '../../assets/images/acropolis.svg'
-
 import './page-not-found.css'
 
 const PageNotFound = ({
   type = 404,
   title = 'Oops,',
   msg = 'Page not found',
-  small
+  small,
 }) => (
   <div className="PageNotFound">
     <img src={Acropolis} style={{ width: '100%' }} alt="acropolis" />
@@ -20,7 +18,7 @@ const PageNotFound = ({
           fontSize: '88px',
           fontWeight: 'bold',
           lineHeight: '112px',
-          margin: 0
+          margin: 0,
         }}
       >
         {type}
@@ -30,7 +28,7 @@ const PageNotFound = ({
           margin: '12px',
           color: '#4004a3',
           fontSize: '28px',
-          fontWeight: 'bold'
+          fontWeight: 'bold',
         }}
       >
         {title}
@@ -41,7 +39,7 @@ const PageNotFound = ({
             margin: 0,
             color: '#4004a3',
             fontSize: '24px',
-            fontWeight: 400
+            fontWeight: 400,
           }}
         >
           {msg}
@@ -52,7 +50,7 @@ const PageNotFound = ({
             color: '#4004a3',
             fontWeight: 400,
             fontSize: '16px',
-            marginTop: '25px'
+            marginTop: '25px',
           }}
         >
           {small}
@@ -66,14 +64,14 @@ PageNotFound.propTypes = {
   type: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
   title: PropTypes.string,
   msg: PropTypes.string,
-  small: PropTypes.string
+  small: PropTypes.string,
 }
 
 PageNotFound.defaultProps = {
   type: 404,
   title: 'Oops,',
   msg: 'Page not found',
-  small: null
+  small: null,
 }
 
 export default PageNotFound

@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
 import { slide as ReactBurgerMenu } from 'react-burger-menu'
 import debounce from 'debounce'
-
 import T2CRLogo from '../../assets/images/t2cr-logo.png'
 import { onlyInfura } from '../../bootstrap/dapp-api'
 import './nav-bar.css'
@@ -14,21 +13,21 @@ export default class NavBar extends PureComponent {
     routes: PropTypes.arrayOf(
       PropTypes.shape({
         title: PropTypes.node.isRequired,
-        isExternal: PropTypes.bool
+        isExternal: PropTypes.bool,
       }).isRequired
     ).isRequired,
     submenus: PropTypes.arrayOf(
       PropTypes.shape({
-        title: PropTypes.node.isRequired
+        title: PropTypes.node.isRequired,
       }).isRequired
     ).isRequired,
     extras: PropTypes.arrayOf(PropTypes.node.isRequired).isRequired,
-    action: PropTypes.node.isRequired
+    action: PropTypes.node.isRequired,
   }
 
   state = {
     isMobile: document.body.clientWidth < 950,
-    isOpen: false
+    isOpen: false,
   }
 
   constructor(props) {
@@ -60,7 +59,7 @@ export default class NavBar extends PureComponent {
 
     const logoImg = <img alt="Logo" className="NavBar-logo" src={T2CRLogo} />
     const routesAndExtras = [
-      ...routes.map(r => (
+      ...routes.map((r) => (
         <div key={r.title}>
           {r.isExternal ? (
             <a
@@ -95,39 +94,35 @@ export default class NavBar extends PureComponent {
           )}
         </div>
       )),
-      ...submenus.map(s => {
-        if (!isMobile)
-          return (
-            <div
-              key={s.key}
-              className={`NavBar-route ${s.extraStyle} NavBar-submenu`}
-            >
-              {s.title}
-              <ul className="NavBar-submenu-list">
-                {s.routes.map(r => (
-                  <a
-                    className={`NavBar-route ${
-                      r.extraStyle
-                    } NavBar-submenu-item`}
-                    style={{ height: '55px' }}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                    href={r.to}
-                    key={r.title}
-                  >
-                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                      {r.title}
-                      <i style={{ fontSize: '10px', letterSpacing: 0 }}>
-                        {r.subtitle}
-                      </i>
-                    </div>
-                  </a>
-                ))}
-              </ul>
-            </div>
-          )
-        else
-          return s.routes.map(r => (
+      ...submenus.map((s) =>
+        !isMobile ? (
+          <div
+            key={s.key}
+            className={`NavBar-route ${s.extraStyle} NavBar-submenu`}
+          >
+            {s.title}
+            <ul className="NavBar-submenu-list">
+              {s.routes.map((r) => (
+                <a
+                  className={`NavBar-route ${r.extraStyle} NavBar-submenu-item`}
+                  style={{ height: '55px' }}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  href={r.to}
+                  key={r.title}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                    {r.title}
+                    <i style={{ fontSize: '10px', letterSpacing: 0 }}>
+                      {r.subtitle}
+                    </i>
+                  </div>
+                </a>
+              ))}
+            </ul>
+          </div>
+        ) : (
+          s.routes.map((r) => (
             <div key={r.title}>
               <a
                 className={`NavBar-route ${r.extraStyle}`}
@@ -146,7 +141,8 @@ export default class NavBar extends PureComponent {
               </a>
             </div>
           ))
-      }),
+        )
+      ),
       ...extras
         .filter(() => !isMobile)
         .map((e, i) => (
@@ -163,7 +159,7 @@ export default class NavBar extends PureComponent {
         key="navbar-action"
       >
         {action}
-      </div>
+      </div>,
     ]
     return (
       <div className="NavBar">
@@ -176,7 +172,7 @@ export default class NavBar extends PureComponent {
                 color: 'white',
                 marginLeft: '14px',
                 fontSize: '16px',
-                alignSelf: 'center'
+                alignSelf: 'center',
               }}
             >
               K L E R O S
@@ -188,7 +184,7 @@ export default class NavBar extends PureComponent {
           <ReactBurgerMenu
             className="NavBar-burgerMenu"
             isOpen={isOpen}
-            onStateChange={state => this.handleStateChange(state)}
+            onStateChange={(state) => this.handleStateChange(state)}
             itemListClassName="NavBar-burgerMenu-itemList"
             overlayClassName="NavBar-burgerMenu-overlay"
             customBurgerIcon={<div />}

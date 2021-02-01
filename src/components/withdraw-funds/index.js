@@ -1,14 +1,12 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { web3Utils } from '../../bootstrap/dapp-api'
 import { itemShape } from '../../reducers/generic-shapes'
-
 import './withdraw-funds.css'
 
 const WithdrawFundsButton = ({
   item: { withdrawable },
-  onWithdrawFundsClick
+  onWithdrawFundsClick,
 }) =>
   withdrawable.gt(web3Utils.toBN(0)) && (
     <>
@@ -24,7 +22,7 @@ const WithdrawFundsButton = ({
 
 WithdrawFundsButton.propTypes = {
   item: itemShape.isRequired,
-  onWithdrawFundsClick: PropTypes.func.isRequired
+  onWithdrawFundsClick: PropTypes.func.isRequired,
 }
 
 export default WithdrawFundsButton

@@ -2,21 +2,18 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import * as modalActions from '../../actions/modal'
 import * as walletActions from '../../actions/wallet'
 import * as walletSelectors from '../../reducers/wallet'
-import Button from '../../components/button'
-import NavOverlay from '../../components/nav-overlay'
+import Button from '../button'
+import NavOverlay from '../nav-overlay'
 import { instantiateEnvObjects } from '../../utils/tcr'
 import { onlyInfura } from '../../bootstrap/dapp-api'
-
 import {
   SettingsForm,
   submitSettingsForm,
-  getSettingsFormIsInvalid
+  getSettingsFormIsInvalid,
 } from './components/settings-form'
-
 import './settings-modal.css'
 
 class SettingsModal extends PureComponent {
@@ -32,7 +29,7 @@ class SettingsModal extends PureComponent {
     // Handlers
     closeSettingsModal: PropTypes.func.isRequired,
     openSettingsModal: PropTypes.func.isRequired,
-    submitSettingsForm: PropTypes.func.isRequired
+    submitSettingsForm: PropTypes.func.isRequired,
   }
 
   state = { settingsSubmitted: false }
@@ -58,10 +55,10 @@ class SettingsModal extends PureComponent {
         acc[
           `t2crNotificationSetting${`${v[0].toUpperCase()}${v.slice(1)}`}`
         ] = {
-          BOOL: rest[v] || false
+          BOOL: rest[v] || false,
         }
         return acc
-      }, {})
+      }, {}),
     }
 
     try {
@@ -73,11 +70,11 @@ class SettingsModal extends PureComponent {
             signature: await web3.eth.personal.sign(
               JSON.stringify(settings),
               accounts.data[0]
-            )
-          }
+            ),
+          },
         }),
         headers: { 'Content-Type': 'application/json' },
-        method: 'PATCH'
+        method: 'PATCH',
       })
       this.setState({ settingsSubmitted: true })
     } catch (err) {
@@ -91,7 +88,7 @@ class SettingsModal extends PureComponent {
       isSettingsModalOpen,
       settings,
       settingsFormIsInvalid,
-      submitSettingsForm
+      submitSettingsForm,
     } = this.props
 
     const { settingsSubmitted } = this.state
@@ -125,7 +122,7 @@ class SettingsModal extends PureComponent {
                       dispute: settings.data.dispute,
                       rulingGiven: settings.data.rulingGiven,
                       shouldFund: settings.data.shouldFund,
-                      requestSubmitted: settings.data.requestSubmitted
+                      requestSubmitted: settings.data.requestSubmitted,
                     }}
                     onSubmit={this.handleUpdateSettingsClick}
                   />
@@ -150,17 +147,17 @@ class SettingsModal extends PureComponent {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     accounts: state.wallet.accounts,
     isSettingsModalOpen: state.modal.isSettingsModalOpen,
     settings: state.wallet.settings,
     envObjects: state.envObjects.data,
-    settingsFormIsInvalid: getSettingsFormIsInvalid(state)
+    settingsFormIsInvalid: getSettingsFormIsInvalid(state),
   }),
   {
     openSettingsModal: modalActions.openSettingsModal,
     closeSettingsModal: modalActions.closeSettingsModal,
     updateSettings: walletActions.updateSettings,
-    submitSettingsForm
+    submitSettingsForm,
   }
 )(SettingsModal)

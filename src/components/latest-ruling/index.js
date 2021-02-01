@@ -1,11 +1,9 @@
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../../constants/tcr'
 import { rulingMessage, getItemInformation } from '../../utils/ui'
 import { itemShape } from '../../reducers/generic-shapes'
-
 import './latest-ruling.css'
 
 const LatestRuling = ({ item, userAccount }) => {
@@ -27,7 +25,7 @@ const LatestRuling = ({ item, userAccount }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        color: '#4d00b4'
+        color: '#4d00b4',
       }}
     >
       <FontAwesomeIcon
@@ -50,7 +48,7 @@ const LatestRuling = ({ item, userAccount }) => {
 
 LatestRuling.propTypes = {
   item: itemShape.isRequired,
-  userAccount: PropTypes.string.isRequired
+  userAccount: PropTypes.string.isRequired,
 }
 
 export default LatestRuling

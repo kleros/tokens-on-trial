@@ -10,22 +10,22 @@ export const CLEAR_ALL_NOTIFICATIONS = 'CLEAR_ALL_NOTIFICATIONS '
 // Notification
 export const notification = createActions('NOTIFICATION', {
   withCreate: true,
-  withDelete: true
+  withDelete: true,
 })
 
 /* Action Creators */
 
 // Notification
-export const deleteNotification = ID => ({
+export const deleteNotification = (ID) => ({
   type: notification.DELETE,
-  payload: { ID }
+  payload: { ID },
 })
 
-export const loadState = data => ({
+export const loadState = (data) => ({
   type: LOAD_NOTIFICATIONS_STATE,
-  payload: { data }
+  payload: { data },
 })
 
 export const clearAll = () => ({
-  type: CLEAR_ALL_NOTIFICATIONS
+  type: CLEAR_ALL_NOTIFICATIONS,
 })

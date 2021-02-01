@@ -1,7 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
-
 import Dropdown from '../dropdown'
 import * as filterConstants from '../../constants/filter'
 import * as filterActions from '../../actions/filter'
@@ -10,7 +9,6 @@ import { ContractsContext } from '../../bootstrap/contexts'
 import { tokensShape } from '../../reducers/token'
 import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
 import { badgesShape } from '../../reducers/badges'
-
 import './sort-bar.css'
 
 class SortBar extends PureComponent {
@@ -27,35 +25,34 @@ class SortBar extends PureComponent {
 
     // Action Dispatchers
     setOldestFirst: PropTypes.func.isRequired,
-    toggleBadgeFilter: PropTypes.func.isRequired
+    toggleBadgeFilter: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
     displayBadgeFilters: false,
-    arbitrableAddressListData: null
+    arbitrableAddressListData: null,
   }
 
   static contextType = ContractsContext
 
-  handleSortChange = oldestFirst => {
+  handleSortChange = (oldestFirst) => {
     const { setOldestFirst } = this.props
     const { arbitrableTokenListView } = this.context
     setOldestFirst(oldestFirst, arbitrableTokenListView)
   }
 
-  handleBadgeChange = badgeContractIndexes => {
+  handleBadgeChange = (badgeContractIndexes) => {
     const { arbitrableTokenListView } = this.context
     const { toggleBadgeFilter, filter, arbitrableAddressListData } = this.props
     const { badgeFilters } = filter
 
-    Object.keys(arbitrableAddressListData).forEach((addr, i) => {
+    for (const [i, addr] of Object.keys(arbitrableAddressListData).entries())
       if (!badgeContractIndexes.includes(i) && badgeFilters[addr])
         // Disabling badge
         toggleBadgeFilter(addr, arbitrableTokenListView)
       else if (badgeContractIndexes.includes(i) && !badgeFilters[addr])
         // Enabling badge
         toggleBadgeFilter(addr, arbitrableTokenListView)
-    })
   }
 
   componentDidUpdate() {
@@ -63,10 +60,9 @@ class SortBar extends PureComponent {
     if (!this.context || !arbitrableAddressListData) return
     const { arbitrableTokenListView } = this.context
     const { badgeFilters } = filter
-    Object.keys(arbitrableAddressListData).forEach(badgeContractAddr => {
+    for (const badgeContractAddr of Object.keys(arbitrableAddressListData))
       if (!(badgeContractAddr in badgeFilters))
         toggleBadgeFilter(badgeContractAddr, arbitrableTokenListView)
-    })
   }
 
   render() {
@@ -76,19 +72,18 @@ class SortBar extends PureComponent {
       filter,
       totalFiltered,
       arbitrableAddressListData,
-      displayBadgeFilters
+      displayBadgeFilters,
     } = this.props
     const { oldestFirst, badgeFilters } = filter
     const selectedBadges = []
 
-    Object.keys(badgeFilters).forEach((badgeContractAddr, i) => {
+    for (const [i, badgeContractAddr] of Object.keys(badgeFilters).entries())
       if (badgeFilters[badgeContractAddr] === true) selectedBadges.push(i)
-    })
 
     const badgeContracts = arbitrableAddressListData
-      ? Object.keys(arbitrableAddressListData).map(badgeContractAddr => ({
+      ? Object.keys(arbitrableAddressListData).map((badgeContractAddr) => ({
           title: arbitrableAddressListData[badgeContractAddr].variables.title,
-          badgeContractAddr
+          badgeContractAddr,
         }))
       : []
 
@@ -114,7 +109,9 @@ class SortBar extends PureComponent {
               value={selectedBadges}
               label="Badge Type:"
               type="checkbox"
-              options={badgeContracts.map(badgeContract => badgeContract.title)}
+              options={badgeContracts.map(
+                (badgeContract) => badgeContract.title
+              )}
               onChange={this.handleBadgeChange}
               className="SortBar-dropdowns-dropdown"
             />
@@ -126,14 +123,14 @@ class SortBar extends PureComponent {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     filter: state.filter,
     arbitrableAddressListData:
-      state.arbitrableAddressList.arbitrableAddressListData.data
+      state.arbitrableAddressList.arbitrableAddressListData.data,
   }),
   {
     setOldestFirst: filterActions.setOldestFirst,
     toggleFilter: filterActions.toggleFilter,
-    toggleBadgeFilter: filterActions.toggleBadgeFilter
+    toggleBadgeFilter: filterActions.toggleBadgeFilter,
   }
 )(SortBar)

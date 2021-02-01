@@ -6,7 +6,7 @@ const CheckboxInput = ({
   input: { value, onChange },
   label,
   className,
-  customKey
+  customKey,
 }) => (
   <div className={`CheckboxInput ${className}`}>
     <div className="CheckboxInput-checkbox">
@@ -31,20 +31,20 @@ CheckboxInput.propTypes = {
   // Redux Form
   input: PropTypes.shape({
     value: PropTypes.bool,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
   }).isRequired,
   label: PropTypes.string,
   customKey: PropTypes.string,
 
   // Modifiers
-  className: PropTypes.string
+  className: PropTypes.string,
 }
 
 CheckboxInput.defaultProps = {
   // Modifiers
   label: '',
   className: '',
-  customKey: ''
+  customKey: '',
 }
 
 export default CheckboxInput

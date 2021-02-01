@@ -14,15 +14,15 @@ const isLocalhost = Boolean(
     // [::1] is the IPv6 localhost address.
     window.location.hostname === '[::1]' ||
     // 127.0.0.1/8 is considered localhost for IPv4.
-    window.location.hostname.match(
-      /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/
+    /^127(?:\.(?:25[0-5]|2[0-4]\d|[01]?\d\d?)){3}$/.test(
+      window.location.hostname
     )
 )
 
 function registerValidSW(swUrl) {
   navigator.serviceWorker
     .register(swUrl)
-    .then(registration => {
+    .then((registration) => {
       registration.onupdatefound = () => {
         const installingWorker = registration.installing
         installingWorker.onstatechange = () => {
@@ -42,7 +42,7 @@ function registerValidSW(swUrl) {
         }
       }
     })
-    .catch(err => {
+    .catch((err) => {
       console.error('Error during service worker registration:', err)
     })
 }
@@ -50,14 +50,14 @@ function registerValidSW(swUrl) {
 function checkValidServiceWorker(swUrl) {
   // Check if the service worker can be found. If it can't reload the page.
   fetch(swUrl)
-    .then(response => {
+    .then((response) => {
       // Ensure service worker exists, and that we really are getting a JS file.
       if (
         response.status === 404 ||
-        response.headers.get('content-type').indexOf('javascript') === -1
+        !response.headers.get('content-type').includes('javascript')
       )
         // No service worker found. Probably a different app. Reload the page.
-        navigator.serviceWorker.ready.then(registration => {
+        navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
             window.location.reload()
           })
@@ -106,7 +106,7 @@ export default function registerServiceWorker() {
 
 export function unregisterServiceWorker() {
   if ('serviceWorker' in navigator)
-    navigator.serviceWorker.ready.then(registration => {
+    navigator.serviceWorker.ready.then((registration) => {
       registration.unregister()
     })
 }

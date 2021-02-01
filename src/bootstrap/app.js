@@ -7,7 +7,6 @@ import { Redirect, Route, Switch, withRouter } from 'react-router-dom'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { BeatLoader } from 'react-spinners'
 import { Footer } from '@kleros/react-components/dist'
-
 import Tokens from '../containers/tokens'
 import Badges from '../containers/badges'
 import TokenDetails from '../containers/token'
@@ -26,24 +25,22 @@ import Button from '../components/button'
 import NotificationBadge from '../components/notification-badge'
 import SettingsModal from '../components/settings-modal'
 import TelegramButton from '../components/telegram-button'
-
 import Initializer from './initializer'
 import GlobalComponents from './global-components'
 import { onlyInfura, IPFS_URL } from './dapp-api'
-
 import './fontawesome'
 import './app.css'
 
 const ETHFINEX_BADGE = {
   1: '0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab',
-  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759'
+  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759',
 }
 
 class _ConnectedNavBar extends Component {
   static propTypes = {
     // Navigation
     history: PropTypes.shape({
-      push: PropTypes.func.isRequired
+      push: PropTypes.func.isRequired,
     }).isRequired,
 
     // Redux State
@@ -56,11 +53,11 @@ class _ConnectedNavBar extends Component {
     // Action Dispatchers
     openActionModal: PropTypes.func.isRequired,
     deleteNotification: PropTypes.func.isRequired,
-    closeNotificationsModal: PropTypes.func.isRequired
+    closeNotificationsModal: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
-    arbitrableAddressListData: null
+    arbitrableAddressListData: null,
   }
 
   handleSubmitTokenClick = () => {
@@ -99,8 +96,10 @@ class _ConnectedNavBar extends Component {
             badgeContractAddr !== ETHFINEX_BADGE[42] &&
             badgeContractAddr !== ETHFINEX_BADGE[1]
         )
-        .map(badgeContractAddr => arbitrableAddressListData[badgeContractAddr])
-        .filter(badgeContract => badgeContract.variables)
+        .map(
+          (badgeContractAddr) => arbitrableAddressListData[badgeContractAddr]
+        )
+        .filter((badgeContract) => badgeContract.variables)
 
     const submenus = [
       {
@@ -111,20 +110,20 @@ class _ConnectedNavBar extends Component {
           {
             title: 'T²CR Guide',
             to: 'https://blog.kleros.io/kleros-ethfinex-tcr-an-explainer/',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'Ethfinex Badge',
             to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'Appeal Fees Crowdfunding',
             to:
               'https://blog.kleros.io/kleros-decentralized-token-listing-appeal-fees/',
-            extraStyle: 'NavBar-route-title'
-          }
-        ]
+            extraStyle: 'NavBar-route-title',
+          },
+        ],
       },
       {
         title: badgeContracts ? (
@@ -135,12 +134,12 @@ class _ConnectedNavBar extends Component {
         key: 'Criteria',
         extraStyle: 'NavBar-route-title',
         routes: badgeContracts
-          ? badgeContracts.map(badgeContract => ({
+          ? badgeContracts.map((badgeContract) => ({
               title: badgeContract.variables.title,
               to: `${IPFS_URL}${badgeContract.fileURI}`,
-              extraStyle: 'NavBar-route-title'
+              extraStyle: 'NavBar-route-title',
             }))
-          : []
+          : [],
       },
       {
         title: 'Integrations',
@@ -150,30 +149,30 @@ class _ConnectedNavBar extends Component {
           {
             title: 'uniswap.exchange',
             to: 'https://uniswap.exchange/',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'revoke.cash',
             to: 'https://revoke.cash/',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'Fairdex/Slow.Trade',
             to: 'https://fairdex.net/',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'Escrow',
             to: 'https://escrow.kleros.io/',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'Ethfinex(Diversifi)',
             to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
-            extraStyle: 'NavBar-route-title'
-          }
-        ]
-      }
+            extraStyle: 'NavBar-route-title',
+          },
+        ],
+      },
     ]
 
     return (
@@ -193,11 +192,11 @@ class _ConnectedNavBar extends Component {
           </SettingsModal>,
           !onlyInfura && (
             <Identicon address={accounts.data[0]} round scale={2} size={15} />
-          )
+          ),
         ]}
         action={
           <Button
-            className={`Button-submitToken`}
+            className="Button-submitToken"
             disabled={onlyInfura}
             onClick={this.handleSubmitTokenClick}
             tooltip={onlyInfura ? 'Please install MetaMask.' : null}
@@ -212,14 +211,14 @@ class _ConnectedNavBar extends Component {
           {
             title: 'Badges',
             to: '/badges',
-            extraStyle: 'NavBar-route-title'
+            extraStyle: 'NavBar-route-title',
           },
           {
             title: 'Statistics',
             to: 'https://t2cr-dashboard.kleros.io',
             extraStyle: 'NavBar-route-title',
-            isExternal: true
-          }
+            isExternal: true,
+          },
         ]}
         submenus={submenus}
       />
@@ -229,17 +228,17 @@ class _ConnectedNavBar extends Component {
 
 const ConnectedNavBar = withRouter(
   connect(
-    state => ({
+    (state) => ({
       accounts: state.wallet.accounts,
       notifications: state.notification.notifications,
       isNotificationsModalOpen: state.modal.isNotificationsModalOpen,
       arbitrableAddressListData:
-        state.arbitrableAddressList.arbitrableAddressListData.data
+        state.arbitrableAddressList.arbitrableAddressListData.data,
     }),
     {
       deleteNotification: notificationActions.deleteNotification,
       openActionModal: modalActions.openActionModal,
-      closeNotificationsModal: modalActions.closeNotificationsModal
+      closeNotificationsModal: modalActions.closeNotificationsModal,
     }
   )(_ConnectedNavBar)
 )
@@ -291,7 +290,7 @@ const App = ({ store, history }) => (
 App.propTypes = {
   // State
   store: PropTypes.shape({}).isRequired,
-  history: PropTypes.shape({}).isRequired
+  history: PropTypes.shape({}).isRequired,
 }
 
 export default App

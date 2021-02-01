@@ -3,12 +3,11 @@ import PropTypes from 'prop-types'
 import TimeAgo from 'timeago-react'
 import { connect } from 'react-redux'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import * as notificationSelectors from '../../reducers/notification'
 import * as modalActions from '../../actions/modal'
 import * as notificationActions from '../../actions/notification'
 import * as tcrConstants from '../../constants/tcr'
-import NavOverlay from '../../components/nav-overlay'
+import NavOverlay from '../nav-overlay'
 import './notification-badge.css'
 
 class NotificationBadge extends PureComponent {
@@ -24,7 +23,7 @@ class NotificationBadge extends PureComponent {
     openNotificationsModal: PropTypes.func.isRequired,
     closeNotificationsModal: PropTypes.func.isRequired,
     onNotificationClick: PropTypes.func.isRequired,
-    clearAllNotifications: PropTypes.func.isRequired
+    clearAllNotifications: PropTypes.func.isRequired,
   }
 
   static defaultProps = {
@@ -32,7 +31,7 @@ class NotificationBadge extends PureComponent {
     maxShown: null,
 
     // Handlers
-    onShowAll: null
+    onShowAll: null,
   }
 
   handleOpenNotificationClick = () => {
@@ -58,7 +57,7 @@ class NotificationBadge extends PureComponent {
       maxShown,
       onShowAll,
       onNotificationClick,
-      isNotificationsModalOpen
+      isNotificationsModalOpen,
     } = this.props
 
     const hasNotifications = notifications.data.length > 0
@@ -97,7 +96,7 @@ class NotificationBadge extends PureComponent {
                         onNotificationClick({
                           ID: n.ID,
                           address: n.address,
-                          badgeAddr: n.badgeAddr
+                          badgeAddr: n.badgeAddr,
                         })
                       }
                     >
@@ -127,7 +126,7 @@ class NotificationBadge extends PureComponent {
                   </div>
                 )}
                 {useMaxShown &&
-                false && ( // TODO: remove false flag once notifications view is implemented
+                  false && ( // TODO: remove false flag once notifications view is implemented
                     <div
                       className="NotificationBadge-notifications-showAll"
                       onClick={onShowAll}
@@ -145,12 +144,12 @@ class NotificationBadge extends PureComponent {
 }
 
 export default connect(
-  state => ({
-    isNotificationsModalOpen: state.modal.isNotificationsModalOpen
+  (state) => ({
+    isNotificationsModalOpen: state.modal.isNotificationsModalOpen,
   }),
   {
     openNotificationsModal: modalActions.openNotificationsModal,
     closeNotificationsModal: modalActions.closeNotificationsModal,
-    clearAllNotifications: notificationActions.clearAll
+    clearAllNotifications: notificationActions.clearAll,
   }
 )(NotificationBadge)

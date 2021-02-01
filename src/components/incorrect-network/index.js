@@ -1,7 +1,5 @@
 import React from 'react'
-
 import metaMaskLogo from '../../assets/images/meta-mask-logo.png'
-
 import './incorrect-network.css'
 
 const IncorrectNetwork = () => (

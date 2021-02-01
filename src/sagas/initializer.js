@@ -1,5 +1,4 @@
 import { put, takeLatest, call } from 'redux-saga/effects'
-
 import { INITIALIZE } from '../actions/initialization'
 import { setEnvObjects } from '../actions/env-objects'
 import { loadState as loadFiltersState } from '../actions/filter'
@@ -17,7 +16,7 @@ function* initialize() {
     ETHFINEX_BADGE_BLOCK,
     ARBITRABLE_ADDRESS_LIST_ADDRESS,
     arbitrableTokenListView,
-    networkID
+    networkID,
   } = yield call(instantiateEnvObjects)
 
   yield put(
@@ -26,7 +25,7 @@ function* initialize() {
       T2CR_BLOCK,
       ETHFINEX_BADGE_BLOCK,
       ARBITRABLE_ADDRESS_LIST_ADDRESS,
-      networkID
+      networkID,
     })
   )
 

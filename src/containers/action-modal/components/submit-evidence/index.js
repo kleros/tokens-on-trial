@@ -1,12 +1,10 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import FilePicker from '../../../../components/file-picker'
 import Button from '../../../../components/button'
 import CheckboxInput from '../../../../components/checkbox-input'
-import { EvidenceForm } from '../../components/submit-evidence/evidence-form'
-
+import { EvidenceForm } from './evidence-form'
 import './submit-evidence.css'
 
 const SubmitEvidence = ({
@@ -16,7 +14,7 @@ const SubmitEvidence = ({
   handleOnFileDropAccepted,
   evidenceFormIsInvalid,
   submitEvidenceForm,
-  file
+  file,
 }) => {
   const [selectedOption, setSelectedOption] = useState(0)
   const [categoriesVisible, toggleCategories] = useState(0)
@@ -26,20 +24,20 @@ const SubmitEvidence = ({
       label: 'Discussion',
       value: 0,
       icon: 'comments',
-      color: 'grey'
+      color: 'grey',
     },
     {
       label: 'Supporting Requester',
       value: 1,
       icon: 'thumbs-up',
-      color: '#66e800'
+      color: '#66e800',
     },
     {
       label: 'Against Requester',
       value: 2,
       icon: 'thumbs-down',
-      color: '#f60c36'
-    }
+      color: '#f60c36',
+    },
   ]
   /* eslint-disable react/jsx-no-bind */
 
@@ -55,7 +53,7 @@ const SubmitEvidence = ({
       <div style={{ padding: '20px', paddingTop: '10px' }}>
         <EvidenceForm
           className="SubmitEvidence-form"
-          onSubmit={evidence => submitEvidence(evidence, selectedOption)}
+          onSubmit={(evidence) => submitEvidence(evidence, selectedOption)}
         />
         <FilePicker
           file={file}
@@ -73,14 +71,14 @@ const SubmitEvidence = ({
         <CheckboxInput
           input={{
             value: categoriesVisible,
-            onChange: () => toggleCategories(!categoriesVisible)
+            onChange: () => toggleCategories(!categoriesVisible),
           }}
           label="Set Evidence Category"
           className="SubmitEvidence-checkboxExtra"
         />
         {!!categoriesVisible && (
           <div className="SubmitEvidence-options">
-            {options.map(option => (
+            {options.map((option) => (
               <div
                 className="SubmitEvidence-options-item"
                 key={option.value}
@@ -152,13 +150,13 @@ SubmitEvidence.propTypes = {
   file: PropTypes.shape({
     name: PropTypes.string.isRequired,
     size: PropTypes.number.isRequired,
-    type: PropTypes.string.isRequired
-  })
+    type: PropTypes.string.isRequired,
+  }),
 }
 
 SubmitEvidence.defaultProps = {
   fileInfoMessage: '',
-  file: null
+  file: null,
 }
 
 export default SubmitEvidence

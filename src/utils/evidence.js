@@ -1,4 +1,4 @@
-const getFileIcon = type => {
+const getFileIcon = (type) => {
   if (!type) return 'file'
 
   switch (type.slice(0, 5)) {

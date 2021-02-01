@@ -1,15 +1,12 @@
 import localforage from 'localforage'
-
 import { put, takeLatest, call, all } from 'redux-saga/effects'
-
 import * as tokensActions from '../actions/tokens'
 import * as badgesActions from '../actions/badges'
 import { web3Utils, APP_VERSION } from '../bootstrap/dapp-api'
 import {
   contractStatusToClientStatus,
-  instantiateEnvObjects
+  instantiateEnvObjects,
 } from '../utils/tcr'
-
 import { fetchEvents, fetchAppealableTokens } from './utils'
 
 /**
@@ -21,7 +18,7 @@ function* fetchTokens() {
     arbitrableTokenListView,
     T2CR_BLOCK,
     arbitrableTCRView,
-    viewWeb3
+    viewWeb3,
   } = yield call(instantiateEnvObjects)
   try {
     let tokens = yield localforage.getItem(
@@ -33,7 +30,7 @@ function* fetchTokens() {
         blockNumber: T2CR_BLOCK,
         statusBlockNumber: T2CR_BLOCK,
         items: {},
-        addressToIDs: {}
+        addressToIDs: {},
       }
     // Display cached state while fetching latest.
     else {
@@ -57,9 +54,9 @@ function* fetchTokens() {
         viewWeb3,
         50000
       ),
-      call(fetchAppealableTokens, arbitrableTokenListView, arbitrableTCRView)
+      call(fetchAppealableTokens, arbitrableTokenListView, arbitrableTCRView),
     ])
-    const submissionEvents = events.filter(e => e.event === 'TokenSubmitted')
+    const submissionEvents = events.filter((e) => e.event === 'TokenSubmitted')
 
     // Find the block number of the lastest token submission event.
     const blockNumber = submissionEvents.reduce((acc, event) => {
@@ -93,7 +90,7 @@ function* fetchTokens() {
             ticker: _ticker,
             address: _address,
             symbolMultihash: _symbolMultihash,
-            blockNumber: event.blockNumber
+            blockNumber: event.blockNumber,
           })
           return acc
         }
@@ -113,8 +110,8 @@ function* fetchTokens() {
           ID: tokenID,
           status: {
             blockNumber: event.blockNumber,
-            statusBlockNumber: event.blockNumber
-          }
+            statusBlockNumber: event.blockNumber,
+          },
         }
         return acc
       },
@@ -126,9 +123,9 @@ function* fetchTokens() {
 
     // Get the lastest status change for every token.
     const latestStatusChanges = {}
-    const statusChanges = events.filter(e => e.event === 'TokenStatusChange')
+    const statusChanges = events.filter((e) => e.event === 'TokenStatusChange')
 
-    statusChanges.forEach(event => {
+    for (const event of statusChanges) {
       const { returnValues } = event
       const { _tokenID } = returnValues
       if (event.blockNumber > statusBlockNumber)
@@ -136,21 +133,21 @@ function* fetchTokens() {
 
       if (!latestStatusChanges[_tokenID]) {
         latestStatusChanges[_tokenID] = event
-        return
+        continue
       }
       if (event.blockNumber > latestStatusChanges[_tokenID].blockNumber)
         latestStatusChanges[_tokenID] = event
-    })
+    }
 
     const cachedTokens = {
       items: receivedTokens,
       addressToIDs: {},
       blockNumber,
-      statusBlockNumber
+      statusBlockNumber,
     }
 
     const statusEvents = Object.keys(latestStatusChanges).map(
-      tokenID => latestStatusChanges[tokenID]
+      (tokenID) => latestStatusChanges[tokenID]
     )
 
     for (const event of statusEvents) {
@@ -160,7 +157,7 @@ function* fetchTokens() {
         _status,
         _disputed,
         _requester,
-        _challenger
+        _challenger,
       } = returnValues
 
       if (!cachedTokens.items[_tokenID]) {
@@ -183,8 +180,8 @@ function* fetchTokens() {
                 status: Number(_status),
                 disputed: Boolean(Number(_disputed)),
                 requester: _requester,
-                challenger: _challenger
-              }
+                challenger: _challenger,
+              },
             }
         }
         continue
@@ -200,11 +197,11 @@ function* fetchTokens() {
           status: Number(_status),
           disputed: Boolean(Number(_disputed)),
           requester: _requester,
-          challenger: _challenger
+          challenger: _challenger,
         }
     }
 
-    Object.keys(cachedTokens.items).forEach(tokenID => {
+    for (const tokenID of Object.keys(cachedTokens.items)) {
       const token = cachedTokens.items[tokenID]
       token.clientStatus = contractStatusToClientStatus(
         token.status.status,
@@ -215,7 +212,7 @@ function* fetchTokens() {
       if (cachedTokens.addressToIDs[token.address])
         cachedTokens.addressToIDs[token.address].push(tokenID)
       else cachedTokens.addressToIDs[token.address] = [tokenID]
-    })
+    }
 
     // Update appealPeriod state of each item.
     for (const tokenID of Object.keys(cachedTokens.items))
@@ -243,7 +240,7 @@ function* fetchTokens() {
       console.warn('Infura timed out. Attempting fetch again.')
       yield put(tokensActions.fetchTokens())
     } else {
-      console.error('Error fetching tokens ', err)
+      console.error('Error fetching tokens', err)
       yield put(tokensActions.fetchTokensFailed())
     }
   }

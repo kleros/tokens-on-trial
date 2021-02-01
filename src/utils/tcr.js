@@ -1,6 +1,5 @@
 import Web3 from 'web3'
 import Archon from '@kleros/archon'
-
 import * as tcrConstants from '../constants/tcr'
 import ArbitrableTokenList from '../assets/contracts/arbitrable-token-list'
 import ArbitrableAddressList from '../assets/contracts/arbitrable-address-list'
@@ -69,7 +68,7 @@ export const instantiateEnvObjects = async () => {
     if (badgeTCRs[networkID])
       badgeContracts = badgeTCRs[networkID]
         .map(
-          address =>
+          (address) =>
             new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
         )
         .reduce((acc, contract) => {
@@ -95,7 +94,8 @@ export const instantiateEnvObjects = async () => {
   if (badgeTCRs[networkID])
     badgeViewContracts = badgeTCRs[networkID]
       .map(
-        address => new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
+        (address) =>
+          new viewWeb3.eth.Contract(ArbitrableAddressList.abi, address)
       )
       .reduce((acc, contract) => {
         acc[web3Utils.toChecksumAddress(contract.options.address)] = contract
@@ -115,7 +115,7 @@ export const instantiateEnvObjects = async () => {
   if (badgeTCRs[networkID])
     badgeEventsContracts = badgeTCRs[networkID]
       .map(
-        address =>
+        (address) =>
           new eventsWeb3.eth.Contract(ArbitrableAddressList.abi, address)
       )
       .reduce((acc, contract) => {
@@ -150,7 +150,7 @@ export const instantiateEnvObjects = async () => {
     latestBlock,
     arbitrableTCRView,
     PATCH_USER_SETTINGS_URL,
-    T2CR_SUBGRAPH_URL
+    T2CR_SUBGRAPH_URL,
   }
 }
 
@@ -170,7 +170,7 @@ export const hasPendingRequest = ({ status, clientStatus, latestRequest }) => {
   return false
 }
 
-export const isRegistrationRequest = tokenStatus =>
+export const isRegistrationRequest = (tokenStatus) =>
   tokenStatus === tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']
 
 export const contractStatusToClientStatus = (status, disputed) => {
@@ -199,7 +199,7 @@ export const getBlock = (block, web3, hash, callback) => {
 }
 
 // Converts item string data to correct js types.
-export const convertFromString = item => {
+export const convertFromString = (item) => {
   const { latestRequest } = item
   item.numberOfRequests = Number(item.numberOfRequests)
   latestRequest.numberOfRounds = Number(latestRequest.numberOfRounds)
@@ -211,11 +211,11 @@ export const convertFromString = item => {
       ? Number(latestRequest.appealDisputeID)
       : 0
 
-  item.requests = item.requests.map(request => ({
+  item.requests = item.requests.map((request) => ({
     ...request,
     resolutionTime: Number(request.resolutionTime) * 1000,
     submissionTime: Number(request.submissionTime) * 1000,
-    ruling: Number(request.ruling)
+    ruling: Number(request.ruling),
   }))
   latestRequest.submissionTime = Number(latestRequest.submissionTime) * 1000
 
@@ -223,8 +223,9 @@ export const convertFromString = item => {
     latestRequest.dispute.ruling = Number(latestRequest.dispute.ruling)
     latestRequest.dispute.status = Number(latestRequest.dispute.status)
     latestRequest.dispute.period = Number(latestRequest.dispute.period)
-    latestRequest.dispute.court.timesPerPeriod =
-      latestRequest.dispute.court.timesPerPeriod.map(t => t * 1000)
+    latestRequest.dispute.court.timesPerPeriod = latestRequest.dispute.court.timesPerPeriod.map(
+      (t) => t * 1000
+    )
 
     latestRequest.dispute.lastPeriodChange =
       Number(latestRequest.dispute.lastPeriodChange) * 1000
@@ -239,8 +240,8 @@ export const convertFromString = item => {
     latestRound.appealPeriod = [
       latestRound.appealPeriod.start,
       latestRound.appealPeriod.end,
-    ].map(aP => aP * 1000)
-    latestRound.paidFees = latestRound.paidFees.map(pF => toBN(pF))
+    ].map((aP) => aP * 1000)
+    latestRound.paidFees = latestRound.paidFees.map((pF) => toBN(pF))
   }
 
   item.latestRound = latestRound

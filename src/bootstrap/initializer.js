@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { RenderIf } from 'lessdux'
 import { BeatLoader } from 'react-spinners'
-
 import * as walletSelectors from '../reducers/wallet'
 import * as walletActions from '../actions/wallet'
 import * as initializationActions from '../actions/initialization'
@@ -12,9 +11,8 @@ import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as arbitrableAddressListActions from '../actions/arbitrable-address-list'
 import IncorrectNetwork from '../components/incorrect-network'
 import { instantiateEnvObjects } from '../utils/tcr'
-import { APP_VERSION } from '../bootstrap/dapp-api'
+import { APP_VERSION } from './dapp-api'
 import { notificationsShape } from '../reducers/notification'
-
 import { ContractsContext } from './contexts'
 import './app.css'
 
@@ -24,8 +22,8 @@ class ContractsProvider extends Component {
     fetchAccounts: PropTypes.func.isRequired,
     notifications: notificationsShape.isRequired,
     envObjects: PropTypes.shape({
-      networkID: PropTypes.number.isRequired
-    }).isRequired
+      networkID: PropTypes.number.isRequired,
+    }).isRequired,
   }
 
   state = {}
@@ -38,12 +36,10 @@ class ContractsProvider extends Component {
     // Save notifications on unload.
     window.addEventListener('unload', () => {
       const {
-        notifications: { data }
+        notifications: { data },
       } = this.props
       localStorage.setItem(
-        `${
-          arbitrableTokenListView.options.address
-        }.notifications@${APP_VERSION}`,
+        `${arbitrableTokenListView.options.address}.notifications@${APP_VERSION}`,
         JSON.stringify(data)
       )
     })
@@ -56,12 +52,12 @@ class ContractsProvider extends Component {
     if (!envObjects || accountChangeListener) return
 
     if (window.ethereum)
-      this.setState(prevState => {
+      this.setState((prevState) => {
         if (prevState.accountChangeListener) return prevState
         return {
           accountChangeListener: window.ethereum.on('accountsChanged', () => {
             fetchAccounts()
-          })
+          }),
         }
       })
   }
@@ -92,15 +88,15 @@ class Initializer extends PureComponent {
     // State
     children: PropTypes.oneOfType([
       PropTypes.element,
-      PropTypes.arrayOf(PropTypes.element.isRequired)
+      PropTypes.arrayOf(PropTypes.element.isRequired),
     ]).isRequired,
     envObjects: PropTypes.shape({
-      networkID: PropTypes.number.isRequired
-    })
+      networkID: PropTypes.number.isRequired,
+    }),
   }
 
   static defaultProps = {
-    envObjects: null
+    envObjects: null,
   }
 
   async componentDidMount() {
@@ -109,7 +105,7 @@ class Initializer extends PureComponent {
       fetchArbitrableTokenListData,
       fetchArbitratorData,
       fetchAccounts,
-      initialize
+      initialize,
     } = this.props
 
     initialize()
@@ -131,7 +127,7 @@ class Initializer extends PureComponent {
       <RenderIf
         done={<ContractsProvider {...this.props}>{children}</ContractsProvider>}
         extraLoadingValues={[
-          !accounts.data || (window.ethereum && accounts.data.length === 0)
+          !accounts.data || (window.ethereum && accounts.data.length === 0),
         ]}
         loading={
           <div className="InitializerLoading">
@@ -146,10 +142,10 @@ class Initializer extends PureComponent {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     accounts: state.wallet.accounts,
     notifications: state.notification.notifications,
-    envObjects: state.envObjects.data
+    envObjects: state.envObjects.data,
   }),
   {
     fetchAccounts: walletActions.fetchAccounts,
@@ -158,6 +154,6 @@ export default connect(
     fetchArbitrableTokenListData:
       arbitrableTokenListActions.fetchArbitrableTokenListData,
     fetchArbitratorData: arbitratorActions.fetchArbitratorData,
-    initialize: initializationActions.initialize
+    initialize: initializationActions.initialize,
   }
 )(Initializer)

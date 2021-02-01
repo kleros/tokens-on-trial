@@ -4,13 +4,13 @@ import { required } from '../../../../../utils/validation'
 export const {
   Form: ChallengeForm,
   isInvalid: getChallengeFormIsInvalid,
-  submit: submitChallengeForm
+  submit: submitChallengeForm,
 } = form('evidenceForm', {
   reason: {
     type: 'text',
     validate: [required],
     props: {
-      type: 'textarea'
-    }
-  }
+      type: 'textarea',
+    },
+  },
 })

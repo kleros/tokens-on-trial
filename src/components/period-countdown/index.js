@@ -1,32 +1,28 @@
 import React, { useState } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Countdown from 'react-countdown-now'
-
 import * as tcrConstants from '../../constants/tcr'
 import CountdownRenderer from '../countdown-renderer'
 import { itemShape } from '../../reducers/generic-shapes'
-
 import './period-countdown.css'
 
 const PeriodCountdown = ({ item: { latestRequest, clientStatus } }) => {
   const { dispute, disputed } = latestRequest
-  if (clientStatus <= 1 || !disputed) return null
-
   let periodRemainingTime = 0
   const { court, lastPeriodChange, period } = dispute
   const timesPerPeriod = court.timesPerPeriod
 
-  if (period === tcrConstants.COURT_PERIOD['Commit'])
-    periodRemainingTime =
-      lastPeriodChange + timesPerPeriod[1] + timesPerPeriod[2] - Date.now()
-  else
-    periodRemainingTime = lastPeriodChange + timesPerPeriod[period] - Date.now()
+  periodRemainingTime =
+    period === tcrConstants.COURT_PERIOD['Commit']
+      ? lastPeriodChange + timesPerPeriod[1] + timesPerPeriod[2] - Date.now()
+      : lastPeriodChange + timesPerPeriod[period] - Date.now()
+  const [periodEnded, setPeriodEnded] = useState(periodRemainingTime <= 0)
+
+  if (clientStatus <= 1 || !disputed) return null
 
   const message = tcrConstants.COURT_PERIOD_STRINGS[period]
   if (period === tcrConstants.COURT_PERIOD['Appeal']) return null // There is a dedicated countdown for user action periods.
   if (period === tcrConstants.COURT_PERIOD['Execution']) return null // Hide timer during execution period.
-
-  const [periodEnded, setPeriodEnded] = useState(periodRemainingTime <= 0)
 
   return (
     <span
@@ -34,7 +30,7 @@ const PeriodCountdown = ({ item: { latestRequest, clientStatus } }) => {
       style={{
         display: 'flex',
         alignItems: 'center',
-        color: '#f60c36'
+        color: '#f60c36',
       }}
     >
       <div className="PeriodCountdown-timer">
@@ -62,7 +58,7 @@ const PeriodCountdown = ({ item: { latestRequest, clientStatus } }) => {
 }
 
 PeriodCountdown.propTypes = {
-  item: itemShape.isRequired
+  item: itemShape.isRequired,
 }
 
 export default PeriodCountdown

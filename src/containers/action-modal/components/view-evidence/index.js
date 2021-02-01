@@ -1,11 +1,10 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import { IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import './view-evidence.css'
 
-const downloadClick = url => async () => {
+const downloadClick = (url) => async () => {
   window.open(`${IPFS_URL}${encodeURI(url)}`)
 }
 
@@ -50,9 +49,9 @@ ViewEvidence.propTypes = {
   evidence: PropTypes.shape({
     name: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
-    fileURI: PropTypes.string.isRequired
+    fileURI: PropTypes.string.isRequired,
   }).isRequired,
-  closeActionModal: PropTypes.func.isRequired
+  closeActionModal: PropTypes.func.isRequired,
 }
 
 export default ViewEvidence

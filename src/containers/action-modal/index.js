@@ -2,7 +2,6 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { BeatLoader } from 'react-spinners'
-
 import * as modalActions from '../../actions/modal'
 import * as modalSelectors from '../../reducers/modal'
 import * as modalConstants from '../../constants/modal'
@@ -20,7 +19,6 @@ import Modal from '../../components/modal'
 import asyncReadFile from '../../utils/async-file-reader'
 import ipfsPublish from '../../sagas/api/ipfs-publish'
 import { ContractsContext } from '../../bootstrap/contexts'
-
 import FundAppeal from './components/appeal'
 import FundDispute from './components/fund-dispute'
 import Submit from './components/submit'
@@ -32,13 +30,12 @@ import AddBadge from './components/add-badge'
 import SubmitBadge from './components/submit-badge'
 import {
   getTokenFormIsInvalid,
-  submitTokenForm
+  submitTokenForm,
 } from './components/submit/token-form'
 import {
   getEvidenceFormIsInvalid,
-  submitEvidenceForm
+  submitEvidenceForm,
 } from './components/submit-evidence/evidence-form'
-
 import './action-modal.css'
 
 class ActionModal extends PureComponent {
@@ -76,7 +73,7 @@ class ActionModal extends PureComponent {
     submitBadgeEvidence: PropTypes.func.isRequired,
     challengeBadgeRequest: PropTypes.func.isRequired,
     fundBadgeDispute: PropTypes.func.isRequired,
-    fundBadgeAppeal: PropTypes.func.isRequired
+    fundBadgeAppeal: PropTypes.func.isRequired,
   }
 
   static contextType = ContractsContext
@@ -86,18 +83,18 @@ class ActionModal extends PureComponent {
     actionModalParam: null,
     token: null,
     badge: null,
-    badgeContracts: null
+    badgeContracts: null,
   }
 
   state = { file: null, fileInfoMessage: null }
 
-  handleSubmitTokenClick = async token => {
+  handleSubmitTokenClick = async (token) => {
     const { createToken, arbitrableTokenListData } = this.props
     const {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      requesterBaseDeposit
+      requesterBaseDeposit,
     } = arbitrableTokenListData.data
     const { file } = this.state
     const fileData = (await asyncReadFile(file))[0]
@@ -116,7 +113,7 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      requesterBaseDeposit
+      requesterBaseDeposit,
     } = arbitrableTokenListData.data
     const value = requesterBaseDeposit
       .add(arbitrationCost)
@@ -130,7 +127,7 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      requesterBaseDeposit
+      requesterBaseDeposit,
     } = arbitrableTokenListData.data
 
     const value = requesterBaseDeposit
@@ -147,7 +144,7 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       MULTIPLIER_DIVISOR,
-      requesterBaseDeposit
+      requesterBaseDeposit,
     } = arbitrableAddressListData
 
     const value = requesterBaseDeposit
@@ -161,12 +158,12 @@ class ActionModal extends PureComponent {
     if (file.size > 1e6)
       return this.setState({
         file: null,
-        fileInfoMessage: 'File is too big. It must be less than 1MB.'
+        fileInfoMessage: 'File is too big. It must be less than 1MB.',
       })
 
     this.setState({
       file,
-      fileInfoMessage: null
+      fileInfoMessage: null,
     })
   }
 
@@ -174,18 +171,18 @@ class ActionModal extends PureComponent {
     if (file.type !== 'image/png')
       return this.setState({
         file: null,
-        fileInfoMessage: 'File should be a PNG with a transparent background.'
+        fileInfoMessage: 'File should be a PNG with a transparent background.',
       })
 
     if (file.size > 1e6)
       return this.setState({
         file: null,
-        fileInfoMessage: 'File is too big. It must be less than 1MB.'
+        fileInfoMessage: 'File is too big. It must be less than 1MB.',
       })
 
     this.setState({
       file,
-      fileInfoMessage: null
+      fileInfoMessage: null,
     })
   }
 
@@ -197,7 +194,7 @@ class ActionModal extends PureComponent {
       file,
       evidenceData: evidence,
       ID: token.data.ID,
-      evidenceSide
+      evidenceSide,
     })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
@@ -208,9 +205,9 @@ class ActionModal extends PureComponent {
       submitBadgeEvidence,
       closeActionModal,
       badge: {
-        data: { tokenAddress }
+        data: { tokenAddress },
       },
-      actionModalParam: { badgeContractAddr }
+      actionModalParam: { badgeContractAddr },
     } = this.props
     const { file } = this.state
     submitBadgeEvidence({
@@ -218,7 +215,7 @@ class ActionModal extends PureComponent {
       evidenceData: evidence,
       tokenAddress,
       badgeContractAddr,
-      evidenceSide
+      evidenceSide,
     })
     this.setState({ file: null, fileInfoMessage: null })
     closeActionModal()
@@ -231,14 +228,14 @@ class ActionModal extends PureComponent {
       challengerBaseDeposit,
       arbitrationCost,
       sharedStakeMultiplier,
-      MULTIPLIER_DIVISOR
+      MULTIPLIER_DIVISOR,
     } = arbitrableTokenListData.data
 
     const evidenceJSON = {
       name: 'Token challenge',
       description: reason,
       fileURI: '',
-      fileTypeExtension: ''
+      fileTypeExtension: '',
     }
 
     /* eslint-disable unicorn/number-literal-case */
@@ -260,7 +257,7 @@ class ActionModal extends PureComponent {
     challengeRequest({
       ID: token.data.ID,
       value,
-      evidence: `/ipfs/${ipfsHashEvidence}`
+      evidence: `/ipfs/${ipfsHashEvidence}`,
     })
   }
 
@@ -269,7 +266,7 @@ class ActionModal extends PureComponent {
       challengeBadgeRequest,
       badge,
       badgeContracts,
-      actionModalParam: { badgeContractAddr }
+      actionModalParam: { badgeContractAddr },
     } = this.props
 
     const arbitrableAddressListData = badgeContracts[badgeContractAddr]
@@ -278,14 +275,14 @@ class ActionModal extends PureComponent {
       challengerBaseDeposit,
       arbitrationCost,
       sharedStakeMultiplier,
-      MULTIPLIER_DIVISOR
+      MULTIPLIER_DIVISOR,
     } = arbitrableAddressListData
 
     const evidenceJSON = {
       name: `Badge challenge`,
       description: reason,
       fileURI: '',
-      fileTypeExtension: ''
+      fileTypeExtension: '',
     }
 
     /* eslint-disable unicorn/number-literal-case */
@@ -309,7 +306,7 @@ class ActionModal extends PureComponent {
       tokenAddr: badge.data.tokenAddress,
       badgeContractAddr,
       evidence: `/ipfs/${ipfsHashEvidence}`,
-      value
+      value,
     })
   }
 
@@ -318,7 +315,7 @@ class ActionModal extends PureComponent {
     const {
       arbitrationCost,
       sharedStakeMultiplier,
-      MULTIPLIER_DIVISOR
+      MULTIPLIER_DIVISOR,
     } = arbitrableTokenListData.data
 
     const value = arbitrationCost.add(
@@ -328,7 +325,7 @@ class ActionModal extends PureComponent {
     fundDispute({
       ID: token.data.ID,
       value,
-      side: tcrConstants.SIDE.Requester
+      side: tcrConstants.SIDE.Requester,
     })
   }
 
@@ -343,7 +340,7 @@ class ActionModal extends PureComponent {
     fundDispute({
       ID: token.data.ID,
       value,
-      side: tcrConstants.SIDE.Challenger
+      side: tcrConstants.SIDE.Challenger,
     })
   }
 
@@ -360,7 +357,7 @@ class ActionModal extends PureComponent {
       address: token.data.address,
       ID: token.data.ID,
       value,
-      side: tcrConstants.SIDE.Challenger
+      side: tcrConstants.SIDE.Challenger,
     })
   }
 
@@ -377,7 +374,7 @@ class ActionModal extends PureComponent {
     const {
       fundBadgeAppeal,
       badge,
-      actionModalParam: { side, badgeContractAddr }
+      actionModalParam: { side, badgeContractAddr },
     } = this.props
     const value = web3Utils.toWei(amount)
 
@@ -385,7 +382,7 @@ class ActionModal extends PureComponent {
       tokenAddr: badge.data.tokenAddress,
       badgeContractAddr,
       side,
-      value
+      value,
     })
   }
 
@@ -397,7 +394,7 @@ class ActionModal extends PureComponent {
       arbitrationCost,
       sharedStakeMultiplier,
       requesterBaseDeposit,
-      MULTIPLIER_DIVISOR
+      MULTIPLIER_DIVISOR,
     } = arbitrableAddressListData
 
     const value = requesterBaseDeposit
@@ -423,7 +420,7 @@ class ActionModal extends PureComponent {
   componentDidMount() {
     const {
       fetchArbitrableTokenListData,
-      fetchArbitrableAddressListData
+      fetchArbitrableAddressListData,
     } = this.props
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
@@ -453,7 +450,7 @@ class ActionModal extends PureComponent {
       evidenceFormIsInvalid,
       token,
       badge,
-      actionModalParam
+      actionModalParam,
     } = this.props
 
     const { fileInfoMessage, file } = this.state
@@ -702,7 +699,7 @@ class ActionModal extends PureComponent {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     openActionModal: state.modal.openActionModal,
     tokenFormIsInvalid: getTokenFormIsInvalid(state),
     evidenceFormIsInvalid: getEvidenceFormIsInvalid(state),
@@ -712,7 +709,7 @@ export default connect(
     accounts: state.wallet.accounts,
     actionModalParam: state.modal.actionModalParam,
     badge: state.badge.badge,
-    envObjects: state.envObjects.data
+    envObjects: state.envObjects.data,
   }),
   {
     closeActionModal: modalActions.closeActionModal,
@@ -739,6 +736,6 @@ export default connect(
     resubmitBadge: badgeActions.resubmitBadge,
     fundBadgeDispute: badgeActions.fundDispute,
     challengeBadgeRequest: badgeActions.challengeRequest,
-    fundBadgeAppeal: badgeActions.fundAppeal
+    fundBadgeAppeal: badgeActions.fundAppeal,
   }
 )(ActionModal)

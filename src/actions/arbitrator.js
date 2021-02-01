@@ -9,5 +9,5 @@ export const arbitratorData = createActions('ARBITRATOR_DATA')
 
 // Arbitrator Data
 export const fetchArbitratorData = () => ({
-  type: arbitratorData.FETCH
+  type: arbitratorData.FETCH,
 })

@@ -13,7 +13,7 @@ export const balance = createActions('BALANCE')
 // Settings
 export const updateSettings = ({ settings }) => ({
   type: settings.UPDATE_SETTINGS,
-  payload: { settings }
+  payload: { settings },
 })
 
 // Accounts

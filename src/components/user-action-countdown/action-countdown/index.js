@@ -2,9 +2,7 @@ import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Countdown from 'react-countdown-now'
 import PropTypes from 'prop-types'
-
 import CountdownRenderer from '../../countdown-renderer'
-
 import './action-countdown.css'
 
 const ActionCountdown = ({ text, icon, endTime, onComplete }) => (
@@ -32,7 +30,7 @@ ActionCountdown.propTypes = {
   endTime: PropTypes.number.isRequired,
   onComplete: PropTypes.func.isRequired,
   text: PropTypes.string.isRequired,
-  icon: PropTypes.string.isRequired
+  icon: PropTypes.string.isRequired,
 }
 
 export default ActionCountdown

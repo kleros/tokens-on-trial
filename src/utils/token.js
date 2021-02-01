@@ -15,7 +15,7 @@ export const hasPendingRequest = ({ status, clientStatus, latestRequest }) => {
   return false
 }
 
-export const isRegistrationRequest = tokenStatus =>
+export const isRegistrationRequest = (tokenStatus) =>
   tokenStatus === tcrConstants.IN_CONTRACT_STATUS_ENUM['RegistrationRequested']
 
 export const getBlock = (block, web3, hash, callback) => {

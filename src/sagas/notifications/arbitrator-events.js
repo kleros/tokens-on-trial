@@ -11,14 +11,14 @@ const filter = [
   false, // Do not include tokens with challenged registration requests.
   true, // Include tokens with challenged clearing requests.
   false, // Include token if caller is the author of a pending request.
-  false // Include token if caller is the challenger of a pending request.
+  false, // Include token if caller is the challenger of a pending request.
 ]
 
 // Helpers
 const getBlockDate = memoizeOne((blockHash, viewWeb3) =>
   viewWeb3.eth
     .getBlock(blockHash)
-    .then(block => new Date(block.timestamp * 1000))
+    .then((block) => new Date(block.timestamp * 1000))
 )
 
 /**
@@ -56,14 +56,12 @@ const emitArbitratorNotifications = async (
       )
         continue
 
-      const message = `Jurors gave an appealable ruling on ${
-        token.ticker
-      } token.`
+      const message = `Jurors gave an appealable ruling on ${token.ticker} token.`
       emit({
         ID: tokenID,
         date: await getBlockDate(event.blockHash, viewWeb3),
         message,
-        clientStatus: 4
+        clientStatus: 4,
       })
     } else if (badgeViewContracts[returnValues._arbitrable]) {
       const arbitrableAddressListView =
@@ -88,15 +86,17 @@ const emitArbitratorNotifications = async (
       )
         continue
 
-      const tokenIDs = (await arbitrableTokenListView.methods
-        .queryTokens(
-          ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
-          10, // Number of items to return at once.
-          filter,
-          true, // Return oldest first.
-          tokenAddress // The token address for which to return the submissions.
-        )
-        .call()).values.filter(ID => ID !== ZERO_ID)
+      const tokenIDs = (
+        await arbitrableTokenListView.methods
+          .queryTokens(
+            ZERO_ID, // A token ID from which to start/end the query from. Set to zero means unused.
+            10, // Number of items to return at once.
+            filter,
+            true, // Return oldest first.
+            tokenAddress // The token address for which to return the submissions.
+          )
+          .call()
+      ).values.filter((ID) => ID !== ZERO_ID)
 
       let token
       if (tokenIDs && tokenIDs.length > 0) {
@@ -116,7 +116,7 @@ const emitArbitratorNotifications = async (
         badgeAddr: arbitrableAddressListView._address,
         date: await getBlockDate(event.blockHash, viewWeb3),
         message,
-        clientStatus: 4
+        clientStatus: 4,
       })
     } else continue
   }

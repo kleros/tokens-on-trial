@@ -8,13 +8,13 @@ export default function asyncReadFile(file) {
     let content = ''
     const reader = new FileReader()
     // Wait till complete
-    reader.onloadend = e => {
+    reader.onloadend = (e) => {
       content = e.target.result
       const result = content.split(/\r\n|\n/)
       resolve(result)
     }
     // Make sure to handle error states
-    reader.addEventListener('error', e => {
+    reader.addEventListener('error', (e) => {
       reject(e)
     })
     reader.readAsDataURL(file)

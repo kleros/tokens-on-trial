@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 import { BeatLoader } from 'react-spinners'
-
 import BadgeCard from '../../components/badge-card'
 import Paging from '../../components/paging'
 import FilterBar from '../filter-bar'
@@ -16,7 +15,6 @@ import { ContractsContext } from '../../bootstrap/contexts'
 import { badgesShape } from '../../reducers/badges'
 import { tokensShape } from '../../reducers/token'
 import { _arbitrableAddressListDataShape } from '../../reducers/arbitrable-address-list'
-
 import './badges.css'
 
 const ITEMS_PER_PAGE = 40
@@ -25,17 +23,17 @@ class Badges extends Component {
   static propTypes = {
     // Navigation
     history: PropTypes.shape({
-      push: PropTypes.func.isRequired
+      push: PropTypes.func.isRequired,
     }).isRequired,
     location: PropTypes.shape({
-      search: PropTypes.string.isRequired
+      search: PropTypes.string.isRequired,
     }).isRequired,
     arbitrableAddressListData: PropTypes.objectOf(
       PropTypes.oneOfType([
         PropTypes.shape({
-          data: _arbitrableAddressListDataShape
+          data: _arbitrableAddressListDataShape,
         }),
-        PropTypes.bool
+        PropTypes.bool,
       ])
     ).isRequired,
 
@@ -47,7 +45,7 @@ class Badges extends Component {
 
     // Action Dispatchers
     toggleFilter: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired,
   }
 
   componentDidMount() {
@@ -60,7 +58,7 @@ class Badges extends Component {
 
   state = { currentPage: 0 }
 
-  handleFilterChange = key => {
+  handleFilterChange = (key) => {
     const { toggleFilter } = this.props
     const { arbitrableTokenListView } = this.context
     toggleFilter(key, arbitrableTokenListView)
@@ -80,7 +78,7 @@ class Badges extends Component {
     this.setState({ currentPage: currentPage + 1 })
   }
 
-  handleLastPageClicked = lastPage => {
+  handleLastPageClicked = (lastPage) => {
     this.setState({ currentPage: lastPage })
   }
 
@@ -90,23 +88,23 @@ class Badges extends Component {
       filter,
       accounts,
       arbitrableAddressListData,
-      tokens
+      tokens,
     } = this.props
     const userAccount = accounts[0]
 
     // Merge badges from all contracts
     const badgesData = Object.keys(badges.data)
-      .map(badgeContractAddr => badges.data[badgeContractAddr])
+      .map((badgeContractAddr) => badges.data[badgeContractAddr])
       .reduce(
         (acc, curr) =>
-          acc.concat(Object.keys(curr.items).map(addr => curr.items[addr])),
+          acc.concat(Object.keys(curr.items).map((addr) => curr.items[addr])),
         []
       )
 
     const { filters, badgeFilters } = filter
 
     const filteredBadges = badgesData
-      .filter(badge => {
+      .filter((badge) => {
         if (userAccount === badge.status.requester && filter['My Submissions'])
           return true
         if (userAccount === badge.status.challenger && filter['My Challenges'])
@@ -124,7 +122,7 @@ class Badges extends Component {
 
         return false
       })
-      .filter(badge => badgeFilters[badge.badgeContractAddr])
+      .filter((badge) => badgeFilters[badge.badgeContractAddr])
       .sort((a, b) => {
         const { oldestFirst } = filter
         if (oldestFirst) return a.blockNumber < b.blockNumber ? -1 : 1
@@ -165,12 +163,13 @@ class Badges extends Component {
         <div className="BadgeGrid">
           <div className="BadgeGrid-container">
             {displayedBadges.length === 0 &&
-            (!tokens.loading && !badges.loading) ? (
+            !tokens.loading &&
+            !badges.loading ? (
               <p
                 style={{
                   textAlign: 'center',
                   width: '100%',
-                  marginTop: '50px'
+                  marginTop: '50px',
                 }}
               >
                 No badges found for the selected filters
@@ -180,7 +179,7 @@ class Badges extends Component {
                 {(displayedBadges.length > 0 ||
                   (!tokens.loading && !badges.loading)) &&
                 arbitrableAddressListData.data ? (
-                  displayedBadges.map(badge => (
+                  displayedBadges.map((badge) => (
                     <BadgeCard
                       badge={badge}
                       key={`${badge.address}.${badge.badgeContractAddr}`}
@@ -212,20 +211,20 @@ class Badges extends Component {
 
 export default withRouter(
   connect(
-    state => ({
+    (state) => ({
       badges: state.badges,
       tokens: state.tokens,
       filter: state.filter,
       accounts: state.wallet.accounts.data,
       envObjects: state.envObjects.data,
       arbitrableAddressListData:
-        state.arbitrableAddressList.arbitrableAddressListData
+        state.arbitrableAddressList.arbitrableAddressListData,
     }),
     {
       fetchArbitrableAddressListData:
         arbitrableAddressListActions.fetchArbitrableAddressListData,
       toggleFilter: filterActions.toggleFilter,
-      fetchTokens: tokensActions.fetchTokens
+      fetchTokens: tokensActions.fetchTokens,
     }
   )(Badges)
 )

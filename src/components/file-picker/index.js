@@ -2,9 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Dropzone from 'react-dropzone'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import { getFileIcon } from '../../utils/evidence'
-
 import './file-picker.css'
 
 const FilePicker = ({ message, file, imageFilePreviewURL, ...rest }) => (
@@ -35,12 +33,12 @@ FilePicker.propTypes = {
   ...Dropzone.propTypes,
 
   // State
-  message: PropTypes.node
+  message: PropTypes.node,
 }
 
 FilePicker.defaultProps = {
   // State
-  message: 'Drag file or click here'
+  message: 'Drag file or click here',
 }
 
 export default FilePicker

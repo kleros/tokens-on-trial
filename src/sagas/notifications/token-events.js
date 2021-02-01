@@ -1,5 +1,4 @@
 import memoizeOne from 'memoize-one'
-
 import * as tcrConstants from '../../constants/tcr'
 import { contractStatusToClientStatus } from '../../utils/tcr'
 
@@ -9,7 +8,7 @@ import { contractStatusToClientStatus } from '../../utils/tcr'
 const getBlockDate = memoizeOne((blockHash, viewWeb3) =>
   viewWeb3.eth
     .getBlock(blockHash)
-    .then(block => new Date(block.timestamp * 1000))
+    .then((block) => new Date(block.timestamp * 1000))
 )
 
 /**
@@ -37,7 +36,7 @@ const emitTokenNotifications = async (
       {
         filter: { _tokenID: returnValues._tokenID },
         fromBlock: 1000,
-        toBlock: 'latest'
+        toBlock: 'latest',
       }
     )
 
@@ -122,7 +121,7 @@ const emitTokenNotifications = async (
         break
       }
       default: {
-        console.warn('Unhandled notification: ', returnValues)
+        console.warn('Unhandled notification:', returnValues)
         console.warn('isRequester', isRequester)
         console.warn('account', account)
         break
@@ -149,7 +148,7 @@ const emitTokenNotifications = async (
         date: await getBlockDate(event.blockHash, viewWeb3),
         message,
         clientStatus,
-        successMessage
+        successMessage,
       })
     }
   }
@@ -168,7 +167,8 @@ const emitTokenNotifications = async (
         ID: oldestNonDisputedSubmittedStatusEvent.returnValues._tokenID,
         date,
         message: 'Token request pending execution.',
-        clientStatus: oldestNonDisputedSubmittedStatusEvent.returnValues._status
+        clientStatus:
+          oldestNonDisputedSubmittedStatusEvent.returnValues._status,
       })
   }
 

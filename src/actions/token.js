@@ -7,7 +7,7 @@ export const tokens = createActions('TOKENS')
 export const token = {
   ...createActions('TOKEN', {
     withCreate: true,
-    withUpdate: true
+    withUpdate: true,
   }),
   CLEAR: 'CLEAR',
   EXECUTE: 'EXECUTE',
@@ -26,82 +26,82 @@ export const token = {
   STATUS_CHANGE_BADGE: 'STATUS_CHANGE_BADGE',
   FUND_APPEAL_BADGE: 'FUND_APPEAL_BADGE',
   FEES_TIMEOUT_BADGE: 'FEES_TIMEOUT_BADGE',
-  CHALLENGE_REQUEST_BADGE: 'CHALLENGE_REQUEST_BADGE'
+  CHALLENGE_REQUEST_BADGE: 'CHALLENGE_REQUEST_BADGE',
 }
 
 /* T²CR Action Creators */
 
 export const createToken = ({ tokenData, file, fileData, value }) => ({
   type: token.CREATE,
-  payload: { token: tokenData, file, fileData, value }
+  payload: { token: tokenData, file, fileData, value },
 })
 export const clearToken = ({ tokenData, value }) => ({
   type: token.CLEAR,
-  payload: { token: tokenData, value }
+  payload: { token: tokenData, value },
 })
 export const fundDispute = ({ ID, value, side }) => ({
   type: token.FUND_DISPUTE,
-  payload: { ID, value, side }
+  payload: { ID, value, side },
 })
 export const challengeRequest = ({ ID, value, evidence }) => ({
   type: token.CHALLENGE_REQUEST,
-  payload: { ID, value, evidence }
+  payload: { ID, value, evidence },
 })
-export const timeout = ID => ({
+export const timeout = (ID) => ({
   type: token.EXECUTE,
-  payload: { ID }
+  payload: { ID },
 })
-export const fetchToken = ID => ({
+export const fetchToken = (ID) => ({
   type: token.FETCH,
-  payload: { ID }
+  payload: { ID },
 })
 export const fundAppeal = (ID, side, value) => ({
   type: token.FUND_APPEAL,
-  payload: { ID, side, value }
+  payload: { ID, side, value },
 })
-export const feesTimeout = tokenData => ({
+export const feesTimeout = (tokenData) => ({
   type: token.FEES_TIMEOUT,
-  payload: { token: tokenData }
+  payload: { token: tokenData },
 })
 export const resubmitToken = ({ tokenData, value }) => ({
   type: token.RESUBMIT,
-  payload: { token: tokenData, value }
+  payload: { token: tokenData, value },
 })
 export const withdrawTokenFunds = ({ ID, item }) => ({
   type: token.WITHDRAW,
-  payload: { ID, item }
+  payload: { ID, item },
 })
 
 /* Badge TCR */
 export const createBadge = ({ tokenData, file, fileData, value }) => ({
   type: token.CREATE_BADGE,
-  payload: { token: tokenData, file, fileData, value }
+  payload: { token: tokenData, file, fileData, value },
 })
 export const clearBadge = ({ tokenData, value }) => ({
   type: token.CLEAR_BADGE,
-  payload: { token: tokenData, value }
+  payload: { token: tokenData, value },
 })
 export const fundBadgeDispute = ({ address, ID, side, value }) => ({
   type: token.FUND_DISPUTE_BADGE,
-  payload: { address, side, ID, value }
+  payload: { address, side, ID, value },
 })
 export const challengeBadgeRequest = ({ address, value, evidence }) => ({
   type: token.CHALLENGE_REQUEST_BADGE,
-  payload: { address, value, evidence }
+  payload: { address, value, evidence },
 })
-export const badgeTimeout = tokenData => ({
+export const badgeTimeout = (tokenData) => ({
   type: token.EXECUTE_BADGE,
-  payload: { token: tokenData }
+  payload: { token: tokenData },
 })
-export const fetchBadge = address => ({
+export const fetchBadge = (address) => ({
   type: token.FETCH_BADGE,
-  payload: { address }
+  payload: { address },
 })
-export const feesTimeoutBadge = tokenData => ({
+export const feesTimeoutBadge = (tokenData) => ({
   type: token.FEES_TIMEOUT_BADGE,
-  payload: { token: tokenData }
+  payload: { token: tokenData },
 })
 export const resubmitBadge = ({ tokenData }) => ({
   type: token.RESUBMIT_BADGE,
-  payload: { token: tokenData }
+  payload: { token: tokenData },
 })

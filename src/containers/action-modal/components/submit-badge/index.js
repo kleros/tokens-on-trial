@@ -1,13 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3Utils, IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
-
 import './submit-badge.css'
 
 const SubmitBadge = ({
@@ -15,7 +13,7 @@ const SubmitBadge = ({
   closeActionModal,
   submitItem,
   badgeContractAddr,
-  tokenAddr
+  tokenAddr,
 }) => (
   <div className="ActionModal">
     <h3 className="Modal-title">Add Badge</h3>
@@ -84,7 +82,7 @@ const SubmitBadge = ({
         textAlign: 'start',
         fontSize: '12px',
         marginTop: '10px',
-        display: 'flex'
+        display: 'flex',
       }}
     >
       <FontAwesomeIcon icon="info-circle" />
@@ -120,14 +118,14 @@ SubmitBadge.propTypes = {
   // State
   arbitrableAddressListData: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape,
   ]).isRequired,
   badgeContractAddr: PropTypes.string.isRequired,
   tokenAddr: PropTypes.string.isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  submitItem: PropTypes.func.isRequired
+  submitItem: PropTypes.func.isRequired,
 }
 
 export default SubmitBadge

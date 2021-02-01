@@ -2,16 +2,14 @@ import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import Progress from 'react-progressbar'
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../../constants/tcr'
 import {
   getItemInformation,
   getRemainingTime,
-  truncateETHValue
+  truncateETHValue,
 } from '../../utils/ui'
-import ItemActionButton from '../../containers/item-action-button'
+import ItemActionButton from '../item-action-button'
 import { itemShape, tcrShape } from '../../reducers/generic-shapes'
-
 import './crowdfunding-card.css'
 
 const CrowdfundingCard = ({
@@ -20,7 +18,7 @@ const CrowdfundingCard = ({
   tcrData,
   fundAppeal,
   handleActionClick,
-  badgeContractAddr
+  badgeContractAddr,
 }) => {
   const { status, latestRequest } = item
   const { dispute, latestRound, disputed, resolved } = latestRequest
@@ -32,7 +30,7 @@ const CrowdfundingCard = ({
     challengerFeesPercent,
     payableValue,
     decisiveRuling,
-    winnerSide
+    winnerSide,
   } = getItemInformation(item, userAccount)
 
   const remainingTime = getRemainingTime(
@@ -86,7 +84,7 @@ const CrowdfundingCard = ({
                   style={{
                     color: 'white',
                     fontSize: '14px',
-                    lineHeight: '14px'
+                    lineHeight: '14px',
                   }}
                 >
                   Previous Round{' '}
@@ -106,7 +104,8 @@ const CrowdfundingCard = ({
             color="#009aff"
             className="CrowdfundingCard-status-progressBar"
             style={{
-              borderColor: challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+              borderColor:
+                challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
             }}
           />
           <div>
@@ -114,7 +113,7 @@ const CrowdfundingCard = ({
               style={{
                 color: 'white',
                 textAlign: 'center',
-                lineHeight: '12px'
+                lineHeight: '12px',
               }}
             >
               <strong>
@@ -137,7 +136,7 @@ const CrowdfundingCard = ({
                   style={{
                     color: 'white',
                     fontSize: '14px',
-                    lineHeight: '14px'
+                    lineHeight: '14px',
                   }}
                 >
                   Previous Round{' '}
@@ -154,7 +153,8 @@ const CrowdfundingCard = ({
           <Progress
             className="CrowdfundingCard-status-progressBar"
             style={{
-              borderColor: challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff'
+              borderColor:
+                challengerFeesPercent === 100 ? '#7ed9ff' : '#009aff',
             }}
             completed={challengerFeesPercent}
             height="5px"
@@ -165,7 +165,7 @@ const CrowdfundingCard = ({
               style={{
                 color: 'white',
                 textAlign: 'center',
-                lineHeight: '12px'
+                lineHeight: '12px',
               }}
             >
               <strong>
@@ -208,12 +208,12 @@ CrowdfundingCard.propTypes = {
   badgeContractAddr: PropTypes.string,
 
   fundAppeal: PropTypes.func.isRequired,
-  handleActionClick: PropTypes.func.isRequired
+  handleActionClick: PropTypes.func.isRequired,
 }
 
 CrowdfundingCard.defaultProps = {
   badgeContractAddr: null,
-  tcrData: null
+  tcrData: null,
 }
 
 export default CrowdfundingCard

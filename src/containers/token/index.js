@@ -3,7 +3,6 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
-
 import { onlyInfura } from '../../bootstrap/dapp-api'
 import Button from '../../components/button'
 import Modal from '../../components/modal'
@@ -23,10 +22,8 @@ import { ContractsContext } from '../../bootstrap/contexts'
 import Evidence from '../evidence'
 import CrowdfundingCard from '../crowdfunding-card'
 import PageNotFound from '../../components/page-not-found'
-
 import Badges from './badges'
 import TokenDetailsCard from './token-details-card'
-
 import './token.css'
 
 class TokenDetails extends PureComponent {
@@ -40,12 +37,12 @@ class TokenDetails extends PureComponent {
       name: PropTypes.string,
       ticker: PropTypes.string,
       address: PropTypes.string,
-      URI: PropTypes.string
+      URI: PropTypes.string,
     }),
     match: PropTypes.shape({
       params: PropTypes.shape({
-        tokenID: PropTypes.string
-      })
+        tokenID: PropTypes.string,
+      }),
     }),
     envObjects: PropTypes.shape({}).isRequired,
 
@@ -55,14 +52,14 @@ class TokenDetails extends PureComponent {
     openActionModal: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired,
     withdrawTokenFunds: PropTypes.func.isRequired,
-    fetchTokens: PropTypes.func.isRequired
+    fetchTokens: PropTypes.func.isRequired,
   }
 
   static contextType = ContractsContext
 
   static defaultProps = {
     match: {},
-    token: null
+    token: null,
   }
 
   state = {
@@ -71,10 +68,10 @@ class TokenDetails extends PureComponent {
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
     eventListenerSet: false,
-    evidencePeriodEnded: false
+    evidencePeriodEnded: false,
   }
 
-  handleFilterChange = key => {
+  handleFilterChange = (key) => {
     const { toggleFilter } = this.props
     const { arbitrableTokenListView } = this.context
     toggleFilter(key, arbitrableTokenListView)
@@ -103,12 +100,12 @@ class TokenDetails extends PureComponent {
     openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidence)
   }
 
-  handleViewEvidenceClick = evidence => () => {
+  handleViewEvidenceClick = (evidence) => () => {
     const { openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.ViewEvidence, evidence)
   }
 
-  toSentenceCase = input => {
+  toSentenceCase = (input) => {
     input = input ? input.toLowerCase() : ''
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
@@ -123,22 +120,22 @@ class TokenDetails extends PureComponent {
     this.setState({ appealModalOpen: true })
   }
 
-  onCountdownComplete = time => {
+  onCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ countdownCompleted: true })
   }
 
-  onWinnerCountdownComplete = time => {
+  onWinnerCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ winnerCountdownCompleted: true })
   }
 
-  onLoserCountdownComplete = time => {
+  onLoserCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ loserCountdownCompleted: true })
   }
 
-  onEvidenceCountdownComplete = time => {
+  onEvidenceCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ evidencePeriodEnded: true })
   }
@@ -169,7 +166,7 @@ class TokenDetails extends PureComponent {
     fetchToken,
     tokenID,
     accounts,
-    arbitratorEvents
+    arbitratorEvents,
   }) {
     arbitrableTokenListEvents.events.Ruling((err, event) => {
       if (err) {
@@ -248,7 +245,7 @@ class TokenDetails extends PureComponent {
       T2CR_BLOCK,
       arbitrableTokenListEvents,
       arbitratorEvents,
-      archon
+      archon,
     } = this.context
 
     const { token, fetching, eventListenerSet } = this.state
@@ -257,7 +254,7 @@ class TokenDetails extends PureComponent {
       fetchToken(tokenID)
       this.setState({
         fetching: true,
-        eventListenerSet: false
+        eventListenerSet: false,
       })
       return
     }
@@ -285,7 +282,7 @@ class TokenDetails extends PureComponent {
           archon,
           arbitrableTokenListView,
           latestRequest,
-          T2CR_BLOCK
+          T2CR_BLOCK,
         })
       })
   }
@@ -301,7 +298,7 @@ class TokenDetails extends PureComponent {
       filter,
       match,
       arbitrableTokenListData,
-      envObjects
+      envObjects,
     } = this.props
 
     if (!envObjects) return null
@@ -336,15 +333,15 @@ class TokenDetails extends PureComponent {
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
-      !latestRequest.latestRound.appealed
-    )
-      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None) {
-        decisiveRuling = true
-        requesterIsLoser =
-          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
-        challengerIsLoser =
-          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
-      }
+      !latestRequest.latestRound.appealed &&
+      latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None
+    ) {
+      decisiveRuling = true
+      requesterIsLoser =
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
+      challengerIsLoser =
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
+    }
 
     const loserRemainingTime = getRemainingTime(
       token,
@@ -366,24 +363,23 @@ class TokenDetails extends PureComponent {
         tcrConstants.DISPUTE_STATUS.Appealable &&
       !latestRequest.latestRound.appealed
     ) {
-      if (!latestRound.hasPaid[1])
-        requesterFeesPercent =
-          (Number(latestRound.paidFees[1]) /
+      requesterFeesPercent = !latestRound.hasPaid[1]
+        ? (Number(latestRound.paidFees[1]) /
             Number(latestRound.requiredForSide[1])) *
           100
-      else requesterFeesPercent = 100
+        : 100
 
-      if (!latestRound.hasPaid[2])
-        challengerFeesPercent =
-          (Number(latestRound.paidFees[2]) /
+      challengerFeesPercent = !latestRound.hasPaid[2]
+        ? (Number(latestRound.paidFees[2]) /
             Number(latestRound.requiredForSide[2])) *
           100
-      else challengerFeesPercent = 100
+        : 100
 
       if (decisiveRuling) {
-        if (latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept)
-          loserPercent = challengerFeesPercent
-        else loserPercent = requesterFeesPercent
+        loserPercent =
+          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
+            ? challengerFeesPercent
+            : requesterFeesPercent
 
         if (loserPercent < 100 && loserCountdownCompleted) loserTimedOut = true
       }
@@ -506,12 +502,12 @@ class TokenDetails extends PureComponent {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     token: state.token.token.data,
     accounts: state.wallet.accounts,
     arbitrableTokenListData: state.arbitrableTokenList.arbitrableTokenListData,
     filter: state.filter,
-    envObjects: state.envObjects
+    envObjects: state.envObjects,
   }),
   {
     fetchToken: tokenActions.fetchToken,
@@ -520,6 +516,6 @@ export default connect(
     openActionModal: modalActions.openActionModal,
     feesTimeout: tokenActions.feesTimeout,
     toggleFilter: filterActions.toggleFilter,
-    fetchTokens: tokensActions.fetchTokens
+    fetchTokens: tokensActions.fetchTokens,
   }
 )(TokenDetails)

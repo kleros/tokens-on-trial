@@ -14,7 +14,7 @@ const Identicon = ({ size, scale, address, tooltip, round, ...rest }) => {
         borderRadius: round ? `${length / 2}px` : 0,
         height: lengthStr,
         width: lengthStr,
-        display: 'flex'
+        display: 'flex',
       }}
     >
       <Blockies scale={scale} seed={address} size={size} {...rest} />
@@ -33,7 +33,7 @@ Identicon.propTypes = {
   tooltip: PropTypes.string,
 
   // Modifiers
-  round: PropTypes.bool
+  round: PropTypes.bool,
 }
 
 Identicon.defaultProps = {
@@ -45,7 +45,7 @@ Identicon.defaultProps = {
   tooltip: null,
 
   // Modifiers
-  round: false
+  round: false,
 }
 
 export default Identicon

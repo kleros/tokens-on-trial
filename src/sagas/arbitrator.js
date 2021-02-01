@@ -1,9 +1,8 @@
 import { call, takeLatest } from 'redux-saga/effects'
-
 import * as arbitratorActions from '../actions/arbitrator'
 import { lessduxSaga } from '../utils/saga'
 import { instantiateEnvObjects } from '../utils/tcr'
-import { fetchEvents } from '../sagas/utils'
+import { fetchEvents } from './utils'
 
 /**
  * Fetches the arbitrators's data.
@@ -18,8 +17,8 @@ export function* fetchArbitratorData() {
   const eventsData = {
     appealDecisionEvents: {
       blockNumber: Number(ARBITRATOR_BLOCK),
-      events: {}
-    }
+      events: {},
+    },
   }
 
   eventsData.appealDecisionEvents.events = (yield call(
@@ -31,7 +30,7 @@ export function* fetchArbitratorData() {
   )).reduce((acc, curr) => {
     const {
       returnValues: { _disputeID },
-      blockNumber
+      blockNumber,
     } = curr
 
     if (blockNumber > eventsData.appealDecisionEvents.blockNumber)
@@ -42,13 +41,13 @@ export function* fetchArbitratorData() {
     acc[_disputeID][curr.transactionHash] = {
       returnValues: curr.returnValues,
       transactionHash: curr.transactionHash,
-      blockNumber: curr.blockNumber
+      blockNumber: curr.blockNumber,
     }
     return acc
   }, eventsData.appealDecisionEvents.events)
 
   return {
-    appealDecisionEvents: eventsData.appealDecisionEvents
+    appealDecisionEvents: eventsData.appealDecisionEvents,
   }
 }
 

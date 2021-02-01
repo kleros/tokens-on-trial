@@ -1,7 +1,6 @@
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
-
 import './crowdfunding-msg.css'
 
 const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
@@ -15,7 +14,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
             width: '30px',
             height: '30px',
             margin: '15px',
-            marginTop: 0
+            marginTop: 0,
           }}
         />
         <p
@@ -23,7 +22,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
             color: '#4d00b4',
             fontSize: '14px',
             lineHeight: '16px',
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           The ruling is final and further appeals are not possible. Awaiting
@@ -42,7 +41,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
             width: '30px',
             height: '30px',
             margin: '15px',
-            marginTop: 0
+            marginTop: 0,
           }}
         />
         <p
@@ -50,7 +49,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
             color: '#4d00b4',
             fontSize: '14px',
             lineHeight: '16px',
-            textAlign: 'center'
+            textAlign: 'center',
           }}
         >
           If the loser is fully funded, the winner of the previous round should
@@ -68,7 +67,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
           width: '30px',
           height: '30px',
           margin: '15px',
-          marginTop: 0
+          marginTop: 0,
         }}
       />
       <p
@@ -76,7 +75,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
           color: '#4d00b4',
           fontSize: '14px',
           lineHeight: '16px',
-          textAlign: 'center'
+          textAlign: 'center',
         }}
       >
         If neither party fully funds, the request will not be executed and
@@ -90,7 +89,7 @@ const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
 CrowdfundingMsg.propTypes = {
   decisiveRuling: PropTypes.bool.isRequired,
   type: PropTypes.string.isRequired,
-  payableValue: PropTypes.bool.isRequired
+  payableValue: PropTypes.bool.isRequired,
 }
 
 export default CrowdfundingMsg

@@ -1,8 +1,8 @@
 import Web3 from 'web3'
 
 const ETHAddressRegExpCaptureGroup = '(0x[a-fA-F0-9]{40})'
-const ETHAddressRegExp = /0x[a-fA-F0-9]{40}/
-const strictETHAddressRegExp = /^0x[a-fA-F0-9]{40}$/
+const ETHAddressRegExp = /0x[\dA-Fa-f]{40}/
+const strictETHAddressRegExp = /^0x[\dA-Fa-f]{40}$/
 
 const web3Utils = new Web3().utils
 let web3
@@ -29,5 +29,5 @@ export {
   IPFS_URL,
   onlyInfura,
   APP_VERSION,
-  web3Utils
+  web3Utils,
 }

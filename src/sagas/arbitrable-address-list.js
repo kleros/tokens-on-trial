@@ -1,8 +1,6 @@
 import piexif from 'piexifjs'
 import JSZip from 'jszip'
-
 import { all, call, select, takeLatest } from 'redux-saga/effects'
-
 import { lessduxSaga } from '../utils/saga'
 import readFile from '../utils/read-file'
 import { sanitize } from '../utils/ui'
@@ -12,7 +10,6 @@ import * as walletSelectors from '../reducers/wallet'
 import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import asyncReadFile from '../utils/async-file-reader'
-
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
@@ -35,18 +32,18 @@ export function* fetchBadgeContractData(
   const eventsData = {
     metaEvidenceEvents: {
       blockNumber: 0,
-      events: []
+      events: [],
     },
     evidenceEvents: {
-      blockNumber: 0
+      blockNumber: 0,
     },
     requestSubmittedEvents: {
-      blockNumber: 0
+      blockNumber: 0,
     },
     disputeEvents: {
-      blockNumber: 0
+      blockNumber: 0,
     },
-    allEvents: {}
+    allEvents: {},
   }
 
   eventsData.allEvents.events = (yield call(
@@ -55,7 +52,7 @@ export function* fetchBadgeContractData(
     arbitrableAddressListView
   )).sort((a, b) => a.blockNumber - b.blockNumber)
   eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
-    e => e.event === 'MetaEvidence'
+    (e) => e.event === 'MetaEvidence'
   )
 
   // Fetch tcr information from the latest meta evidence event
@@ -68,7 +65,7 @@ export function* fetchBadgeContractData(
 
   const { fileURI, variables } = metaEvidence
   eventsData.evidenceEvents = eventsData.allEvents.events
-    .filter(e => e.event === 'Evidence')
+    .filter((e) => e.event === 'Evidence')
     .reduce((acc, curr) => {
       const { returnValues } = curr
       const { _evidenceGroupID } = returnValues
@@ -77,30 +74,30 @@ export function* fetchBadgeContractData(
       acc[_evidenceGroupID].push({
         returnValues: curr.returnValues,
         transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber
+        blockNumber: curr.blockNumber,
       })
       return acc
     }, eventsData.evidenceEvents)
 
   eventsData.requestSubmittedEvents = eventsData.allEvents.events
-    .filter(e => e.event === 'RequestSubmitted')
+    .filter((e) => e.event === 'RequestSubmitted')
     .reduce((acc, curr) => {
       if (!acc[curr.returnValues._address]) acc[curr.returnValues._address] = []
 
       acc[curr.returnValues._address].push({
         returnValues: curr.returnValues,
         transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber
+        blockNumber: curr.blockNumber,
       })
 
       return acc
     }, eventsData.requestSubmittedEvents)
 
   eventsData.disputeEvents = eventsData.allEvents.events
-    .filter(e => e.event === 'Dispute')
+    .filter((e) => e.event === 'Dispute')
     .reduce((acc, curr) => {
       const {
-        returnValues: { _evidenceGroupID }
+        returnValues: { _evidenceGroupID },
       } = curr
 
       if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
@@ -109,7 +106,7 @@ export function* fetchBadgeContractData(
       acc[_evidenceGroupID] = {
         returnValues: curr.returnValues,
         transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber
+        blockNumber: curr.blockNumber,
       }
       return acc
     }, eventsData.disputeEvents)
@@ -146,7 +143,7 @@ export function* fetchBadgeContractData(
         return acc
       },
       {}
-    )
+    ),
   }
 }
 
@@ -161,7 +158,7 @@ export function* fetchArbitrableAddressListData() {
   )
 
   const badgeContractsData = (yield all(
-    Object.keys(badgeViewContracts).map(address =>
+    Object.keys(badgeViewContracts).map((address) =>
       call(
         fetchBadgeContractData,
         badgeViewContracts[address],
@@ -182,7 +179,13 @@ export function* fetchArbitrableAddressListData() {
  * @returns {object} - The `lessdux` collection mod object for updating the list of tokens.
  */
 function* submitBadgeEvidence({
-  payload: { evidenceData, file, tokenAddress, badgeContractAddr, evidenceSide }
+  payload: {
+    evidenceData,
+    file,
+    tokenAddress,
+    badgeContractAddr,
+    evidenceSide,
+  },
 }) {
   const { badgeContracts } = yield call(instantiateEnvObjects)
   const arbitrableAddressList = badgeContracts[badgeContractAddr]
@@ -209,12 +212,11 @@ function* submitBadgeEvidence({
       const xmlString = yield zip.file('docProps/core.xml').async('text')
       const xmlObject = new DOMParser().parseFromString(xmlString, 'text/xml')
 
-      xmlObject.getElementsByTagName('dc:creator')[0].childNodes[0].nodeValue =
-        ''
-      xmlObject.getElementsByTagName(
+      xmlObject.querySelectorAll('dc:creator')[0].childNodes[0].nodeValue = ''
+      xmlObject.querySelectorAll(
         'cp:lastModifiedBy'
       )[0].childNodes[0].nodeValue = ''
-      xmlObject.getElementsByTagName(
+      xmlObject.querySelectorAll(
         'cp:lastModifiedBy'
       )[0].childNodes[0].nodeValue = ''
 
@@ -236,7 +238,7 @@ function* submitBadgeEvidence({
     fileURI,
     fileHash: multihash,
     fileTypeExtension,
-    evidenceSide
+    evidenceSide,
   }
 
   const enc = new TextEncoder()
@@ -255,7 +257,7 @@ function* submitBadgeEvidence({
       `/ipfs/${ipfsHashEvidence}`
     ).send,
     {
-      from: yield select(walletSelectors.getAccount)
+      from: yield select(walletSelectors.getAccount),
     }
   )
 
@@ -280,7 +282,7 @@ export default function* arbitrableAddressListSaga() {
     lessduxSaga,
     {
       flow: 'create',
-      collection: arbitrableAddressListActions.badgeEvidence.self
+      collection: arbitrableAddressListActions.badgeEvidence.self,
     },
     arbitrableAddressListActions.badgeEvidence,
     submitBadgeEvidence

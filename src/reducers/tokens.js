@@ -2,7 +2,7 @@ import {
   CACHE_TOKENS,
   FETCH_TOKENS_CACHE,
   FETCH_TOKENS_FAILED,
-  LOAD_TOKENS_STATE
+  LOAD_TOKENS_STATE,
 } from '../actions/tokens'
 
 const initialState = {
@@ -12,8 +12,8 @@ const initialState = {
     blockNumber: 0,
     statusBlockNumber: 0,
     items: {},
-    addressToIDs: {}
-  }
+    addressToIDs: {},
+  },
 }
 
 const tokens = (state = initialState, action) => {
@@ -21,14 +21,14 @@ const tokens = (state = initialState, action) => {
     case FETCH_TOKENS_CACHE: {
       return {
         ...state,
-        loading: true
+        loading: true,
       }
     }
     case FETCH_TOKENS_FAILED: {
       return {
         ...state,
         loading: false,
-        failedLoading: true
+        failedLoading: true,
       }
     }
     case CACHE_TOKENS: {
@@ -36,14 +36,14 @@ const tokens = (state = initialState, action) => {
       return {
         data: { ...tokens },
         loading: false,
-        failedLoading: false
+        failedLoading: false,
       }
     }
     case LOAD_TOKENS_STATE: {
       const { data } = action.payload
       return {
         ...state,
-        data
+        data,
       }
     }
     default:
@@ -53,4 +53,4 @@ const tokens = (state = initialState, action) => {
 
 export default tokens
 
-export const getTokens = state => state.tokens
+export const getTokens = (state) => state.tokens

@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import Button from '../button'
 import * as modalConstants from '../../constants/modal'
 import * as tcrConstants from '../../constants/tcr'
@@ -13,7 +12,7 @@ const { toBN } = web3Utils
 
 const ETHFINEX_BADGE = {
   1: '0x916deaB80DFbc7030277047cD18B233B3CE5b4Ab',
-  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759'
+  42: '0xd58BDd286E8155b6223e2A62932AE3e0A9A75759',
 }
 
 const getActionButton = ({
@@ -25,7 +24,7 @@ const getActionButton = ({
   badgeContractAddr,
   decisiveRuling,
   loserPercent,
-  loserTimedOut
+  loserTimedOut,
 }) => {
   let method
   let disabled = true
@@ -143,8 +142,9 @@ const getActionButton = ({
       icon = 'gavel'
       disabled = false
       method = handleExecuteRequestClick
-      if (submitterFees.gt(challengerFees)) label = 'Timeout Challenger'
-      else label = 'Timeout Submitter'
+      label = submitterFees.gt(challengerFees)
+        ? 'Timeout Challenger'
+        : 'Timeout Submitter'
     } else if (
       Date.now() >=
       latestRequest.submissionTime + challengePeriodDuration

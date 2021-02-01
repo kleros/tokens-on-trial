@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3Utils } from '../../../../bootstrap/dapp-api'
@@ -92,12 +91,12 @@ FundDispute.propTypes = {
   // State
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape,
   ]).isRequired,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  fundDispute: PropTypes.func.isRequired
+  fundDispute: PropTypes.func.isRequired,
 }
 
 export default FundDispute

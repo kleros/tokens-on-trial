@@ -14,7 +14,7 @@ CountdownRenderer.propTypes = {
   days: PropTypes.number.isRequired,
   hours: PropTypes.number.isRequired,
   minutes: PropTypes.number.isRequired,
-  seconds: PropTypes.number.isRequired
+  seconds: PropTypes.number.isRequired,
 }
 
 export default CountdownRenderer

@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import createReducer, { createResource } from 'lessdux'
-
 import * as itemConstants from '../constants/tcr'
 
 const _arbitrableAddressListDataShape = PropTypes.shape({
@@ -17,13 +16,13 @@ const _arbitrableAddressListDataShape = PropTypes.shape({
       acc[value] = PropTypes.number.isRequired
       return acc
     }, {})
-  ).isRequired
+  ).isRequired,
 })
 
 // Shapes
 const {
   shape: arbitrableAddressListDataShape,
-  initialState: arbitrableAddressListDataInitialState
+  initialState: arbitrableAddressListDataInitialState,
 } = createResource(
   PropTypes.objectOf(_arbitrableAddressListDataShape).isRequired
 )
@@ -31,7 +30,7 @@ export { arbitrableAddressListDataShape, _arbitrableAddressListDataShape }
 
 // Reducer
 export default createReducer({
-  arbitrableAddressListData: arbitrableAddressListDataInitialState
+  arbitrableAddressListData: arbitrableAddressListDataInitialState,
 })
 
 // Selectors

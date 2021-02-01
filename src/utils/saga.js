@@ -1,5 +1,4 @@
 import { call, put } from 'redux-saga/effects'
-
 import { action as _action, errorAction } from './action'
 
 /**
@@ -36,8 +35,8 @@ export function* lessduxSaga(
             ? {
                 collectionMod: {
                   collection: flowOrCollectionModFlow.collection,
-                  updating: [flowOrCollectionModFlow.updating(action)]
-                }
+                  updating: [flowOrCollectionModFlow.updating(action)],
+                },
               }
             : undefined
         )
@@ -61,13 +60,13 @@ export function* lessduxSaga(
             flowOrCollectionModFlow.find(action),
           updating:
             flowOrCollectionModFlow.updating &&
-            flowOrCollectionModFlow.updating(action)
+            flowOrCollectionModFlow.updating(action),
         }
       : yield call(saga, action)
 
     yield put(
       _action(resourceActions[`RECEIVE${receiveWord}`], {
-        [result.collection ? 'collectionMod' : resourceActions.self]: result
+        [result.collection ? 'collectionMod' : resourceActions.self]: result,
       })
     )
   } catch (err) {
@@ -85,8 +84,8 @@ export function* lessduxSaga(
                 updating:
                   flowOrCollectionModFlow.updating &&
                   flowOrCollectionModFlow.updating(action),
-                error: err
-              }
+                error: err,
+              },
             }
           : err
       )

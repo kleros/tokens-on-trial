@@ -5,5 +5,5 @@ export const PERIOD = createEnum([
   'Commit',
   'Vote',
   'Appeal',
-  'Execution'
+  'Execution',
 ])

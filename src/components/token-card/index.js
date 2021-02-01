@@ -4,18 +4,16 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../../constants/tcr'
 import EtherScanLogo from '../../assets/images/etherscan.png'
 import {
   getItemStatusColor,
   getItemStatusText,
-  getBadgeStyle
+  getBadgeStyle,
 } from '../../utils/ui'
 import { IPFS_URL } from '../../bootstrap/dapp-api'
 import { envObjectsShape, cacheItemShape } from '../../reducers/generic-shapes'
 import { _cacheTokenShape } from '../../reducers/token'
-
 import './token-card.css'
 
 const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
@@ -55,7 +53,7 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
             marginBottom: 0,
             marginTop: '12px',
             textAlign: 'center',
-            wordBreak: 'break-word'
+            wordBreak: 'break-word',
           }}
         >
           {`${token.name} ${token.name && token.ticker ? '-' : ''} ${
@@ -69,7 +67,7 @@ const TokenCard = ({ token, envObjects: { FILE_BASE_URL }, badges }) => (
         {(token.clientStatus === 1 ||
           token.clientStatus === 3 ||
           token.clientStatus === 5) &&
-          Object.keys(badges).map(badgeContrAddr => {
+          Object.keys(badges).map((badgeContrAddr) => {
             const badge = badges[badgeContrAddr].items[token.address]
             return (
               badge &&
@@ -103,13 +101,13 @@ TokenCard.propTypes = {
     PropTypes.shape({
       badgeContractAddr: PropTypes.string.isRequired,
       items: PropTypes.objectOf(cacheItemShape.isRequired).isRequired,
-      statusBlockNumber: PropTypes.number.isRequired
+      statusBlockNumber: PropTypes.number.isRequired,
     })
   ).isRequired,
-  envObjects: envObjectsShape.isRequired
+  envObjects: envObjectsShape.isRequired,
 }
 
-export default connect(state => ({
+export default connect((state) => ({
   envObjects: state.envObjects.data,
-  badges: state.badges.data
+  badges: state.badges.data,
 }))(TokenCard)

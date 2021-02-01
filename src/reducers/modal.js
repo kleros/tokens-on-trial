@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types'
 import createReducer from 'lessdux'
-
 import * as modalActions from '../actions/modal'
 import * as modalConstants from '../constants/modal'
 
@@ -15,7 +14,7 @@ export default createReducer(
   {
     openActionModal: null,
     isNotificationsModalOpen: false,
-    isSettingsModalOpen: false
+    isSettingsModalOpen: false,
   },
   {
     [modalActions.OPEN_ACTION_MODAL]: (
@@ -24,28 +23,28 @@ export default createReducer(
     ) => ({
       ...state,
       openActionModal: actionModal,
-      actionModalParam: param
+      actionModalParam: param,
     }),
-    [modalActions.CLOSE_ACTION_MODAL]: state => ({
+    [modalActions.CLOSE_ACTION_MODAL]: (state) => ({
       ...state,
       openActionModal: null,
-      actionModalParam: null
+      actionModalParam: null,
     }),
-    [modalActions.OPEN_NOTIFICATIONS_MODAL]: state => ({
+    [modalActions.OPEN_NOTIFICATIONS_MODAL]: (state) => ({
       ...state,
-      isNotificationsModalOpen: true
+      isNotificationsModalOpen: true,
     }),
-    [modalActions.CLOSE_NOTIFICATIONS_MODAL]: state => ({
+    [modalActions.CLOSE_NOTIFICATIONS_MODAL]: (state) => ({
       ...state,
-      isNotificationsModalOpen: false
+      isNotificationsModalOpen: false,
     }),
-    [modalActions.OPEN_SETTINGS_MODAL]: state => ({
+    [modalActions.OPEN_SETTINGS_MODAL]: (state) => ({
       ...state,
-      isSettingsModalOpen: true
+      isSettingsModalOpen: true,
     }),
-    [modalActions.CLOSE_SETTINGS_MODAL]: state => ({
+    [modalActions.CLOSE_SETTINGS_MODAL]: (state) => ({
       ...state,
-      isSettingsModalOpen: false
-    })
+      isSettingsModalOpen: false,
+    }),
   }
 )

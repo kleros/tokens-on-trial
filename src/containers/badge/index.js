@@ -3,7 +3,6 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
 import PropTypes from 'prop-types'
 import { BeatLoader } from 'react-spinners'
-
 import { onlyInfura } from '../../bootstrap/dapp-api'
 import Button from '../../components/button'
 import Modal from '../../components/modal'
@@ -22,10 +21,8 @@ import { ContractsContext } from '../../bootstrap/contexts'
 import WithdrawFundsButton from '../../components/withdraw-funds'
 import CrowdfundingCard from '../crowdfunding-card'
 import PageNotFound from '../../components/page-not-found'
-
 import BadgeDetailsCard from './badge-details-card'
 import TokenInfo from './token-info'
-
 import './badge.css'
 
 class BadgeDetails extends PureComponent {
@@ -39,8 +36,8 @@ class BadgeDetails extends PureComponent {
     envObjects: PropTypes.shape({}).isRequired,
     match: PropTypes.shape({
       params: PropTypes.shape({
-        tokenID: PropTypes.string
-      })
+        tokenID: PropTypes.string,
+      }),
     }),
     failedLoading: PropTypes.bool.isRequired,
 
@@ -49,14 +46,14 @@ class BadgeDetails extends PureComponent {
     fetchBadge: PropTypes.func.isRequired,
     openActionModal: PropTypes.func.isRequired,
     toggleFilter: PropTypes.func.isRequired,
-    withdrawBadgeFunds: PropTypes.func.isRequired
+    withdrawBadgeFunds: PropTypes.func.isRequired,
   }
 
   static contextType = ContractsContext
 
   static defaultProps = {
     match: {},
-    badge: null
+    badge: null,
   }
 
   state = {
@@ -65,10 +62,10 @@ class BadgeDetails extends PureComponent {
     loserCountdownCompleted: false,
     winnerCountdownCompleted: false,
     eventListenerSet: false,
-    evidencePeriodEnded: false
+    evidencePeriodEnded: false,
   }
 
-  handleFilterChange = key => {
+  handleFilterChange = (key) => {
     const { toggleFilter, match } = this.props
     const { badgeAddr } = match
     const { badgeViewContracts } = this.context
@@ -98,39 +95,39 @@ class BadgeDetails extends PureComponent {
     timeout(badge)
   }
 
-  handleOpenEvidenceModal = badgeContractAddr => {
+  handleOpenEvidenceModal = (badgeContractAddr) => {
     const { openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.SubmitEvidenceBadge, {
-      badgeContractAddr
+      badgeContractAddr,
     })
   }
 
-  handleViewEvidenceClick = evidence => () => {
+  handleViewEvidenceClick = (evidence) => () => {
     const { openActionModal } = this.props
     openActionModal(modalConstants.ACTION_MODAL_ENUM.ViewEvidence, evidence)
   }
 
-  toSentenceCase = input => {
+  toSentenceCase = (input) => {
     input = input ? input.toLowerCase() : ''
     return input.charAt(0).toUpperCase() + input.slice(1)
   }
 
-  onCountdownComplete = time => {
+  onCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ countdownCompleted: true })
   }
 
-  onWinnerCountdownComplete = time => {
+  onWinnerCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ winnerCountdownCompleted: true })
   }
 
-  onLoserCountdownComplete = time => {
+  onLoserCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ loserCountdownCompleted: true })
   }
 
-  onEvidenceCountdownComplete = time => {
+  onEvidenceCountdownComplete = (time) => {
     if (typeof time === 'number' && time > 0) return
     this.setState({ evidencePeriodEnded: true })
   }
@@ -142,7 +139,7 @@ class BadgeDetails extends PureComponent {
     withdrawBadgeFunds({
       badgeContractAddr: badgeAddr,
       tokenAddr,
-      item: badge
+      item: badge,
     })
   }
 
@@ -175,7 +172,7 @@ class BadgeDetails extends PureComponent {
     badgeAddr,
     tokenAddr,
     match,
-    arbitratorEvents
+    arbitratorEvents,
   }) {
     arbitrableAddressListEvents.events.RewardWithdrawal((err, event) => {
       if (err) {
@@ -235,7 +232,7 @@ class BadgeDetails extends PureComponent {
       arbitratorEvents,
       archon,
       badgeEventsContracts,
-      badgeViewContracts
+      badgeViewContracts,
     } = this.context
 
     const { match } = this.props
@@ -262,7 +259,7 @@ class BadgeDetails extends PureComponent {
       fetchBadge(tokenAddr, badgeAddr)
       this.setState({
         fetching: true,
-        eventListenerSet: false
+        eventListenerSet: false,
       })
       return
     }
@@ -299,7 +296,7 @@ class BadgeDetails extends PureComponent {
           badge,
           archon,
           arbitrableAddressListView,
-          badgeContractBlockNumber
+          badgeContractBlockNumber,
         })
       })
   }
@@ -313,7 +310,7 @@ class BadgeDetails extends PureComponent {
       match,
       arbitrableAddressListData,
       envObjects,
-      failedLoading
+      failedLoading,
     } = this.props
 
     if (failedLoading)
@@ -367,15 +364,15 @@ class BadgeDetails extends PureComponent {
       latestRequest.dispute &&
       Number(latestRequest.dispute.status) ===
         tcrConstants.DISPUTE_STATUS.Appealable &&
-      !latestRequest.latestRound.appealed
-    )
-      if (latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None) {
-        decisiveRuling = true
-        requesterIsLoser =
-          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
-        challengerIsLoser =
-          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
-      }
+      !latestRequest.latestRound.appealed &&
+      latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None
+    ) {
+      decisiveRuling = true
+      requesterIsLoser =
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Refuse
+      challengerIsLoser =
+        latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
+    }
 
     const loserRemainingTime = getRemainingTime(
       badge,
@@ -397,24 +394,23 @@ class BadgeDetails extends PureComponent {
         tcrConstants.DISPUTE_STATUS.Appealable &&
       !latestRequest.latestRound.appealed
     ) {
-      if (!latestRound.hasPaid[1])
-        requesterFeesPercent =
-          (Number(latestRound.paidFees[1]) /
+      requesterFeesPercent = !latestRound.hasPaid[1]
+        ? (Number(latestRound.paidFees[1]) /
             Number(latestRound.requiredForSide[1])) *
           100
-      else requesterFeesPercent = 100
+        : 100
 
-      if (!latestRound.hasPaid[2])
-        challengerFeesPercent =
-          (Number(latestRound.paidFees[2]) /
+      challengerFeesPercent = !latestRound.hasPaid[2]
+        ? (Number(latestRound.paidFees[2]) /
             Number(latestRound.requiredForSide[2])) *
           100
-      else challengerFeesPercent = 100
+        : 100
 
       if (decisiveRuling) {
-        if (latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept)
-          loserPercent = challengerFeesPercent
-        else loserPercent = requesterFeesPercent
+        loserPercent =
+          latestRequest.dispute.ruling === tcrConstants.RULING_OPTIONS.Accept
+            ? challengerFeesPercent
+            : requesterFeesPercent
 
         if (loserPercent < 100 && loserCountdownCompleted) loserTimedOut = true
       }
@@ -511,7 +507,7 @@ class BadgeDetails extends PureComponent {
                     modalConstants.ACTION_MODAL_ENUM['FundAppealBadge'],
                     {
                       side: tcrConstants.SIDE.Requester,
-                      badgeContractAddr: badgeAddr
+                      badgeContractAddr: badgeAddr,
                     }
                   )
                 }}
@@ -535,7 +531,7 @@ class BadgeDetails extends PureComponent {
                     modalConstants.ACTION_MODAL_ENUM['FundAppealBadge'],
                     {
                       side: tcrConstants.SIDE.Challenger,
-                      badgeContractAddr: badgeAddr
+                      badgeContractAddr: badgeAddr,
                     }
                   )
                 }}
@@ -551,20 +547,20 @@ class BadgeDetails extends PureComponent {
 }
 
 export default connect(
-  state => ({
+  (state) => ({
     badge: state.badge.badge.data,
     failedLoading: state.badge.badge.failedLoading,
     accounts: state.wallet.accounts,
     arbitrableAddressListData:
       state.arbitrableAddressList.arbitrableAddressListData,
     filter: state.filter,
-    envObjects: state.envObjects.data
+    envObjects: state.envObjects.data,
   }),
   {
     openActionModal: modalActions.openActionModal,
     fetchBadge: badgeActions.fetchBadge,
     timeout: badgeActions.timeout,
     withdrawBadgeFunds: badgeActions.withdrawBadgeFunds,
-    toggleFilter: filterActions.toggleFilter
+    toggleFilter: filterActions.toggleFilter,
   }
 )(BadgeDetails)

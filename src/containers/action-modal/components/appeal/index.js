@@ -2,7 +2,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import { connect } from 'react-redux'
-
 import * as tokenSelectors from '../../../../reducers/token'
 import * as tcrConstants from '../../../../constants/tcr'
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
@@ -10,7 +9,6 @@ import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable
 import { web3Utils } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
-
 import { AppealForm, getAppealFormIsInvalid, submitAppealForm } from './form'
 import './appeal.css'
 
@@ -31,7 +29,7 @@ const isLosingSide = (item, side) => {
   return losingSide
 }
 
-const decisiveRuling = item =>
+const decisiveRuling = (item) =>
   item.latestRequest.dispute.ruling !== tcrConstants.RULING_OPTIONS.None
 
 const FundAppeal = ({
@@ -41,7 +39,7 @@ const FundAppeal = ({
   tcr,
   side,
   appealFormIsInvalid,
-  submitAppealForm
+  submitAppealForm,
 }) => (
   <div className="ActionModal">
     <h3 className="Modal-title">
@@ -54,10 +52,12 @@ const FundAppeal = ({
     </h5>
     <div className="Appeal-cost">
       <span>Appeal Cost</span>
-      {`${item.latestRequest.latestRound.appealCost &&
+      {`${
+        item.latestRequest.latestRound.appealCost &&
         truncateETHValue(
           String(web3Utils.fromWei(item.latestRequest.latestRound.appealCost))
-        )} ETH`}
+        )
+      } ETH`}
     </div>
     <div className="Appeal-cost">
       <span>Arbitration Fee Stake</span>
@@ -201,7 +201,7 @@ const FundAppeal = ({
                   )
                 )
                 .toString()
-            )
+            ),
       }}
     />
     <div
@@ -209,7 +209,7 @@ const FundAppeal = ({
         textAlign: 'start',
         fontSize: '12px',
         marginTop: '10px',
-        display: 'flex'
+        display: 'flex',
       }}
     >
       <FontAwesomeIcon icon="info-circle" />
@@ -246,7 +246,7 @@ FundAppeal.propTypes = {
   item: tokenSelectors.tokenShape.isRequired,
   tcr: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape,
   ]).isRequired,
   side: PropTypes.string.isRequired,
   appealFormIsInvalid: PropTypes.bool.isRequired,
@@ -254,14 +254,14 @@ FundAppeal.propTypes = {
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
   fundAppeal: PropTypes.func.isRequired,
-  submitAppealForm: PropTypes.func.isRequired
+  submitAppealForm: PropTypes.func.isRequired,
 }
 
 export default connect(
-  state => ({
-    appealFormIsInvalid: getAppealFormIsInvalid(state)
+  (state) => ({
+    appealFormIsInvalid: getAppealFormIsInvalid(state),
   }),
   {
-    submitAppealForm
+    submitAppealForm,
   }
 )(FundAppeal)

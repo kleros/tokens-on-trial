@@ -1,17 +1,15 @@
 import React from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
-
 import * as tcrConstants from '../../constants/tcr'
 import { userFriendlyLabel, toSentenceCase } from '../../utils/ui'
-
 import './item-status.css'
 
 const ItemStatus = ({
   item: {
     clientStatus,
-    latestRequest: { disputeID, disputed, resolved }
-  }
+    latestRequest: { disputeID, disputed, resolved },
+  },
 }) => (
   <span
     className="ItemStatus-meta-item"
@@ -42,8 +40,8 @@ const ItemStatus = ({
 
 ItemStatus.propTypes = {
   item: PropTypes.shape({
-    clientStatus: PropTypes.number.isRequired
-  }).isRequired
+    clientStatus: PropTypes.number.isRequired,
+  }).isRequired,
 }
 
 export default ItemStatus

@@ -2,27 +2,27 @@ import { form } from '../../../../../utils/form-generator'
 import {
   ETHAddress,
   required,
-  notEmptyAddress
+  notEmptyAddress,
 } from '../../../../../utils/validation'
 
 export const {
   Form: TokenForm,
   isInvalid: getTokenFormIsInvalid,
-  submit: submitTokenForm
+  submit: submitTokenForm,
 } = form('tokenForm', {
   name: {
     type: 'text',
     validate: [required],
-    props: { placeholder: 'Name' }
+    props: { placeholder: 'Name' },
   },
   address: {
     type: 'text',
     validate: [required, ETHAddress, notEmptyAddress],
-    props: { placeholder: 'Address' }
+    props: { placeholder: 'Address' },
   },
   ticker: {
     type: 'text',
     validate: [required],
-    props: { placeholder: 'Ticker' }
-  }
+    props: { placeholder: 'Ticker' },
+  },
 })

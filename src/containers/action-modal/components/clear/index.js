@@ -1,13 +1,11 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
-
 import * as arbitrableTokenListSelectors from '../../../../reducers/arbitrable-token-list'
 import * as arbitrableAddressListSelectors from '../../../../reducers/arbitrable-address-list'
 import { web3Utils, IPFS_URL } from '../../../../bootstrap/dapp-api'
 import Button from '../../../../components/button'
 import { truncateETHValue } from '../../../../utils/ui'
-
 import './clear.css'
 
 const Clear = ({ tcrData, closeActionModal, clearItem, item, badge }) => (
@@ -68,7 +66,7 @@ const Clear = ({ tcrData, closeActionModal, clearItem, item, badge }) => (
         textAlign: 'start',
         fontSize: '12px',
         marginTop: '10px',
-        display: 'flex'
+        display: 'flex',
       }}
     >
       <FontAwesomeIcon icon="info-circle" />
@@ -100,18 +98,18 @@ Clear.propTypes = {
   item: PropTypes.shape({ name: PropTypes.string.isRequired }),
   tcrData: PropTypes.oneOfType([
     arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-    arbitrableAddressListSelectors.arbitrableAddressListDataShape
+    arbitrableAddressListSelectors.arbitrableAddressListDataShape,
   ]).isRequired,
   badge: PropTypes.bool,
 
   // Action Dispatchers
   closeActionModal: PropTypes.func.isRequired,
-  clearItem: PropTypes.func.isRequired
+  clearItem: PropTypes.func.isRequired,
 }
 
 Clear.defaultProps = {
   item: null,
-  badge: false
+  badge: false,
 }
 
 export default Clear

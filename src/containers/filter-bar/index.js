@@ -1,12 +1,10 @@
 import React, { Component, PureComponent } from 'react'
 import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
-
 import Button from '../../components/button'
 import SearchBar from '../search'
 import * as filterConstants from '../../constants/filter'
 import { userFriendlyLabel } from '../../utils/ui'
-
 import './filter-bar.css'
 
 class FilterButton extends PureComponent {
@@ -14,7 +12,7 @@ class FilterButton extends PureComponent {
     option: PropTypes.number.isRequired,
     handleFilterChange: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
-    className: PropTypes.string.isRequired
+    className: PropTypes.string.isRequired,
   }
 
   onFilterChange = () => {
@@ -44,15 +42,15 @@ class FilterBar extends Component {
 
     // Handlers
     handleFilterChange: PropTypes.func.isRequired,
-    filterVisible: PropTypes.bool
+    filterVisible: PropTypes.bool,
   }
 
   static defaultProps = {
-    filterVisible: false
+    filterVisible: false,
   }
 
   state = {
-    filterOptionsVisible: false
+    filterOptionsVisible: false,
   }
 
   toggleFilterOptions = () => {
@@ -84,8 +82,8 @@ class FilterBar extends Component {
             <div className="FilterBar-filterSelect">
               <div className="FilterBar-my">
                 {filterConstants.FILTER_OPTIONS_ENUM.indexes
-                  .filter(i => i >= 6)
-                  .map(i => (
+                  .filter((i) => i >= 6)
+                  .map((i) => (
                     <FilterButton
                       className="FilterBar-my-button"
                       handleFilterChange={handleFilterChange}
@@ -103,8 +101,8 @@ class FilterBar extends Component {
               </div>
               <div className="FilterBar-status">
                 {filterConstants.FILTER_OPTIONS_ENUM.indexes
-                  .filter(i => i < 6)
-                  .map(i => (
+                  .filter((i) => i < 6)
+                  .map((i) => (
                     <FilterButton
                       className={`FilterBar-status-button
                         FilterBar-status-button-${

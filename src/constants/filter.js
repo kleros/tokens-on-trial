@@ -9,7 +9,7 @@ export const FILTER_OPTIONS_ENUM = createEnum([
   'Clearing Requests',
   'Challenged Clearing Requests',
   'My Submissions',
-  'My Challenges'
+  'My Challenges',
 ])
 
 export const SORT_OPTIONS_ENUM = createEnum(['Newest', 'Oldest'])

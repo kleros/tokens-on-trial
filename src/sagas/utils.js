@@ -21,15 +21,14 @@ export const fetchEvents = async (
     promises.push(
       contract.getPastEvents(eventName, {
         fromBlock: startBlock,
-        toBlock: endBlock
+        toBlock: endBlock,
       })
     )
   }
   const logBatches = await Promise.all(promises)
   let events = []
-  logBatches.forEach(logBatch => {
-    events = events.concat(logBatch)
-  })
+  for (const logBatch of logBatches) events = events.concat(logBatch)
+
   return events
 }
 
@@ -47,8 +46,8 @@ export function* fetchAppealableAddresses(tcrView, arbitrableTCRView) {
       2000
     ).call
   ))
-    .filter(item => item.disputeID !== '0')
-    .filter(item => item.inAppealPeriod)
+    .filter((item) => item.disputeID !== '0')
+    .filter((item) => item.inAppealPeriod)
     .reduce((acc, curr) => ({ ...acc, [curr.addr]: curr }), {})
 
   return returnedItems
@@ -68,8 +67,8 @@ export function* fetchAppealableTokens(tcrView, arbitrableTCRView) {
       2000
     ).call
   ))
-    .filter(item => item.disputeID !== '0')
-    .filter(item => item.inAppealPeriod)
+    .filter((item) => item.disputeID !== '0')
+    .filter((item) => item.inAppealPeriod)
     .reduce((acc, curr) => ({ ...acc, [curr.tokenID]: curr }), {})
 
   return returnedItems

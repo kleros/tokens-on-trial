@@ -1,6 +1,5 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-
 import './paging.css'
 
 const Paging = ({
@@ -9,7 +8,7 @@ const Paging = ({
   onFirstPageClick,
   onLastPageClick,
   currentPage,
-  totalPages
+  totalPages,
 }) => (
   <div className="Paging">
     <span>{`Page ${currentPage + 1} of ${
@@ -69,7 +68,7 @@ Paging.propTypes = {
   onFirstPageClick: PropTypes.func.isRequired,
   onPreviousPageClick: PropTypes.func.isRequired,
   onNextPageClick: PropTypes.func.isRequired,
-  onLastPageClick: PropTypes.func.isRequired
+  onLastPageClick: PropTypes.func.isRequired,
 }
 
 export default Paging

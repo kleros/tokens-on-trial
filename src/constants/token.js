@@ -5,7 +5,7 @@ export const IN_CONTRACT_STATUS_ENUM = createEnum([
   'Absent', // The item has never been submitted.
   'Registered', // The item has been submitted and the dispute resolution process determined it should be added or the submission was never contested.
   'RegistrationRequested', // The item has been submitted.
-  'ClearingRequested' // The item is registered, but someone has requested to remove it.
+  'ClearingRequested', // The item is registered, but someone has requested to remove it.
 ])
 
 export const DISPUTE_STATUS = createEnum(['Waiting', 'Appealable', 'Solved'])
@@ -18,7 +18,7 @@ export const STATUS_ENUM = createEnum([
   'Submission Pending',
   'Clearing Requested',
   'Registration Request Challenged',
-  'Clearing Request Challenged'
+  'Clearing Request Challenged',
 ])
 
 export const STATUS_ICON_ENUM = createEnum([
@@ -27,7 +27,7 @@ export const STATUS_ICON_ENUM = createEnum([
   'hourglass-half',
   'hourglass-half',
   'gavel',
-  'gavel'
+  'gavel',
 ])
 
 export const STATUS_COLOR_ENUM = createEnum([
@@ -36,9 +36,9 @@ export const STATUS_COLOR_ENUM = createEnum([
   '##CCC', // Grey
   '##CCC', // Grey
   '#FB7413', // Orange
-  '#FB7413' // Orange
+  '#FB7413', // Orange
 ])
 
 // helloThere => Hello There
-export const camelCaseAddSpaces = str =>
-  str.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())
+export const camelCaseAddSpaces = (str) =>
+  str.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase())
