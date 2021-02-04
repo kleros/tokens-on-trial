@@ -252,9 +252,12 @@ const RequestEvidences = ({
                 isToken,
               })}
             </h4>
-            <small style={{ margin: '12px' }}>
-              {new Date(requestInfo.resolutionTime).toUTCString()}
-            </small>
+            {!!requestInfo.resolutionTime && !isNaN(requestInfo.resolutionTime) && (
+              <small style={{ margin: '12px' }}>
+                {new Date(requestInfo.resolutionTime).toUTCString()}
+              </small>
+              )
+            }
           </>
         )}
       </div>

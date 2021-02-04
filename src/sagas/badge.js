@@ -91,15 +91,11 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
           Number(badge.latestRequest.numberOfRounds) - 1
         ).call
       )
-      badge.latestRequest.latestRound.paidFees[0] = toBN(
-        badge.latestRequest.latestRound.paidFees[0]
-      )
-      badge.latestRequest.latestRound.paidFees[1] = toBN(
-        badge.latestRequest.latestRound.paidFees[1]
-      )
-      badge.latestRequest.latestRound.paidFees[2] = toBN(
-        badge.latestRequest.latestRound.paidFees[2]
-      )
+
+      badge.latestRequest.latestRound = {
+        ...badge.latestRequest.latestRound,
+        paidFees: badge.latestRequest.latestRound.paidFees.map(pF => toBN(pF))
+      }
 
       if (badge.latestRequest.disputed) {
         // Fetch dispute data.
