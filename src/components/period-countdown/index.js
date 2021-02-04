@@ -9,7 +9,7 @@ import './period-countdown.css'
 const PeriodCountdown = ({ item: { latestRequest, clientStatus } }) => {
   const { dispute, disputed } = latestRequest || {}
   if (clientStatus <= 1 || !disputed) return null
-  
+
   let periodRemainingTime = 0
   const { court, lastPeriodChange, period } = dispute || {}
   const timesPerPeriod = court.timesPerPeriod

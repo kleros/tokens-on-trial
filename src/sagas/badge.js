@@ -94,7 +94,9 @@ export function* fetchBadge({ payload: { tokenAddress, badgeContractAddr } }) {
 
       badge.latestRequest.latestRound = {
         ...badge.latestRequest.latestRound,
-        paidFees: badge.latestRequest.latestRound.paidFees.map(pF => toBN(pF))
+        paidFees: badge.latestRequest.latestRound.paidFees.map((pF) =>
+          toBN(pF)
+        ),
       }
 
       if (badge.latestRequest.disputed) {
