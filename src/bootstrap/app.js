@@ -213,12 +213,6 @@ class _ConnectedNavBar extends Component {
             to: '/badges',
             extraStyle: 'NavBar-route-title',
           },
-          {
-            title: 'Statistics',
-            to: 'https://t2cr-dashboard.kleros.io',
-            extraStyle: 'NavBar-route-title',
-            isExternal: true,
-          },
         ]}
         submenus={submenus}
       />
