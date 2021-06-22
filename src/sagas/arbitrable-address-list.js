@@ -11,21 +11,21 @@ import { web3Utils, IPFS_URL } from '../bootstrap/dapp-api'
 import { instantiateEnvObjects } from '../utils/tcr'
 import asyncReadFile from '../utils/async-file-reader'
 import ipfsPublish from './api/ipfs-publish'
+import { fetchEvents } from './utils'
 
 const { toBN } = web3Utils
-
-const fetchEvents = async (eventName, contract, fromBlock) =>
-  contract.getPastEvents(eventName, { fromBlock: fromBlock || 0 }) // Web3js returns an empty array if fromBlock is not set.
 
 /**
  * Fetches the arbitrable address list data.
  * @param { object } arbitrableAddressListView - The contract.
  * @param { object } arbitrableTCRView - View contract to fetch arbitrable data in a batch.
+ * @param { object } viewWeb3 - View only provider.
  * @returns {object} - The fetched data.
  */
 export function* fetchBadgeContractData(
   arbitrableAddressListView,
-  arbitrableTCRView
+  arbitrableTCRView,
+  viewWeb3
 ) {
   // Initial cache object.
   // This gets overwritten if there is cached data available.
@@ -46,14 +46,19 @@ export function* fetchBadgeContractData(
     allEvents: {},
   }
 
+  console.info('arbitrableAddressList: Fetch allEvents')
   eventsData.allEvents.events = (yield call(
     fetchEvents,
     'allEvents',
-    arbitrableAddressListView
+    arbitrableAddressListView,
+    0,
+    viewWeb3
   )).sort((a, b) => a.blockNumber - b.blockNumber)
   eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
     (e) => e.event === 'MetaEvidence'
   )
+
+  console.info('arbitrableAddressList: Done fetch allEvents')
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${
@@ -153,7 +158,7 @@ export function* fetchBadgeContractData(
  * @returns {object} - The fetched data.
  */
 export function* fetchArbitrableAddressListData() {
-  const { badgeViewContracts, arbitrableTCRView } = yield call(
+  const { badgeViewContracts, arbitrableTCRView, viewWeb3 } = yield call(
     instantiateEnvObjects
   )
 
@@ -162,7 +167,8 @@ export function* fetchArbitrableAddressListData() {
       call(
         fetchBadgeContractData,
         badgeViewContracts[address],
-        arbitrableTCRView
+        arbitrableTCRView,
+        viewWeb3
       )
     )
   )).reduce((acc, curr) => {

@@ -3,6 +3,7 @@ import JSZip from 'jszip'
 import { call, select, takeLatest } from 'redux-saga/effects'
 import { lessduxSaga } from '../utils/saga'
 import { sanitize } from '../utils/ui'
+import { fetchEvents } from './utils'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
@@ -13,9 +14,6 @@ import asyncReadFile from '../utils/async-file-reader'
 import ipfsPublish from './api/ipfs-publish'
 
 const { toBN } = web3Utils
-
-const fetchEvents = async (eventName, contract, fromBlock) =>
-  contract.getPastEvents(eventName, { fromBlock: fromBlock || 0 }) // Web3js returns an empty array if fromBlock is not set.
 
 /**
  * Fetches the arbitrable token list's data.
@@ -28,6 +26,7 @@ export function* fetchArbitrableTokenListData() {
     arbitratorView,
     arbitrableTCRView,
     T2CR_BLOCK,
+    viewWeb3,
   } = yield call(instantiateEnvObjects)
 
   // Initial cache object.
@@ -52,7 +51,9 @@ export function* fetchArbitrableTokenListData() {
   eventsData.allEvents.events = (yield call(
     fetchEvents,
     'allEvents',
-    arbitrableTokenListView
+    arbitrableTokenListView,
+    T2CR_BLOCK,
+    viewWeb3
   )).sort((a, b) => a.blockNumber - b.blockNumber)
   eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
     (e) => e.event === 'MetaEvidence'
