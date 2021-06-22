@@ -46,7 +46,6 @@ export function* fetchBadgeContractData(
     allEvents: {},
   }
 
-  console.info('arbitrableAddressList: Fetch allEvents')
   eventsData.allEvents.events = (yield call(
     fetchEvents,
     'allEvents',
@@ -57,8 +56,6 @@ export function* fetchBadgeContractData(
   eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
     (e) => e.event === 'MetaEvidence'
   )
-
-  console.info('arbitrableAddressList: Done fetch allEvents')
 
   // Fetch tcr information from the latest meta evidence event
   const metaEvidencePath = `${IPFS_URL}${

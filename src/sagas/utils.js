@@ -5,7 +5,7 @@ export const fetchEvents = async (
   contract,
   fromBlock = 0,
   web3,
-  blocksPerRequest = 50000
+  blocksPerRequest = 10000
 ) => {
   fromBlock = Number(fromBlock)
   const latestBlockNumber = (await web3.eth.getBlock('latest')).number
