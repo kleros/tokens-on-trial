@@ -37,6 +37,7 @@ import {
   submitEvidenceForm,
 } from './components/submit-evidence/evidence-form'
 import './action-modal.css'
+import { instantiateEnvObjects } from '../../utils/tcr'
 
 class ActionModal extends PureComponent {
   static propTypes = {
@@ -47,7 +48,9 @@ class ActionModal extends PureComponent {
     openActionModal: modalSelectors.openActionModalShape,
     closeActionModal: PropTypes.func.isRequired,
     actionModalParam: PropTypes.shape({}),
-    envObjects: PropTypes.shape({}).isRequired,
+    envObjects: PropTypes.shape({
+      T2CR_SUBGRAPH_URL: PropTypes.string.isRequired,
+    }).isRequired,
     arbitrableTokenListData:
       arbitrableTokenListSelectors.arbitrableTokenListDataShape.isRequired,
     badgeContracts: PropTypes.objectOf(
@@ -424,6 +427,7 @@ class ActionModal extends PureComponent {
     } = this.props
     fetchArbitrableTokenListData()
     fetchArbitrableAddressListData()
+    instantiateEnvObjects().then((envObjects) => this.setState({ envObjects }))
   }
 
   componentDidUpdate(prevProps) {
@@ -453,6 +457,10 @@ class ActionModal extends PureComponent {
       actionModalParam,
     } = this.props
 
+    const { envObjects } = this.state
+
+    if (!envObjects) return null
+
     const { fileInfoMessage, file } = this.state
 
     if (token.creating || token.updating || badge.creating || badge.updating)
@@ -473,6 +481,49 @@ class ActionModal extends PureComponent {
         badgeContracts[actionModalParam.badgeContractAddr]
 
     /* eslint-disable react/jsx-no-bind */
+    const {
+      T2CR_SUBGRAPH_URL,
+      arbitrableTCRView,
+      ARBITRABLE_TOKEN_LIST_ADDRESS,
+    } = envObjects
+
+    switch (openActionModal) {
+      case modalConstants.ACTION_MODAL_ENUM.Submit:
+      case modalConstants.ACTION_MODAL_ENUM.Resubmit:
+        return (
+          <Modal
+            className={
+              openActionModal === modalConstants.ACTION_MODAL_ENUM.AddBadge
+                ? 'Modal-add-badge'
+                : ''
+            }
+            isOpen={openActionModal !== null}
+            onRequestClose={this.handleRequestClose}
+          >
+            <Submit
+              arbitrableTCRView={arbitrableTCRView}
+              T2CR_SUBGRAPH_URL={T2CR_SUBGRAPH_URL}
+              ARBITRABLE_TOKEN_LIST_ADDRESS={ARBITRABLE_TOKEN_LIST_ADDRESS}
+              form={submitTokenForm}
+              submitItem={this.handleSubmitTokenClick}
+              submitItemForm={submitTokenForm}
+              file={file}
+              formIsInvalid={tokenFormIsInvalid}
+              fileInfoMessage={fileInfoMessage}
+              handleOnFileDropAccepted={this.handleOnImageDropAccepted}
+              closeActionModal={this.handleCloseTokenSubmission}
+              item={
+                openActionModal === modalConstants.ACTION_MODAL_ENUM.Submit
+                  ? null
+                  : token
+              }
+              resubmit={this.handleResubmitTokenClick}
+            />
+          </Modal>
+        )
+      default:
+        break
+    }
 
     if (!arbitrableTokenListData.data)
       switch (openActionModal) {
@@ -514,27 +565,6 @@ class ActionModal extends PureComponent {
       >
         {(() => {
           switch (openActionModal) {
-            case modalConstants.ACTION_MODAL_ENUM.Submit:
-            case modalConstants.ACTION_MODAL_ENUM.Resubmit:
-              return (
-                <Submit
-                  tcr={arbitrableTokenListData}
-                  form={submitTokenForm}
-                  submitItem={this.handleSubmitTokenClick}
-                  submitItemForm={submitTokenForm}
-                  file={file}
-                  formIsInvalid={tokenFormIsInvalid}
-                  fileInfoMessage={fileInfoMessage}
-                  handleOnFileDropAccepted={this.handleOnImageDropAccepted}
-                  closeActionModal={this.handleCloseTokenSubmission}
-                  item={
-                    openActionModal === modalConstants.ACTION_MODAL_ENUM.Submit
-                      ? null
-                      : token
-                  }
-                  resubmit={this.handleResubmitTokenClick}
-                />
-              )
             case modalConstants.ACTION_MODAL_ENUM.Clear:
               return (
                 <Clear
@@ -709,7 +739,6 @@ export default connect(
     accounts: state.wallet.accounts,
     actionModalParam: state.modal.actionModalParam,
     badge: state.badge.badge,
-    envObjects: state.envObjects.data,
   }),
   {
     closeActionModal: modalActions.closeActionModal,
