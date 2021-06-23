@@ -129,7 +129,7 @@ class EvidenceSection extends Component {
             }))
             .map((evidence) => ({
               ...evidence,
-
+              blockNumber: Number(evidence.blockNumber),
               returnValues: {
                 _evidence: evidence.evidenceURI,
                 _evidenceGroupID: evidence.evidenceGroupID,
@@ -139,7 +139,6 @@ class EvidenceSection extends Component {
               },
             })),
         }))
-      console.info('requests', token.requests)
 
       token.requests.forEach((request) => {
         requestsInfo[request.evidenceGroupID] = {
@@ -149,12 +148,12 @@ class EvidenceSection extends Component {
           }, {}),
           ruling: request.ruling,
           resolved: !!request.resolutionTime,
-          submissionTime: request.submissionTime,
-          resolutionTime: request.resolutionTime,
+          submissionTime: Number(request.submissionTime),
+          resolutionTime: Number(request.resolutionTime),
           disputed: request.disputed,
+          blockNumber: Number(request.blockNumber),
         }
       })
-      console.info('requestsInfo', requestsInfo)
     } else {
       const badgeContract = badgeContracts[badgeContractAddr]
       const [requestSubmittedEvents] = await Promise.all([
@@ -200,8 +199,8 @@ class EvidenceSection extends Component {
             : {},
           ruling: request.ruling,
           resolved: request.resolved,
-          submissionTime: request.submissionTime,
-          resolutionTime: request.resolutionTime,
+          submissionTime: Number(request.submissionTime),
+          resolutionTime: Number(request.resolutionTime),
           disputed: request.disputed,
         }
       }
@@ -221,8 +220,9 @@ class EvidenceSection extends Component {
                       .returnValues,
                   archon,
                   txHash,
-                  blockNumber:
-                    requestsInfo[evidenceGroupID].evidences[txHash].blockNumber,
+                  blockNumber: Number(
+                    requestsInfo[evidenceGroupID].evidences[txHash].blockNumber
+                  ),
                 })
             )
           )
@@ -322,6 +322,7 @@ class EvidenceSection extends Component {
                   tcrData={tcrData}
                   arbitratorView={arbitratorView}
                   isTokenEvidence={isTokenEvidence}
+                  evidences={requestInfo.evidences}
                 />
               ))}
           </div>

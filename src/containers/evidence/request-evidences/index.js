@@ -77,9 +77,10 @@ const RequestEvidences = ({
             Object.keys(
               arbitratorData.appealDecisionEvents.events[disputeID]
             ).map(async (txHash, i) => ({
-              blockNumber:
+              blockNumber: Number(
                 arbitratorData.appealDecisionEvents.events[disputeID][txHash]
-                  .blockNumber,
+                  .blockNumber
+              ),
               txHash,
               arbitratorEvent: true,
               message: (
@@ -152,7 +153,7 @@ const RequestEvidences = ({
         )}
         {Object.keys(timelineItems)
           .map((txHash) => timelineItems[txHash])
-          .sort((a, b) => a.blockNumber - b.blockNumber)
+          .sort((a, b) => Number(a.blockNumber) - Number(b.blockNumber))
           .filter((_, i) => showHistory || i <= 2)
           .map((evidence, j) => (
             <React.Fragment key={`${idKey}${j}`}>
