@@ -8,10 +8,9 @@ import { itemShape, tcrShape } from '../../reducers/generic-shapes'
 import { getFileIcon } from '../../utils/evidence'
 import { ContractsContext } from '../../bootstrap/contexts'
 import Button from '../../components/button'
-import * as arbitrableTokenListSelectors from '../../reducers/arbitrable-token-list'
-import * as arbitrableAddressListSelectors from '../../reducers/arbitrable-address-list'
 import RequestEvidences from './request-evidences'
 import './evidence.css'
+import { instantiateEnvObjects } from '../../utils/tcr'
 
 const getEvidenceInfo = async ({
   returnValues,
@@ -54,10 +53,6 @@ class EvidenceSection extends Component {
 
   static propTypes = {
     tcrData: tcrShape.isRequired,
-    tcr: PropTypes.oneOfType([
-      arbitrableTokenListSelectors.arbitrableTokenListDataShape,
-      arbitrableAddressListSelectors.arbitrableAddressListDataShape,
-    ]).isRequired,
     itemID: PropTypes.string.isRequired,
   }
 
@@ -66,44 +61,149 @@ class EvidenceSection extends Component {
   async componentWillReceiveProps({
     item: { requests, badgeContractAddr },
     tcrData,
-    tcr,
     itemID,
   }) {
     let { requestsInfo } = this.state
-    if (requestsInfo) return
     if (!tcrData || (badgeContractAddr && !tcrData[badgeContractAddr])) return
-    if (
-      (badgeContractAddr && !tcrData[badgeContractAddr].evidenceEvents) ||
-      (!badgeContractAddr && !tcrData.evidenceEvents)
-    )
-      return
+
+    const isTokenEvidence = !badgeContractAddr
+    if (badgeContractAddr && !tcrData[badgeContractAddr].evidenceEvents) return
+
     if (!this.context) return
 
-    const { evidenceEvents, requestSubmittedEvents } = badgeContractAddr
-      ? tcrData[badgeContractAddr]
-      : tcrData
     requestsInfo = {}
-    for (const request of requests)
-      requestsInfo[request.evidenceGroupID] = {
-        evidences: evidenceEvents[request.evidenceGroupID]
-          ? evidenceEvents[request.evidenceGroupID].reduce((acc, curr) => {
-              acc[curr.transactionHash] = curr
-              return acc
-            }, {})
-          : {},
-        ruling: request.ruling,
-        resolved: request.resolved,
-        submissionTime: request.submissionTime,
-        resolutionTime: request.resolutionTime,
-        disputed: request.disputed,
+    const { T2CR_SUBGRAPH_URL, badgeContracts } = await instantiateEnvObjects()
+
+    if (isTokenEvidence) {
+      const data = await (
+        await fetch(T2CR_SUBGRAPH_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `
+            {
+              token(id: "${itemID}") {
+                requests {
+                  id
+                  result
+                  resolutionTime
+                  submissionTime
+                  disputed
+                  disputeID
+                  arbitrator
+                  blockNumber
+                  evidences {
+                    id
+                    hash
+                    submissionTime
+                    submitter
+                    evidenceURI
+                    blockNumber
+                  }
+                }
+              }
+            }
+          `,
+          }),
+        })
+      ).json()
+
+      const token = data.data.token
+      token.requests = token.requests
+        .map((request) => ({
+          ...request,
+          requestIndex: Number(request.id.slice(request.id.indexOf('-') + 1)),
+          ruling: request.result === 'Accepted' ? 1 : 2,
+          registrationRequest: request.type === 'RegistrationRequested',
+        }))
+        .map((request) => ({
+          ...request,
+          evidenceGroupID: web3Utils
+            .toBN(web3Utils.soliditySha3(itemID, request.requestIndex))
+            .toString(10),
+          evidences: request.evidences
+            .map((evidence) => ({
+              ...evidence,
+              evidenceGroupID: web3Utils
+                .toBN(web3Utils.soliditySha3(itemID, request.requestIndex))
+                .toString(10),
+            }))
+            .map((evidence) => ({
+              ...evidence,
+              blockNumber: Number(evidence.blockNumber),
+              returnValues: {
+                _evidence: evidence.evidenceURI,
+                _evidenceGroupID: evidence.evidenceGroupID,
+                _arbitrator: request.arbitrator,
+                _party: evidence.submitter,
+                _registrationRequest: request.type === 'RegistrationRequested',
+              },
+            })),
+        }))
+
+      token.requests.forEach((request) => {
+        requestsInfo[request.evidenceGroupID] = {
+          evidences: request.evidences.reduce((acc, curr) => {
+            acc[curr.hash] = curr
+            return acc
+          }, {}),
+          ruling: request.ruling,
+          resolved: !!request.resolutionTime,
+          submissionTime: Number(request.submissionTime),
+          resolutionTime: Number(request.resolutionTime),
+          disputed: request.disputed,
+          blockNumber: Number(request.blockNumber),
+        }
+      })
+    } else {
+      const badgeContract = badgeContracts[badgeContractAddr]
+      const [requestSubmittedEvents] = await Promise.all([
+        badgeContract.getPastEvents('RequestSubmitted', {
+          filter: {
+            _address: itemID,
+          },
+          fromBlock: 0,
+          toBlock: 'latest',
+        }),
+      ])
+
+      for (const [i, event] of requestSubmittedEvents.entries()) {
+        const evidenceGroupID = web3Utils
+          .toBN(web3Utils.soliditySha3(itemID, i))
+          .toString(10)
+
+        requestsInfo[evidenceGroupID] = requestsInfo[evidenceGroupID] || {}
+        requestsInfo[evidenceGroupID].requestSubmittedEvent = event
       }
+      for (const [i, request] of requests.entries()) {
+        request.evidenceGroupID = web3Utils
+          .toBN(web3Utils.soliditySha3(itemID, i))
+          .toString(10)
 
-    for (const [i, event] of requestSubmittedEvents[itemID].entries()) {
-      const evidenceGroupID = web3Utils
-        .toBN(web3Utils.soliditySha3(itemID, i))
-        .toString(10)
+        const [evidenceEvents] = await Promise.all([
+          badgeContract.getPastEvents('Evidence', {
+            filter: {
+              _evidenceGroupID: request.evidenceGroupID,
+            },
+            fromBlock: 0,
+            toBlock: 'latest',
+          }),
+        ])
 
-      requestsInfo[evidenceGroupID].requestSubmittedEvent = event
+        requestsInfo[request.evidenceGroupID] = {
+          ...requestsInfo[request.evidenceGroupID],
+          evidences: evidenceEvents
+            ? evidenceEvents.reduce((acc, curr) => {
+                acc[curr.transactionHash] = curr
+                return acc
+              }, {})
+            : {},
+          ruling: request.ruling,
+          resolved: request.resolved,
+          submissionTime: Number(request.submissionTime),
+          resolutionTime: Number(request.resolutionTime),
+          disputed: request.disputed,
+        }
+      }
     }
 
     const { archon } = this.context
@@ -120,8 +220,9 @@ class EvidenceSection extends Component {
                       .returnValues,
                   archon,
                   txHash,
-                  blockNumber:
-                    requestsInfo[evidenceGroupID].evidences[txHash].blockNumber,
+                  blockNumber: Number(
+                    requestsInfo[evidenceGroupID].evidences[txHash].blockNumber
+                  ),
                 })
             )
           )
@@ -133,42 +234,10 @@ class EvidenceSection extends Component {
       })
     )
 
-    // Listen for new evidence.
-    const eventSubscription = tcr.events.Evidence(async (err, e) => {
-      if (err) {
-        console.error(err)
-        return
-      }
-
-      const evidence = await getEvidenceInfo({
-        returnValues: e.returnValues,
-        archon,
-        txHash: e.transactionHash,
-        blockNumber: e.blockNumber,
-      })
-      const { requestsInfo } = this.state
-      const newRequestInfo = { ...requestsInfo }
-
-      if (!newRequestInfo[evidence._evidenceGroupID]) window.location.reload()
-
-      newRequestInfo[evidence._evidenceGroupID].evidences[
-        e.transactionHash
-      ] = evidence
-      this.setState({ requestsInfo: newRequestInfo })
-    })
-
     this.setState({
       requestsInfo,
-      eventSubscription,
       tcrData: badgeContractAddr ? tcrData[badgeContractAddr] : tcrData,
     })
-  }
-
-  componentWillUnmount() {
-    const { eventSubscription } = this.state
-    if (!eventSubscription) return
-
-    eventSubscription.unsubscribe()
   }
 
   render() {
@@ -199,8 +268,13 @@ class EvidenceSection extends Component {
       .map((key) => requestsInfo[key])
       .sort((a, b) => b.submissionTime - a.submissionTime)
 
-    const latestRequestEvent = history[0]
-    const { resolved } = latestRequestEvent
+    const latestRequestInfo = history[0]
+
+    if (!latestRequest) return null
+
+    const { resolved } = latestRequestInfo
+
+    const isTokenEvidence = !badgeContractAddr
 
     return (
       <div className="Evidence">
@@ -225,11 +299,13 @@ class EvidenceSection extends Component {
               idKey="firstRequest"
               requester={requester}
               challenger={challenger}
-              requestInfo={latestRequestEvent}
+              requestInfo={latestRequestInfo}
               requestNumber={history.length > 1 ? history.length : 1}
               itemID={itemID}
               tcrData={tcrData}
               arbitratorView={arbitratorView}
+              isTokenEvidence={isTokenEvidence}
+              evidences={latestRequestInfo.evidences}
             />
             <h3>Previous Requests</h3>
             {history
@@ -245,6 +321,8 @@ class EvidenceSection extends Component {
                   requestNumber={history.length - i - 1}
                   tcrData={tcrData}
                   arbitratorView={arbitratorView}
+                  isTokenEvidence={isTokenEvidence}
+                  evidences={requestInfo.evidences}
                 />
               ))}
           </div>

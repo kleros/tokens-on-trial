@@ -3,7 +3,6 @@ import JSZip from 'jszip'
 import { call, select, takeLatest } from 'redux-saga/effects'
 import { lessduxSaga } from '../utils/saga'
 import { sanitize } from '../utils/ui'
-import { fetchEvents } from './utils'
 import * as arbitrableTokenListActions from '../actions/arbitrable-token-list'
 import * as tcrConstants from '../constants/tcr'
 import * as walletSelectors from '../reducers/wallet'
@@ -26,99 +25,27 @@ export function* fetchArbitrableTokenListData() {
     arbitratorView,
     arbitrableTCRView,
     T2CR_BLOCK,
-    viewWeb3,
+    T2CR_SUBGRAPH_URL,
   } = yield call(instantiateEnvObjects)
 
-  // Initial cache object.
-  // This gets overwritten if there is cached data available.
-  const eventsData = {
-    metaEvidenceEvents: {
-      blockNumber: Number(T2CR_BLOCK),
-      events: [],
-    },
-    evidenceEvents: {
-      blockNumber: Number(T2CR_BLOCK),
-    },
-    requestSubmittedEvents: {
-      blockNumber: Number(T2CR_BLOCK),
-    },
-    disputeEvents: {
-      blockNumber: Number(T2CR_BLOCK),
-    },
-    allEvents: {},
-  }
-
-  eventsData.allEvents.events = (yield call(
-    fetchEvents,
-    'allEvents',
-    arbitrableTokenListView,
-    T2CR_BLOCK,
-    viewWeb3
-  )).sort((a, b) => a.blockNumber - b.blockNumber)
-  eventsData.metaEvidenceEvents.events = eventsData.allEvents.events.filter(
-    (e) => e.event === 'MetaEvidence'
-  )
-
   // Fetch tcr information from the latest meta evidence event
-  const metaEvidencePath = `${IPFS_URL}${
-    eventsData.metaEvidenceEvents.events[
-      eventsData.metaEvidenceEvents.events.length - 1
-    ].returnValues._evidence
-  }`
+  const { data } = yield (yield call(fetch, T2CR_SUBGRAPH_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      query: `
+          {
+            registries(first: 5) {
+              registrationMetaEvidenceURI
+            }
+          }
+        `,
+    }),
+  })).json()
+  const registry = data.registries[0]
+
+  const metaEvidencePath = `${IPFS_URL}${registry.registrationMetaEvidenceURI}`
   const metaEvidence = yield (yield call(fetch, metaEvidencePath)).json()
   const { fileURI } = metaEvidence
-
-  eventsData.evidenceEvents = eventsData.allEvents.events
-    .filter((e) => e.event === 'Evidence')
-    .reduce((acc, curr) => {
-      const {
-        returnValues: { _evidenceGroupID },
-      } = curr
-
-      if (curr.blockNumber > eventsData.evidenceEvents.blockNumber)
-        eventsData.evidenceEvents.blockNumber = curr.blockNumber + 1
-
-      acc[_evidenceGroupID] = acc[_evidenceGroupID] ? acc[_evidenceGroupID] : []
-      acc[_evidenceGroupID].push({
-        returnValues: curr.returnValues,
-        transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber,
-      })
-      return acc
-    }, eventsData.evidenceEvents)
-
-  eventsData.requestSubmittedEvents = eventsData.allEvents.events
-    .filter((e) => e.event === 'RequestSubmitted')
-    .reduce((acc, curr) => {
-      if (curr.blockNumber > eventsData.requestSubmittedEvents.blockNumber)
-        eventsData.requestSubmittedEvents.blockNumber = curr.blockNumber + 1
-
-      if (!acc[curr.returnValues._tokenID]) acc[curr.returnValues._tokenID] = []
-      acc[curr.returnValues._tokenID].push({
-        returnValues: curr.returnValues,
-        transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber,
-      })
-      return acc
-    }, eventsData.requestSubmittedEvents)
-
-  eventsData.disputeEvents = eventsData.allEvents.events
-    .filter((e) => e.event === 'Dispute')
-    .reduce((acc, curr) => {
-      const {
-        returnValues: { _evidenceGroupID },
-      } = curr
-
-      if (curr.blockNumber > eventsData.disputeEvents.blockNumber)
-        eventsData.disputeEvents.blockNumber = curr.blockNumber + 1
-
-      acc[_evidenceGroupID] = {
-        returnValues: curr.returnValues,
-        transactionHash: curr.transactionHash,
-        blockNumber: curr.blockNumber,
-      }
-      return acc
-    }, eventsData.disputeEvents)
 
   const d = yield call(
     arbitrableTCRView.methods.fetchArbitrable(
@@ -132,9 +59,6 @@ export function* fetchArbitrableTokenListData() {
   return {
     blockNumber: T2CR_BLOCK,
     fileURI,
-    evidenceEvents: eventsData.evidenceEvents,
-    requestSubmittedEvents: eventsData.requestSubmittedEvents,
-    disputeEvents: eventsData.disputeEvents,
     arbitrator: d.arbitrator,
     governor: d.governor,
     arbitratorExtraData: d.arbitratorExtraData,

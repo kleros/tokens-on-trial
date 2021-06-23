@@ -44,77 +44,82 @@ const RequestEvidences = ({
   tcrData,
   arbitratorData,
   arbitratorView,
+  isTokenEvidence,
+  evidences,
 }) => {
   const [showHistory, toggleShowHistory] = useState(false)
-  const [timelineItems, setTimelineItems] = useState({})
+  const [timelineItems, setTimelineItems] = useState(evidences || {})
 
   useEffect(() => {
     const fetchArbitratorData = async () => {
-      if (Object.keys(requestInfo.evidences).length > 0) {
-        const evidenceGroupID =
-          requestInfo.evidences[Object.keys(requestInfo.evidences)[0]]
-            ._evidenceGroupID
+      if (isTokenEvidence) return
+      if (Object.keys(requestInfo.evidences).length === 0) return
 
-        // If a dispute is raised, fetch events.
-        if (tcrData.disputeEvents[evidenceGroupID]) {
-          const { _disputeID: disputeID } = tcrData.disputeEvents[
-            evidenceGroupID
-          ].returnValues
-          requestInfo.evidences[
-            tcrData.disputeEvents[evidenceGroupID].txHash
-          ] = {
-            ...tcrData.disputeEvents[evidenceGroupID],
-            message: `Dispute Created`,
-            arbitratorEvent: true,
-            disputeID,
-          }
+      const evidenceGroupID =
+        requestInfo.evidences[Object.keys(requestInfo.evidences)[0]]
+          ._evidenceGroupID
 
-          // Fetch rulings by the arbitrator.
-          if (arbitratorData.appealDecisionEvents.events[disputeID]) {
-            const winningChoices = await Promise.all(
-              Object.keys(
-                arbitratorData.appealDecisionEvents.events[disputeID]
-              ).map(async (txHash, i) => ({
-                blockNumber:
-                  arbitratorData.appealDecisionEvents.events[disputeID][txHash]
-                    .blockNumber,
-                txHash,
-                arbitratorEvent: true,
-                message: (
-                  await arbitratorView.methods
-                    .getVoteCounter(disputeID, i)
-                    .call()
-                ).winningChoice,
-              }))
-            )
+      // If a dispute is raised, fetch events.
+      if (tcrData.disputeEvents[evidenceGroupID]) {
+        const { _disputeID: disputeID } = tcrData.disputeEvents[
+          evidenceGroupID
+        ].returnValues
+        requestInfo.evidences[tcrData.disputeEvents[evidenceGroupID].txHash] = {
+          ...tcrData.disputeEvents[evidenceGroupID],
+          message: `Dispute Created`,
+          arbitratorEvent: true,
+          disputeID,
+        }
 
-            for (const winningChoice of winningChoices.map((winningChoice) => ({
-              ...winningChoice,
-              message: rulingMessage(
-                Number(winningChoice.message) !==
-                  tcrConstants.RULING_OPTIONS.None,
-                false,
-                false,
-                winningChoice.message.toString()
+        // Fetch rulings by the arbitrator.
+        if (arbitratorData.appealDecisionEvents.events[disputeID]) {
+          const winningChoices = await Promise.all(
+            Object.keys(
+              arbitratorData.appealDecisionEvents.events[disputeID]
+            ).map(async (txHash, i) => ({
+              blockNumber: Number(
+                arbitratorData.appealDecisionEvents.events[disputeID][txHash]
+                  .blockNumber
               ),
-            })))
-              requestInfo.evidences[winningChoice.txHash] = winningChoice
-          }
+              txHash,
+              arbitratorEvent: true,
+              message: (
+                await arbitratorView.methods.getVoteCounter(disputeID, i).call()
+              ).winningChoice,
+            }))
+          )
+
+          for (const winningChoice of winningChoices.map((winningChoice) => ({
+            ...winningChoice,
+            message: rulingMessage(
+              Number(winningChoice.message) !==
+                tcrConstants.RULING_OPTIONS.None,
+              false,
+              false,
+              winningChoice.message.toString()
+            ),
+          })))
+            requestInfo.evidences[winningChoice.txHash] = winningChoice
         }
       }
+
       setTimelineItems(requestInfo.evidences)
     }
     fetchArbitratorData()
-  }, [arbitratorData, arbitratorView, requestInfo, tcrData])
+  }, [arbitratorData, arbitratorView, requestInfo, tcrData, isTokenEvidence])
 
-  if (!requestInfo || !requestInfo.requestSubmittedEvent || !tcrData)
+  if (
+    !requestInfo ||
+    (!requestInfo.requestSubmittedEvent && !isTokenEvidence) ||
+    !tcrData
+  )
     return null
 
-  const {
-    requestSubmittedEvent: {
-      returnValues: { _registrationRequest },
-    },
-  } = requestInfo
+  let isRegistrationRequest = true
+  if (isTokenEvidence) isRegistrationRequest = requestInfo
+  else
+    isRegistrationRequest =
+      requestInfo.requestSubmittedEvent.returnValues._registrationRequest
 
   // Detect if request is related to a token or a badge.
   const isToken = itemID.length === 66
@@ -126,7 +131,7 @@ const RequestEvidences = ({
       style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}
     >
       <h4 className="RequestEvidence-title">
-        {_registrationRequest
+        {isRegistrationRequest
           ? isToken
             ? 'Token Submission'
             : 'Badge Addition'
@@ -148,7 +153,7 @@ const RequestEvidences = ({
         )}
         {Object.keys(timelineItems)
           .map((txHash) => timelineItems[txHash])
-          .sort((a, b) => a.blockNumber - b.blockNumber)
+          .sort((a, b) => Number(a.blockNumber) - Number(b.blockNumber))
           .filter((_, i) => showHistory || i <= 2)
           .map((evidence, j) => (
             <React.Fragment key={`${idKey}${j}`}>
@@ -248,7 +253,7 @@ const RequestEvidences = ({
               {getResultMessage({
                 ruling: requestInfo.ruling,
                 disputed: requestInfo.disputed,
-                registrationRequest: _registrationRequest,
+                registrationRequest: isRegistrationRequest,
                 isToken,
               })}
             </h4>
