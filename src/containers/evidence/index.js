@@ -148,8 +148,8 @@ class EvidenceSection extends Component {
           }, {}),
           ruling: request.ruling,
           resolved: !!request.resolutionTime,
-          submissionTime: Number(request.submissionTime),
-          resolutionTime: Number(request.resolutionTime),
+          submissionTime: Number(request.submissionTime) * 1000,
+          resolutionTime: Number(request.resolutionTime) * 1000,
           disputed: request.disputed,
           blockNumber: Number(request.blockNumber),
         }
