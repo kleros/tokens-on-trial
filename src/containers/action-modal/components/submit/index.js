@@ -61,11 +61,14 @@ const Submit = ({
           requesterBaseDeposit,
           sharedStakeMultiplier,
         } = registry
+        const { fileURI } = await (
+          await fetch(`${IPFS_URL}${registrationMetaEvidenceURI}`)
+        ).json()
 
         const { MULTIPLIER_DIVISOR, arbitrationCost } = arbitrableData
 
         setState({
-          fileURI: registrationMetaEvidenceURI,
+          fileURI,
           requesterBaseDeposit,
           arbitrationCost,
           sharedStakeMultiplier,
