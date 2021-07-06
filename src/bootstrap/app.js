@@ -103,29 +103,6 @@ class _ConnectedNavBar extends Component {
 
     const submenus = [
       {
-        title: 'Guides',
-        key: 'Guides',
-        extraStyle: 'NavBar-route-title',
-        routes: [
-          {
-            title: 'T²CR Guide',
-            to: 'https://blog.kleros.io/kleros-ethfinex-tcr-an-explainer/',
-            extraStyle: 'NavBar-route-title',
-          },
-          {
-            title: 'Ethfinex Badge',
-            to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
-            extraStyle: 'NavBar-route-title',
-          },
-          {
-            title: 'Appeal Fees Crowdfunding',
-            to:
-              'https://blog.kleros.io/kleros-decentralized-token-listing-appeal-fees/',
-            extraStyle: 'NavBar-route-title',
-          },
-        ],
-      },
-      {
         title: badgeContracts ? (
           'Criteria'
         ) : (
@@ -140,38 +117,6 @@ class _ConnectedNavBar extends Component {
               extraStyle: 'NavBar-route-title',
             }))
           : [],
-      },
-      {
-        title: 'Integrations',
-        key: 'Integrations',
-        extraStyle: 'NavBar-route-title',
-        routes: [
-          {
-            title: 'uniswap.exchange',
-            to: 'https://uniswap.exchange/',
-            extraStyle: 'NavBar-route-title',
-          },
-          {
-            title: 'revoke.cash',
-            to: 'https://revoke.cash/',
-            extraStyle: 'NavBar-route-title',
-          },
-          {
-            title: 'Fairdex/Slow.Trade',
-            to: 'https://fairdex.net/',
-            extraStyle: 'NavBar-route-title',
-          },
-          {
-            title: 'Escrow',
-            to: 'https://escrow.kleros.io/',
-            extraStyle: 'NavBar-route-title',
-          },
-          {
-            title: 'Ethfinex(Diversifi)',
-            to: 'https://blog.kleros.io/the-ethfinex-listing-guide/',
-            extraStyle: 'NavBar-route-title',
-          },
-        ],
       },
     ]
 
@@ -212,6 +157,20 @@ class _ConnectedNavBar extends Component {
             title: 'Badges',
             to: '/badges',
             extraStyle: 'NavBar-route-title',
+          },
+          {
+            title: 'Integrations',
+            to:
+              'https://kleros.gitbook.io/docs/integrations/live-and-upcoming-integrations',
+            extraStyle: 'NavBar-route-title',
+            isExternal: true,
+          },
+          {
+            title: 'Tutorial',
+            to:
+              'https://kleros.gitbook.io/docs/products/tokens/kleros-t2cr-tutorial',
+            extraStyle: 'NavBar-route-title',
+            isExternal: true,
           },
         ]}
         submenus={submenus}
