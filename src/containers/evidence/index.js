@@ -147,7 +147,7 @@ class EvidenceSection extends Component {
             return acc
           }, {}),
           ruling: request.ruling,
-          resolved: !!request.resolutionTime,
+          resolved: Number(request.resolutionTime) > 0,
           submissionTime: Number(request.submissionTime) * 1000,
           resolutionTime: Number(request.resolutionTime) * 1000,
           disputed: request.disputed,
@@ -273,7 +273,6 @@ class EvidenceSection extends Component {
     if (!latestRequest) return null
 
     const { resolved } = latestRequestInfo
-
     const isTokenEvidence = !badgeContractAddr
 
     return (
