@@ -114,12 +114,14 @@ const TokenDetailsCard = ({
               </a>
             </div>
           </div>
-          {appealable &&
-          (!decisiveRuling || !loserTimedOut) &&
-          remainingTime > 0 ? (
+          {(appealable &&
+            (!decisiveRuling || !loserTimedOut) &&
+            remainingTime > 0) ||
+          loserTimedOut ? (
             <CrowdfundingMsg
               decisiveRuling={decisiveRuling}
               payableValue={payableValue}
+              loserTimedOut={loserTimedOut}
               type="Token"
             />
           ) : (

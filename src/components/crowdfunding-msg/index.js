@@ -3,7 +3,39 @@ import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import PropTypes from 'prop-types'
 import './crowdfunding-msg.css'
 
-const CrowdfundingMsg = ({ decisiveRuling, type, payableValue }) => {
+const CrowdfundingMsg = ({
+  decisiveRuling,
+  type,
+  payableValue,
+  loserTimedOut,
+}) => {
+  if (loserTimedOut)
+    return (
+      <div className={`${type}CrowdfundingCard-info`}>
+        <FontAwesomeIcon
+          color="#4d00b4"
+          icon="exclamation-triangle"
+          style={{
+            width: '30px',
+            height: '30px',
+            margin: '15px',
+            marginTop: 0,
+          }}
+        />
+        <p
+          style={{
+            color: '#4d00b4',
+            fontSize: '14px',
+            lineHeight: '16px',
+            textAlign: 'center',
+          }}
+        >
+          The party that lost the current round was not fully funded before the
+          end of the loser appeal deadline (half of the winner).
+        </p>
+      </div>
+    )
+
   if (!payableValue)
     return (
       <div className={`${type}CrowdfundingCard-info`}>
@@ -90,6 +122,11 @@ CrowdfundingMsg.propTypes = {
   decisiveRuling: PropTypes.bool.isRequired,
   type: PropTypes.string.isRequired,
   payableValue: PropTypes.bool.isRequired,
+  loserTimedOut: PropTypes.bool,
+}
+
+CrowdfundingMsg.defaultProps = {
+  loserTimedOut: null,
 }
 
 export default CrowdfundingMsg

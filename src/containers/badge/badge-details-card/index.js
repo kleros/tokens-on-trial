@@ -108,6 +108,7 @@ const BadgeDetailsCard = ({
             <CrowdfundingMsg
               decisiveRuling={decisiveRuling}
               payableValue={payableValue}
+              loserTimedOut={loserTimedOut}
               type="Badge"
             />
           )}
