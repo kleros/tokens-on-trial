@@ -1,5 +1,7 @@
 <p align="center">
   <b style="font-size: 32px;">Tokens² Curated List</b>
+  </br>
+  <b>DEPRECATED: MIGRATED TO A VANILLA CURATE LIST</b>
 </p>
 
 <p align="center">
